@@ -288,14 +288,30 @@ table.tbl{width:100%;border-collapse:collapse}
 .activity-date{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--ink-3);flex:0 0 auto}
 
 /* ---------- inline edit engine ---------- */
-.ef{display:inline}
-.ef-display{cursor:pointer;border-bottom:1px dashed var(--line-2);transition:border-color .12s var(--ease),color .12s var(--ease)}
-.ef-display:hover{border-color:var(--brand);color:var(--brand-ink)}
+/* At rest: no persistent marker. On hover: cell fill + a right-edge edit glyph.
+   Click anywhere in the cell to edit. One pattern, everywhere. */
+.ef{position:relative;display:block;cursor:pointer;border-radius:var(--r-s);
+  padding:var(--s1) var(--s5) var(--s1) var(--s2);margin:calc(-1 * var(--s1)) calc(-1 * var(--s2));
+  transition:background .12s var(--ease)}
+.ef:hover{background:var(--hover)}
+.ef::after{content:'\270E';position:absolute;right:var(--s2);top:50%;transform:translateY(-50%);
+  font-size:11px;color:var(--ink-3);opacity:0;transition:opacity .12s var(--ease)}
+.ef:hover::after{opacity:1}
+.ef.editing{cursor:default;background:transparent;padding:0;margin:0}
+.ef.editing::after{content:none}
 .ef-editing{display:inline-flex;align-items:center;gap:var(--s2);flex-wrap:wrap}
 .ef-input{height:var(--h);padding:0 var(--s3);border:1px solid var(--line-2);border-radius:var(--r-s);
   background:var(--paper);color:var(--ink);font-size:12.5px;min-width:140px}
 .ef-checks{display:flex;flex-wrap:wrap;gap:var(--s3);align-items:center;min-height:var(--h)}
-.ef-check{display:flex;align-items:center;gap:var(--s1);font-size:12px;color:var(--ink-2)}
+.ef-check{display:inline-flex;align-items:center;gap:var(--s1);font-size:12px;color:var(--ink-2);cursor:pointer}
+.ef-check-input{position:absolute;opacity:0;width:1px;height:1px;overflow:hidden}
+.ef-check-box{width:var(--s4);height:var(--s4);flex:0 0 var(--s4);border:1px solid var(--line-2);border-radius:var(--r-s);
+  background:var(--paper);display:inline-flex;align-items:center;justify-content:center;
+  transition:background .12s var(--ease),border-color .12s var(--ease)}
+.ef-check-input:checked + .ef-check-box{background:var(--brand);border-color:var(--brand)}
+.ef-check-box::after{content:'';width:4px;height:7px;border:solid var(--paper);border-width:0 2px 2px 0;
+  transform:rotate(45deg) translate(-1px,-1px);opacity:0}
+.ef-check-input:checked + .ef-check-box::after{opacity:1}
 .ef-actions{display:inline-flex;gap:var(--s1)}
 .ef-btn{height:var(--h);width:var(--h);flex:0 0 var(--h);display:inline-flex;align-items:center;justify-content:center;
   border-radius:var(--r-s);border:1px solid var(--line-2);background:var(--paper);color:var(--ink-2);font-size:13px}
@@ -44264,6 +44280,13 @@ const CORE_DEFS = [
   cdef('useOfProceeds','Use of Proceeds','select', USE_OF_PROCEEDS),
 ];
 
+/* Product Type is editable only pre-commit (the intake review draft) — changing it on a live
+   record would invalidate stage history/audit assumptions, out of scope here. Kept out of
+   DEF_INDEX so nothing else picks it up; resolved explicitly by findDef() below. */
+const REVIEW_PRODUCT_TYPE_DEF = cdef('productType','Product Type','select',['Factoring','ABL','TermLoan'],{
+  set:(o,v)=>{ if(o.productType!==v){ o.productType=v; o.productFields=randomProductFields(v,o.facilitySize); } }
+});
+
 const PDEF = {
   advanceRatePct: pdef('advanceRatePct','Advance Rate','percent'),
   recourse: pdef('recourse','Recourse','select',['Recourse','Non-recourse']),
@@ -44316,7 +44339,11 @@ function controlHtml(def, elId, value){
   if(def.type==='multiselect'){
     const sel = new Set(value||[]);
     return '<div class="ef-checks" id="'+elId+'">'+(def.options||[]).map(o=>
-      '<label class="ef-check"><input type="checkbox" value="'+esc(o.value)+'"'+(sel.has(o.value)?' checked':'')+'> '+esc(o.label)+'</label>'
+      '<label class="ef-check">'+
+        '<input type="checkbox" class="ef-check-input" value="'+esc(o.value)+'"'+(sel.has(o.value)?' checked':'')+'>'+
+        '<span class="ef-check-box"></span>'+
+        '<span>'+esc(o.label)+'</span>'+
+      '</label>'
     ).join('')+'</div>';
   }
   if(def.type==='date') return '<input type="date" id="'+elId+'" class="ef-input" value="'+esc(value||'')+'">';
@@ -44343,14 +44370,15 @@ let EF_RERENDER = null;
 function registerRecord(recId, obj){ EF_STORE[recId]={obj}; return recId; }
 function efSpan(recId, def){
   const obj = EF_STORE[recId].obj;
-  return '<span class="ef" data-rec="'+esc(recId)+'" data-key="'+esc(def.key)+'">'+
-    '<span class="ef-display" title="Click to edit">'+displayValue(def, def.get(obj))+'</span></span>';
+  return '<span class="ef" data-rec="'+esc(recId)+'" data-key="'+esc(def.key)+'" title="Click to edit">'+
+    displayValue(def, def.get(obj))+'</span>';
 }
 function findDef(recId, key){
   if(key==='core.closedLostReason'){
     const obj = EF_STORE[recId].obj;
     return closedLostReasonDef(obj.lostAtStage);
   }
+  if(key==='core.productType') return REVIEW_PRODUCT_TYPE_DEF;
   return DEF_INDEX[key];
 }
 function activateEdit(span){
@@ -44399,8 +44427,8 @@ function commitEdit(recId, def, elId){
 }
 function cancelEdit(){ if(EF_RERENDER) EF_RERENDER(); }
 document.addEventListener('click', function(e){
-  const display = e.target.closest('.ef-display');
-  if(display){ activateEdit(display.closest('.ef')); }
+  const cell = e.target.closest('.ef');
+  if(cell && !cell.classList.contains('editing')){ activateEdit(cell); }
 });
 
 /* ---------- derived analytics (computed, never hardcoded) ---------- */
@@ -45340,27 +45368,21 @@ function drawIntake(){
 
   if(INTAKE_STATE==='review'){
     const ctx = INTAKE_CTX;
-    const acct = ctx.account, product = ctx.productType;
-    if(!INTAKE_DRAFT) INTAKE_DRAFT = draftOpportunity(acct, product);
+    const acct = ctx.account;
+    if(!INTAKE_DRAFT) INTAKE_DRAFT = draftOpportunity(acct, ctx.productType);
     const recId = registerRecord('intake_draft', INTAKE_DRAFT);
     EF_RERENDER = ()=>drawIntake();
-
-    const liens = LIENS_BY_ACCT[acct.id] || [];
-    const edges = EDGES_BY_ACCT[acct.id] || [];
-    const wonEdges = edges.filter(e=>{
-      const other = e.fromAccountId===acct.id ? e.toAccountId : e.fromAccountId;
-      return CLOSED_WON_ACCT_IDS.has(other);
-    });
+    const product = INTAKE_DRAFT.productType; // live — may have been overridden below
 
     const coreRows = [
-      ['Opportunity Name','core.name'], ['Facility Size','core.facilitySize'], ['Owner','core.bdoId'],
+      ['Opportunity Name','core.name'], ['Product Type','core.productType'],
+      ['Facility Size','core.facilitySize'], ['Owner','core.bdoId'],
       ['Expected Close','core.expectedCloseDate'], ['Channel','core.channel'],
       ['Industry','core.industryCode'], ['Use of Proceeds','core.useOfProceeds'],
     ];
     const coreKvHtml = '<dl class="kv">'+
       '<div><dt>Account</dt><dd>'+esc(acct.name)+'</dd></div>'+
-      '<div><dt>Product Type</dt><dd>'+product+'</dd></div>'+
-      coreRows.map(r=>'<div><dt>'+r[0]+'</dt><dd>'+efSpan(recId,DEF_INDEX[r[1]])+'</dd></div>').join('')+
+      coreRows.map(r=>'<div><dt>'+r[0]+'</dt><dd>'+efSpan(recId,findDef(recId,r[1]))+'</dd></div>').join('')+
       '<div><dt>Stage</dt><dd>Qualification</dd></div>'+
       '</dl>';
 
@@ -45379,16 +45401,6 @@ function drawIntake(){
       '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
         '<div class="panel-title">'+product+' terms</div><div class="panel-scope">Product-conditional fields — this is what changes by product type</div>'+
       '</div></div><div class="panel-body">'+productFieldsHtml(recId)+'</div></div>'+
-      '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
-        '<div class="panel-title">Signals detected during extraction</div><div class="panel-scope">Auto-enriched from existing CRM data</div>'+
-      '</div></div><div class="panel-body">'+
-        '<div class="feedrow static">'+
-          '<div class="feed-icon brand">⇄</div><div class="feed-main"><div class="feed-title">'+edges.length+' network relationship'+(edges.length===1?'':'s')+' found</div>'+
-          '<div class="feed-sub">'+wonEdges.length+' connect'+(wonEdges.length===1?'s':'')+' to a Closed-Won account</div></div></div>'+
-        '<div class="feedrow static">'+
-          '<div class="feed-icon '+(liens.length?'neg':'')+'">⚖</div><div class="feed-main"><div class="feed-title">'+liens.length+' lien filing'+(liens.length===1?'':'s')+' on record</div>'+
-          '<div class="feed-sub">'+(liens.some(l=>l.subordinated)?'Includes a subordinated position':'No subordination detected')+'</div></div></div>'+
-      '</div></div>'+
       '<div class="actions-end">'+
         '<button class="btn" onclick="startOverIntake()">Start over</button>'+
         '<button class="btn primary" onclick="completeIntake()">Create Opportunity</button>'+
