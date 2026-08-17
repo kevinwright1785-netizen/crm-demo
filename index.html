@@ -287,6 +287,50 @@ table.tbl{width:100%;border-collapse:collapse}
 .activity-subject{font-size:12px;color:var(--ink)}
 .activity-date{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--ink-3);flex:0 0 auto}
 
+/* ---------- inline edit engine ---------- */
+.ef{display:inline}
+.ef-display{cursor:pointer;border-bottom:1px dashed var(--line-2);transition:border-color .12s var(--ease),color .12s var(--ease)}
+.ef-display:hover{border-color:var(--brand);color:var(--brand-ink)}
+.ef-editing{display:inline-flex;align-items:center;gap:var(--s2);flex-wrap:wrap}
+.ef-input{height:var(--h);padding:0 var(--s3);border:1px solid var(--line-2);border-radius:var(--r-s);
+  background:var(--paper);color:var(--ink);font-size:12.5px;min-width:140px}
+.ef-checks{display:flex;flex-wrap:wrap;gap:var(--s3);align-items:center;min-height:var(--h)}
+.ef-check{display:flex;align-items:center;gap:var(--s1);font-size:12px;color:var(--ink-2)}
+.ef-actions{display:inline-flex;gap:var(--s1)}
+.ef-btn{height:var(--h);width:var(--h);flex:0 0 var(--h);display:inline-flex;align-items:center;justify-content:center;
+  border-radius:var(--r-s);border:1px solid var(--line-2);background:var(--paper);color:var(--ink-2);font-size:13px}
+.ef-btn:hover{border-color:var(--ink-3);color:var(--ink)}
+.ef-btn.save{background:var(--brand);border-color:var(--brand);color:var(--paper)}
+.ef-btn.save:hover{background:var(--brand-2);border-color:var(--brand-2)}
+.ef-hero{display:inline-flex;align-items:center;gap:var(--s3);flex-wrap:wrap}
+
+/* ---------- + New menu ---------- */
+.newmenu-wrap{position:relative}
+.newmenu{position:absolute;top:calc(100% + var(--s2));right:0;background:var(--paper);border:1px solid var(--line);
+  border-radius:var(--r-m);box-shadow:var(--lift-hi);min-width:260px;padding:var(--s2);z-index:20}
+.newmenu-item{padding:var(--s3);border-radius:var(--r-s);cursor:pointer}
+.newmenu-item:hover{background:var(--hover)}
+.newmenu-item-title{font-size:12.5px;font-weight:500;color:var(--ink)}
+.newmenu-item-sub{font-size:11px;color:var(--ink-3);margin-top:var(--s1)}
+
+/* ---------- forms (manual create) ---------- */
+.form-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:var(--s4) var(--s5)}
+.form-field label{display:block;font-size:11px;font-weight:500;color:var(--ink-3);margin-bottom:var(--s1)}
+.form-field input,.form-field select{width:100%;height:var(--h);padding:0 var(--s3);
+  border:1px solid var(--line-2);border-radius:var(--r-s);background:var(--paper);color:var(--ink);font-size:12.5px}
+.form-section-label{font-size:11px;font-weight:500;color:var(--ink-3);margin:var(--s5) 0 var(--s3)}
+.form-section-label:first-child{margin-top:0}
+
+/* ---------- scenario picker ---------- */
+.scenario-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s4)}
+@media (max-width:900px){.scenario-grid{grid-template-columns:1fr}}
+.scenario-card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-l);padding:var(--s4);
+  cursor:pointer;transition:border-color .12s var(--ease)}
+.scenario-card:hover{border-color:var(--brand)}
+.scenario-product{font-size:11px;font-weight:500;color:var(--brand-ink)}
+.scenario-acct{font-family:var(--display);font-size:15px;color:var(--ink);margin-top:var(--s1)}
+.scenario-meta{font-size:11px;color:var(--ink-3);margin-top:var(--s2)}
+
 @media (max-width:900px){
   .rail{display:none}
   .strip-4{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -339,13 +383,30 @@ table.tbl{width:100%;border-collapse:collapse}
         <button id="role-bdo" class="active" onclick="setRole('bdo')">BDO</button>
         <button id="role-exec" onclick="setRole('exec')">Exec</button>
       </div>
-      <button class="btn primary" onclick="location.hash='#/intake'">+ New</button>
+      <div class="newmenu-wrap">
+        <button class="btn primary" id="newmenu-btn" onclick="toggleNewMenu(event)">+ New</button>
+        <div class="newmenu" id="newmenu" style="display:none">
+          <div class="newmenu-item" onclick="closeNewMenu();location.hash='#/create'">
+            <div class="newmenu-item-title">Manual entry</div>
+            <div class="newmenu-item-sub">Blank form — create an Account + Opportunity yourself</div>
+          </div>
+          <div class="newmenu-item" onclick="closeNewMenu();location.hash='#/intake'">
+            <div class="newmenu-item-title">Drop documents</div>
+            <div class="newmenu-item-sub">Extraction reads borrower docs and builds the deal for you</div>
+          </div>
+          <div class="newmenu-item" onclick="closeNewMenu();location.hash='#/intake/simulated'">
+            <div class="newmenu-item-title">Simulated demo</div>
+            <div class="newmenu-item-sub">Pick a scripted product scenario to show the flow — demo-only, not a shipping path</div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="viewport">
       <div class="view" id="view-home"></div>
       <div class="view" id="view-pipeline"></div>
       <div class="view" id="view-opp"></div>
+      <div class="view" id="view-create"></div>
       <div class="view" id="view-intake"></div>
       <div class="view" id="view-accounts"></div>
       <div class="view" id="view-network"></div>
@@ -44122,6 +44183,226 @@ function moneyPlain(n){ return '$'+Math.round(n).toLocaleString('en-US'); }
 function pct(n,d){ d=d==null?0:d; return (n*100).toFixed(d)+'%'; }
 function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
+/* ================================================================
+   CONTROLLED VOCABULARIES — mirrors data/generate.js exactly so
+   edited/created records stay honest to the dataset's taxonomy
+   (the generator has no runtime presence, so the app carries its own copy).
+   ================================================================ */
+const CHANNELS = ['Partner-Referred','Outbound Prospecting','Inbound Inquiry','Repeat Borrower','Conference / Event'];
+const USE_OF_PROCEEDS = ['Working capital','Growth capital','Refinance existing debt','Acquisition financing',
+  'Equipment purchase','Recapitalization','Debt consolidation','Seasonal inventory build'];
+const INDUSTRIES = [
+  { code: '3231', name: 'Manufacturing — Metal Fabrication' },
+  { code: '3327', name: 'Manufacturing — Industrial Machinery' },
+  { code: '4238', name: 'Wholesale — Building Materials' },
+  { code: '4244', name: 'Wholesale — Food & Beverage Distribution' },
+  { code: '4841', name: 'Trucking & Transportation' },
+  { code: '5613', name: 'Staffing Services' },
+  { code: '2361', name: 'Construction — Commercial' },
+  { code: '3113', name: 'Food Processing' },
+  { code: '3159', name: 'Apparel & Textiles' },
+  { code: '3273', name: 'Building Products' },
+  { code: '1119', name: 'Agriculture & Ag Processing' },
+  { code: '6216', name: 'Healthcare Services' },
+  { code: '5613', name: 'Business Services' },
+  { code: '2131', name: 'Energy Services' },
+  { code: '3399', name: 'Consumer Products' },
+];
+const CITY_STATE = ['Charlotte, NC','New York, NY','Chicago, IL','Dallas, TX','Atlanta, GA','Los Angeles, CA',
+  'Denver, CO','Boston, MA','Houston, TX','Philadelphia, PA','Minneapolis, MN','Phoenix, AZ',
+  'Nashville, TN','Columbus, OH','Cincinnati, OH','Milwaukee, WI','Kansas City, MO','Indianapolis, IN',
+  'Memphis, TN','Salt Lake City, UT'];
+const CLOSED_LOST_REASONS = {
+  Qualification: ['Not a fit — product/segment mismatch', 'Unresponsive / went dark', 'Deal size below minimum'],
+  Analysis: ['Financials disqualified', 'Went with incumbent bank', 'Timing — not ready'],
+  Proposal: ['Lost to competitor on terms', 'Pricing — too expensive', 'Structure rejected'],
+  Underwriting: ['Declined in credit committee', 'Failed field exam / appraisal', 'Died in legal / documentation', 'Borrower withdrew'],
+};
+
+/* ================================================================
+   GENERIC EDITABLE-FIELD ENGINE
+   A field is a "def": {key, label, type, options, get(obj), set(obj,val), format(val)}.
+   efSpan(recId, def) renders a click-to-edit span wherever it's dropped — it has no idea
+   what panel or card it's sitting in. Saving calls def.set on the record object then
+   re-renders via whatever EF_RERENDER currently points at. This is what keeps editing
+   independent of the record-page layout, so round 2's restructure can move fields around
+   without touching this engine — it just needs to keep calling efSpan/registerRecord.
+   ================================================================ */
+function toOptions(arr){ return arr.map(x => (x && typeof x === 'object') ? x : {value:x, label:String(x)}); }
+
+function cdef(key,label,type,options,extra){
+  const base = {key:'core.'+key, label, type, options: options?toOptions(options):null,
+    get:o=>o[key], set:(o,v)=>{ o[key]=v; }};
+  return Object.assign(base, extra||{});
+}
+function pdef(key,label,type,options,extra){
+  const base = {key:'prod.'+key, label, type, options: options?toOptions(options):null,
+    get:o=>(o.productFields||{})[key],
+    set:(o,v)=>{ o.productFields=o.productFields||{}; o.productFields[key]=v; }};
+  return Object.assign(base, extra||{});
+}
+
+const CORE_DEFS = [
+  cdef('name','Opportunity Name','text'),
+  cdef('facilitySize','Facility Size','money',null,{format:v=>money(v,1)}),
+  cdef('bdoId','Owner','select', D.bdos.map(b=>({value:b.id,label:b.name}))),
+  cdef('expectedCloseDate','Expected Close','date',null,{set:(o,v)=>{o.expectedCloseDate=v||null;}}),
+  cdef('fundedDate','Funded Date','date',null,{set:(o,v)=>{o.fundedDate=v||null;}}),
+  cdef('referralPartnerId','Referral Partner','select',
+    [{value:'',label:'— None —'}].concat(D.partners.map(p=>({value:p.id,label:p.name}))),
+    {set:(o,v)=>{o.referralPartnerId=v||null;}}),
+  cdef('referralDate','Referral Date','date',null,{set:(o,v)=>{o.referralDate=v||null;}}),
+  cdef('channel','Channel','select', CHANNELS),
+  cdef('industryCode','Industry','select', INDUSTRIES.map(i=>({value:i.name,label:i.name})), {
+    get:o=>getAccount(o.accountId).industryName || null,
+    set:(o,v)=>{
+      const acct=getAccount(o.accountId);
+      const match=INDUSTRIES.find(i=>i.name===v);
+      if(acct) acct.industryName=v;
+      if(match){ if(acct) acct.industryCode=match.code; o.industryCode=match.code; }
+    }}),
+  cdef('useOfProceeds','Use of Proceeds','select', USE_OF_PROCEEDS),
+];
+
+const PDEF = {
+  advanceRatePct: pdef('advanceRatePct','Advance Rate','percent'),
+  recourse: pdef('recourse','Recourse','select',['Recourse','Non-recourse']),
+  notification: pdef('notification','Notification','select',['Notification','Non-notification']),
+  discountFeePct: pdef('discountFeePct','Discount Fee','percent'),
+  estMonthlyARVolume: pdef('estMonthlyARVolume','Est. Monthly AR Volume','money'),
+  debtorConcentrationPct: pdef('debtorConcentrationPct','Debtor Concentration','percent'),
+  arAdvanceRatePct: pdef('arAdvanceRatePct','AR Advance Rate','percent'),
+  inventoryAdvanceRatePct: pdef('inventoryAdvanceRatePct','Inventory Advance Rate','percent'),
+  collateralTypes: pdef('collateralTypes','Collateral Types','multiselect',['AR','Inventory','M&E','RE']),
+  rateSpreadBps: pdef('rateSpreadBps','Rate','number',null,{format:v=>v==null?'—':'SOFR + '+v+' bps'}),
+  fieldExamStatus: pdef('fieldExamStatus','Field Exam Status','select',['Not Started','Scheduled','In Progress','Complete']),
+  primaryCovenant: pdef('primaryCovenant','Primary Covenant','text'),
+  rateType: pdef('rateType','Rate Type','select',['Fixed','Floating']),
+  fixedRatePct: pdef('fixedRatePct','Fixed Rate','percent'),
+  termMonths: pdef('termMonths','Term','select',[24,36,48,60,72,84],{format:v=>v==null?'—':v+' months'}),
+  amortizationType: pdef('amortizationType','Amortization','select',['Straight-line','Interest-only w/ bullet','Custom']),
+  maturityDate: pdef('maturityDate','Maturity','date'),
+  seniority: pdef('seniority','Seniority','select',['Senior','Unitranche','Subordinated']),
+  securedStatus: pdef('securedStatus','Secured Status','select',['Secured','Unsecured']),
+  callProtection: pdef('callProtection','Call Protection','select',['None','Non-call 1yr','2yr soft call','1% Yr1 stepdown']),
+};
+
+const DEF_INDEX = {};
+CORE_DEFS.forEach(d=>DEF_INDEX[d.key]=d);
+Object.values(PDEF).forEach(d=>DEF_INDEX[d.key]=d);
+function closedLostReasonDef(lostAtStage){
+  return cdef('closedLostReason','Closed Lost Reason','select', CLOSED_LOST_REASONS[lostAtStage]||[]);
+}
+
+function displayValue(def, val, plain){
+  if(def.format && !plain) return def.format(val);
+  if(val==null || val==='') return '—';
+  if(def.type==='money') return moneyPlain(val);
+  if(def.type==='percent') return val+'%';
+  if(def.type==='date') return fmtDate(val);
+  if(def.type==='multiselect') return (val&&val.length) ? val.join(', ') : '—';
+  if(def.type==='select'){
+    const hit=(def.options||[]).find(o=>String(o.value)===String(val));
+    return hit ? esc(hit.label) : esc(String(val));
+  }
+  return esc(String(val));
+}
+function controlHtml(def, elId, value){
+  if(def.type==='select'){
+    return '<select id="'+elId+'" class="ef-input">'+(def.options||[]).map(o=>
+      '<option value="'+esc(o.value)+'"'+(String(o.value)===String(value)?' selected':'')+'>'+esc(o.label)+'</option>'
+    ).join('')+'</select>';
+  }
+  if(def.type==='multiselect'){
+    const sel = new Set(value||[]);
+    return '<div class="ef-checks" id="'+elId+'">'+(def.options||[]).map(o=>
+      '<label class="ef-check"><input type="checkbox" value="'+esc(o.value)+'"'+(sel.has(o.value)?' checked':'')+'> '+esc(o.label)+'</label>'
+    ).join('')+'</div>';
+  }
+  if(def.type==='date') return '<input type="date" id="'+elId+'" class="ef-input" value="'+esc(value||'')+'">';
+  if(def.type==='number'||def.type==='money'||def.type==='percent')
+    return '<input type="number" id="'+elId+'" class="ef-input" value="'+(value==null?'':value)+'" step="any">';
+  return '<input type="text" id="'+elId+'" class="ef-input" value="'+esc(value==null?'':value)+'">';
+}
+function controlValue(def, elId){
+  if(def.type==='multiselect')
+    return Array.from(document.querySelectorAll('#'+elId+' input:checked')).map(i=>i.value);
+  const el = document.getElementById(elId);
+  if(def.type==='select'){
+    const hit=(def.options||[]).find(o=>String(o.value)===el.value);
+    return hit ? hit.value : el.value;
+  }
+  if(def.type==='number'||def.type==='percent'){ const v=parseFloat(el.value); return isNaN(v)?null:v; }
+  if(def.type==='money'){ const v=parseFloat(el.value); return isNaN(v)?null:Math.round(v); }
+  return el.value;
+}
+
+const EF_STORE = {};
+let EF_SEQ = 0;
+let EF_RERENDER = null;
+function registerRecord(recId, obj){ EF_STORE[recId]={obj}; return recId; }
+function efSpan(recId, def){
+  const obj = EF_STORE[recId].obj;
+  return '<span class="ef" data-rec="'+esc(recId)+'" data-key="'+esc(def.key)+'">'+
+    '<span class="ef-display" title="Click to edit">'+displayValue(def, def.get(obj))+'</span></span>';
+}
+function findDef(recId, key){
+  if(key==='core.closedLostReason'){
+    const obj = EF_STORE[recId].obj;
+    return closedLostReasonDef(obj.lostAtStage);
+  }
+  return DEF_INDEX[key];
+}
+function activateEdit(span){
+  if(!span || span.classList.contains('editing')) return;
+  const recId = span.dataset.rec, key = span.dataset.key;
+  const def = findDef(recId, key);
+  if(!def) return;
+  const obj = EF_STORE[recId].obj;
+  const val = def.get(obj);
+  const elId = 'efc_'+(++EF_SEQ);
+  span.classList.add('editing');
+  span.innerHTML = '<span class="ef-editing">'+controlHtml(def, elId, val)+
+    '<span class="ef-actions">'+
+      '<button type="button" class="ef-btn save" title="Save">&#10003;</button>'+
+      '<button type="button" class="ef-btn cancel" title="Cancel">&#10005;</button>'+
+    '</span></span>';
+  const input = document.getElementById(elId);
+  const isField = input && input.tagName!=='DIV';
+  if(isField) input.focus();
+  span.querySelector('.ef-btn.save').addEventListener('click', ()=>commitEdit(recId, def, elId));
+  span.querySelector('.ef-btn.cancel').addEventListener('click', ()=>cancelEdit());
+  if(isField){
+    input.addEventListener('keydown', e=>{
+      if(e.key==='Enter'){ e.preventDefault(); commitEdit(recId, def, elId); }
+      if(e.key==='Escape'){ e.preventDefault(); cancelEdit(); }
+    });
+  }
+}
+function auditFieldEdit(recId, def, oldVal, newVal){
+  if(!OPPS[recId]) return;
+  if(String(oldVal)===String(newVal)) return;
+  const list = AUDIT_BY_OPP[recId] = AUDIT_BY_OPP[recId] || [];
+  list.push({
+    id:'audit_RT_'+(++EF_SEQ), opportunityId: recId, field: def.label,
+    oldValue: displayValue(def, oldVal, true), newValue: displayValue(def, newVal, true),
+    changedBy: CURRENT_BDO_ID, changedAt: TODAY,
+  });
+}
+function commitEdit(recId, def, elId){
+  const obj = EF_STORE[recId].obj;
+  const oldVal = def.get(obj);
+  const newVal = controlValue(def, elId);
+  def.set(obj, newVal);
+  auditFieldEdit(recId, def, oldVal, newVal);
+  if(EF_RERENDER) EF_RERENDER();
+}
+function cancelEdit(){ if(EF_RERENDER) EF_RERENDER(); }
+document.addEventListener('click', function(e){
+  const display = e.target.closest('.ef-display');
+  if(display){ activateEdit(display.closest('.ef')); }
+});
+
 /* ---------- derived analytics (computed, never hardcoded) ---------- */
 function computeStageP75(){
   const openByStage = {};
@@ -44170,6 +44451,7 @@ function route(){
     home: ROLE==='bdo' ? 'BDO Home' : 'Exec Home',
     pipeline: 'Pipeline',
     opp: 'Opportunity',
+    create: 'New Opportunity',
     intake: 'New Opportunity',
     accounts: 'Accounts',
     network: 'Network',
@@ -44180,7 +44462,8 @@ function route(){
   if(view==='home'){ renderHome(); showView('view-home'); }
   else if(view==='pipeline'){ renderPipeline(); showView('view-pipeline'); }
   else if(view==='opp' && id){ renderOpp(id); showView('view-opp'); titles.opp = getOpp(id) ? getOpp(id).name : 'Opportunity'; }
-  else if(view==='intake'){ renderIntake(); showView('view-intake'); }
+  else if(view==='create'){ CREATE_PRODUCT='Factoring'; CREATE_ACCT_MODE='new'; CREATE_RATETYPE='Fixed'; renderCreate(); showView('view-create'); }
+  else if(view==='intake'){ renderIntake(id); showView('view-intake'); }
   else if(view==='accounts'){ renderStub('view-accounts','Accounts','Prospect and Partner account records — list and record views. Not built in this skeleton pass; see PROJECT_STATE.md §12.'); showView('view-accounts'); }
   else if(view==='network'){ renderStub('view-network','Network','The full trade-relationship graph explorer. This pass wires network insight into the Opportunity record only; the standalone explorer is next.'); showView('view-network'); }
   else if(view==='bdoperf'){ renderStub('view-bdoperf','BDO Performance','Rep-level created/lost/won/activity intelligence — exec-only. Not built in this skeleton pass.'); showView('view-bdoperf'); }
@@ -44200,6 +44483,20 @@ window.setRole = function(role){
   document.getElementById('role-exec').classList.toggle('active', role==='exec');
   if((location.hash||'#/home').replace('#/','').split('/')[0]==='home'){ route(); }
 };
+
+window.toggleNewMenu = function(e){
+  e.stopPropagation();
+  const menu = document.getElementById('newmenu');
+  menu.style.display = menu.style.display==='none' ? 'block' : 'none';
+};
+window.closeNewMenu = function(){
+  document.getElementById('newmenu').style.display = 'none';
+};
+document.addEventListener('click', function(e){
+  const menu = document.getElementById('newmenu');
+  if(menu && menu.style.display!=='none' && !e.target.closest('.newmenu-wrap')){ closeNewMenu(); }
+});
+window.addEventListener('hashchange', closeNewMenu);
 
 /* ================================================================
    BDO HOME
@@ -44585,34 +44882,35 @@ function renderStepperHtml(o){
   return html;
 }
 
-function productFieldsHtml(o){
-  const f=o.productFields||{};
+function productFieldsHtml(recId){
+  const o = EF_STORE[recId].obj;
+  const f = o.productFields||{};
   const rows=[];
   if(o.productType==='Factoring'){
-    rows.push(['Advance Rate', f.advanceRatePct+'%']);
-    rows.push(['Recourse', f.recourse]);
-    rows.push(['Notification', f.notification]);
-    rows.push(['Discount Fee', f.discountFeePct+'%']);
-    rows.push(['Est. Monthly AR Volume', moneyPlain(f.estMonthlyARVolume)]);
-    rows.push(['Debtor Concentration', f.debtorConcentrationPct+'%']);
+    rows.push(['Advance Rate', PDEF.advanceRatePct]);
+    rows.push(['Recourse', PDEF.recourse]);
+    rows.push(['Notification', PDEF.notification]);
+    rows.push(['Discount Fee', PDEF.discountFeePct]);
+    rows.push(['Est. Monthly AR Volume', PDEF.estMonthlyARVolume]);
+    rows.push(['Debtor Concentration', PDEF.debtorConcentrationPct]);
   } else if(o.productType==='ABL'){
-    rows.push(['AR Advance Rate', f.arAdvanceRatePct+'%']);
-    rows.push(['Inventory Advance Rate', f.inventoryAdvanceRatePct+'%']);
-    rows.push(['Collateral Types', (f.collateralTypes||[]).join(', ')]);
-    rows.push(['Rate', 'SOFR + '+f.rateSpreadBps+' bps']);
-    rows.push(['Field Exam Status', f.fieldExamStatus]);
-    rows.push(['Primary Covenant', f.primaryCovenant]);
+    rows.push(['AR Advance Rate', PDEF.arAdvanceRatePct]);
+    rows.push(['Inventory Advance Rate', PDEF.inventoryAdvanceRatePct]);
+    rows.push(['Collateral Types', PDEF.collateralTypes]);
+    rows.push(['Rate', PDEF.rateSpreadBps]);
+    rows.push(['Field Exam Status', PDEF.fieldExamStatus]);
+    rows.push(['Primary Covenant', PDEF.primaryCovenant]);
   } else if(o.productType==='TermLoan'){
-    rows.push(['Rate Type', f.rateType]);
-    rows.push(['Rate', f.rateType==='Fixed' ? f.fixedRatePct+'%' : 'SOFR + '+f.rateSpreadBps+' bps']);
-    rows.push(['Term', f.termMonths+' months']);
-    rows.push(['Amortization', f.amortizationType]);
-    rows.push(['Maturity', fmtDate(f.maturityDate)]);
-    rows.push(['Seniority', f.seniority]);
-    rows.push(['Secured Status', f.securedStatus]);
-    rows.push(['Call Protection', f.callProtection]);
+    rows.push(['Rate Type', PDEF.rateType]);
+    rows.push([f.rateType==='Fixed'?'Fixed Rate':'Rate', f.rateType==='Fixed'?PDEF.fixedRatePct:PDEF.rateSpreadBps]);
+    rows.push(['Term', PDEF.termMonths]);
+    rows.push(['Amortization', PDEF.amortizationType]);
+    rows.push(['Maturity', PDEF.maturityDate]);
+    rows.push(['Seniority', PDEF.seniority]);
+    rows.push(['Secured Status', PDEF.securedStatus]);
+    rows.push(['Call Protection', PDEF.callProtection]);
   }
-  return '<dl class="kv">'+rows.map(r=>'<div><dt>'+r[0]+'</dt><dd>'+esc(r[1])+'</dd></div>').join('')+'</dl>';
+  return '<dl class="kv">'+rows.map(r=>'<div><dt>'+r[0]+'</dt><dd>'+efSpan(recId,r[1])+'</dd></div>').join('')+'</dl>';
 }
 
 let introRequested = {};
@@ -44723,24 +45021,26 @@ function renderOpp(id){
   }
   const acct = getAccount(o.accountId);
   const owner = BDOS[o.bdoId];
-  const partner = o.referralPartnerId ? PARTNERS[o.referralPartnerId] : null;
   const contacts = CONTACTS_BY_ACCT[o.accountId] || [];
   const docs = DOCS_BY_OPP[o.id] || [];
   const acts = (ACTS_BY_OPP[o.id] || []).slice().sort((a,b)=>b.date.localeCompare(a.date));
 
+  const recId = registerRecord(o.id, o);
+  EF_RERENDER = ()=>renderOpp(id);
+
   const coreKv = '<dl class="kv">'+
     '<div><dt>Account</dt><dd>'+esc(acct.name)+'</dd></div>'+
-    '<div><dt>Owner</dt><dd>'+esc(owner?owner.name:'')+'</dd></div>'+
+    '<div><dt>Owner</dt><dd>'+efSpan(recId,DEF_INDEX['core.bdoId'])+'</dd></div>'+
     '<div><dt>Product Type</dt><dd>'+o.productType+'</dd></div>'+
     '<div><dt>Stage</dt><dd>'+(o.outcome==='open'?o.stage:(o.outcome==='won'?'Closed · Won':'Closed · Lost'))+'</dd></div>'+
-    '<div><dt>Expected Close</dt><dd>'+fmtDate(o.expectedCloseDate)+'</dd></div>'+
-    '<div><dt>Funded Date</dt><dd>'+fmtDate(o.fundedDate)+'</dd></div>'+
-    '<div><dt>Referral Partner</dt><dd>'+(partner?esc(partner.name):'—')+'</dd></div>'+
-    '<div><dt>Referral Date</dt><dd>'+fmtDate(o.referralDate)+'</dd></div>'+
-    '<div><dt>Channel</dt><dd>'+esc(o.channel)+'</dd></div>'+
-    '<div><dt>Industry</dt><dd>'+esc(acct.industryName||'—')+'</dd></div>'+
-    '<div><dt>Use of Proceeds</dt><dd>'+esc(o.useOfProceeds)+'</dd></div>'+
-    (o.outcome==='lost' ? '<div><dt>Closed Lost Reason</dt><dd>'+esc(o.closedLostReason)+'</dd></div><div><dt>Died At Stage</dt><dd>'+o.lostAtStage+'</dd></div>' : '')+
+    '<div><dt>Expected Close</dt><dd>'+efSpan(recId,DEF_INDEX['core.expectedCloseDate'])+'</dd></div>'+
+    '<div><dt>Funded Date</dt><dd>'+efSpan(recId,DEF_INDEX['core.fundedDate'])+'</dd></div>'+
+    '<div><dt>Referral Partner</dt><dd>'+efSpan(recId,DEF_INDEX['core.referralPartnerId'])+'</dd></div>'+
+    '<div><dt>Referral Date</dt><dd>'+efSpan(recId,DEF_INDEX['core.referralDate'])+'</dd></div>'+
+    '<div><dt>Channel</dt><dd>'+efSpan(recId,DEF_INDEX['core.channel'])+'</dd></div>'+
+    '<div><dt>Industry</dt><dd>'+efSpan(recId,DEF_INDEX['core.industryCode'])+'</dd></div>'+
+    '<div><dt>Use of Proceeds</dt><dd>'+efSpan(recId,DEF_INDEX['core.useOfProceeds'])+'</dd></div>'+
+    (o.outcome==='lost' ? '<div><dt>Closed Lost Reason</dt><dd>'+efSpan(recId,closedLostReasonDef(o.lostAtStage))+'</dd></div><div><dt>Died At Stage</dt><dd>'+o.lostAtStage+'</dd></div>' : '')+
     '</dl>';
 
   const contactsHtml = contacts.length
@@ -44766,8 +45066,8 @@ function renderOpp(id){
   document.getElementById('view-opp').innerHTML =
     '<div class="opp-header">'+
       '<div class="opp-eyebrow"><span>'+o.productType+'</span><span>·</span><span>'+esc(acct.name)+'</span></div>'+
-      '<div class="opp-title">'+esc(o.name)+'</div>'+
-      '<div class="opp-hero">'+money(o.facilitySize,1)+'</div>'+
+      '<div class="opp-title">'+efSpan(recId,DEF_INDEX['core.name'])+'</div>'+
+      '<div class="opp-hero"><span class="ef-hero">'+efSpan(recId,DEF_INDEX['core.facilitySize'])+'</span></div>'+
       '<div class="opp-hero-label">Facility Size</div>'+
       '<div class="opp-meta">'+
         '<div class="opp-meta-item">Owner <b>'+esc(owner?owner.name:'')+'</b></div>'+
@@ -44785,7 +45085,7 @@ function renderOpp(id){
 
         '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
           '<div class="panel-title">'+o.productType+' terms</div><div class="panel-scope">Product-specific commercial terms</div>'+
-        '</div></div><div class="panel-body">'+productFieldsHtml(o)+'</div></div>'+
+        '</div></div><div class="panel-body">'+productFieldsHtml(recId)+'</div></div>'+
 
         networkPanelHtml(o)+
         lienPanelHtml(o)+
@@ -44817,7 +45117,10 @@ function renderOpp(id){
 }
 
 /* ================================================================
-   DOC-EXTRACTION INTAKE (the one fully-wired end-to-end path)
+   DOC-EXTRACTION INTAKE — two of the three "+ New" paths.
+   Hero (real drag/drop, single flagship scenario — unchanged selection logic)
+   and Simulated demo (explicit demo-only prop, three product-type scenarios
+   so product type visibly drives which fields extract).
    ================================================================ */
 function pickIntakeAccount(){
   let best=null, bestScore=-1;
@@ -44844,32 +45147,57 @@ function pickIntakeProduct(acct){
 }
 const INTAKE_PRODUCT = pickIntakeProduct(INTAKE_ACCOUNT);
 
-function intakeFileNames(acct){
+function pickScenarioAccounts(){
+  const used = new Set();
+  return ['Factoring','ABL','TermLoan'].map(pt=>{
+    let best=null, bestScore=-1;
+    D.prospects.forEach(p=>{
+      if(used.has(p.id) || CLOSED_WON_ACCT_IDS.has(p.id)) return;
+      const hasProduct = Object.values(OPPS).some(o=>o.accountId===p.id && o.productType===pt);
+      if(hasProduct) return;
+      const lienCount=(LIENS_BY_ACCT[p.id]||[]).length;
+      const edges=EDGES_BY_ACCT[p.id]||[];
+      const warmEdges=edges.filter(e=>{
+        const other=e.fromAccountId===p.id?e.toAccountId:e.fromAccountId;
+        return CLOSED_WON_ACCT_IDS.has(other);
+      });
+      const score = lienCount*2 + warmEdges.length*3 + (warmEdges.some(e=>e.goldenPath)?5:0);
+      if(score>bestScore){ bestScore=score; best=p; }
+    });
+    if(!best) best = D.prospects.find(p=>!used.has(p.id)) || D.prospects[0];
+    used.add(best.id);
+    return {productType:pt, account:best};
+  });
+}
+const SCENARIOS = pickScenarioAccounts();
+
+const DOC_BASE = ['Financial Statements','Tax Returns','Bank Statements','Formation Docs',
+  'AP Aging','AR Aging','UCC Lien Search','Term Sheet Draft'];
+const DOC_EXTRA = {
+  Factoring: ['AR Detail Schedule','Debtor Concentration Report'],
+  ABL: ['Borrowing Base Certificate','Field Exam Report'],
+  TermLoan: ['Equipment Appraisal','Debt Schedule'],
+};
+function intakeFileNames(acct, productType){
   const base = acct.name.replace(/[^A-Za-z0-9]+/g,'_');
-  return [base+'_AR_Aging.pdf', base+'_Financials_2025.pdf', base+'_Formation_Docs.pdf'];
+  return DOC_BASE.concat(DOC_EXTRA[productType]||[]).map(n=>base+'_'+n.replace(/\s+/g,'_')+'.pdf');
 }
 
 let RUNTIME_COUNTER = 0;
-function synthesizeOpportunity(acct, productType){
-  RUNTIME_COUNTER++;
-  const id = 'opp_NEW_'+RUNTIME_COUNTER;
-  const ranges = {Factoring:[250000,5000000], ABL:[2000000,25000000], TermLoan:[1000000,20000000]};
-  const range = ranges[productType];
-  const facilitySize = Math.round((range[0] + Math.random()*(range[1]-range[0]))/5000)*5000;
-
-  let productFields = {};
+function randomProductFields(productType, facilitySize){
   if(productType==='Factoring'){
     const advanceRatePct = Math.round(75+Math.random()*15);
     const mult = 1.1+Math.random()*0.5;
     const estMonthlyARVolume = Math.round(facilitySize/(advanceRatePct/100*mult)/1000)*1000;
-    productFields = {
+    return {
       advanceRatePct, recourse: Math.random()<0.5?'Recourse':'Non-recourse',
       notification: Math.random()<0.5?'Notification':'Non-notification',
       discountFeePct: +(1+Math.random()*3).toFixed(2),
       estMonthlyARVolume, debtorConcentrationPct: Math.round(15+Math.random()*45)
     };
-  } else if(productType==='ABL'){
-    productFields = {
+  }
+  if(productType==='ABL'){
+    return {
       arAdvanceRatePct: Math.round(75+Math.random()*15),
       inventoryAdvanceRatePct: Math.round(40+Math.random()*20),
       collateralTypes: ['AR','Inventory'],
@@ -44877,40 +45205,54 @@ function synthesizeOpportunity(acct, productType){
       fieldExamStatus: 'Scheduled',
       primaryCovenant: 'FCCR >= 1.10x'
     };
-  } else {
-    const rateType = Math.random()<0.5?'Fixed':'Floating';
-    productFields = {
-      rateType,
-      fixedRatePct: rateType==='Fixed' ? +(8+Math.random()*6).toFixed(2) : null,
-      rateSpreadBps: rateType==='Floating' ? Math.round(400+Math.random()*400) : null,
-      termMonths: [24,36,48,60][Math.floor(Math.random()*4)],
-      amortizationType: 'Straight-line',
-      maturityDate: addDaysStr(TODAY, 60*30),
-      seniority: 'Senior', securedStatus: 'Secured', callProtection: 'None'
-    };
   }
-
-  const opp = {
-    id, name: acct.name+' — '+productType, accountId: acct.id, bdoId: CURRENT_BDO_ID,
+  const rateType = Math.random()<0.5?'Fixed':'Floating';
+  return {
+    rateType,
+    fixedRatePct: rateType==='Fixed' ? +(8+Math.random()*6).toFixed(2) : null,
+    rateSpreadBps: rateType==='Floating' ? Math.round(400+Math.random()*400) : null,
+    termMonths: [24,36,48,60][Math.floor(Math.random()*4)],
+    amortizationType: 'Straight-line',
+    maturityDate: addDaysStr(TODAY, 60*30),
+    seniority: 'Senior', securedStatus: 'Secured', callProtection: 'None'
+  };
+}
+function draftOpportunity(acct, productType){
+  const ranges = {Factoring:[250000,5000000], ABL:[2000000,25000000], TermLoan:[1000000,20000000]};
+  const range = ranges[productType];
+  const facilitySize = Math.round((range[0] + Math.random()*(range[1]-range[0]))/5000)*5000;
+  return {
+    id: 'opp_DRAFT', name: acct.name+' — '+productType, accountId: acct.id, bdoId: CURRENT_BDO_ID,
     productType, facilitySize, referralPartnerId: null, channel: 'Doc Extraction Intake',
     industryCode: acct.industryCode, useOfProceeds: 'Working capital', competitors: [],
     outcome: 'open', stage: 'Qualification', createdDate: TODAY,
     expectedCloseDate: addDaysStr(TODAY,90), fundedDate: null, referralDate: null,
-    productFields
+    productFields: randomProductFields(productType, facilitySize)
   };
-  OPPS[id] = opp;
+}
+function commitDraftOpportunity(draft){
+  RUNTIME_COUNTER++;
+  const id = 'opp_NEW_'+RUNTIME_COUNTER;
+  draft.id = id;
+  OPPS[id] = draft;
   STAGEHIST[id] = [
     {stage:'Qualification', enteredDate:TODAY, exitedDate:null, durationDays:null},
     {stage:'Qualification', enteredDate:TODAY, exitedDate:null, durationDays:null, terminal:false}
   ];
-  return opp;
+  return draft;
 }
 
-let INTAKE_STATE = 'drop';
+let INTAKE_MODE = 'hero';   // 'hero' | 'simulated'
+let INTAKE_STATE = 'drop';  // 'drop' | 'extracting' | 'review'
+let INTAKE_CTX = null;      // {account, productType}
+let INTAKE_DRAFT = null;    // editable draft opportunity, set on entering 'review'
 let INTAKE_TIMER = null;
 
-function renderIntake(){
+function renderIntake(mode){
+  INTAKE_MODE = mode==='simulated' ? 'simulated' : 'hero';
   INTAKE_STATE = 'drop';
+  INTAKE_CTX = null;
+  INTAKE_DRAFT = null;
   drawIntake();
 }
 
@@ -44920,10 +45262,37 @@ function wizardBarHtml(step){
     '<span class="tag '+(i===step?'brand':'neutral')+'">'+(i+1)+' '+s+'</span>'
   ).join('')+'</div>';
 }
+function demoOnlyBannerHtml(){
+  if(INTAKE_MODE!=='simulated') return '';
+  return '<div class="chipbar tight">'+
+    '<span class="tag warn">Demo prop — not a shipping feature</span>'+
+    '<span class="tag neutral">The real product reads your dropped files; this runs a scripted scenario</span>'+
+  '</div>';
+}
 
 function drawIntake(){
   const el = document.getElementById('view-intake');
+
   if(INTAKE_STATE==='drop'){
+    if(INTAKE_MODE==='simulated'){
+      el.innerHTML =
+        '<h1 class="page-heading">New Opportunity — Simulated Demo</h1>'+
+        '<div class="page-sub">Pick a scripted scenario — product type drives which fields extract</div>'+
+        wizardBarHtml(0)+
+        demoOnlyBannerHtml()+
+        '<div class="scenario-grid">'+
+          SCENARIOS.map((s,i)=>{
+            const fileCount = intakeFileNames(s.account,s.productType).length;
+            return '<div class="scenario-card" onclick="startScenario('+i+')">'+
+              '<div class="scenario-product">'+s.productType+'</div>'+
+              '<div class="scenario-acct">'+esc(s.account.name)+'</div>'+
+              '<div class="scenario-meta">'+esc(s.account.industryName)+' · '+esc(s.account.location)+'</div>'+
+              '<div class="scenario-meta">'+fileCount+' documents to extract</div>'+
+            '</div>';
+          }).join('')+
+        '</div>';
+      return;
+    }
     el.innerHTML =
       '<h1 class="page-heading">New Opportunity</h1>'+
       '<div class="page-sub">Drop borrower documents and Keystone builds the deal for you</div>'+
@@ -44931,25 +45300,23 @@ function drawIntake(){
       '<div class="dropzone" id="dropzone" onclick="document.getElementById(\'filepick\').click()">'+
         '<div class="dropzone-icon">&#8681;</div>'+
         '<div class="dropzone-title">Drop AP/AR aging, financials, or formation docs</div>'+
-        '<div class="dropzone-sub">Or click to browse — any file starts the simulated extraction</div>'+
-        '<input type="file" id="filepick" onchange="startExtraction()">'+
-      '</div>'+
-      '<div class="center-mt">'+
-        '<button class="btn" onclick="startExtraction()">Simulate a document drop</button>'+
+        '<div class="dropzone-sub">Or click to browse — any file starts extraction</div>'+
+        '<input type="file" id="filepick" onchange="startHeroExtraction()">'+
       '</div>';
     const dz = document.getElementById('dropzone');
     dz.addEventListener('dragover', e=>{ e.preventDefault(); dz.classList.add('dragover'); });
     dz.addEventListener('dragleave', ()=>dz.classList.remove('dragover'));
-    dz.addEventListener('drop', e=>{ e.preventDefault(); dz.classList.remove('dragover'); startExtraction(); });
+    dz.addEventListener('drop', e=>{ e.preventDefault(); dz.classList.remove('dragover'); startHeroExtraction(); });
     return;
   }
 
   if(INTAKE_STATE==='extracting'){
-    const files = intakeFileNames(INTAKE_ACCOUNT);
+    const files = intakeFileNames(INTAKE_CTX.account, INTAKE_CTX.productType);
     el.innerHTML =
       '<h1 class="page-heading">New Opportunity</h1>'+
-      '<div class="page-sub">Extracting&hellip;</div>'+
+      '<div class="page-sub">Extracting from '+files.length+' documents&hellip;</div>'+
       wizardBarHtml(1)+
+      demoOnlyBannerHtml()+
       '<div class="panel"><div class="panel-body pad-top">'+
         files.map((f,i)=>'<div class="extract-row" id="extract-row-'+i+'"><div class="extract-check" id="extract-check-'+i+'">&hellip;</div><div class="extract-name">'+esc(f)+'</div></div>').join('')+
         '<div class="progressbar"><div class="progressbar-fill" id="extract-progress"></div></div>'+
@@ -44957,9 +45324,10 @@ function drawIntake(){
     let step=0;
     const advance=()=>{
       if(step>0){ const prev=document.getElementById('extract-check-'+(step-1)); if(prev){ prev.classList.add('done'); prev.textContent='✓'; } }
-      document.getElementById('extract-progress').style.width = Math.round((step/files.length)*100)+'%';
+      const bar=document.getElementById('extract-progress');
+      if(bar) bar.style.width = Math.round((step/files.length)*100)+'%';
       if(step>=files.length){
-        document.getElementById('extract-progress').style.width='100%';
+        if(bar) bar.style.width='100%';
         INTAKE_TIMER=setTimeout(()=>{ INTAKE_STATE='review'; drawIntake(); }, 500);
         return;
       }
@@ -44971,30 +45339,46 @@ function drawIntake(){
   }
 
   if(INTAKE_STATE==='review'){
-    const acct = INTAKE_ACCOUNT;
-    const product = INTAKE_PRODUCT;
+    const ctx = INTAKE_CTX;
+    const acct = ctx.account, product = ctx.productType;
+    if(!INTAKE_DRAFT) INTAKE_DRAFT = draftOpportunity(acct, product);
+    const recId = registerRecord('intake_draft', INTAKE_DRAFT);
+    EF_RERENDER = ()=>drawIntake();
+
     const liens = LIENS_BY_ACCT[acct.id] || [];
     const edges = EDGES_BY_ACCT[acct.id] || [];
     const wonEdges = edges.filter(e=>{
       const other = e.fromAccountId===acct.id ? e.toAccountId : e.fromAccountId;
       return CLOSED_WON_ACCT_IDS.has(other);
     });
+
+    const coreRows = [
+      ['Opportunity Name','core.name'], ['Facility Size','core.facilitySize'], ['Owner','core.bdoId'],
+      ['Expected Close','core.expectedCloseDate'], ['Channel','core.channel'],
+      ['Industry','core.industryCode'], ['Use of Proceeds','core.useOfProceeds'],
+    ];
+    const coreKvHtml = '<dl class="kv">'+
+      '<div><dt>Account</dt><dd>'+esc(acct.name)+'</dd></div>'+
+      '<div><dt>Product Type</dt><dd>'+product+'</dd></div>'+
+      coreRows.map(r=>'<div><dt>'+r[0]+'</dt><dd>'+efSpan(recId,DEF_INDEX[r[1]])+'</dd></div>').join('')+
+      '<div><dt>Stage</dt><dd>Qualification</dd></div>'+
+      '</dl>';
+
     el.innerHTML =
       '<h1 class="page-heading">New Opportunity</h1>'+
-      '<div class="page-sub">Review the extracted deal before creating it</div>'+
+      '<div class="page-sub">Review the extracted deal — every field below is overridable before you create it</div>'+
       wizardBarHtml(2)+
+      demoOnlyBannerHtml()+
       '<div class="match-banner">'+
         '<div class="match-banner-title">Matched to existing account: '+esc(acct.name)+'</div>'+
         '<div class="match-banner-sub">'+esc(acct.industryName)+' · '+esc(acct.location)+' · Account already on file — this will be a new '+product+' opportunity on it</div>'+
       '</div>'+
       '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
-        '<div class="panel-title">Extracted fields</div><div class="panel-scope">Product Type detected: '+product+'</div>'+
-      '</div></div><div class="panel-body">'+
-        '<dl class="kv"><div><dt>Account</dt><dd>'+esc(acct.name)+'</dd></div>'+
-        '<div><dt>Product Type</dt><dd>'+product+'</dd></div>'+
-        '<div><dt>Owner</dt><dd>'+esc(BDOS[CURRENT_BDO_ID].name)+'</dd></div>'+
-        '<div><dt>Stage</dt><dd>Qualification</dd></div></dl>'+
-      '</div></div>'+
+        '<div class="panel-title">Extracted fields</div><div class="panel-scope">Product Type detected: '+product+' · click any value to override</div>'+
+      '</div></div><div class="panel-body">'+coreKvHtml+'</div></div>'+
+      '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
+        '<div class="panel-title">'+product+' terms</div><div class="panel-scope">Product-conditional fields — this is what changes by product type</div>'+
+      '</div></div><div class="panel-body">'+productFieldsHtml(recId)+'</div></div>'+
       '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
         '<div class="panel-title">Signals detected during extraction</div><div class="panel-scope">Auto-enriched from existing CRM data</div>'+
       '</div></div><div class="panel-body">'+
@@ -45006,17 +45390,169 @@ function drawIntake(){
           '<div class="feed-sub">'+(liens.some(l=>l.subordinated)?'Includes a subordinated position':'No subordination detected')+'</div></div></div>'+
       '</div></div>'+
       '<div class="actions-end">'+
-        '<button class="btn" onclick="INTAKE_STATE=\'drop\';drawIntake()">Start over</button>'+
+        '<button class="btn" onclick="startOverIntake()">Start over</button>'+
         '<button class="btn primary" onclick="completeIntake()">Create Opportunity</button>'+
       '</div>';
   }
 }
-window.startExtraction = function(){
+window.startHeroExtraction = function(){
+  INTAKE_MODE='hero';
+  INTAKE_CTX = {account:INTAKE_ACCOUNT, productType:INTAKE_PRODUCT};
   INTAKE_STATE='extracting';
   drawIntake();
 };
+window.startScenario = function(i){
+  const s = SCENARIOS[i];
+  INTAKE_CTX = {account:s.account, productType:s.productType};
+  INTAKE_STATE='extracting';
+  drawIntake();
+};
+window.startOverIntake = function(){
+  INTAKE_DRAFT=null;
+  INTAKE_STATE='drop';
+  drawIntake();
+};
 window.completeIntake = function(){
-  const opp = synthesizeOpportunity(INTAKE_ACCOUNT, INTAKE_PRODUCT);
+  const draft = INTAKE_DRAFT || draftOpportunity(INTAKE_CTX.account, INTAKE_CTX.productType);
+  const opp = commitDraftOpportunity(draft);
+  INTAKE_DRAFT = null;
+  location.hash = '#/opp/'+opp.id;
+};
+
+/* ================================================================
+   MANUAL CREATE — the third "+ New" path: a blank form that creates
+   Account + Opportunity together in one motion (D6: no Lead object).
+   ================================================================ */
+let CREATE_PRODUCT = 'Factoring';
+let CREATE_ACCT_MODE = 'new';
+let CREATE_RATETYPE = 'Fixed';
+
+function productDefsFor(productType){
+  if(productType==='Factoring') return [PDEF.advanceRatePct,PDEF.recourse,PDEF.notification,PDEF.discountFeePct,PDEF.estMonthlyARVolume,PDEF.debtorConcentrationPct];
+  if(productType==='ABL') return [PDEF.arAdvanceRatePct,PDEF.inventoryAdvanceRatePct,PDEF.collateralTypes,PDEF.rateSpreadBps,PDEF.fieldExamStatus,PDEF.primaryCovenant];
+  const rateDef = CREATE_RATETYPE==='Fixed' ? PDEF.fixedRatePct : PDEF.rateSpreadBps;
+  return [PDEF.rateType, rateDef, PDEF.termMonths, PDEF.amortizationType, PDEF.maturityDate, PDEF.seniority, PDEF.securedStatus, PDEF.callProtection];
+}
+function accountOptionsHtml(){
+  const sorted = D.prospects.slice().sort((a,b)=>a.name.localeCompare(b.name));
+  return '<option value="">Select an account&hellip;</option>'+
+    sorted.map(p=>'<option value="'+p.id+'">'+esc(p.name)+'</option>').join('');
+}
+window.setCreateAcctMode = function(mode){ CREATE_ACCT_MODE=mode; renderCreate(); };
+window.setCreateProduct = function(pt){ CREATE_PRODUCT=pt; CREATE_RATETYPE='Fixed'; renderCreate(); };
+window.setCreateRateType = function(rt){ CREATE_RATETYPE=rt; renderCreate(); };
+
+function renderCreate(){
+  const el = document.getElementById('view-create');
+  const prodDefs = productDefsFor(CREATE_PRODUCT);
+  el.innerHTML =
+    '<h1 class="page-heading">New Opportunity — Manual Entry</h1>'+
+    '<div class="page-sub">Create the Account and Opportunity together, in one motion — no Lead object</div>'+
+    '<div class="panel"><div class="panel-body pad-top">'+
+
+      '<div class="form-section-label">Account</div>'+
+      '<div class="chipbar tight">'+
+        '<button class="chip'+(CREATE_ACCT_MODE==='new'?' active':'')+'" onclick="setCreateAcctMode(\'new\')">New account</button>'+
+        '<button class="chip'+(CREATE_ACCT_MODE==='existing'?' active':'')+'" onclick="setCreateAcctMode(\'existing\')">Existing account</button>'+
+      '</div>'+
+      '<div class="form-grid">'+
+        (CREATE_ACCT_MODE==='new'
+          ? '<div class="form-field"><label>Account Name</label><input type="text" id="cf_acct_name" placeholder="Borrower legal name"></div>'+
+            '<div class="form-field"><label>Industry</label><select id="cf_acct_industry">'+INDUSTRIES.map(i=>'<option value="'+esc(i.name)+'">'+esc(i.name)+'</option>').join('')+'</select></div>'+
+            '<div class="form-field"><label>Location</label><select id="cf_acct_location">'+CITY_STATE.map(c=>'<option value="'+esc(c)+'">'+esc(c)+'</option>').join('')+'</select></div>'
+          : '<div class="form-field"><label>Account</label><select id="cf_acct_existing">'+accountOptionsHtml()+'</select></div>')+
+      '</div>'+
+
+      '<div class="form-section-label">Deal</div>'+
+      '<div class="form-grid">'+
+        '<div class="form-field"><label>Opportunity Name</label><input type="text" id="cf_core_name" placeholder="Auto-filled from account + product if left blank"></div>'+
+        '<div class="form-field"><label>Product Type</label><select id="cf_product" onchange="setCreateProduct(this.value)">'+
+          ['Factoring','ABL','TermLoan'].map(p=>'<option value="'+p+'"'+(p===CREATE_PRODUCT?' selected':'')+'>'+p+'</option>').join('')+
+        '</select></div>'+
+        '<div class="form-field"><label>Facility Size</label>'+controlHtml({type:'money'},'cf_core_facilitySize',null)+'</div>'+
+        '<div class="form-field"><label>Owner</label>'+controlHtml(DEF_INDEX['core.bdoId'],'cf_core_bdoId',CURRENT_BDO_ID)+'</div>'+
+        '<div class="form-field"><label>Expected Close</label>'+controlHtml({type:'date'},'cf_core_expectedCloseDate',addDaysStr(TODAY,90))+'</div>'+
+        '<div class="form-field"><label>Channel</label>'+controlHtml(DEF_INDEX['core.channel'],'cf_core_channel','Outbound Prospecting')+'</div>'+
+        '<div class="form-field"><label>Referral Partner</label>'+controlHtml(DEF_INDEX['core.referralPartnerId'],'cf_core_referralPartnerId','')+'</div>'+
+        '<div class="form-field"><label>Use of Proceeds</label>'+controlHtml(DEF_INDEX['core.useOfProceeds'],'cf_core_useOfProceeds',USE_OF_PROCEEDS[0])+'</div>'+
+      '</div>'+
+
+      '<div class="form-section-label">'+CREATE_PRODUCT+' terms</div>'+
+      '<div class="form-grid">'+
+        prodDefs.map(d=>{
+          const key = d.key.replace('prod.','');
+          const elId = 'cf_prod_'+key;
+          const defaultVal = d.type==='select' ? (d.options[0]?d.options[0].value:null) : null;
+          let ctrl = controlHtml(d, elId, defaultVal);
+          if(key==='rateType') ctrl = ctrl.replace('<select ', '<select onchange="setCreateRateType(this.value)" ');
+          return '<div class="form-field"><label>'+d.label+'</label>'+ctrl+'</div>';
+        }).join('')+
+      '</div>'+
+    '</div>'+
+    '<div class="panel-footer">'+
+      '<span>New Account + Opportunity created in one motion</span>'+
+      '<div class="actions-end ml-auto">'+
+        '<button class="btn" onclick="location.hash=\'#/home\'">Cancel</button>'+
+        '<button class="btn primary" onclick="submitCreate()">Create Opportunity</button>'+
+      '</div>'+
+    '</div></div>';
+}
+
+window.submitCreate = function(){
+  let acct;
+  if(CREATE_ACCT_MODE==='new'){
+    const name = (document.getElementById('cf_acct_name').value||'').trim();
+    if(!name){ alert('Enter an account name.'); return; }
+    const industryName = document.getElementById('cf_acct_industry').value;
+    const industry = INDUSTRIES.find(i=>i.name===industryName);
+    const location = document.getElementById('cf_acct_location').value;
+    RUNTIME_COUNTER++;
+    acct = {
+      id:'acct_c_NEW_'+RUNTIME_COUNTER, name, accountType:'Prospect',
+      industryCode: industry?industry.code:null, industryName, location,
+      employeeCount:null, annualRevenue:null, createdDate:TODAY, domain:null
+    };
+    PROSPECTS[acct.id]=acct;
+  } else {
+    const id = document.getElementById('cf_acct_existing').value;
+    if(!id){ alert('Choose an existing account.'); return; }
+    acct = PROSPECTS[id];
+  }
+
+  const productType = CREATE_PRODUCT;
+  const facilitySize = controlValue({type:'money'},'cf_core_facilitySize');
+  if(facilitySize==null){ alert('Enter a facility size.'); return; }
+  const nameField = document.getElementById('cf_core_name').value.trim();
+  const referralPartnerId = controlValue(DEF_INDEX['core.referralPartnerId'],'cf_core_referralPartnerId')||null;
+
+  RUNTIME_COUNTER++;
+  const opp = {
+    id: 'opp_NEW_'+RUNTIME_COUNTER,
+    name: nameField || (acct.name+' — '+productType),
+    accountId: acct.id, bdoId: controlValue(DEF_INDEX['core.bdoId'],'cf_core_bdoId'),
+    productType, facilitySize, referralPartnerId,
+    channel: controlValue(DEF_INDEX['core.channel'],'cf_core_channel'),
+    industryCode: acct.industryCode, useOfProceeds: controlValue(DEF_INDEX['core.useOfProceeds'],'cf_core_useOfProceeds'),
+    competitors: [], outcome:'open', stage:'Qualification', createdDate:TODAY,
+    expectedCloseDate: controlValue({type:'date'},'cf_core_expectedCloseDate') || addDaysStr(TODAY,90),
+    fundedDate:null, referralDate: referralPartnerId ? TODAY : null,
+    productFields: {}
+  };
+
+  productDefsFor(productType).forEach(d=>{
+    const key = d.key.replace('prod.','');
+    opp.productFields[key] = controlValue(d, 'cf_prod_'+key);
+  });
+  if(productType==='TermLoan'){
+    opp.productFields.rateType = CREATE_RATETYPE;
+    if(CREATE_RATETYPE==='Fixed') opp.productFields.rateSpreadBps=null; else opp.productFields.fixedRatePct=null;
+  }
+
+  OPPS[opp.id]=opp;
+  STAGEHIST[opp.id] = [
+    {stage:'Qualification', enteredDate:TODAY, exitedDate:null, durationDays:null},
+    {stage:'Qualification', enteredDate:TODAY, exitedDate:null, durationDays:null, terminal:false}
+  ];
   location.hash = '#/opp/'+opp.id;
 };
 
