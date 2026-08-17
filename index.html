@@ -244,6 +244,21 @@ table.tbl{width:100%;border-collapse:collapse}
 .opp-meta-item{font-size:12px;color:var(--ink-2)}
 .opp-meta-item b{color:var(--ink);font-weight:500}
 
+/* record page: persistent header (above) + persistent left rail + section-nav'd main.
+   minmax(0,1fr) on the main track is what actually stops wide content (tables) from
+   blowing the grid past the viewport — the old .two-col lacked it. */
+.record-layout{display:grid;grid-template-columns:300px minmax(0,1fr);gap:var(--s5);align-items:start}
+@media (max-width:900px){.record-layout{grid-template-columns:1fr}}
+.record-rail{position:sticky;top:calc(57px + var(--s5))}
+@media (max-width:900px){.record-rail{position:static}}
+.record-main{min-width:0}
+.section-nav{display:flex;gap:var(--s1);border-bottom:1px solid var(--line);margin-bottom:var(--s5);overflow-x:auto}
+.section-nav-item{height:var(--h);padding:0 var(--s4);display:inline-flex;align-items:center;font-size:12.5px;
+  color:var(--ink-2);border-bottom:2px solid transparent;white-space:nowrap;cursor:pointer;flex:0 0 auto;
+  transition:color .12s var(--ease),border-color .12s var(--ease)}
+.section-nav-item:hover{color:var(--ink)}
+.section-nav-item.active{color:var(--brand-ink);border-bottom-color:var(--brand);font-weight:500}
+
 .kv{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:var(--s4) var(--s5)}
 .kv dt{font-size:11px;font-weight:500;color:var(--ink-3)}
 .kv dd{font-size:13px;color:var(--ink);margin-top:var(--s1);font-weight:400}
@@ -45041,6 +45056,78 @@ function auditPanelHtml(o){
   '</div>';
 }
 
+/* ================================================================
+   RECORD PAGE — three-zone template (D28): persistent header, persistent
+   left rail of core fields, and a main panel switched by a horizontal
+   section nav. Built for the Opportunity record this round; the pattern
+   (renderRecordShell-style header+rail+nav/section) is meant to be the
+   template other record types adopt later, not a one-off.
+   ================================================================ */
+const OPP_SECTIONS = [
+  {key:'details', label:'Details'},
+  {key:'network', label:'Network'},
+  {key:'intelligence', label:'Intelligence'},
+  {key:'contacts', label:'Contacts'},
+  {key:'activity', label:'Activity'},
+  {key:'documents', label:'Documents'},
+  {key:'audit', label:'Audit'},
+];
+let OPP_SECTION = 'details';
+let OPP_SECTION_FOR = null;
+window.setOppSection = function(key){
+  OPP_SECTION = key;
+  if(OPP_SECTION_FOR) renderOpp(OPP_SECTION_FOR);
+};
+
+function sectionDetailsHtml(o, recId){
+  const competitorsHtml = (o.competitors&&o.competitors.length)
+    ? '<div class="chips-inline">'+o.competitors.map(c=>'<span class="tag neutral">'+esc(c)+'</span>').join('')+'</div>'
+    : '<div class="empty">No competitors identified on this deal.</div>';
+  return (
+    '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
+      '<div class="panel-title">'+o.productType+' terms</div><div class="panel-scope">Product-specific commercial terms</div>'+
+    '</div></div><div class="panel-body">'+productFieldsHtml(recId)+'</div></div>'+
+    '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
+      '<div class="panel-title">Competitors</div><div class="panel-scope">Other capital providers on this deal</div>'+
+    '</div></div><div class="panel-body">'+competitorsHtml+'</div></div>'+
+    '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
+      '<div class="panel-title">Approvals</div><div class="panel-scope">Credit committee</div>'+
+    '</div></div><div class="panel-body"><div class="empty">Approvals object not yet modeled in this dataset — planned for a later pass.</div></div></div>'
+  );
+}
+function sectionNetworkHtml(o){
+  return networkPanelHtml(o)+
+    '<div class="velocity-note">This list is the real signal today — round 3 adds the full trade-relationship graph explorer on top of it.</div>';
+}
+function sectionContactsHtml(contacts){
+  const contactsHtml = contacts.length
+    ? '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Name</th><th>Role</th><th>Email</th><th>Phone</th></tr></thead><tbody>'+
+        contacts.map(c=>'<tr><td class="name">'+esc(c.name)+'</td><td class="sec">'+esc(c.role)+'</td><td class="sec">'+esc(c.email)+'</td><td class="sec">'+esc(c.phone)+'</td></tr>').join('')+
+      '</tbody></table></div>'
+    : '<div class="empty">No contacts on record.</div>';
+  return '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
+      '<div class="panel-title">Contacts</div><div class="panel-scope">'+contacts.length+' stakeholder'+(contacts.length===1?'':'s')+' with roles</div>'+
+    '</div></div><div class="panel-body flush">'+contactsHtml+'</div></div>';
+}
+function sectionActivityHtml(acts){
+  const activityHtml = acts.length
+    ? acts.map(a=>'<div class="activity-item"><div class="activity-type">'+a.type+'</div><div class="activity-subject">'+esc(a.subject)+'</div><div class="activity-date">'+fmtDate(a.date)+'</div></div>').join('')
+    : '<div class="empty">No activity logged yet.</div>';
+  return '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
+      '<div class="panel-title">Activity timeline</div><div class="panel-scope">'+acts.length+' logged event'+(acts.length===1?'':'s')+'</div>'+
+    '</div></div><div class="panel-body">'+activityHtml+'</div></div>';
+}
+function sectionDocumentsHtml(docs){
+  const docsHtml = docs.length
+    ? '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Document</th><th>Uploaded</th><th>By</th></tr></thead><tbody>'+
+        docs.map(d=>'<tr><td class="name">'+esc(d.type)+'</td><td class="sec">'+fmtDate(d.uploadedDate)+'</td><td class="sec">'+esc(BDOS[d.uploadedBy]?BDOS[d.uploadedBy].name:'')+'</td></tr>').join('')+
+      '</tbody></table></div>'
+    : '<div class="empty">No documents on record.</div>';
+  return '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
+      '<div class="panel-title">Documents</div><div class="panel-scope">'+docs.length+' file'+(docs.length===1?'':'s')+' on the deal</div>'+
+    '</div></div><div class="panel-body flush">'+docsHtml+'</div></div>';
+}
+
 function renderOpp(id){
   const o = getOpp(id);
   if(!o){
@@ -45055,6 +45142,11 @@ function renderOpp(id){
 
   const recId = registerRecord(o.id, o);
   EF_RERENDER = ()=>renderOpp(id);
+  // Section resets to Details on a *different* record (you land on the overview, not
+  // wherever a previous unrelated deal happened to leave off) but persists across
+  // re-renders of the *same* record (e.g. an edit-triggered refresh while on Audit).
+  if(OPP_SECTION_FOR !== id) OPP_SECTION = 'details';
+  OPP_SECTION_FOR = id;
 
   const coreKv = '<dl class="kv">'+
     '<div><dt>Account</dt><dd>'+esc(acct.name)+'</dd></div>'+
@@ -45071,25 +45163,18 @@ function renderOpp(id){
     (o.outcome==='lost' ? '<div><dt>Closed Lost Reason</dt><dd>'+efSpan(recId,closedLostReasonDef(o.lostAtStage))+'</dd></div><div><dt>Died At Stage</dt><dd>'+o.lostAtStage+'</dd></div>' : '')+
     '</dl>';
 
-  const contactsHtml = contacts.length
-    ? '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Name</th><th>Role</th><th>Email</th><th>Phone</th></tr></thead><tbody>'+
-        contacts.map(c=>'<tr><td class="name">'+esc(c.name)+'</td><td class="sec">'+esc(c.role)+'</td><td class="sec">'+esc(c.email)+'</td><td class="sec">'+esc(c.phone)+'</td></tr>').join('')+
-      '</tbody></table></div>'
-    : '<div class="empty">No contacts on record.</div>';
+  let sectionBody;
+  if(OPP_SECTION==='network') sectionBody = sectionNetworkHtml(o);
+  else if(OPP_SECTION==='intelligence') sectionBody = lienPanelHtml(o);
+  else if(OPP_SECTION==='contacts') sectionBody = sectionContactsHtml(contacts);
+  else if(OPP_SECTION==='activity') sectionBody = sectionActivityHtml(acts);
+  else if(OPP_SECTION==='documents') sectionBody = sectionDocumentsHtml(docs);
+  else if(OPP_SECTION==='audit') sectionBody = auditPanelHtml(o);
+  else sectionBody = sectionDetailsHtml(o, recId);
 
-  const docsHtml = docs.length
-    ? '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Document</th><th>Uploaded</th><th>By</th></tr></thead><tbody>'+
-        docs.map(d=>'<tr><td class="name">'+esc(d.type)+'</td><td class="sec">'+fmtDate(d.uploadedDate)+'</td><td class="sec">'+esc(BDOS[d.uploadedBy]?BDOS[d.uploadedBy].name:'')+'</td></tr>').join('')+
-      '</tbody></table></div>'
-    : '<div class="empty">No documents on record.</div>';
-
-  const competitorsHtml = (o.competitors&&o.competitors.length)
-    ? '<div class="chips-inline">'+o.competitors.map(c=>'<span class="tag neutral">'+esc(c)+'</span>').join('')+'</div>'
-    : '<div class="empty">No competitors identified on this deal.</div>';
-
-  const activityHtml = acts.length
-    ? acts.map(a=>'<div class="activity-item"><div class="activity-type">'+a.type+'</div><div class="activity-subject">'+esc(a.subject)+'</div><div class="activity-date">'+fmtDate(a.date)+'</div></div>').join('')
-    : '<div class="empty">No activity logged yet.</div>';
+  const navHtml = '<div class="section-nav">'+OPP_SECTIONS.map(s=>
+    '<div class="section-nav-item'+(OPP_SECTION===s.key?' active':'')+'" onclick="setOppSection(\''+s.key+'\')">'+s.label+'</div>'
+  ).join('')+'</div>';
 
   document.getElementById('view-opp').innerHTML =
     '<div class="opp-header">'+
@@ -45105,42 +45190,13 @@ function renderOpp(id){
       renderStepperHtml(o)+
     '</div>'+
 
-    '<div class="two-col">'+
-      '<div>'+
+    '<div class="record-layout">'+
+      '<div class="record-rail">'+
         '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
-          '<div class="panel-title">Deal core</div><div class="panel-scope">Commercial terms and routing</div>'+
+          '<div class="panel-title">Deal core</div><div class="panel-scope">Commercial terms and routing — always visible</div>'+
         '</div></div><div class="panel-body">'+coreKv+'</div></div>'+
-
-        '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
-          '<div class="panel-title">'+o.productType+' terms</div><div class="panel-scope">Product-specific commercial terms</div>'+
-        '</div></div><div class="panel-body">'+productFieldsHtml(recId)+'</div></div>'+
-
-        networkPanelHtml(o)+
-        lienPanelHtml(o)+
-        auditPanelHtml(o)+
-
-        '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
-          '<div class="panel-title">Activity timeline</div><div class="panel-scope">'+acts.length+' logged event'+(acts.length===1?'':'s')+'</div>'+
-        '</div></div><div class="panel-body">'+activityHtml+'</div></div>'+
       '</div>'+
-
-      '<div>'+
-        '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
-          '<div class="panel-title">Contacts</div><div class="panel-scope">'+contacts.length+' stakeholder'+(contacts.length===1?'':'s')+' with roles</div>'+
-        '</div></div><div class="panel-body flush">'+contactsHtml+'</div></div>'+
-
-        '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
-          '<div class="panel-title">Documents</div><div class="panel-scope">'+docs.length+' file'+(docs.length===1?'':'s')+' on the deal</div>'+
-        '</div></div><div class="panel-body flush">'+docsHtml+'</div></div>'+
-
-        '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
-          '<div class="panel-title">Competitors</div><div class="panel-scope">Other capital providers on this deal</div>'+
-        '</div></div><div class="panel-body">'+competitorsHtml+'</div></div>'+
-
-        '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
-          '<div class="panel-title">Approvals</div><div class="panel-scope">Credit committee</div>'+
-        '</div></div><div class="panel-body"><div class="empty">Approvals object not yet modeled in this dataset — planned for a later pass.</div></div></div>'+
-      '</div>'+
+      '<div class="record-main">'+navHtml+sectionBody+'</div>'+
     '</div>';
 }
 
