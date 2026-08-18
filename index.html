@@ -45106,8 +45106,10 @@ function lienPanelHtml(o){
 }
 
 function auditPanelHtml(o){
-  const hist = getStageHistory(o.id).filter(e=>e.durationDays!=null || e.terminal!==undefined);
-  const stageRows = getStageHistory(o.id).map(e=>
+  /* Drop only the open-deal terminal marker (terminal:false), which duplicates the row for the
+     stage it marks. terminal:true is NOT a duplicate — it's the distinct ClosedWon/ClosedLost
+     entry carrying the close date, and must keep its row. */
+  const stageRows = getStageHistory(o.id).filter(e=>e.terminal!==false).map(e=>
     '<tr><td class="name">'+e.stage+'</td><td class="sec">'+fmtDate(e.enteredDate)+'</td>'+
     '<td class="sec">'+(e.exitedDate?fmtDate(e.exitedDate):'— (current)')+'</td>'+
     '<td class="num">'+(e.durationDays!=null?e.durationDays:'—')+'</td></tr>'
