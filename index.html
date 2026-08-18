@@ -22,6 +22,8 @@
   --row-sep:rgba(20,22,20,.045);
   --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px;
   --r-s:6px; --r-m:10px; --r-l:16px;
+  /* full-round. Approved deviation from the three-radius cap (D31) — stage-track nodes only. */
+  --r-full:999px;
   --lift:0 1px 1px rgba(20,22,20,.03),0 8px 28px -12px rgba(20,22,20,.14);
   --lift-hi:0 2px 4px rgba(20,22,20,.04),0 24px 56px -20px rgba(20,22,20,.20);
   --h:32px;
@@ -226,7 +228,7 @@ table.tbl{width:100%;border-collapse:collapse}
 .track-seg.r{left:50%;right:0}
 .track-seg.fill{background:var(--brand)}
 .track-dot{position:relative;width:var(--s5);height:var(--s5);flex:0 0 var(--s5);
-  border-radius:var(--r-s);background:var(--paper);box-shadow:inset 0 0 0 1px var(--line-2);
+  border-radius:var(--r-full);background:var(--paper);box-shadow:inset 0 0 0 1px var(--line-2);
   display:flex;align-items:center;justify-content:center;font-size:11px;line-height:1;
   color:var(--ink-3);transition:background .18s var(--ease),box-shadow .18s var(--ease)}
 .track-stage.done .track-dot{background:var(--brand);color:var(--paper);box-shadow:none}
@@ -240,10 +242,15 @@ table.tbl{width:100%;border-collapse:collapse}
 .track-stage.won .track-label{color:var(--pos-ink);font-weight:500}
 .track-stage.lost .track-label{color:var(--neg-ink);font-weight:500}
 .track-sub{font-family:var(--mono);font-size:11px;letter-spacing:-.01em;color:var(--ink-3)}
-.track-stage.next{cursor:pointer}
-.track-stage.next:hover .track-dot{background:var(--brand-soft);color:var(--brand-ink);
+/* Every stage a deal can be moved to is clickable — forward and backward alike — so one hover
+   affordance covers both. Hollow (future) nodes tint up; already-filled (completed) nodes
+   lighten to --brand-2 instead, so the hover doesn't hollow out a node that reads as done. */
+.track-stage.move{cursor:pointer}
+.track-stage.move:hover .track-dot{background:var(--brand-soft);color:var(--brand-ink);
   box-shadow:inset 0 0 0 1px var(--brand)}
-.track-stage.next:hover .track-label{color:var(--brand-ink)}
+.track-stage.done.move:hover .track-dot{background:var(--brand-2);color:var(--paper);
+  box-shadow:none}
+.track-stage.move:hover .track-label{color:var(--brand-ink)}
 
 /* ---------- tags ---------- */
 .tag{display:inline-flex;align-items:center;height:20px;padding:0 var(--s2);border-radius:var(--r-s);
@@ -44919,13 +44926,18 @@ function stageStatusText(o){
    an empty cls means "not reached". Outcome states are read off the record, never faked —
    a lost deal fills only to lostAtStage and leaves Closed unreached. */
 const TRACK_STAGES = ['Qualification','Analysis','Proposal','Underwriting'];
-const STAGE_AUDIT_DEF = cdef('stage','Stage','text');
+/* Two defs, one per direction, so the audit trail distinguishes progression from regression
+   rather than flattening both into a generic "stage changed". Where deals fall backward is
+   itself signal — a stage that keeps getting kicked back is a stall the exec view should be
+   able to see. Both write through the same auditFieldEdit() wiring inline edits use. */
+const STAGE_ADVANCE_DEF = cdef('stage','Stage advanced','text');
+const STAGE_REGRESS_DEF = cdef('stage','Stage regressed','text');
 
 function trackNodes(o){
-  const nodes = TRACK_STAGES.map(s=>({stage:s, label:s, cls:'', sub:null, advanceTo:null}));
+  const nodes = TRACK_STAGES.map(s=>({stage:s, label:s, cls:'', sub:null, moveTo:null}));
   if(o.outcome==='won'){
     nodes.forEach(n=>{ n.cls='done'; });
-    nodes.push({stage:'Closed', label:'Closed · Won', cls:'won', sub:null, advanceTo:null});
+    nodes.push({stage:'Closed', label:'Closed · Won', cls:'won', sub:null, moveTo:null});
   } else if(o.outcome==='lost'){
     const idx=TRACK_STAGES.indexOf(o.lostAtStage);
     nodes.forEach((n,i)=>{
@@ -44934,18 +44946,21 @@ function trackNodes(o){
     });
     /* Closed stays unreached: the deal died in the stage above and never progressed
        through the pipeline, so the bar must not read as fully run. */
-    nodes.push({stage:'Closed', label:'Closed', cls:'', sub:null, advanceTo:null});
+    nodes.push({stage:'Closed', label:'Closed', cls:'', sub:null, moveTo:null});
   } else {
     const idx=TRACK_STAGES.indexOf(o.stage);
     const days=currentDaysInStage(o);
     nodes.forEach((n,i)=>{
       if(i<idx) n.cls='done';
       else if(i===idx){ n.cls='active'; n.sub=days+' day'+(days===1?'':'s'); }
-      else n.advanceTo=n.stage;
+      /* Every working stage other than the current one is a move target, backward included —
+         deals regress (a proposal collapses back to Analysis, underwriting kicks back for
+         financials) and the bar has to be able to say so. */
+      if(i!==idx) n.moveTo=n.stage;
     });
-    /* Closed is deliberately not an advance target — closing needs a won/lost outcome and,
-       when lost, a stage-aware reason (D9). A progress bar can't ask for either. */
-    nodes.push({stage:'Closed', label:'Closed', cls:'', sub:null, advanceTo:null});
+    /* Closed is deliberately not a move target — closing needs a won/lost outcome and, when
+       lost, a stage-aware reason (D9). A progress bar can't ask for either. */
+    nodes.push({stage:'Closed', label:'Closed', cls:'', sub:null, moveTo:null});
   }
   return nodes;
 }
@@ -44953,16 +44968,25 @@ function trackNodes(o){
 function renderStageTrackHtml(o){
   const nodes = trackNodes(o);
   const reached = i => !!(nodes[i] && nodes[i].cls);
+  const curIdx = TRACK_STAGES.indexOf(o.stage);
   let html='<div class="track">';
   nodes.forEach((n,i)=>{
     const glyph = (n.cls==='done'||n.cls==='won') ? '&#10003;' : (n.cls==='lost' ? '&#10005;' : '');
-    const attrs = n.advanceTo
-      ? ' onclick="advanceOppStage(\''+o.id+'\',\''+n.advanceTo+'\')" title="Advance to '+n.advanceTo+'"'
+    const back = n.moveTo && i < curIdx;
+    const attrs = n.moveTo
+      ? ' onclick="moveOppStage(\''+o.id+'\',\''+n.moveTo+'\')" title="'+
+        (back?'Move back to ':'Advance to ')+n.moveTo+'"'
       : '';
-    html+='<div class="track-stage'+(n.cls?' '+n.cls:'')+(n.advanceTo?' next':'')+'"'+attrs+'>'+
+    /* Both outer half-segments are rendered, so the line runs the full content width of the
+       header margin to margin rather than stopping at the first and last node centres. A
+       segment is filled iff the node it runs toward is reached; the two outer stubs have no
+       node beyond them, so they follow their own node — which is what makes a won deal read
+       as filled edge to edge and leaves an open or lost one short. */
+    const last = i===nodes.length-1;
+    html+='<div class="track-stage'+(n.cls?' '+n.cls:'')+(n.moveTo?' move':'')+'"'+attrs+'>'+
       '<div class="track-row">'+
-        (i>0 ? '<div class="track-seg l'+(reached(i)?' fill':'')+'"></div>' : '')+
-        (i<nodes.length-1 ? '<div class="track-seg r'+(reached(i+1)?' fill':'')+'"></div>' : '')+
+        '<div class="track-seg l'+(reached(i)?' fill':'')+'"></div>'+
+        '<div class="track-seg r'+((last?reached(i):reached(i+1))?' fill':'')+'"></div>'+
         '<div class="track-dot">'+glyph+'</div>'+
       '</div>'+
       '<div class="track-label">'+esc(n.label)+'</div>'+
@@ -44972,32 +44996,36 @@ function renderStageTrackHtml(o){
   return html+'</div>';
 }
 
-/* In-session stage advance. Closes out the current stage-history entry, walks any skipped
-   stages through at zero days so the history stays contiguous, re-stamps the terminal marker
-   (which is what every days-in-stage read in the app derives from), and logs the move through
-   the same auditFieldEdit() wiring inline edits already use. */
-window.advanceOppStage = function(oppId, toStage){
+/* In-session stage move, either direction. Closes out the current stage-history entry, appends
+   the target stage as a fresh entry, and re-stamps the terminal marker (which is what every
+   days-in-stage read in the app derives from). A forward move also walks any skipped stages
+   through at zero days so the history stays contiguous; a backward move does not — a regression
+   is a single jump back, not a reverse tour, and the forward history it came from is left
+   standing so the stage shows up twice and the round trip stays visible. */
+window.moveOppStage = function(oppId, toStage){
   const o = OPPS[oppId];
   if(!o || o.outcome!=='open') return;
   const from = TRACK_STAGES.indexOf(o.stage);
   const to = TRACK_STAGES.indexOf(toStage);
-  if(from<0 || to<=from) return;
+  if(from<0 || to<0 || to===from) return;
   const hist = STAGEHIST[oppId];
   if(!hist || !hist.length) return;
+  const forward = to>from;
 
   if(hist[hist.length-1].terminal!==undefined) hist.pop();
   const cur = hist[hist.length-1];
   if(cur){ cur.exitedDate=TODAY; cur.durationDays=daysBetween(cur.enteredDate,TODAY); }
-  for(let i=from+1;i<=to;i++){
-    const last = i===to;
-    hist.push({stage:TRACK_STAGES[i], enteredDate:TODAY,
-      exitedDate: last?null:TODAY, durationDays: last?null:0});
+  if(forward){
+    for(let i=from+1;i<to;i++){
+      hist.push({stage:TRACK_STAGES[i], enteredDate:TODAY, exitedDate:TODAY, durationDays:0});
+    }
   }
+  hist.push({stage:toStage, enteredDate:TODAY, exitedDate:null, durationDays:null});
   hist.push({stage:toStage, enteredDate:TODAY, exitedDate:null, durationDays:null, terminal:false});
 
   const prevStage=o.stage;
   o.stage=toStage;
-  auditFieldEdit(oppId, STAGE_AUDIT_DEF, prevStage, toStage);
+  auditFieldEdit(oppId, forward?STAGE_ADVANCE_DEF:STAGE_REGRESS_DEF, prevStage, toStage);
   if(EF_RERENDER) EF_RERENDER();
 };
 
