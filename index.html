@@ -129,8 +129,10 @@ h1,h2,h3,p,dl,dd{margin:0}
 .panel-footer{border-top:1px solid var(--line);padding:var(--s3) var(--s5);font-size:12px;color:var(--ink-3);
   display:flex;align-items:center}
 .panel-footer .drill{margin-left:auto;color:var(--brand);font-weight:500;cursor:pointer}
-.two-col{display:grid;grid-template-columns:2fr 1fr;gap:var(--s5)}
-@media (max-width:1140px){.two-col{grid-template-columns:1fr}}
+/* minmax(0,...) on both tracks: without it a wide child (a table, a long unbroken title) can
+   blow a grid track past the viewport. Same fix the record layout needed in round 2. */
+.two-col{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:var(--s5)}
+@media (max-width:1140px){.two-col{grid-template-columns:minmax(0,1fr)}}
 
 /* ---------- list / feed panel ---------- */
 .feedrow{display:flex;align-items:flex-start;gap:var(--s3);padding:var(--s3) var(--s5);cursor:pointer;
@@ -163,6 +165,70 @@ h1,h2,h3,p,dl,dd{margin:0}
 .feed-sub{font-size:12px;color:var(--ink-3);margin-top:var(--s1)}
 .feed-time{font-family:var(--mono);font-size:11px;color:var(--ink-3);flex:0 0 auto;white-space:nowrap;
   padding-top:var(--s1)}
+/* right-aligned action label on an action-feed card — what you'd do about this signal */
+.feed-action{font-size:11px;font-weight:500;color:var(--brand);flex:0 0 auto;white-space:nowrap;
+  padding-top:var(--s1);display:flex;align-items:center;gap:var(--s1)}
+.feedrow:hover .feed-action{color:var(--brand-ink)}
+.feed-action .arrow{transition:transform .12s var(--ease)}
+.feedrow:hover .feed-action .arrow{transform:translateX(2px)}
+
+/* ---------- state-of-day line ---------- */
+.dayline{display:flex;align-items:baseline;gap:var(--s3);flex-wrap:wrap;margin-bottom:var(--s5)}
+.dayline-date{font-size:12px;color:var(--ink-3)}
+.dayline-sum{font-size:12px;color:var(--ink-2)}
+.dayline-sum b{font-weight:500;color:var(--ink)}
+
+/* ---------- today's agenda (POC-faked; shaped like a real calendar feed) ---------- */
+.agenda-row{display:flex;align-items:flex-start;gap:var(--s3);padding:var(--s3) var(--s5);
+  box-shadow:inset 0 1px 0 var(--row-sep)}
+.agenda-row:first-child{box-shadow:none}
+.agenda-time{font-family:var(--mono);font-size:11px;color:var(--ink-3);flex:0 0 42px;padding-top:var(--s1)}
+.agenda-row.past{opacity:.55}
+.agenda-row.next{background:var(--brand-a05)}
+.agenda-row.next .agenda-time{color:var(--brand-ink)}
+.agenda-main{flex:1;min-width:0}
+.agenda-title{font-size:12px;font-weight:500;color:var(--ink)}
+.agenda-sub{font-size:11px;color:var(--ink-3);margin-top:var(--s1)}
+.agenda-tag{font-size:11px;font-weight:500;color:var(--brand-ink);flex:0 0 auto;padding-top:var(--s1)}
+
+/* ---------- top partners ---------- */
+.partner-row{display:flex;align-items:center;gap:var(--s3);padding:var(--s2) var(--s5);
+  box-shadow:inset 0 1px 0 var(--row-sep)}
+.partner-row:first-child{box-shadow:none}
+.partner-main{flex:1;min-width:0}
+.partner-name{font-size:12px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.partner-sub{font-size:11px;color:var(--ink-3);margin-top:var(--s1)}
+.partner-row.dormant .partner-sub{color:var(--warn-ink)}
+.partner-count{font-family:var(--mono);font-size:12px;color:var(--ink-2);flex:0 0 auto}
+
+/* ---------- charts (v7: brand ink, 3–4 gridlines, dashed reference, tint ramp, no gradients) ----------
+   Gridlines are a repeating background rather than elements, so the plot stays one box and the
+   only inline styles on a chart are the data-driven ones (bar height, point geometry). */
+.chart-head{display:flex;align-items:baseline;justify-content:space-between;gap:var(--s3);
+  margin-bottom:var(--s3);font-size:11px;color:var(--ink-3)}
+.chart-head .peak{font-family:var(--mono);color:var(--ink-2)}
+.plot{position:relative;height:calc(var(--s7) * 2);
+  background:repeating-linear-gradient(to top,var(--line) 0 1px,transparent 1px 25%)}
+.plot.tall{height:calc(var(--s5) * 5)}
+.chart-ref{position:absolute;left:0;right:0;height:0;border-top:1px dashed var(--line-2)}
+.chart-ref-lab{position:absolute;right:0;top:calc(var(--s1) * -1);transform:translateY(-100%);
+  font-size:11px;color:var(--ink-3);background:var(--paper);padding-left:var(--s1)}
+.cols{position:absolute;inset:0;display:flex;align-items:flex-end;gap:var(--s2)}
+.colw{flex:1;min-width:0;display:flex;align-items:flex-end;height:100%}
+.colbar{width:100%;background:var(--brand-a30);transition:background .12s var(--ease)}
+.colbar.t2{background:var(--brand-a65)}
+.colbar.t3{background:var(--brand-a80)}
+.colbar.t4{background:var(--brand)}
+.chart-x{display:flex;gap:var(--s2);margin-top:var(--s2)}
+.chart-x span{flex:1;min-width:0;font-size:11px;color:var(--ink-3);text-align:center;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chart-x.dense span{text-align:left}
+.trend{display:block;width:100%;height:100%}
+.trend-line{fill:none;stroke:var(--brand);stroke-width:1.5}
+.trend-area{fill:var(--brand-a07);stroke:none}
+.trend-grid{stroke:var(--line);stroke-width:1}
+.trend-ref{stroke:var(--line-2);stroke-width:1;stroke-dasharray:3 3}
+.chart-note{font-size:11px;color:var(--ink-3);margin-top:var(--s2)}
 
 /* ---------- chips / segments ---------- */
 .chipbar{display:flex;gap:var(--s2);flex-wrap:wrap;margin-bottom:var(--s4)}
@@ -44241,6 +44307,16 @@ function money(n,decimals){
   return '<span class="cur">$</span>'+v.toFixed(u?decimals:0)+'<span class="un">'+u+'</span>';
 }
 function moneyPlain(n){ return '$'+Math.round(n).toLocaleString('en-US'); }
+/* Plain-text abbreviated money (money() returns markup, moneyPlain() returns every digit).
+   Used for aggregates and for figures in narrow rails; exact deal amounts stay moneyPlain,
+   where the precision is what makes them read as real numbers to a finance reader. */
+function moneyShort(n){
+  if(n==null) return '—';
+  const abs=Math.abs(n);
+  if(abs>=1e6) return '$'+(n/1e6).toFixed(1)+'M';
+  if(abs>=1e3) return '$'+(n/1e3).toFixed(0)+'K';
+  return '$'+Math.round(n);
+}
 function pct(n,d){ d=d==null?0:d; return (n*100).toFixed(d)+'%'; }
 function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
@@ -44554,7 +44630,7 @@ window.setRole = function(role){
   ROLE = role;
   document.getElementById('role-bdo').classList.toggle('active', role==='bdo');
   document.getElementById('role-exec').classList.toggle('active', role==='exec');
-  if((location.hash||'#/home').replace('#/','').split('/')[0]==='home'){ route(); }
+  if(((location.hash||'#/home').replace('#/','').split('/')[0] || 'home')==='home'){ route(); }
 };
 
 window.toggleNewMenu = function(e){
@@ -44574,114 +44650,218 @@ window.addEventListener('hashchange', closeNewMenu);
 /* ================================================================
    BDO HOME
    ================================================================ */
+/* ---------- the action feed ----------
+   ONE ranked stream, not five type-grouped buckets. Every candidate signal across all five
+   types is scored on the same scale and sorted together, so a badly stale follow-up can and
+   does outrank a mild lien. Score = a type weight (what kind of thing this is) + an urgency
+   component computed from the record itself (how bad it is right now), which is what lets the
+   types genuinely interleave instead of stacking type-by-type.
+
+   Type weights put a warm intro and a big stalled deal at the top of a normal book — that's
+   the deliberate curation, and it's a weighting, not a hardcoded first row: a quiet book with
+   no network tie and no stalled deal will lead with whatever is actually most urgent. */
+const FEED_LIMIT = 9;
+const FEED_MAX_PER_OPP = 2;
+/* A per-type cap is what actually keeps this a mixed stream. Without it a book like this one —
+   where nearly every open deal has a Closed-Won network tie — floods the feed with a single
+   type and the "ranked stream" degenerates into the type-grouped bucket list it replaced. */
+const FEED_MAX_PER_TYPE = 2;
+
+function lastActivityDays(oppId){
+  const acts = ACTS_BY_OPP[oppId]||[];
+  if(!acts.length) return null;
+  return daysBetween(acts.reduce((m,a)=>a.date>m?a.date:m, acts[0].date), TODAY);
+}
+
 function buildFeed(bdoId){
   const myOpps = Object.values(OPPS).filter(o=>o.bdoId===bdoId);
   const myOpen = myOpps.filter(o=>o.outcome==='open');
-  const cards = [];
+  const maxSize = Math.max(1, ...myOpen.map(o=>o.facilitySize));
+  /* big deals bubble up within a type without letting size alone dominate the stream */
+  const sizeW = o => (o.facilitySize/maxSize)*18;
+  const cand = [];
 
-  // 1. warm intro (network hero signal)
-  let warm = myOpen.map(o=>{
+  // warm intro — the network signal, our lead differentiator (D4)
+  myOpen.forEach(o=>{
     const edges=(EDGES_BY_ACCT[o.accountId]||[]).filter(e=>{
       const other = e.fromAccountId===o.accountId ? e.toAccountId : e.fromAccountId;
       return CLOSED_WON_ACCT_IDS.has(other);
     });
-    return {o, edges};
-  }).filter(x=>x.edges.length);
-  warm.sort((a,b)=>{
-    const ag=a.edges.some(e=>e.goldenPath), bg=b.edges.some(e=>e.goldenPath);
-    if(ag!==bg) return ag?-1:1;
-    return b.o.facilitySize-a.o.facilitySize;
+    if(!edges.length) return;
+    const edge = edges.find(e=>e.goldenPath) || edges[0];
+    const otherId = edge.fromAccountId===o.accountId ? edge.toAccountId : edge.fromAccountId;
+    const acct=getAccount(o.accountId), other=getAccount(otherId);
+    cand.push({
+      type:'warm', score: 58 + sizeW(o) + (edge.goldenPath?6:0), oppId:o.id,
+      icon:'brand', glyph:'⇄', action:'Request intro',
+      title:'Warm intro available into '+esc(acct.name),
+      sub:(edge.relationship==='buys_from'?'Buys from ':'Sells to ')+esc(other.name)+
+          ' · Closed-Won account · '+moneyPlain(o.facilitySize)+' facility'
+    });
   });
-  if(warm.length){
-    const top=warm[0];
-    const edge=top.edges.find(e=>e.goldenPath)||top.edges[0];
-    const otherId = edge.fromAccountId===top.o.accountId ? edge.toAccountId : edge.fromAccountId;
-    const other=getAccount(otherId);
-    const acct=getAccount(top.o.accountId);
-    cards.push({
-      icon:'brand', glyph:'⇄', oppId:top.o.id,
-      title:'Warm intro available via '+esc(acct.name),
-      sub:(edge.relationship==='buys_from'?'Buys from ':'Sells to ')+esc(other.name)+', a Closed-Won account',
-      time:'Network'
-    });
-  }
 
-  // 2. stuck deal, biggest first
-  let stuck = myOpen.map(o=>{
-    const hist=getStageHistory(o.id); const term=hist[hist.length-1];
-    const days=daysBetween(term.enteredDate,TODAY);
-    return {o,days};
-  }).filter(x=>x.days >= Math.max(STAGE_P75[x.o.stage]||0,1));
-  stuck.sort((a,b)=>b.o.facilitySize-a.o.facilitySize);
-  if(stuck.length){
-    const top=stuck[0];
-    const acct=getAccount(top.o.accountId);
-    cards.push({
-      icon:'warn', glyph:'⚠', oppId:top.o.id,
-      title:esc(acct.name)+' stuck in '+top.o.stage,
-      sub:top.days+' days in stage · '+moneyPlain(top.o.facilitySize)+' facility',
-      time:top.days+'d'
+  // stalled — in-stage longer than the p75 for that stage
+  myOpen.forEach(o=>{
+    const hist=getStageHistory(o.id);
+    const days=daysBetween(hist[hist.length-1].enteredDate,TODAY);
+    const thresh=Math.max(STAGE_P75[o.stage]||0,1);
+    if(days < thresh) return;
+    const over=days/thresh;
+    cand.push({
+      type:'stall', score: 54 + sizeW(o) + Math.min(20,(over-1)*18), oppId:o.id,
+      icon:'warn', glyph:'⚠', action:'Nudge deal',
+      title:esc(getAccount(o.accountId).name)+' stalled in '+o.stage,
+      sub:days+' days in stage vs '+thresh+' typical · '+moneyPlain(o.facilitySize)+' facility'
     });
-  }
-
-  // 3. dormant partner
-  let dormant = myOpps.filter(o=>o.referralPartnerId && PARTNERS[o.referralPartnerId] && PARTNERS[o.referralPartnerId].isDormant);
-  dormant.sort((a,b)=>{
-    const pa=PARTNERS[a.referralPartnerId], pb=PARTNERS[b.referralPartnerId];
-    const da=pa.lastReferralDate? daysBetween(pa.lastReferralDate,TODAY) : 99999;
-    const db=pb.lastReferralDate? daysBetween(pb.lastReferralDate,TODAY) : 99999;
-    return db-da;
   });
-  if(dormant.length){
-    const top=dormant[0];
-    const partner=PARTNERS[top.referralPartnerId];
-    const days=partner.lastReferralDate? daysBetween(partner.lastReferralDate,TODAY) : null;
-    cards.push({
-      icon:'neutral', glyph:'○', oppId:top.id,
-      title:esc(partner.name)+' has gone quiet',
-      sub:(days!=null? 'No referral in '+days+' days' : 'No referral on record')+' · last sent '+esc(getAccount(top.accountId).name),
-      time:days!=null? days+'d' : '—'
-    });
-  }
 
-  // 4. new lien event, most recent first
+  // new lien filed against one of my accounts
   const myAccountIds = new Set(myOpps.map(o=>o.accountId));
-  let liens = D.liens.filter(l=>myAccountIds.has(l.accountId)).slice()
-    .sort((a,b)=>toDateObj(b.filingDate)-toDateObj(a.filingDate));
-  if(liens.length){
-    const top=liens[0];
-    const acct=getAccount(top.accountId);
-    const relatedOpp = myOpen.find(o=>o.accountId===top.accountId) || myOpps.find(o=>o.accountId===top.accountId);
-    const days=daysBetween(top.filingDate,TODAY);
-    cards.push({
-      icon:'neg', glyph:'⚖', oppId: relatedOpp? relatedOpp.id : null,
-      title:'New lien filed against '+esc(acct.name),
-      sub:esc(top.collateralDescription)+(top.subordinated?' · subordinated':'')+' · '+esc(top.filingNumber),
-      time:days+'d ago'
+  D.liens.filter(l=>myAccountIds.has(l.accountId)).forEach(l=>{
+    const days=daysBetween(l.filingDate,TODAY);
+    if(days>60) return;
+    const rel = myOpen.find(o=>o.accountId===l.accountId) || myOpps.find(o=>o.accountId===l.accountId);
+    cand.push({
+      type:'lien', score: 46 + (l.subordinated?8:0) + Math.max(0,14-days/4), oppId: rel?rel.id:null,
+      icon:'neg', glyph:'⚖', action:'Review lien',
+      title:'New lien filed against '+esc(getAccount(l.accountId).name),
+      sub:esc(l.collateralDescription)+(l.subordinated?' · subordinated':'')+' · filed '+days+' days ago'
     });
-  }
+  });
 
-  // 5. follow-up due (stale), excluding opps already spotlighted above
-  const used = new Set(cards.map(c=>c.oppId).filter(Boolean));
-  let stale = myOpen.filter(o=>!used.has(o.id)).map(o=>{
-    const acts = ACTS_BY_OPP[o.id]||[];
-    const last = acts.length? acts.reduce((m,a)=>a.date>m?a.date:m, acts[0].date) : null;
-    const days = last? daysBetween(last,TODAY) : 9999;
-    return {o,days};
-  }).filter(x=>x.days>10);
-  stale.sort((a,b)=>b.days-a.days);
-  if(stale.length){
-    const top=stale[0];
-    const acct=getAccount(top.o.accountId);
-    cards.push({
-      icon:'neutral', glyph:'⏱', oppId:top.o.id,
-      title:'Follow up with '+esc(acct.name),
-      sub:'No activity logged in '+top.days+' days',
-      time:top.days+'d'
+  // follow-up due — no logged activity in a while
+  myOpen.forEach(o=>{
+    const days=lastActivityDays(o.id);
+    if(days==null || days<=10) return;
+    cand.push({
+      type:'followup', score: 38 + Math.min(26,(days-10)*0.8), oppId:o.id,
+      icon:'', glyph:'⏱', action:'Log follow-up',
+      title:'Follow up with '+esc(getAccount(o.accountId).name),
+      sub:'No activity logged in '+days+' days · '+o.stage+' · '+moneyPlain(o.facilitySize)
     });
-  }
+  });
 
-  return cards;
+  // partner going dormant — referral source decaying
+  const seenPartner = new Set();
+  myOpps.forEach(o=>{
+    const p = o.referralPartnerId && PARTNERS[o.referralPartnerId];
+    if(!p || !p.isDormant || seenPartner.has(p.id)) return;
+    seenPartner.add(p.id);
+    const days = p.lastReferralDate ? daysBetween(p.lastReferralDate,TODAY) : null;
+    cand.push({
+      type:'dormant', score: 32 + (days!=null?Math.min(24,(days-90)/8):24), oppId:o.id,
+      icon:'warn', glyph:'○', action:'Re-engage',
+      title:esc(p.name)+' has gone quiet',
+      sub:(days!=null?'No referral in '+days+' days':'No referral on record')+
+          ' · '+p.referralCount+' sent all-time · last was '+esc(getAccount(o.accountId).name)
+    });
+  });
+
+  /* Sort the whole mixed pool once, then cap repeats so one busy deal can't own the feed. */
+  cand.sort((a,b)=>b.score-a.score);
+  const perOpp={}, perType={}, out=[];
+  for(const c of cand){
+    if(out.length>=FEED_LIMIT) break;
+    perType[c.type]=(perType[c.type]||0)+1;
+    if(perType[c.type]>FEED_MAX_PER_TYPE) continue;
+    const k=c.oppId||('_'+out.length);
+    perOpp[k]=(perOpp[k]||0)+1;
+    if(perOpp[k]>FEED_MAX_PER_OPP) continue;
+    out.push(c);
+  }
+  return out;
+}
+
+/* ---------- today's agenda ----------
+   POC-faked, deliberately: there is no calendar in the dataset. It is built deterministically
+   from the BDO's real open deals (no Math.random, so the demo is stable) and shaped exactly
+   like the real thing — a "next few hours" list with times, subjects, and the next item marked
+   against a notional clock. In production this panel is a Microsoft Graph / Google Calendar
+   feed; the shape here is what that integration would populate, not a toy placeholder. */
+const NOW_HHMM = '09:40';
+const AGENDA_SLOTS = [
+  {time:'08:30', kind:'Internal', title:'Pipeline review', sub:'Weekly desk sync'},
+  {time:'09:00', kind:'Call',     title:'Discovery call'},
+  {time:'10:30', kind:'Meeting',  title:'Committee prep'},
+  {time:'13:00', kind:'Call',     title:'Term sheet walkthrough'},
+  {time:'15:30', kind:'Meeting',  title:'Site visit debrief'}
+];
+function buildAgenda(bdoId){
+  const open = Object.values(OPPS).filter(o=>o.bdoId===bdoId && o.outcome==='open')
+    .slice().sort((a,b)=>b.facilitySize-a.facilitySize);
+  let oi=0;
+  const rows = AGENDA_SLOTS.map(s=>{
+    if(s.kind==='Internal') return {time:s.time, title:s.title, sub:s.sub, tag:''};
+    const o = open[oi++ % Math.max(1,open.length)];
+    if(!o) return {time:s.time, title:s.title, sub:'No deal attached', tag:''};
+    return {time:s.time, title:s.kind+' — '+getAccount(o.accountId).name,
+      sub:s.title+' · '+o.stage+' · '+moneyShort(o.facilitySize), oppId:o.id, tag:s.kind};
+  });
+  const nextIdx = rows.findIndex(r=>r.time>NOW_HHMM);
+  rows.forEach((r,i)=>{ r.past = r.time<=NOW_HHMM; r.next = i===nextIdx; });
+  return rows;
+}
+
+/* Last 12 months of funded volume for this BDO, zero-filled so the axis is a real continuous
+   month axis rather than only the months that happen to have deals. */
+function fundedByMonth(bdoId, months){
+  const out=[];
+  const d=toDateObj(TODAY);
+  for(let i=months-1;i>=0;i--){
+    const dt=new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth()-i, 1));
+    out.push({key:dt.toISOString().slice(0,7),
+      label:dt.toLocaleDateString('en-US',{month:'short',timeZone:'UTC'}), value:0, count:0});
+  }
+  const idx={}; out.forEach((m,i)=>idx[m.key]=i);
+  Object.values(OPPS).filter(o=>o.bdoId===bdoId && o.outcome==='won' && o.fundedDate).forEach(o=>{
+    const i=idx[o.fundedDate.slice(0,7)];
+    if(i!=null){ out[i].value+=o.facilitySize; out[i].count++; }
+  });
+  return out;
+}
+
+function trendChartHtml(series){
+  const max = Math.max(1, ...series.map(p=>p.value));
+  const avg = series.reduce((s,p)=>s+p.value,0)/series.length;
+  const n = series.length;
+  const x = i => (n===1?0:(i/(n-1))*100);
+  const y = v => 100 - (v/max)*100;
+  const pts = series.map((p,i)=>x(i).toFixed(2)+','+y(p.value).toFixed(2));
+  const area = 'M0,100 L'+pts.join(' L')+' L100,100 Z';
+  const line = 'M'+pts.join(' L');
+  const refY = y(avg).toFixed(2);
+  /* preserveAspectRatio="none" stretches the plot to the panel; vector-effect keeps every
+     stroke a true 1px (and the dashes even) instead of scaling with it. */
+  return '<div class="chart-head"><span></span>'+
+      '<span class="peak">peak '+moneyShort(max)+'</span></div>'+
+    '<div class="plot tall">'+
+      '<svg class="trend" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">'+
+        [25,50,75].map(g=>'<line class="trend-grid" x1="0" y1="'+g+'" x2="100" y2="'+g+
+          '" vector-effect="non-scaling-stroke"></line>').join('')+
+        '<path class="trend-area" d="'+area+'"></path>'+
+        '<line class="trend-ref" x1="0" y1="'+refY+'" x2="100" y2="'+refY+
+          '" vector-effect="non-scaling-stroke"></line>'+
+        '<path class="trend-line" d="'+line+'" vector-effect="non-scaling-stroke"></path>'+
+      '</svg>'+
+    '</div>'+
+    '<div class="chart-x dense">'+series.map(p=>'<span>'+p.label+'</span>').join('')+'</div>'+
+    '<div class="chart-note">Dashed line is the '+n+'-month average, '+moneyShort(avg)+' per month.</div>';
+}
+
+function stageChartHtml(byStage){
+  const max = Math.max(1, ...byStage.map(b=>b.value));
+  const avg = byStage.reduce((s,b)=>s+b.value,0)/byStage.length;
+  const tint = ['','t2','t3','t4'];
+  return '<div class="chart-head"><span>Open facility by stage</span>'+
+      '<span class="peak">'+moneyShort(max)+' peak</span></div>'+
+    '<div class="plot">'+
+      '<div class="chart-ref" style="bottom:'+((avg/max)*100).toFixed(1)+'%"></div>'+
+      '<div class="cols">'+byStage.map((b,i)=>
+        '<div class="colw"><div class="'+('colbar '+tint[i]).trim()+'" style="height:'+
+          Math.max(b.value>0?2:0,(b.value/max)*100).toFixed(1)+'%"></div></div>').join('')+
+      '</div>'+
+    '</div>'+
+    '<div class="chart-x">'+byStage.map(b=>'<span>'+b.short+'</span>').join('')+'</div>';
 }
 
 function renderHome(){
@@ -44692,44 +44872,85 @@ function renderHome(){
   const myOpen = myOpps.filter(o=>o.outcome==='open');
   const myWon = myOpps.filter(o=>o.outcome==='won');
   const myLost = myOpps.filter(o=>o.outcome==='lost');
+
   const pipelineValue = myOpen.reduce((s,o)=>s+o.facilitySize,0);
-  const winRate = (myWon.length+myLost.length) ? myWon.length/(myWon.length+myLost.length) : 0;
+  const wonYTD = myWon.filter(o=>(o.fundedDate||'').slice(0,4)===TODAY.slice(0,4));
+  const wonYTDValue = wonYTD.reduce((s,o)=>s+o.facilitySize,0);
+  const closedN = myWon.length+myLost.length;
+  const wonSize = myWon.reduce((s,o)=>s+o.facilitySize,0);
+  const lostSize = myLost.reduce((s,o)=>s+o.facilitySize,0);
+  const winByCount = closedN ? myWon.length/closedN : 0;
+  const winBySize = (wonSize+lostSize) ? wonSize/(wonSize+lostSize) : 0;
   const followupsDue = myOpen.filter(o=>{
-    const acts=ACTS_BY_OPP[o.id]||[];
-    const last=acts.length? acts.reduce((m,a)=>a.date>m?a.date:m,acts[0].date) : null;
-    return !last || daysBetween(last,TODAY)>10;
+    const d=lastActivityDays(o.id); return d==null || d>10;
   }).length;
 
   const feed = buildFeed(CURRENT_BDO_ID);
+  const agenda = buildAgenda(CURRENT_BDO_ID);
+  const trend = fundedByMonth(CURRENT_BDO_ID, 12);
 
-  const todayActs = D.activities.filter(a=>a.bdoId===CURRENT_BDO_ID && daysBetween(a.date,TODAY)<=7)
+  const recent = D.activities.filter(a=>a.bdoId===CURRENT_BDO_ID)
     .slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,6);
 
-  const byStage = ['Qualification','Analysis','Proposal','Underwriting'].map(s=>({
-    stage:s, opps:myOpen.filter(o=>o.stage===s)
-  }));
+  const byStage = ['Qualification','Analysis','Proposal','Underwriting'].map(s=>{
+    const opps=myOpen.filter(o=>o.stage===s);
+    return {stage:s, short:s.slice(0,4)==='Qual'?'Qual':(s==='Underwriting'?'Underwr.':s),
+      count:opps.length, value:opps.reduce((t,o)=>t+o.facilitySize,0)};
+  });
+
+  const partners = (()=>{
+    const tally={};
+    myOpps.forEach(o=>{
+      if(!o.referralPartnerId || !PARTNERS[o.referralPartnerId]) return;
+      const p=PARTNERS[o.referralPartnerId];
+      const t = tally[p.id] = tally[p.id] || {p, mine:0};
+      t.mine++;
+    });
+    return Object.values(tally).sort((a,b)=>b.mine-a.mine || a.p.name.localeCompare(b.p.name)).slice(0,5);
+  })();
+
+  const todayLabel = toDateObj(TODAY).toLocaleDateString('en-US',
+    {weekday:'long', month:'long', day:'numeric', timeZone:'UTC'});
 
   document.getElementById('view-home').innerHTML =
     '<h1 class="page-heading">Good morning, '+esc(bdo.name.split(' ')[0])+'</h1>'+
-    '<div class="page-sub">Your book, ranked by what needs you first</div>'+
+    '<div class="dayline">'+
+      '<span class="dayline-date">'+todayLabel+'</span>'+
+      '<span class="dayline-sum"><b>'+feed.length+'</b> item'+(feed.length===1?'':'s')+
+        ' need you today · <b>'+moneyShort(pipelineValue)+'</b> active pipeline</span>'+
+    '</div>'+
 
     '<div class="strip strip-4">'+
-      '<div class="met"><div class="met-label">My Open Deals</div><div class="met-figure">'+myOpen.length+'</div>'+
-        '<div class="met-sub">across '+new Set(myOpen.map(o=>o.accountId)).size+' accounts</div></div>'+
-      '<div class="met"><div class="met-label">My Pipeline Value</div><div class="met-figure emphasis">'+money(pipelineValue)+'</div>'+
-        '<div class="met-sub">open facility commitments</div></div>'+
-      '<div class="met"><div class="met-label">Activities Due</div><div class="met-figure">'+followupsDue+'</div>'+
-        '<div class="met-sub">open deals, no activity in 10+ days</div></div>'+
-      '<div class="met"><div class="met-label">Win Rate</div><div class="met-figure">'+pct(winRate)+'</div>'+
-        '<div class="met-sub">'+myWon.length+' won / '+(myWon.length+myLost.length)+' closed, all-time</div></div>'+
+      '<div class="met"><div class="met-label">Active Pipeline</div>'+
+        '<div class="met-figure emphasis">'+money(pipelineValue)+'</div>'+
+        '<div class="met-sub">'+myOpen.length+' open deals · '+
+          new Set(myOpen.map(o=>o.accountId)).size+' accounts</div></div>'+
+      '<div class="met"><div class="met-label">Funded YTD</div>'+
+        '<div class="met-figure">'+money(wonYTDValue)+'</div>'+
+        '<div class="met-sub">'+wonYTD.length+' deal'+(wonYTD.length===1?'':'s')+' funded this year</div></div>'+
+      '<div class="met"><div class="met-label">Win Rate</div>'+
+        '<div class="met-figure">'+pct(winByCount)+'</div>'+
+        '<div class="met-sub">by count · '+pct(winBySize)+' by size, on '+closedN+' closed</div></div>'+
+      '<div class="met"><div class="met-label">Activities Due</div>'+
+        '<div class="met-figure">'+followupsDue+'</div>'+
+        '<div class="met-sub">open deals with no touch in 10+ days</div></div>'+
+    '</div>'+
+
+    '<div class="panel">'+
+      '<div class="panel-header"><div class="panel-header-text">'+
+        '<div class="panel-title">Funded trend</div>'+
+        '<div class="panel-scope">My closed-won volume by month · rolling 12 months</div>'+
+      '</div></div>'+
+      '<div class="panel-body">'+trendChartHtml(trend)+'</div>'+
     '</div>'+
 
     '<div class="two-col">'+
       '<div>'+
         '<div class="panel">'+
           '<div class="panel-header"><div class="panel-header-text">'+
-            '<div class="panel-title">Signal feed</div>'+
-            '<div class="panel-scope">'+feed.length+' signals ranked by what needs attention first</div>'+
+            '<div class="panel-title">Today</div>'+
+            '<div class="panel-scope">'+feed.length+
+              ' signals across your book, ranked by urgency — most pressing first</div>'+
           '</div></div>'+
           '<div class="panel-body flush">'+
             (feed.length ? feed.map(c=>
@@ -44739,7 +44960,7 @@ function renderHome(){
                   '<div class="feed-title">'+c.title+'</div>'+
                   '<div class="feed-sub">'+c.sub+'</div>'+
                 '</div>'+
-                '<div class="feed-time">'+c.time+'</div>'+
+                '<div class="feed-action">'+c.action+'<span class="arrow">&rsaquo;</span></div>'+
               '</div>'
             ).join('') : '<div class="empty">No signals right now — book is quiet.</div>')+
           '</div>'+
@@ -44749,38 +44970,74 @@ function renderHome(){
       '<div>'+
         '<div class="panel">'+
           '<div class="panel-header"><div class="panel-header-text">'+
-            '<div class="panel-title">Recent activity</div>'+
-            '<div class="panel-scope">Last 7 days · '+todayActs.length+' logged</div>'+
+            '<div class="panel-title">Today\'s agenda</div>'+
+            '<div class="panel-scope">'+agenda.filter(r=>!r.past).length+' left today · demo calendar</div>'+
           '</div></div>'+
           '<div class="panel-body flush">'+
-            (todayActs.length ? todayActs.map(a=>{
-              const opp=getOpp(a.opportunityId);
-              return '<div class="feedrow" onclick="location.hash=\'#/opp/'+a.opportunityId+'\'">'+
-                '<div class="feed-icon">'+(a.type[0])+'</div>'+
-                '<div class="feed-main"><div class="feed-title">'+esc(a.subject)+'</div>'+
-                  '<div class="feed-sub">'+esc(opp?opp.name:'')+'</div></div>'+
-                '<div class="feed-time">'+fmtDate(a.date)+'</div>'+
-              '</div>';
-            }).join('') : '<div class="empty">No activity in the last 7 days.</div>')+
+            agenda.map(r=>
+              '<div class="agenda-row'+(r.past?' past':'')+(r.next?' next':'')+'"'+
+                (r.oppId?(' onclick="location.hash=\'#/opp/'+r.oppId+'\'"'):'')+'>'+
+                '<div class="agenda-time">'+r.time+'</div>'+
+                '<div class="agenda-main">'+
+                  '<div class="agenda-title">'+esc(r.title)+'</div>'+
+                  '<div class="agenda-sub">'+esc(r.sub)+'</div>'+
+                '</div>'+
+                (r.next?'<div class="agenda-tag">Next</div>':'')+
+              '</div>').join('')+
           '</div>'+
         '</div>'+
 
         '<div class="panel">'+
           '<div class="panel-header"><div class="panel-header-text">'+
-            '<div class="panel-title">My pipeline by stage</div>'+
-            '<div class="panel-scope">Open deals · count and value</div>'+
+            '<div class="panel-title">My pipeline</div>'+
+            '<div class="panel-scope">'+myOpen.length+' open deals · '+moneyShort(pipelineValue)+' total</div>'+
           '</div></div>'+
           '<div class="panel-body">'+
-            byStage.map(b=>{
-              const val=b.opps.reduce((s,o)=>s+o.facilitySize,0);
-              const max=Math.max(1,...byStage.map(x=>x.opps.reduce((s,o)=>s+o.facilitySize,0)));
-              return '<div class="stage-row">'+
-                '<div class="barlabel">'+
-                  '<span>'+b.stage+'</span><span>'+b.opps.length+' · '+moneyPlain(val)+'</span></div>'+
-                '<div class="bar-track">'+
-                  '<div class="bar-fill" style="width:'+Math.round(val/max*100)+'%"></div></div>'+
+            stageChartHtml(byStage)+
+            '<div class="mt-5">'+byStage.map(b=>
+              '<div class="barlabel"><span>'+b.stage+'</span>'+
+                '<span>'+b.count+' · '+moneyShort(b.value)+'</span></div>').join('')+
+            '</div>'+
+          '</div>'+
+        '</div>'+
+
+        '<div class="panel">'+
+          '<div class="panel-header"><div class="panel-header-text">'+
+            '<div class="panel-title">Top partners</div>'+
+            '<div class="panel-scope">My referral sources · '+
+              partners.filter(t=>t.p.isDormant).length+' going quiet</div>'+
+          '</div></div>'+
+          '<div class="panel-body flush">'+
+            (partners.length ? partners.map(t=>{
+              const days = t.p.lastReferralDate ? daysBetween(t.p.lastReferralDate,TODAY) : null;
+              return '<div class="partner-row'+(t.p.isDormant?' dormant':'')+'">'+
+                '<div class="partner-main">'+
+                  '<div class="partner-name">'+esc(t.p.name)+'</div>'+
+                  '<div class="partner-sub">'+(t.p.isDormant
+                    ? 'Dormant · no referral in '+(days!=null?days+' days':'record')
+                    : 'Last referral '+(days!=null?days+' days ago':'—'))+'</div>'+
+                '</div>'+
+                '<div class="partner-count">'+t.mine+'</div>'+
               '</div>';
-            }).join('')+
+            }).join('') : '<div class="empty">No partner-sourced deals yet.</div>')+
+          '</div>'+
+        '</div>'+
+
+        '<div class="panel">'+
+          '<div class="panel-header"><div class="panel-header-text">'+
+            '<div class="panel-title">Recent activity</div>'+
+            '<div class="panel-scope">Last '+recent.length+' logged on my deals</div>'+
+          '</div></div>'+
+          '<div class="panel-body flush">'+
+            (recent.length ? recent.map(a=>{
+              const opp=getOpp(a.opportunityId);
+              return '<div class="feedrow" onclick="location.hash=\'#/opp/'+a.opportunityId+'\'">'+
+                '<div class="feed-icon">'+esc(a.type[0])+'</div>'+
+                '<div class="feed-main"><div class="feed-title">'+esc(a.subject)+'</div>'+
+                  '<div class="feed-sub">'+esc(opp?opp.name:'')+'</div></div>'+
+                '<div class="feed-time">'+fmtDate(a.date)+'</div>'+
+              '</div>';
+            }).join('') : '<div class="empty">No activity logged yet.</div>')+
           '</div>'+
         '</div>'+
       '</div>'+
