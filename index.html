@@ -208,19 +208,42 @@ table.tbl{width:100%;border-collapse:collapse}
 .tbl.clickable tbody tr{cursor:pointer;transition:background .12s var(--ease)}
 .tbl.clickable tbody tr:hover td{background:var(--hover)}
 
-/* ---------- stepper ---------- */
-.stepper{display:flex;align-items:flex-start;margin:var(--s4) 0 0}
-.step{display:flex;flex-direction:column;align-items:center;gap:var(--s2);flex:0 0 auto}
-.step-row{display:flex;align-items:center;width:100%}
-.step-dot{width:22px;height:22px;border-radius:var(--r-s);background:var(--sunken);color:var(--ink-3);
-  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;flex:0 0 22px}
-.step.done .step-dot{background:var(--brand);color:var(--paper)}
-.step.active .step-dot{background:var(--paper);color:var(--brand);box-shadow:inset 0 0 0 2px var(--brand)}
-.step.dead .step-dot{background:var(--neg-soft);color:var(--neg-ink)}
-.step-label{font-size:11px;color:var(--ink-3);white-space:nowrap}
-.step.done .step-label,.step.active .step-label,.step.dead .step-label{color:var(--ink);font-weight:500}
-.step-line{flex:1;height:1px;background:var(--line-2)}
-.step-line.done{background:var(--brand)}
+/* ---------- stage node track ----------
+   Equal-width columns so every label sits below its own node at full column width and can
+   never collide with its neighbour. Line segments are absolutely positioned half-widths that
+   meet under each dot; the dot's opaque fill masks the join. Outline is an inset shadow, not
+   a border, so the active halo doesn't put a border and a shadow on the same element. */
+.track{display:flex;align-items:flex-start;margin:var(--s5) 0 0}
+/* No horizontal padding on the column: .track-row is its containing block, so padding here
+   would inset every segment and leave a hole in the line at each column boundary. Label
+   breathing room lives on the label instead. */
+.track-stage{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;
+  gap:var(--s2)}
+.track-row{position:relative;display:flex;align-items:center;justify-content:center;
+  width:100%;height:var(--s5)}
+.track-seg{position:absolute;top:50%;height:1px;background:var(--line-2)}
+.track-seg.l{left:0;right:50%}
+.track-seg.r{left:50%;right:0}
+.track-seg.fill{background:var(--brand)}
+.track-dot{position:relative;width:var(--s5);height:var(--s5);flex:0 0 var(--s5);
+  border-radius:var(--r-s);background:var(--paper);box-shadow:inset 0 0 0 1px var(--line-2);
+  display:flex;align-items:center;justify-content:center;font-size:11px;line-height:1;
+  color:var(--ink-3);transition:background .18s var(--ease),box-shadow .18s var(--ease)}
+.track-stage.done .track-dot{background:var(--brand);color:var(--paper);box-shadow:none}
+.track-stage.active .track-dot{background:var(--brand);color:var(--paper);
+  box-shadow:0 0 0 var(--s1) var(--brand-a15)}
+.track-stage.won .track-dot{background:var(--pos);color:var(--paper);box-shadow:none}
+.track-stage.lost .track-dot{background:var(--neg);color:var(--paper);box-shadow:none}
+.track-label{font-size:11px;color:var(--ink-3);text-align:center;line-height:1.3;padding:0 var(--s2)}
+.track-stage.done .track-label{color:var(--ink-2)}
+.track-stage.active .track-label{color:var(--ink);font-weight:500}
+.track-stage.won .track-label{color:var(--pos-ink);font-weight:500}
+.track-stage.lost .track-label{color:var(--neg-ink);font-weight:500}
+.track-sub{font-family:var(--mono);font-size:11px;letter-spacing:-.01em;color:var(--ink-3)}
+.track-stage.next{cursor:pointer}
+.track-stage.next:hover .track-dot{background:var(--brand-soft);color:var(--brand-ink);
+  box-shadow:inset 0 0 0 1px var(--brand)}
+.track-stage.next:hover .track-label{color:var(--brand-ink)}
 
 /* ---------- tags ---------- */
 .tag{display:inline-flex;align-items:center;height:20px;padding:0 var(--s2);border-radius:var(--r-s);
@@ -44890,40 +44913,93 @@ function stageStatusText(o){
   return 'Lost after '+(dieEntry?dieEntry.durationDays:'—')+' days in '+o.lostAtStage;
 }
 
-function stepperItems(o){
-  const stages=['Qualification','Analysis','Proposal','Underwriting'];
-  const items=[];
-  if(o.outcome==='open'){
-    const idx=stages.indexOf(o.stage);
-    stages.forEach((s,i)=>items.push({label:s, cls: i<idx?'done':(i===idx?'active':'')}));
-    items.push({label:'Closed', cls:''});
-  } else if(o.outcome==='won'){
-    stages.forEach(s=>items.push({label:s, cls:'done'}));
-    items.push({label:'Closed · Won', cls:'done'});
+/* ---------- stage node track ----------
+   One node per stage, label below it, line filled up to the node the deal has actually
+   reached. The node model is the whole truth of the bar: `cls` drives colour and marker,
+   an empty cls means "not reached". Outcome states are read off the record, never faked —
+   a lost deal fills only to lostAtStage and leaves Closed unreached. */
+const TRACK_STAGES = ['Qualification','Analysis','Proposal','Underwriting'];
+const STAGE_AUDIT_DEF = cdef('stage','Stage','text');
+
+function trackNodes(o){
+  const nodes = TRACK_STAGES.map(s=>({stage:s, label:s, cls:'', sub:null, advanceTo:null}));
+  if(o.outcome==='won'){
+    nodes.forEach(n=>{ n.cls='done'; });
+    nodes.push({stage:'Closed', label:'Closed · Won', cls:'won', sub:null, advanceTo:null});
+  } else if(o.outcome==='lost'){
+    const idx=TRACK_STAGES.indexOf(o.lostAtStage);
+    nodes.forEach((n,i)=>{
+      if(i<idx) n.cls='done';
+      else if(i===idx){ n.cls='lost'; n.label=n.stage+' · Lost'; }
+    });
+    /* Closed stays unreached: the deal died in the stage above and never progressed
+       through the pipeline, so the bar must not read as fully run. */
+    nodes.push({stage:'Closed', label:'Closed', cls:'', sub:null, advanceTo:null});
   } else {
-    const idx=stages.indexOf(o.lostAtStage);
-    stages.forEach((s,i)=>items.push({label:s, cls: i<idx?'done':(i===idx?'dead':'')}));
-    items.push({label:'Closed · Lost', cls:'dead'});
+    const idx=TRACK_STAGES.indexOf(o.stage);
+    const days=currentDaysInStage(o);
+    nodes.forEach((n,i)=>{
+      if(i<idx) n.cls='done';
+      else if(i===idx){ n.cls='active'; n.sub=days+' day'+(days===1?'':'s'); }
+      else n.advanceTo=n.stage;
+    });
+    /* Closed is deliberately not an advance target — closing needs a won/lost outcome and,
+       when lost, a stage-aware reason (D9). A progress bar can't ask for either. */
+    nodes.push({stage:'Closed', label:'Closed', cls:'', sub:null, advanceTo:null});
   }
-  return items;
+  return nodes;
 }
 
-function renderStepperHtml(o){
-  const items=stepperItems(o);
-  let html='<div class="stepper">';
-  items.forEach((it,i)=>{
-    html+='<div class="step">'+
-      '<div class="step-row">'+
-        (i>0?'<div class="step-line'+(items[i-1].cls==='done'||items[i-1].cls==='dead'?' done':'')+'"></div>':'')+
-        '<div class="step-dot '+it.cls+'">'+(it.cls==='done'?'✓':it.cls==='dead'?'×':(i+1))+'</div>'+
-        (i<items.length-1?'<div class="step-line'+(it.cls==='done'||it.cls==='dead'?' done':'')+'"></div>':'')+
+function renderStageTrackHtml(o){
+  const nodes = trackNodes(o);
+  const reached = i => !!(nodes[i] && nodes[i].cls);
+  let html='<div class="track">';
+  nodes.forEach((n,i)=>{
+    const glyph = (n.cls==='done'||n.cls==='won') ? '&#10003;' : (n.cls==='lost' ? '&#10005;' : '');
+    const attrs = n.advanceTo
+      ? ' onclick="advanceOppStage(\''+o.id+'\',\''+n.advanceTo+'\')" title="Advance to '+n.advanceTo+'"'
+      : '';
+    html+='<div class="track-stage'+(n.cls?' '+n.cls:'')+(n.advanceTo?' next':'')+'"'+attrs+'>'+
+      '<div class="track-row">'+
+        (i>0 ? '<div class="track-seg l'+(reached(i)?' fill':'')+'"></div>' : '')+
+        (i<nodes.length-1 ? '<div class="track-seg r'+(reached(i+1)?' fill':'')+'"></div>' : '')+
+        '<div class="track-dot">'+glyph+'</div>'+
       '</div>'+
-      '<div class="step-label">'+it.label+'</div>'+
+      '<div class="track-label">'+esc(n.label)+'</div>'+
+      (n.sub ? '<div class="track-sub">'+esc(n.sub)+'</div>' : '')+
     '</div>';
   });
-  html+='</div>';
-  return html;
+  return html+'</div>';
 }
+
+/* In-session stage advance. Closes out the current stage-history entry, walks any skipped
+   stages through at zero days so the history stays contiguous, re-stamps the terminal marker
+   (which is what every days-in-stage read in the app derives from), and logs the move through
+   the same auditFieldEdit() wiring inline edits already use. */
+window.advanceOppStage = function(oppId, toStage){
+  const o = OPPS[oppId];
+  if(!o || o.outcome!=='open') return;
+  const from = TRACK_STAGES.indexOf(o.stage);
+  const to = TRACK_STAGES.indexOf(toStage);
+  if(from<0 || to<=from) return;
+  const hist = STAGEHIST[oppId];
+  if(!hist || !hist.length) return;
+
+  if(hist[hist.length-1].terminal!==undefined) hist.pop();
+  const cur = hist[hist.length-1];
+  if(cur){ cur.exitedDate=TODAY; cur.durationDays=daysBetween(cur.enteredDate,TODAY); }
+  for(let i=from+1;i<=to;i++){
+    const last = i===to;
+    hist.push({stage:TRACK_STAGES[i], enteredDate:TODAY,
+      exitedDate: last?null:TODAY, durationDays: last?null:0});
+  }
+  hist.push({stage:toStage, enteredDate:TODAY, exitedDate:null, durationDays:null, terminal:false});
+
+  const prevStage=o.stage;
+  o.stage=toStage;
+  auditFieldEdit(oppId, STAGE_AUDIT_DEF, prevStage, toStage);
+  if(EF_RERENDER) EF_RERENDER();
+};
 
 function productFieldsHtml(recId){
   const o = EF_STORE[recId].obj;
@@ -45187,7 +45263,7 @@ function renderOpp(id){
         '<div class="opp-meta-item">Status <b>'+stageStatusText(o)+'</b></div>'+
         '<div class="opp-meta-item">Created <b>'+fmtDate(o.createdDate)+'</b></div>'+
       '</div>'+
-      renderStepperHtml(o)+
+      renderStageTrackHtml(o)+
     '</div>'+
 
     '<div class="record-layout">'+
