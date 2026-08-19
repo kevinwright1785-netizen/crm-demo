@@ -213,14 +213,18 @@ h1,h2,h3,p,dl,dd{margin:0}
 .tip-v{font-family:var(--mono);color:var(--paper)}
 .tip-s{color:var(--ink-3)}
 
-/* ---------- horizontal stage funnel (echoes the record page's stage track) ---------- */
-.funnel{display:flex;height:var(--s5);border-radius:var(--r-s);overflow:hidden;background:var(--sunken)}
-.funnel-seg{height:100%;transition:opacity .12s var(--ease);background:var(--brand-a30);cursor:default}
-.funnel-seg.t2{background:var(--brand-a65)}
-.funnel-seg.t3{background:var(--brand-a80)}
-.funnel-seg.t4{background:var(--brand)}
-.funnel:hover .funnel-seg{opacity:.5}
-.funnel .funnel-seg:hover{opacity:1}
+/* ---------- pipeline snapshot (ranked deal list — a list stays a list, per the chart rule) ---------- */
+.snap-row{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s5);cursor:pointer;
+  transition:background .12s var(--ease);box-shadow:inset 0 1px 0 var(--row-sep)}
+.snap-row:first-child{box-shadow:none}
+.snap-row:hover{background:var(--hover)}
+.snap-main{flex:1;min-width:0}
+.snap-name-line{display:flex;align-items:center;gap:var(--s2)}
+.snap-name{font-size:12.5px;font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.snap-sub{font-size:11px;color:var(--ink-3);margin-top:var(--s1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.snap-size{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--ink);flex:0 0 auto}
+.tag.fig{font-family:var(--mono);letter-spacing:-.01em;flex:0 0 auto}
+.panel-header-count{flex:0 0 auto;font-size:11px;color:var(--ink-3);white-space:nowrap}
 
 /* ---------- horizontal ranked bars (partners) ---------- */
 .hbar-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--s3);align-items:center;
@@ -45739,23 +45743,44 @@ document.addEventListener('mouseout', function(e){
 });
 window.addEventListener('hashchange', ()=>{ TIP_EL.style.display='none'; });
 
-/* Open pipeline as one horizontal stacked funnel rather than a four-row table. The shape — how
-   much of the book sits in which stage — is the insight; four numbers in a table are not.
-   Tint deepens by stage, echoing the record page's stage track so the two read as one system. */
-function stageFunnelHtml(byStage, total){
-  const tint = ['','t2','t3','t4'];
-  const segs = byStage.map((b,i)=>{
-    if(!b.value) return '';
-    const pctOf = (b.value/total)*100;
-    return '<div class="'+('funnel-seg '+tint[i]).trim()+'" style="width:'+pctOf.toFixed(2)+'%"'+
-      tipAttr(b.stage, b.count+' deal'+(b.count===1?'':'s')+' · '+moneyShort(b.value),
-        pct(b.value/total)+' of open pipeline')+'></div>';
+/* Pipeline Snapshot: the BDO's biggest active deals, ranked by facility size. A genuine ranked
+   list — ordering is the only "shape" here, and a reader can just read it — so it stays a list
+   per the governing chart rule, not a funnel/chart rendering of the same four numbers. Each row
+   deep-links to the Opportunity record (the record page is the full deal, a modal would be a
+   shallower copy of it). */
+function pipelineSnapshotHtml(myOpen){
+  const top = myOpen.slice().sort((a,b)=>b.facilitySize-a.facilitySize).slice(0,5);
+  if(!top.length) return '<div class="empty">No open deals right now.</div>';
+  return top.map(o=>{
+    const days = currentDaysInStage(o);
+    const stale = days >= Math.max(STAGE_P75[o.stage]||0,1);
+    const acct = getAccount(o.accountId);
+    const owner = BDOS[o.bdoId];
+    return '<div class="snap-row" onclick="location.hash=\'#/opp/'+o.id+'\'">'+
+      '<div class="snap-main">'+
+        '<div class="snap-name-line">'+
+          '<span class="snap-name">'+esc(acct.name)+'</span>'+
+          '<span class="tag fig'+(stale?' warn':' neutral')+'"'+
+            tipAttr(o.stage, days+' day'+(days===1?'':'s')+' in stage',
+              stale ? 'Stale · beyond the '+Math.max(STAGE_P75[o.stage]||0,1)+'d typical for '+o.stage
+                    : 'Within the '+Math.max(STAGE_P75[o.stage]||0,1)+'d typical for '+o.stage)+
+            '>'+days+'d</span>'+
+        '</div>'+
+        '<div class="snap-sub">'+o.stage+' · '+o.productType+' · '+esc(owner.name)+'</div>'+
+      '</div>'+
+      '<div class="snap-size">'+moneyPlain(o.facilitySize)+'</div>'+
+    '</div>';
   }).join('');
-  return '<div class="funnel">'+segs+'</div>'+
-    '<div class="mt-3">'+byStage.map(b=>
-      '<div class="kv-line"><span class="k">'+b.stage+'</span>'+
-        '<span class="v">'+b.count+' <span class="sec">·</span> '+moneyShort(b.value)+'</span></div>'
-    ).join('')+'</div>';
+}
+
+/* Stage-mix footer summary, ranked by count (most-populated stage first) so it reads like a
+   quick "where's my book sitting" line rather than the fixed funnel order. */
+function stageMixSummary(myOpen){
+  const counts = {};
+  myOpen.forEach(o=>{ counts[o.stage] = (counts[o.stage]||0)+1; });
+  return Object.keys(counts)
+    .sort((a,b)=> counts[b]-counts[a] || TRACK_STAGES.indexOf(a)-TRACK_STAGES.indexOf(b))
+    .map(s=> counts[s]+' '+s).join(' · ');
 }
 
 /* ================================================================
@@ -46253,26 +46278,6 @@ MODALS.coverage = function(){
   };
 };
 
-MODALS.stages = function(){
-  const open = myOpps().filter(o=>o.outcome==='open');
-  const rows = TRACK_STAGES.map(st=>{
-    const g = open.filter(o=>o.stage===st);
-    const val = g.reduce((t,o)=>t+o.facilitySize,0);
-    const avgDays = g.length ? Math.round(g.reduce((t,o)=>t+currentDaysInStage(o),0)/g.length) : null;
-    return modalRow([
-      {v:st, cls:'name'}, {v:g.length, cls:'num'}, {v:moneyPlain(val), cls:'num'},
-      {v:avgDays!=null?avgDays+'d':'—', cls:'num sec'},
-    ]);
-  });
-  return {
-    title:'Open pipeline by stage',
-    scope:open.length+' open deals · '+moneyPlain(open.reduce((s,o)=>s+o.facilitySize,0)),
-    body: modalTable(['Stage', {label:'Deals',num:true}, {label:'Facility',num:true},
-      {label:'Avg age in stage',num:true}], rows) +
-      '<div class="mt-4">'+oppRowsTable(open, o=>o.stage+' · '+currentDaysInStage(o)+'d')+'</div>',
-  };
-};
-
 MODALS.partners = function(){
   const stats = partnerStats(CURRENT_BDO_ID)
     .sort((a,b)=>(b.days||0)-(a.days||0));
@@ -46406,12 +46411,6 @@ function renderHome(){
   const recent = D.activities.filter(a=>a.bdoId===CURRENT_BDO_ID)
     .slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,6);
 
-  const byStage = ['Qualification','Analysis','Proposal','Underwriting'].map(s=>{
-    const opps=myOpen.filter(o=>o.stage===s);
-    return {stage:s, short:s.slice(0,4)==='Qual'?'Qual':(s==='Underwriting'?'Underwr.':s),
-      count:opps.length, value:opps.reduce((t,o)=>t+o.facilitySize,0)};
-  });
-
   const partners = partnerStats(CURRENT_BDO_ID);
 
   const todayLabel = toDateObj(TODAY).toLocaleDateString('en-US',
@@ -46496,12 +46495,14 @@ function renderHome(){
 
         partnersPanelHtml(partners)+
 
-        '<div class="panel expandable" onclick="openModal(\'stages\')">'+
+        '<div class="panel">'+
           '<div class="panel-header"><div class="panel-header-text">'+
-            '<div class="panel-title">Open pipeline</div>'+
-            '<div class="panel-scope">'+myOpen.length+' open deals · '+moneyShort(pipelineValue)+' total</div>'+
-          '</div><span class="expand-hint">Expand &rsaquo;</span></div>'+
-          '<div class="panel-body">'+stageFunnelHtml(byStage, Math.max(1,pipelineValue))+'</div>'+
+            '<div class="panel-title">Pipeline Snapshot</div>'+
+            '<div class="panel-scope">Top 5 by facility size · active opportunities</div>'+
+          '</div><span class="panel-header-count">'+myOpen.length+' total deal'+(myOpen.length===1?'':'s')+'</span></div>'+
+          '<div class="panel-body flush">'+pipelineSnapshotHtml(myOpen)+'</div>'+
+          '<div class="panel-footer"><span>'+stageMixSummary(myOpen)+'</span>'+
+            '<span class="drill" onclick="location.hash=\'#/pipeline\'">Pipeline &rsaquo;</span></div>'+
         '</div>'+
 
         lossPanelHtml(CURRENT_BDO_ID)+
