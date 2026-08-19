@@ -292,15 +292,30 @@ h1,h2,h3,p,dl,dd{margin:0}
 .segbar-seg.t2{background:var(--brand-a65)}
 .segbar-seg.t3{background:var(--brand-a80)}
 .segbar-seg.t4{background:var(--brand)}
+.segbar-seg.clickable{cursor:pointer;transition:opacity .12s var(--ease)}
+.segbar-seg.clickable:hover{opacity:.7}
 
 /* ---------- pipeline-by-stage bar (BDO Home) ---------- */
 .stagebar-legend{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--s4);margin-top:var(--s3)}
 @media (max-width:1140px){.stagebar-legend{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .stagebar-item .k{font-size:11px;color:var(--ink-2);display:block}
 .stagebar-item .v{font-family:var(--mono);font-size:11px;color:var(--ink);margin-top:var(--s1);display:block}
+.stagebar-item.clickable{cursor:pointer;border-radius:var(--r-s);
+  margin:calc(var(--s1) * -1) calc(var(--s2) * -1);padding:var(--s1) var(--s2);
+  transition:background .12s var(--ease)}
+.stagebar-item.clickable:hover{background:var(--hover)}
 
-/* ---------- today/now pair row (agenda + pipeline snapshot, side by side) ---------- */
-.pair-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--s5)}
+/* ---------- pipeline stage-filter chip (Pipeline view, arrived via a stage-bar click) ---------- */
+.stage-filter-clear{margin-left:var(--s1);background:none;border:none;color:var(--brand);
+  font-size:11px;font-weight:500;cursor:pointer;padding:0}
+.stage-filter-clear:hover{color:var(--brand-ink)}
+
+/* ---------- today/now pair row (agenda + pipeline snapshot, side by side) ----------
+   align-items:start, not the grid default (stretch): stretch was forcing the shorter card (the
+   agenda, which frequently has fewer rows than the Snapshot's fixed top-5) to inflate to match
+   its taller sibling, leaving dead whitespace at the bottom of its panel. Each card now sizes to
+   its own content; only the agenda's own internal scroll (.agenda-scroll) caps its height. */
+.pair-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--s5);align-items:start}
 @media (max-width:1140px){.pair-row{grid-template-columns:minmax(0,1fr)}}
 
 /* ---------- compact label/value rows (no hard-right islands with an empty middle) ---------- */
@@ -488,6 +503,14 @@ table.tbl{width:100%;border-collapse:collapse}
 .intel-main{flex:1;min-width:0}
 .intel-source{font-size:12.5px;font-weight:500;color:var(--brand-ink)}
 .intel-detail{font-size:12px;color:var(--ink-2);margin-top:var(--s1)}
+
+/* ---------- intelligence gate ----------
+   The "extraction is done, intelligence hasn't run yet" step. The explicit click that follows is
+   the premium tier made visible (D39/§2a) — intelligence is a distinct action, not a free step
+   that just happens after extraction. */
+.intel-gate{display:flex;align-items:center;justify-content:space-between;gap:var(--s5);flex-wrap:wrap}
+.intel-gate-title{font-size:14px;font-weight:500;color:var(--ink)}
+.intel-gate-sub{font-size:12px;color:var(--ink-3);margin-top:var(--s1);max-width:520px}
 
 .match-banner{background:var(--brand-soft);border-radius:var(--r-m);padding:var(--s4);margin-bottom:var(--s4)}
 .match-banner-title{font-size:12.5px;font-weight:500;color:var(--brand-ink)}
@@ -45522,7 +45545,20 @@ function route(){
   };
 
   if(view==='home'){ showView('view-home'); renderHome(); }
-  else if(view==='pipeline'){ renderPipeline(); showView('view-pipeline'); }
+  else if(view==='pipeline'){
+    /* #/pipeline/stage/X arrives pre-filtered (BDO Home's pipeline-by-stage bar links here) —
+       forces My Open Deals + List so the landing view is exactly "my open X deals," not a kanban
+       board with one populated column. A plain #/pipeline always clears any stale filter, so
+       navigating away and back via the nav rail never leaves a stranded filter behind. */
+    if(parts[1]==='stage' && parts[2]){
+      PIPE_STAGE_FILTER = parts[2];
+      PIPE_SEGMENT = 'myOpen';
+      PIPE_VIEW = 'list';
+    } else {
+      PIPE_STAGE_FILTER = null;
+    }
+    renderPipeline(); showView('view-pipeline');
+  }
   else if(view==='opp' && id){ renderOpp(id); showView('view-opp'); titles.opp = getOpp(id) ? getOpp(id).name : 'Opportunity'; }
   else if(view==='create'){ CREATE_PRODUCT='Factoring'; CREATE_ACCT_MODE='new'; CREATE_RATETYPE='Fixed'; renderCreate(); showView('view-create'); }
   else if(view==='intake'){ renderIntake(id); showView('view-intake'); }
@@ -45945,7 +45981,10 @@ function quotaStats(bdoId){
    Replaces the pipeline-coverage card's slot. A single horizontal stacked bar, one segment per
    stage sized by $, tint deepening by stage — echoes the segmented-bar language used elsewhere
    (.segbar) so this and any future stacked-by-category bar read as one system. Each segment and
-   the legend cell beneath it carry a tooltip (standing app-wide rule). */
+   the legend cell beneath it carry a tooltip (standing app-wide rule) and — since a stage is a
+   real, navigable filter, not just a fact to read — are click targets that drill into Pipeline
+   pre-filtered to that stage via goToPipelineStage(). A stage with zero deals gets no segment
+   (nothing to click) and its legend cell isn't a click target either (nowhere useful to land). */
 function pipelineByStageHtml(myOpen){
   const byStage = TRACK_STAGES.map(s=>{
     const g = myOpen.filter(o=>o.stage===s);
@@ -45953,13 +45992,14 @@ function pipelineByStageHtml(myOpen){
   });
   const total = Math.max(1, byStage.reduce((s,b)=>s+b.value,0));
   const segs = byStage.filter(b=>b.value>0).map(b=>
-    '<div class="'+('segbar-seg '+['','t2','t3','t4'][TRACK_STAGES.indexOf(b.stage)]).trim()+
-      '" style="width:'+((b.value/total)*100).toFixed(2)+'%"'+
+    '<div class="'+('segbar-seg clickable '+['','t2','t3','t4'][TRACK_STAGES.indexOf(b.stage)]).trim()+
+      '" style="width:'+((b.value/total)*100).toFixed(2)+'%" onclick="goToPipelineStage(\''+b.stage+'\')"'+
       tipAttr(b.stage, b.count+' deal'+(b.count===1?'':'s')+' · '+moneyShort(b.value),
-        pct(b.value/total)+' of open pipeline')+'></div>').join('');
+        pct(b.value/total)+' of open pipeline · click to view')+'></div>').join('');
   const legend = byStage.map(b=>
-    '<div class="stagebar-item"'+tipAttr(b.stage, b.count+' deal'+(b.count===1?'':'s')+' · '+moneyShort(b.value),
-        pct(b.value/total)+' of open pipeline')+'>'+
+    '<div class="stagebar-item'+(b.count?' clickable':'')+'"'+(b.count?' onclick="goToPipelineStage(\''+b.stage+'\')"':'')+
+      tipAttr(b.stage, b.count+' deal'+(b.count===1?'':'s')+' · '+moneyShort(b.value),
+        pct(b.value/total)+' of open pipeline'+(b.count?' · click to view':''))+'>'+
       '<span class="k">'+b.stage+'</span><span class="v">'+b.count+' · '+moneyShort(b.value)+'</span>'+
     '</div>').join('');
   return '<div class="segbar">'+segs+'</div>'+
@@ -46425,11 +46465,22 @@ function renderHome(){
         '<div class="met-sub">'+wonYTD.length+' deal'+(wonYTD.length===1?'':'s')+' funded this year</div></div>'+
     '</div>'+
 
-    /* Today/now pair — agenda (your day) and Pipeline Snapshot (your book) — belong together at
-       the top, above the step-back-and-think analytical cards. A fixed two-column row, not the
-       masonry pool below: with exactly two cards the packer would always place them side by side
-       anyway, but a dedicated row makes the pairing explicit and collapses to stacked (agenda
-       then snapshot) under the same 1140px breakpoint the rest of the home body already uses. */
+    /* Pipeline by stage sits directly under the metric strip — the highest-altitude "shape of
+       my book" read, right where the strip leaves off. The today/now pair (agenda + snapshot)
+       and the analytical grid follow below it. */
+    '<div class="panel">'+
+      '<div class="panel-header"><div class="panel-header-text">'+
+        '<div class="panel-title">Pipeline by stage</div>'+
+        '<div class="panel-scope">'+myOpen.length+' open deal'+(myOpen.length===1?'':'s')+' · '+moneyShort(pipelineValue)+' total</div>'+
+      '</div></div>'+
+      '<div class="panel-body">'+pipelineByStageHtml(myOpen)+'</div>'+
+    '</div>'+
+
+    /* Today/now pair — agenda (your day) and Pipeline Snapshot (your book) — belong together,
+       above the step-back-and-think analytical cards. A fixed two-column row, not the masonry
+       pool below: with exactly two cards the packer would always place them side by side anyway,
+       but a dedicated row makes the pairing explicit and collapses to stacked (agenda then
+       snapshot) under the same 1140px breakpoint the rest of the home body already uses. */
     '<div class="pair-row">'+
       '<div class="panel">'+
         '<div class="panel-header"><div class="panel-header-text">'+
@@ -46459,14 +46510,6 @@ function renderHome(){
         '<div class="panel-footer"><span>'+stageMixSummary(myOpen)+'</span>'+
           '<span class="drill" onclick="location.hash=\'#/pipeline\'">Pipeline &rsaquo;</span></div>'+
       '</div>'+
-    '</div>'+
-
-    '<div class="panel">'+
-      '<div class="panel-header"><div class="panel-header-text">'+
-        '<div class="panel-title">Pipeline by stage</div>'+
-        '<div class="panel-scope">'+myOpen.length+' open deal'+(myOpen.length===1?'':'s')+' · '+moneyShort(pipelineValue)+' total</div>'+
-      '</div></div>'+
-      '<div class="panel-body">'+pipelineByStageHtml(myOpen)+'</div>'+
     '</div>'+
 
     '<div class="home-grid">'+
@@ -46549,7 +46592,8 @@ const SEGMENTS = [
   {key:'byProduct', label:'By Product Type', grouping:'product', filter:()=>true},
 ];
 let PIPE_SEGMENT = 'allOpen';
-let PIPE_VIEW = 'kanban';
+let PIPE_VIEW = 'list';   // reps live in lists — list is the default, board is opt-in
+let PIPE_STAGE_FILTER = null;   // set by #/pipeline/stage/X (BDO Home's stage-bar drill-down)
 
 function currentDaysInStage(o){
   const hist=getStageHistory(o.id); const term=hist[hist.length-1];
@@ -46558,7 +46602,7 @@ function currentDaysInStage(o){
 
 function renderPipeline(){
   const seg = SEGMENTS.find(s=>s.key===PIPE_SEGMENT);
-  const opps = D.opportunities.filter(seg.filter);
+  const opps = D.opportunities.filter(seg.filter).filter(o=>!PIPE_STAGE_FILTER || o.stage===PIPE_STAGE_FILTER);
   const totalVal = opps.reduce((s,o)=>s+o.facilitySize,0);
 
   const cols = seg.grouping==='product'
@@ -46616,20 +46660,27 @@ function renderPipeline(){
 
   document.getElementById('view-pipeline').innerHTML =
     '<h1 class="page-heading">Pipeline</h1>'+
-    '<div class="page-sub">'+opps.length+' deals · '+moneyPlain(totalVal)+' · '+seg.label+'</div>'+
+    '<div class="page-sub">'+opps.length+' deals · '+moneyPlain(totalVal)+' · '+seg.label+
+      (PIPE_STAGE_FILTER ? ' · Stage: <b>'+esc(PIPE_STAGE_FILTER)+'</b> '+
+        '<button class="stage-filter-clear" onclick="clearPipeStageFilter()">Clear filter &times;</button>' : '')+
+    '</div>'+
     '<div class="pipe-toolbar">'+
       '<div class="chipbar tight">'+
         SEGMENTS.map(s=>'<button class="chip'+(s.key===PIPE_SEGMENT?' active':'')+'" onclick="setPipeSegment(\''+s.key+'\')">'+s.label+'</button>').join('')+
       '</div>'+
       '<div class="viewtoggle">'+
-        '<button class="'+(PIPE_VIEW==='kanban'?'active':'')+'" onclick="setPipeView(\'kanban\')">Board</button>'+
         '<button class="'+(PIPE_VIEW==='list'?'active':'')+'" onclick="setPipeView(\'list\')">List</button>'+
+        '<button class="'+(PIPE_VIEW==='kanban'?'active':'')+'" onclick="setPipeView(\'kanban\')">Board</button>'+
       '</div>'+
     '</div>'+
     (PIPE_VIEW==='kanban' ? kanbanHtml : listHtml);
 }
-window.setPipeSegment = function(key){ PIPE_SEGMENT=key; renderPipeline(); };
+/* Changing segment swaps the underlying deal set, so any stage drill-down from BDO Home no
+   longer applies — cleared here. Toggling List/Board keeps it: same deals, different presentation. */
+window.setPipeSegment = function(key){ PIPE_SEGMENT=key; PIPE_STAGE_FILTER=null; renderPipeline(); };
 window.setPipeView = function(v){ PIPE_VIEW=v; renderPipeline(); };
+window.clearPipeStageFilter = function(){ PIPE_STAGE_FILTER=null; renderPipeline(); };
+window.goToPipelineStage = function(stage){ location.hash = '#/pipeline/stage/'+stage; };
 
 /* ================================================================
    OPPORTUNITY RECORD
@@ -47206,7 +47257,7 @@ function intelligenceResults(acct){
 }
 
 let INTAKE_MODE = 'hero';   // 'hero' | 'simulated'
-let INTAKE_STATE = 'drop';  // 'drop' | 'extracting' | 'intelligence' | 'review'
+let INTAKE_STATE = 'drop';  // 'drop' | 'extracting' | 'ready' | 'intelligence' | 'review'
 let INTAKE_CTX = null;      // {account, productType}
 let INTAKE_DRAFT = null;    // editable draft opportunity, set on entering 'review'
 let INTAKE_TIMER = null;
@@ -47303,7 +47354,7 @@ function drawIntake(){
       const phraseEl=document.getElementById('extract-phrase');
       if(step>=totalSteps){
         if(bar) bar.style.width='100%';
-        INTAKE_TIMER=setTimeout(()=>{ INTAKE_STATE='intelligence'; drawIntake(); }, 500);
+        INTAKE_TIMER=setTimeout(()=>{ INTAKE_STATE='ready'; drawIntake(); }, 500);
         return;
       }
       if(step<total){
@@ -47321,11 +47372,37 @@ function drawIntake(){
     return;
   }
 
+  if(INTAKE_STATE==='ready'){
+    /* Extraction is done; intelligence does NOT auto-run. The explicit click IS the premium
+       tier made visible (D39/§2a) — it demonstrates intelligence as a distinct, gated capability
+       rather than a step that just happens for free. Wizard bar stays on "Extract": Intelligence
+       only becomes the active step once the user actually starts it. */
+    el.innerHTML =
+      '<h1 class="page-heading">New Opportunity</h1>'+
+      '<div class="page-sub">Extraction complete — review, then run intelligence when ready</div>'+
+      wizardBarHtml(1)+
+      demoOnlyBannerHtml()+
+      '<div class="panel">'+
+        '<div class="panel-header"><div class="panel-header-text">'+
+          '<div class="panel-title">Extraction complete</div>'+
+          '<div class="panel-scope">'+intakeDocLabels(INTAKE_CTX.productType).length+' documents read for '+esc(INTAKE_CTX.account.name)+'</div>'+
+        '</div></div>'+
+        '<div class="panel-body pad-top intel-gate">'+
+          '<div class="intel-gate-copy">'+
+            '<div class="intel-gate-title">Run intelligence on this account?</div>'+
+            '<div class="intel-gate-sub">Premium intelligence layer — D&amp;B, ZoomInfo, LexisNexis lien search, and network mapping. Part of your plan\'s intelligence tier, not bundled into the base CRM.</div>'+
+          '</div>'+
+          '<button class="btn primary" onclick="runIntelligence()">Run Intelligence</button>'+
+        '</div>'+
+      '</div>';
+    return;
+  }
+
   if(INTAKE_STATE==='intelligence'){
     /* Round 3b — a distinct beat from extraction: extraction reads what was handed to you,
-       this pulls in enrichment/intelligence sources. Runs as a continuous sequence after
-       extraction (auto-advances in), but stays visually its own step (own wizard-bar stop,
-       own panel, its own per-source resolve) so the two jobs don't blur together. */
+       this pulls in enrichment/intelligence sources. Deliberately NOT auto-run — see the
+       'ready' gate above — but stays visually its own step (own wizard-bar stop, own panel,
+       its own per-source resolve) once started, so the two jobs don't blur together. */
     const results = intelligenceResults(INTAKE_CTX.account);
     el.innerHTML =
       '<h1 class="page-heading">New Opportunity</h1>'+
@@ -47419,6 +47496,10 @@ window.startScenario = function(i){
   const s = SCENARIOS[i];
   INTAKE_CTX = {account:s.account, productType:s.productType};
   INTAKE_STATE='extracting';
+  drawIntake();
+};
+window.runIntelligence = function(){
+  INTAKE_STATE='intelligence';
   drawIntake();
 };
 window.startOverIntake = function(){
