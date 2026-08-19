@@ -146,13 +146,12 @@ h1,h2,h3,p,dl,dd{margin:0}
 .chipbar.tight{margin-bottom:0}
 .tagrow{display:flex;gap:var(--s2)}
 .actions-end{display:flex;gap:var(--s3);justify-content:flex-end}
-.stage-row{margin-bottom:var(--s3)}
-.barlabel{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-2);margin-bottom:var(--s1)}
-.bar-track{height:6px;background:var(--sunken);border-radius:var(--r-s);overflow:hidden}
-.bar-fill{height:100%;background:var(--brand)}
 .ml-auto{margin-left:auto}
 .velocity-note{margin-top:var(--s4);font-size:12px;color:var(--ink-2)}
 .center-mt{margin-top:var(--s4);text-align:center}
+.mono-inline{font-family:var(--mono);color:var(--ink-3)}
+.mt-3{margin-top:var(--s3)}
+.mt-4{margin-top:var(--s4)}
 .mt-5{margin-top:var(--s5)}
 .feed-icon{width:26px;height:26px;border-radius:var(--r-s);background:var(--sunken);color:var(--ink-2);
   display:flex;align-items:center;justify-content:center;flex:0 0 26px;font-size:13px}
@@ -191,16 +190,6 @@ h1,h2,h3,p,dl,dd{margin:0}
 .agenda-sub{font-size:11px;color:var(--ink-3);margin-top:var(--s1)}
 .agenda-tag{font-size:11px;font-weight:500;color:var(--brand-ink);flex:0 0 auto;padding-top:var(--s1)}
 
-/* ---------- top partners ---------- */
-.partner-row{display:flex;align-items:center;gap:var(--s3);padding:var(--s2) var(--s5);
-  box-shadow:inset 0 1px 0 var(--row-sep)}
-.partner-row:first-child{box-shadow:none}
-.partner-main{flex:1;min-width:0}
-.partner-name{font-size:12px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.partner-sub{font-size:11px;color:var(--ink-3);margin-top:var(--s1)}
-.partner-row.dormant .partner-sub{color:var(--warn-ink)}
-.partner-count{font-family:var(--mono);font-size:12px;color:var(--ink-2);flex:0 0 auto}
-
 /* ---------- charts (v7: brand ink, 3–4 gridlines, dashed reference, tint ramp, no gradients) ----------
    Gridlines are a repeating background rather than elements, so the plot stays one box and the
    only inline styles on a chart are the data-driven ones (bar height, point geometry). */
@@ -214,21 +203,66 @@ h1,h2,h3,p,dl,dd{margin:0}
 .chart-ref-lab{position:absolute;right:0;top:calc(var(--s1) * -1);transform:translateY(-100%);
   font-size:11px;color:var(--ink-3);background:var(--paper);padding-left:var(--s1)}
 .cols{position:absolute;inset:0;display:flex;align-items:flex-end;gap:var(--s2)}
-.colw{flex:1;min-width:0;display:flex;align-items:flex-end;height:100%}
-.colbar{width:100%;background:var(--brand-a30);transition:background .12s var(--ease)}
-.colbar.t2{background:var(--brand-a65)}
-.colbar.t3{background:var(--brand-a80)}
-.colbar.t4{background:var(--brand)}
 .chart-x{display:flex;gap:var(--s2);margin-top:var(--s2)}
 .chart-x span{flex:1;min-width:0;font-size:11px;color:var(--ink-3);text-align:center;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .chart-x.dense span{text-align:left}
-.trend{display:block;width:100%;height:100%}
-.trend-line{fill:none;stroke:var(--brand);stroke-width:1.5}
-.trend-area{fill:var(--brand-a07);stroke:none}
-.trend-grid{stroke:var(--line);stroke-width:1}
-.trend-ref{stroke:var(--line-2);stroke-width:1;stroke-dasharray:3 3}
 .chart-note{font-size:11px;color:var(--ink-3);margin-top:var(--s2)}
+
+/* ---------- chart tooltip ----------
+   One shared element, delegated off [data-tip]. Every chart mark app-wide carries a data-tip,
+   so no chart is dead on hover (CLAUDE.md chart rules). No shadow: the strip already spends
+   this view's single tier-2 elevation, and a dark fill on warm paper reads without one. */
+.tip{position:fixed;z-index:60;pointer-events:none;display:none;max-width:260px;
+  background:var(--ink);color:var(--paper);border-radius:var(--r-s);
+  padding:var(--s2) var(--s3);font-size:11px;line-height:1.45}
+.tip-t{font-weight:500}
+.tip-v{font-family:var(--mono);color:var(--paper)}
+.tip-s{color:var(--ink-3)}
+
+/* ---------- vertical bar chart (funded by month) ---------- */
+.vcol{position:relative;flex:1;min-width:0;height:100%;display:flex;align-items:flex-end;cursor:default}
+.vcol-bar{width:100%;background:var(--brand-a65);transition:background .12s var(--ease)}
+.vcol:hover .vcol-bar{background:var(--brand)}
+.vcol-bar.zero{background:var(--line-2)}
+.vcol:hover .vcol-bar.zero{background:var(--ink-3)}
+
+/* ---------- horizontal stage funnel (echoes the record page's stage track) ---------- */
+.funnel{display:flex;height:var(--s5);border-radius:var(--r-s);overflow:hidden;background:var(--sunken)}
+.funnel-seg{height:100%;transition:opacity .12s var(--ease);background:var(--brand-a30);cursor:default}
+.funnel-seg.t2{background:var(--brand-a65)}
+.funnel-seg.t3{background:var(--brand-a80)}
+.funnel-seg.t4{background:var(--brand)}
+.funnel:hover .funnel-seg{opacity:.5}
+.funnel .funnel-seg:hover{opacity:1}
+
+/* ---------- horizontal ranked bars (partners) ---------- */
+.hbar-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--s3);align-items:center;
+  padding:var(--s2) var(--s5)}
+.hbar-name{font-size:12px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hbar-val{font-family:var(--mono);font-size:11px;color:var(--ink-2)}
+.hbar-row.warnrow .hbar-val{color:var(--warn-ink)}
+.hbar-track{grid-column:1 / -1;height:var(--s2);background:var(--sunken);border-radius:var(--r-s);
+  overflow:hidden;margin-top:var(--s1)}
+.hbar-fill{height:100%;background:var(--brand);transition:background .12s var(--ease)}
+.hbar-fill.warn{background:var(--warn)}
+.hbar-fill.muted{background:var(--brand-a30)}
+.hbar-row:hover .hbar-fill{background:var(--brand-2)}
+.hbar-row:hover .hbar-fill.warn{background:var(--warn-ink)}
+
+/* ---------- segmented control (reuses the .viewtoggle idiom, full-width in a rail) ---------- */
+.viewtoggle.seg{width:100%}
+.viewtoggle.seg button{flex:1;padding:0 var(--s2);font-size:11px}
+
+/* ---------- agenda: fixed height, scrolls internally like a real calendar pane ---------- */
+.agenda-scroll{max-height:calc(var(--s7) * 5);overflow-y:auto}
+
+/* ---------- compact label/value rows (no hard-right islands with an empty middle) ---------- */
+.kv-line{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--s3);align-items:baseline;
+  padding:var(--s1) 0;font-size:12px}
+.kv-line .k{color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kv-line .v{font-family:var(--mono);font-size:11px;color:var(--ink);text-align:right}
+.kv-line .v .sec{color:var(--ink-3)}
 
 /* ---------- chips / segments ---------- */
 .chipbar{display:flex;gap:var(--s2);flex-wrap:wrap;margin-bottom:var(--s4)}
@@ -2396,7 +2430,9 @@ const DATASET = {
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "1% Yr1 stepdown"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0002",
@@ -2426,7 +2462,9 @@ const DATASET = {
         "discountFeePct": 1.88,
         "estMonthlyARVolume": 1091000,
         "debtorConcentrationPct": 17
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0003",
@@ -2460,7 +2498,9 @@ const DATASET = {
         "rateSpreadBps": 628,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.19x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0004",
@@ -2489,7 +2529,9 @@ const DATASET = {
         "discountFeePct": 3.25,
         "estMonthlyARVolume": 4090000,
         "debtorConcentrationPct": 44
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0005",
@@ -2523,7 +2565,9 @@ const DATASET = {
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "1% Yr1 stepdown"
-      }
+      },
+      "lostToCompetitor": "Regional factoring company",
+      "lostToCompetitorEvidence": "UCC filing"
     },
     {
       "id": "opp_0006",
@@ -2556,7 +2600,9 @@ const DATASET = {
         "rateSpreadBps": 453,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.22x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0007",
@@ -2583,7 +2629,9 @@ const DATASET = {
         "discountFeePct": 2.7,
         "estMonthlyARVolume": 595000,
         "debtorConcentrationPct": 20
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0008",
@@ -2613,7 +2661,9 @@ const DATASET = {
         "rateSpreadBps": 588,
         "fieldExamStatus": "Complete",
         "primaryCovenant": "FCCR >= 1.09x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0009",
@@ -2645,7 +2695,9 @@ const DATASET = {
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "1% Yr1 stepdown"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0010",
@@ -2680,7 +2732,9 @@ const DATASET = {
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0011",
@@ -2712,7 +2766,9 @@ const DATASET = {
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0012",
@@ -2745,7 +2801,9 @@ const DATASET = {
         "rateSpreadBps": 544,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.1x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0013",
@@ -2775,7 +2833,9 @@ const DATASET = {
         "seniority": "Senior",
         "securedStatus": "Unsecured",
         "callProtection": "1% Yr1 stepdown"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0014",
@@ -2805,7 +2865,9 @@ const DATASET = {
         "discountFeePct": 3.34,
         "estMonthlyARVolume": 2986000,
         "debtorConcentrationPct": 48
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0015",
@@ -2836,7 +2898,9 @@ const DATASET = {
         "rateSpreadBps": 571,
         "fieldExamStatus": "Complete",
         "primaryCovenant": "FCCR >= 1.1x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0016",
@@ -2868,7 +2932,9 @@ const DATASET = {
         "seniority": "Subordinated",
         "securedStatus": "Unsecured",
         "callProtection": "1% Yr1 stepdown"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0017",
@@ -2897,7 +2963,9 @@ const DATASET = {
         "discountFeePct": 1.15,
         "estMonthlyARVolume": 1798000,
         "debtorConcentrationPct": 22
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0018",
@@ -2926,7 +2994,9 @@ const DATASET = {
         "discountFeePct": 2.13,
         "estMonthlyARVolume": 2863000,
         "debtorConcentrationPct": 27
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0019",
@@ -2958,7 +3028,9 @@ const DATASET = {
         "seniority": "Senior",
         "securedStatus": "Unsecured",
         "callProtection": "1% Yr1 stepdown"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0020",
@@ -2991,7 +3063,9 @@ const DATASET = {
         "rateSpreadBps": 414,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.08x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0021",
@@ -3018,7 +3092,9 @@ const DATASET = {
         "discountFeePct": 3.03,
         "estMonthlyARVolume": 1780000,
         "debtorConcentrationPct": 41
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0022",
@@ -3045,7 +3121,9 @@ const DATASET = {
         "discountFeePct": 1.8,
         "estMonthlyARVolume": 323000,
         "debtorConcentrationPct": 21
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0023",
@@ -3077,7 +3155,9 @@ const DATASET = {
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "2yr soft call"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0024",
@@ -3111,7 +3191,9 @@ const DATASET = {
         "rateSpreadBps": 637,
         "fieldExamStatus": "Complete",
         "primaryCovenant": "FCCR >= 1.1x"
-      }
+      },
+      "lostToCompetitor": "Another private credit firm",
+      "lostToCompetitorEvidence": "UCC filing"
     },
     {
       "id": "opp_0025",
@@ -3144,7 +3226,9 @@ const DATASET = {
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0026",
@@ -3176,7 +3260,9 @@ const DATASET = {
         "discountFeePct": 1.06,
         "estMonthlyARVolume": 1336000,
         "debtorConcentrationPct": 44
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0027",
@@ -3209,7 +3295,9 @@ const DATASET = {
         "rateSpreadBps": 467,
         "fieldExamStatus": "Complete",
         "primaryCovenant": "FCCR >= 1.18x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0028",
@@ -3241,7 +3329,9 @@ const DATASET = {
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0029",
@@ -3270,7 +3360,9 @@ const DATASET = {
         "discountFeePct": 3.77,
         "estMonthlyARVolume": 1843000,
         "debtorConcentrationPct": 54
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0030",
@@ -3304,7 +3396,9 @@ const DATASET = {
         "rateSpreadBps": 538,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.07x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0031",
@@ -3336,7 +3430,9 @@ const DATASET = {
         "discountFeePct": 2.83,
         "estMonthlyARVolume": 1487000,
         "debtorConcentrationPct": 38
-      }
+      },
+      "lostToCompetitor": "Community bank line",
+      "lostToCompetitorEvidence": "UCC filing"
     },
     {
       "id": "opp_0032",
@@ -3366,7 +3462,9 @@ const DATASET = {
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "2yr soft call"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0033",
@@ -3395,7 +3493,9 @@ const DATASET = {
         "discountFeePct": 2.27,
         "estMonthlyARVolume": 1372000,
         "debtorConcentrationPct": 23
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0034",
@@ -3425,7 +3525,9 @@ const DATASET = {
         "seniority": "Unitranche",
         "securedStatus": "Unsecured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0035",
@@ -3459,7 +3561,9 @@ const DATASET = {
         "rateSpreadBps": 417,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.23x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0036",
@@ -3494,7 +3598,9 @@ const DATASET = {
         "rateSpreadBps": 564,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.2x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0037",
@@ -3526,7 +3632,9 @@ const DATASET = {
         "rateSpreadBps": 514,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.18x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0038",
@@ -3553,7 +3661,9 @@ const DATASET = {
         "discountFeePct": 2.61,
         "estMonthlyARVolume": 2615000,
         "debtorConcentrationPct": 38
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0039",
@@ -3586,7 +3696,9 @@ const DATASET = {
         "rateSpreadBps": 589,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.2x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0040",
@@ -3613,7 +3725,9 @@ const DATASET = {
         "discountFeePct": 3.66,
         "estMonthlyARVolume": 2324000,
         "debtorConcentrationPct": 15
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0041",
@@ -3645,7 +3759,9 @@ const DATASET = {
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "1% Yr1 stepdown"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0042",
@@ -3676,7 +3792,9 @@ const DATASET = {
         "rateSpreadBps": 352,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.06x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0043",
@@ -3706,7 +3824,9 @@ const DATASET = {
         "discountFeePct": 3.58,
         "estMonthlyARVolume": 347000,
         "debtorConcentrationPct": 18
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0044",
@@ -3736,7 +3856,9 @@ const DATASET = {
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "2yr soft call"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0045",
@@ -3769,7 +3891,9 @@ const DATASET = {
         "rateSpreadBps": 559,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.14x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0046",
@@ -3801,7 +3925,9 @@ const DATASET = {
         "discountFeePct": 3.65,
         "estMonthlyARVolume": 2862000,
         "debtorConcentrationPct": 46
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0047",
@@ -3835,7 +3961,9 @@ const DATASET = {
         "rateSpreadBps": 512,
         "fieldExamStatus": "Complete",
         "primaryCovenant": "FCCR >= 1.24x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0048",
@@ -3864,7 +3992,9 @@ const DATASET = {
         "discountFeePct": 3.86,
         "estMonthlyARVolume": 1658000,
         "debtorConcentrationPct": 40
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0049",
@@ -3898,7 +4028,9 @@ const DATASET = {
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0050",
@@ -3927,7 +4059,9 @@ const DATASET = {
         "discountFeePct": 1.74,
         "estMonthlyARVolume": 2483000,
         "debtorConcentrationPct": 44
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0051",
@@ -3962,7 +4096,9 @@ const DATASET = {
         "rateSpreadBps": 636,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.22x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0052",
@@ -3994,7 +4130,9 @@ const DATASET = {
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0053",
@@ -4021,7 +4159,9 @@ const DATASET = {
         "discountFeePct": 1.61,
         "estMonthlyARVolume": 4431000,
         "debtorConcentrationPct": 16
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0054",
@@ -4054,7 +4194,9 @@ const DATASET = {
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "2yr soft call"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0055",
@@ -4089,7 +4231,9 @@ const DATASET = {
         "rateSpreadBps": 533,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.23x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0056",
@@ -4121,7 +4265,9 @@ const DATASET = {
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": "Community bank line",
+      "lostToCompetitorEvidence": "UCC filing"
     },
     {
       "id": "opp_0057",
@@ -4148,7 +4294,9 @@ const DATASET = {
         "discountFeePct": 3.07,
         "estMonthlyARVolume": 4140000,
         "debtorConcentrationPct": 21
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0058",
@@ -4180,7 +4328,9 @@ const DATASET = {
         "seniority": "Senior",
         "securedStatus": "Unsecured",
         "callProtection": "2yr soft call"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0059",
@@ -4212,7 +4362,9 @@ const DATASET = {
         "seniority": "Unitranche",
         "securedStatus": "Unsecured",
         "callProtection": "2yr soft call"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0060",
@@ -4244,7 +4396,9 @@ const DATASET = {
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "2yr soft call"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0061",
@@ -4276,7 +4430,9 @@ const DATASET = {
         "discountFeePct": 2.26,
         "estMonthlyARVolume": 3899000,
         "debtorConcentrationPct": 53
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0062",
@@ -4310,7 +4466,9 @@ const DATASET = {
         "rateSpreadBps": 418,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.12x"
-      }
+      },
+      "lostToCompetitor": "Another private credit firm",
+      "lostToCompetitorEvidence": "Reported by borrower"
     },
     {
       "id": "opp_0063",
@@ -4342,7 +4500,9 @@ const DATASET = {
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0064",
@@ -4373,7 +4533,9 @@ const DATASET = {
         "discountFeePct": 1.61,
         "estMonthlyARVolume": 3533000,
         "debtorConcentrationPct": 18
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0065",
@@ -4405,7 +4567,9 @@ const DATASET = {
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "1% Yr1 stepdown"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0066",
@@ -4434,7 +4598,9 @@ const DATASET = {
         "discountFeePct": 2.51,
         "estMonthlyARVolume": 1037000,
         "debtorConcentrationPct": 15
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0067",
@@ -4466,7 +4632,9 @@ const DATASET = {
         "seniority": "Unitranche",
         "securedStatus": "Unsecured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0068",
@@ -4496,7 +4664,9 @@ const DATASET = {
         "discountFeePct": 2.29,
         "estMonthlyARVolume": 1316000,
         "debtorConcentrationPct": 45
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0069",
@@ -4528,7 +4698,9 @@ const DATASET = {
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "2yr soft call"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0070",
@@ -4561,7 +4733,9 @@ const DATASET = {
         "seniority": "Unitranche",
         "securedStatus": "Unsecured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0071",
@@ -4594,7 +4768,9 @@ const DATASET = {
         "rateSpreadBps": 437,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.18x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0072",
@@ -4626,7 +4802,9 @@ const DATASET = {
         "discountFeePct": 1.37,
         "estMonthlyARVolume": 3874000,
         "debtorConcentrationPct": 25
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0073",
@@ -4661,7 +4839,9 @@ const DATASET = {
         "rateSpreadBps": 366,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.14x"
-      }
+      },
+      "lostToCompetitor": "Another private credit firm",
+      "lostToCompetitorEvidence": "UCC filing"
     },
     {
       "id": "opp_0074",
@@ -4694,7 +4874,9 @@ const DATASET = {
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "1% Yr1 stepdown"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0075",
@@ -4729,7 +4911,9 @@ const DATASET = {
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0076",
@@ -4761,7 +4945,9 @@ const DATASET = {
         "rateSpreadBps": 378,
         "fieldExamStatus": "Complete",
         "primaryCovenant": "FCCR >= 1.12x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0077",
@@ -4793,7 +4979,9 @@ const DATASET = {
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": "Incumbent relationship bank",
+      "lostToCompetitorEvidence": "UCC filing"
     },
     {
       "id": "opp_0078",
@@ -4823,7 +5011,9 @@ const DATASET = {
         "discountFeePct": 1.93,
         "estMonthlyARVolume": 2729000,
         "debtorConcentrationPct": 44
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0079",
@@ -4859,7 +5049,9 @@ const DATASET = {
         "rateSpreadBps": 393,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.12x"
-      }
+      },
+      "lostToCompetitor": "Incumbent relationship bank",
+      "lostToCompetitorEvidence": "UCC filing"
     },
     {
       "id": "opp_0080",
@@ -4890,7 +5082,9 @@ const DATASET = {
         "discountFeePct": 3.62,
         "estMonthlyARVolume": 2647000,
         "debtorConcentrationPct": 41
-      }
+      },
+      "lostToCompetitor": "Incumbent relationship bank",
+      "lostToCompetitorEvidence": "Reported by borrower"
     },
     {
       "id": "opp_0081",
@@ -4922,7 +5116,9 @@ const DATASET = {
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0082",
@@ -4952,7 +5148,9 @@ const DATASET = {
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0083",
@@ -4983,7 +5181,9 @@ const DATASET = {
         "rateSpreadBps": 592,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.13x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0084",
@@ -5010,7 +5210,9 @@ const DATASET = {
         "discountFeePct": 2.35,
         "estMonthlyARVolume": 397000,
         "debtorConcentrationPct": 27
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0085",
@@ -5044,7 +5246,9 @@ const DATASET = {
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0086",
@@ -5077,7 +5281,9 @@ const DATASET = {
         "rateSpreadBps": 384,
         "fieldExamStatus": "Complete",
         "primaryCovenant": "FCCR >= 1.22x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0087",
@@ -5104,7 +5310,9 @@ const DATASET = {
         "discountFeePct": 2.04,
         "estMonthlyARVolume": 4649000,
         "debtorConcentrationPct": 30
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0088",
@@ -5133,7 +5341,9 @@ const DATASET = {
         "discountFeePct": 1.39,
         "estMonthlyARVolume": 2790000,
         "debtorConcentrationPct": 50
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0089",
@@ -5168,7 +5378,9 @@ const DATASET = {
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0090",
@@ -5203,7 +5415,9 @@ const DATASET = {
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": "Incumbent relationship bank",
+      "lostToCompetitorEvidence": "Reported by borrower"
     },
     {
       "id": "opp_0091",
@@ -5233,7 +5447,9 @@ const DATASET = {
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0092",
@@ -5263,7 +5479,9 @@ const DATASET = {
         "rateSpreadBps": 439,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.17x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0093",
@@ -5295,7 +5513,9 @@ const DATASET = {
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": "Another private credit firm",
+      "lostToCompetitorEvidence": "UCC filing"
     },
     {
       "id": "opp_0094",
@@ -5325,7 +5545,9 @@ const DATASET = {
         "discountFeePct": 2.56,
         "estMonthlyARVolume": 430000,
         "debtorConcentrationPct": 18
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0095",
@@ -5360,7 +5582,9 @@ const DATASET = {
         "rateSpreadBps": 396,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.1x"
-      }
+      },
+      "lostToCompetitor": "Regional factoring company",
+      "lostToCompetitorEvidence": "UCC filing"
     },
     {
       "id": "opp_0096",
@@ -5390,7 +5614,9 @@ const DATASET = {
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0097",
@@ -5419,7 +5645,9 @@ const DATASET = {
         "discountFeePct": 3.4,
         "estMonthlyARVolume": 1154000,
         "debtorConcentrationPct": 16
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0098",
@@ -5452,7 +5680,9 @@ const DATASET = {
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0099",
@@ -5483,7 +5713,9 @@ const DATASET = {
         "rateSpreadBps": 595,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.16x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0100",
@@ -5515,7 +5747,9 @@ const DATASET = {
         "discountFeePct": 2.65,
         "estMonthlyARVolume": 3706000,
         "debtorConcentrationPct": 43
-      }
+      },
+      "lostToCompetitor": "National ABL lender",
+      "lostToCompetitorEvidence": "UCC filing"
     },
     {
       "id": "opp_0101",
@@ -5547,7 +5781,9 @@ const DATASET = {
         "rateSpreadBps": 411,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.15x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0102",
@@ -5580,7 +5816,9 @@ const DATASET = {
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0103",
@@ -5610,7 +5848,9 @@ const DATASET = {
         "discountFeePct": 3.12,
         "estMonthlyARVolume": 751000,
         "debtorConcentrationPct": 55
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0104",
@@ -5645,7 +5885,9 @@ const DATASET = {
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0105",
@@ -5678,7 +5920,9 @@ const DATASET = {
         "seniority": "Senior",
         "securedStatus": "Unsecured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0106",
@@ -5709,7 +5953,9 @@ const DATASET = {
         "rateSpreadBps": 480,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.08x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0107",
@@ -5738,7 +5984,9 @@ const DATASET = {
         "discountFeePct": 3.39,
         "estMonthlyARVolume": 4375000,
         "debtorConcentrationPct": 55
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0108",
@@ -5771,7 +6019,9 @@ const DATASET = {
         "rateSpreadBps": 620,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.19x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0109",
@@ -5800,7 +6050,9 @@ const DATASET = {
         "discountFeePct": 1.89,
         "estMonthlyARVolume": 1622000,
         "debtorConcentrationPct": 44
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0110",
@@ -5832,7 +6084,9 @@ const DATASET = {
         "rateSpreadBps": 391,
         "fieldExamStatus": "Complete",
         "primaryCovenant": "FCCR >= 1.11x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0111",
@@ -5862,7 +6116,9 @@ const DATASET = {
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0112",
@@ -5895,7 +6151,9 @@ const DATASET = {
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0113",
@@ -5925,7 +6183,9 @@ const DATASET = {
         "discountFeePct": 2.36,
         "estMonthlyARVolume": 517000,
         "debtorConcentrationPct": 42
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0114",
@@ -5957,7 +6217,9 @@ const DATASET = {
         "rateSpreadBps": 622,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.12x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0115",
@@ -5992,7 +6254,9 @@ const DATASET = {
         "rateSpreadBps": 450,
         "fieldExamStatus": "Complete",
         "primaryCovenant": "FCCR >= 1.08x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0116",
@@ -6025,7 +6289,9 @@ const DATASET = {
         "rateSpreadBps": 642,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.24x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0117",
@@ -6055,7 +6321,9 @@ const DATASET = {
         "discountFeePct": 2.39,
         "estMonthlyARVolume": 2829000,
         "debtorConcentrationPct": 28
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0118",
@@ -6085,7 +6353,9 @@ const DATASET = {
         "seniority": "Subordinated",
         "securedStatus": "Unsecured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0119",
@@ -6119,7 +6389,9 @@ const DATASET = {
         "rateSpreadBps": 513,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.15x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0120",
@@ -6149,7 +6421,9 @@ const DATASET = {
         "seniority": "Subordinated",
         "securedStatus": "Unsecured",
         "callProtection": "2yr soft call"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0121",
@@ -6182,7 +6456,9 @@ const DATASET = {
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "1% Yr1 stepdown"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0122",
@@ -6215,7 +6491,9 @@ const DATASET = {
         "rateSpreadBps": 531,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.07x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0123",
@@ -6245,7 +6523,9 @@ const DATASET = {
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "1% Yr1 stepdown"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0124",
@@ -6277,7 +6557,9 @@ const DATASET = {
         "discountFeePct": 3.46,
         "estMonthlyARVolume": 1679000,
         "debtorConcentrationPct": 60
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0125",
@@ -6306,7 +6588,9 @@ const DATASET = {
         "discountFeePct": 2.48,
         "estMonthlyARVolume": 3162000,
         "debtorConcentrationPct": 25
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0126",
@@ -6339,7 +6623,9 @@ const DATASET = {
         "rateSpreadBps": 351,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.22x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0127",
@@ -6368,7 +6654,9 @@ const DATASET = {
         "discountFeePct": 1.09,
         "estMonthlyARVolume": 3520000,
         "debtorConcentrationPct": 43
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0128",
@@ -6403,7 +6691,9 @@ const DATASET = {
         "seniority": "Subordinated",
         "securedStatus": "Unsecured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0129",
@@ -6436,7 +6726,9 @@ const DATASET = {
         "rateSpreadBps": 488,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.07x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0130",
@@ -6465,7 +6757,9 @@ const DATASET = {
         "discountFeePct": 2.73,
         "estMonthlyARVolume": 4725000,
         "debtorConcentrationPct": 57
-      }
+      },
+      "lostToCompetitor": "Incumbent relationship bank",
+      "lostToCompetitorEvidence": "UCC filing"
     },
     {
       "id": "opp_0131",
@@ -6497,7 +6791,9 @@ const DATASET = {
         "rateSpreadBps": 459,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.06x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0132",
@@ -6531,7 +6827,9 @@ const DATASET = {
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": "Incumbent relationship bank",
+      "lostToCompetitorEvidence": "UCC filing"
     },
     {
       "id": "opp_0133",
@@ -6563,7 +6861,9 @@ const DATASET = {
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0134",
@@ -6597,7 +6897,9 @@ const DATASET = {
         "rateSpreadBps": 409,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.1x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0135",
@@ -6626,7 +6928,9 @@ const DATASET = {
         "discountFeePct": 1.97,
         "estMonthlyARVolume": 2367000,
         "debtorConcentrationPct": 34
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0136",
@@ -6656,7 +6960,9 @@ const DATASET = {
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0137",
@@ -6687,7 +6993,9 @@ const DATASET = {
         "discountFeePct": 2.35,
         "estMonthlyARVolume": 2413000,
         "debtorConcentrationPct": 37
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0138",
@@ -6721,7 +7029,9 @@ const DATASET = {
         "rateSpreadBps": 353,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.25x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0139",
@@ -6756,7 +7066,9 @@ const DATASET = {
         "rateSpreadBps": 451,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.08x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0140",
@@ -6786,7 +7098,9 @@ const DATASET = {
         "discountFeePct": 2.2,
         "estMonthlyARVolume": 1817000,
         "debtorConcentrationPct": 24
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0141",
@@ -6816,7 +7130,9 @@ const DATASET = {
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0142",
@@ -6848,7 +7164,9 @@ const DATASET = {
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "1% Yr1 stepdown"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0143",
@@ -6877,7 +7195,9 @@ const DATASET = {
         "discountFeePct": 2.91,
         "estMonthlyARVolume": 2031000,
         "debtorConcentrationPct": 46
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0144",
@@ -6910,7 +7230,9 @@ const DATASET = {
         "rateSpreadBps": 375,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.2x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0145",
@@ -6940,7 +7262,9 @@ const DATASET = {
         "discountFeePct": 2.74,
         "estMonthlyARVolume": 2193000,
         "debtorConcentrationPct": 26
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0146",
@@ -6976,7 +7300,9 @@ const DATASET = {
         "rateSpreadBps": 577,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.2x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0147",
@@ -7006,7 +7332,9 @@ const DATASET = {
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0148",
@@ -7036,7 +7364,9 @@ const DATASET = {
         "rateSpreadBps": 605,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.13x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0149",
@@ -7070,7 +7400,9 @@ const DATASET = {
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0150",
@@ -7103,7 +7435,9 @@ const DATASET = {
         "rateSpreadBps": 351,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.14x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0151",
@@ -7133,7 +7467,9 @@ const DATASET = {
         "discountFeePct": 1.17,
         "estMonthlyARVolume": 3573000,
         "debtorConcentrationPct": 40
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0152",
@@ -7168,7 +7504,9 @@ const DATASET = {
         "rateSpreadBps": 473,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.08x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0153",
@@ -7195,7 +7533,9 @@ const DATASET = {
         "discountFeePct": 2.05,
         "estMonthlyARVolume": 1419000,
         "debtorConcentrationPct": 37
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0154",
@@ -7225,7 +7565,9 @@ const DATASET = {
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0155",
@@ -7257,7 +7599,9 @@ const DATASET = {
         "rateSpreadBps": 588,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.18x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0156",
@@ -7287,7 +7631,9 @@ const DATASET = {
         "discountFeePct": 2.3,
         "estMonthlyARVolume": 5044000,
         "debtorConcentrationPct": 45
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0157",
@@ -7320,7 +7666,9 @@ const DATASET = {
         "rateSpreadBps": 591,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.16x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0158",
@@ -7355,7 +7703,9 @@ const DATASET = {
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "2yr soft call"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0159",
@@ -7387,7 +7737,9 @@ const DATASET = {
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "2yr soft call"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0160",
@@ -7416,7 +7768,9 @@ const DATASET = {
         "discountFeePct": 3.88,
         "estMonthlyARVolume": 3140000,
         "debtorConcentrationPct": 29
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0161",
@@ -7449,7 +7803,9 @@ const DATASET = {
         "rateSpreadBps": 487,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.14x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0162",
@@ -7482,7 +7838,9 @@ const DATASET = {
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0163",
@@ -7512,7 +7870,9 @@ const DATASET = {
         "discountFeePct": 2.91,
         "estMonthlyARVolume": 3968000,
         "debtorConcentrationPct": 34
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0164",
@@ -7545,7 +7905,9 @@ const DATASET = {
         "seniority": "Subordinated",
         "securedStatus": "Unsecured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0165",
@@ -7579,7 +7941,9 @@ const DATASET = {
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0166",
@@ -7609,7 +7973,9 @@ const DATASET = {
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "2yr soft call"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0167",
@@ -7638,7 +8004,9 @@ const DATASET = {
         "discountFeePct": 1.56,
         "estMonthlyARVolume": 4010000,
         "debtorConcentrationPct": 18
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0168",
@@ -7670,7 +8038,9 @@ const DATASET = {
         "rateSpreadBps": 391,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.16x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0169",
@@ -7704,7 +8074,9 @@ const DATASET = {
         "rateSpreadBps": 500,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.14x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0170",
@@ -7737,7 +8109,9 @@ const DATASET = {
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0171",
@@ -7771,7 +8145,9 @@ const DATASET = {
         "rateSpreadBps": 402,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.16x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0172",
@@ -7800,7 +8176,9 @@ const DATASET = {
         "discountFeePct": 1.96,
         "estMonthlyARVolume": 1361000,
         "debtorConcentrationPct": 51
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0173",
@@ -7833,7 +8211,9 @@ const DATASET = {
         "rateSpreadBps": 382,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.18x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0174",
@@ -7868,7 +8248,9 @@ const DATASET = {
         "rateSpreadBps": 388,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.23x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0175",
@@ -7900,7 +8282,9 @@ const DATASET = {
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": "Incumbent relationship bank",
+      "lostToCompetitorEvidence": "Reported by borrower"
     },
     {
       "id": "opp_0176",
@@ -7933,7 +8317,9 @@ const DATASET = {
         "rateSpreadBps": 367,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.2x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0177",
@@ -7963,7 +8349,9 @@ const DATASET = {
         "discountFeePct": 2.22,
         "estMonthlyARVolume": 3298000,
         "debtorConcentrationPct": 40
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0178",
@@ -7993,7 +8381,9 @@ const DATASET = {
         "discountFeePct": 3.43,
         "estMonthlyARVolume": 1720000,
         "debtorConcentrationPct": 22
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0179",
@@ -8020,7 +8410,9 @@ const DATASET = {
         "discountFeePct": 2.72,
         "estMonthlyARVolume": 2305000,
         "debtorConcentrationPct": 23
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0180",
@@ -8051,7 +8443,9 @@ const DATASET = {
         "rateSpreadBps": 635,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.12x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0181",
@@ -8082,7 +8476,9 @@ const DATASET = {
         "rateSpreadBps": 407,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.08x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0182",
@@ -8115,7 +8511,9 @@ const DATASET = {
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "1% Yr1 stepdown"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0183",
@@ -8150,7 +8548,9 @@ const DATASET = {
         "seniority": "Senior",
         "securedStatus": "Unsecured",
         "callProtection": "1% Yr1 stepdown"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0184",
@@ -8180,7 +8580,9 @@ const DATASET = {
         "discountFeePct": 3.68,
         "estMonthlyARVolume": 4424000,
         "debtorConcentrationPct": 23
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0185",
@@ -8211,7 +8613,9 @@ const DATASET = {
         "rateSpreadBps": 492,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.23x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0186",
@@ -8244,7 +8648,9 @@ const DATASET = {
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "2yr soft call"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0187",
@@ -8274,7 +8680,9 @@ const DATASET = {
         "rateSpreadBps": 433,
         "fieldExamStatus": "Complete",
         "primaryCovenant": "FCCR >= 1.21x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0188",
@@ -8306,7 +8714,9 @@ const DATASET = {
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0189",
@@ -8339,7 +8749,9 @@ const DATASET = {
         "rateSpreadBps": 483,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.22x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0190",
@@ -8366,7 +8778,9 @@ const DATASET = {
         "discountFeePct": 2.42,
         "estMonthlyARVolume": 4532000,
         "debtorConcentrationPct": 20
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0191",
@@ -8398,7 +8812,9 @@ const DATASET = {
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0192",
@@ -8428,7 +8844,9 @@ const DATASET = {
         "discountFeePct": 1.59,
         "estMonthlyARVolume": 592000,
         "debtorConcentrationPct": 40
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0193",
@@ -8462,7 +8880,9 @@ const DATASET = {
         "rateSpreadBps": 558,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.09x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0194",
@@ -8492,7 +8912,9 @@ const DATASET = {
         "discountFeePct": 3.19,
         "estMonthlyARVolume": 885000,
         "debtorConcentrationPct": 42
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0195",
@@ -8524,7 +8946,9 @@ const DATASET = {
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "1% Yr1 stepdown"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0196",
@@ -8556,7 +8980,9 @@ const DATASET = {
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0197",
@@ -8590,7 +9016,9 @@ const DATASET = {
         "rateSpreadBps": 594,
         "fieldExamStatus": "Complete",
         "primaryCovenant": "FCCR >= 1.24x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0198",
@@ -8620,7 +9048,9 @@ const DATASET = {
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "1% Yr1 stepdown"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0199",
@@ -8652,7 +9082,9 @@ const DATASET = {
         "rateSpreadBps": 364,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.18x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0200",
@@ -8686,7 +9118,9 @@ const DATASET = {
         "rateSpreadBps": 454,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.24x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0201",
@@ -8718,7 +9152,9 @@ const DATASET = {
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0202",
@@ -8748,7 +9184,9 @@ const DATASET = {
         "discountFeePct": 2.31,
         "estMonthlyARVolume": 1348000,
         "debtorConcentrationPct": 48
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0203",
@@ -8780,7 +9218,9 @@ const DATASET = {
         "discountFeePct": 1.26,
         "estMonthlyARVolume": 767000,
         "debtorConcentrationPct": 22
-      }
+      },
+      "lostToCompetitor": "Community bank line",
+      "lostToCompetitorEvidence": "Reported by borrower"
     },
     {
       "id": "opp_0204",
@@ -8812,7 +9252,9 @@ const DATASET = {
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "2yr soft call"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0205",
@@ -8844,7 +9286,9 @@ const DATASET = {
         "discountFeePct": 1.36,
         "estMonthlyARVolume": 2902000,
         "debtorConcentrationPct": 53
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0206",
@@ -8878,7 +9322,9 @@ const DATASET = {
         "seniority": "Subordinated",
         "securedStatus": "Unsecured",
         "callProtection": "1% Yr1 stepdown"
-      }
+      },
+      "lostToCompetitor": "Incumbent relationship bank",
+      "lostToCompetitorEvidence": "UCC filing"
     },
     {
       "id": "opp_0207",
@@ -8905,7 +9351,9 @@ const DATASET = {
         "discountFeePct": 1.77,
         "estMonthlyARVolume": 3125000,
         "debtorConcentrationPct": 19
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0208",
@@ -8936,7 +9384,9 @@ const DATASET = {
         "rateSpreadBps": 448,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.16x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0209",
@@ -8966,7 +9416,9 @@ const DATASET = {
         "rateSpreadBps": 633,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.08x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0210",
@@ -8996,7 +9448,9 @@ const DATASET = {
         "discountFeePct": 3.17,
         "estMonthlyARVolume": 3025000,
         "debtorConcentrationPct": 56
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0211",
@@ -9026,7 +9480,9 @@ const DATASET = {
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "1% Yr1 stepdown"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0212",
@@ -9053,7 +9509,9 @@ const DATASET = {
         "discountFeePct": 3.93,
         "estMonthlyARVolume": 3076000,
         "debtorConcentrationPct": 56
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0213",
@@ -9085,7 +9543,9 @@ const DATASET = {
         "rateSpreadBps": 532,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.13x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0214",
@@ -9115,7 +9575,9 @@ const DATASET = {
         "discountFeePct": 2.93,
         "estMonthlyARVolume": 4757000,
         "debtorConcentrationPct": 29
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0215",
@@ -9150,7 +9612,9 @@ const DATASET = {
         "seniority": "Senior",
         "securedStatus": "Unsecured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0216",
@@ -9182,7 +9646,9 @@ const DATASET = {
         "rateSpreadBps": 573,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.22x"
-      }
+      },
+      "lostToCompetitor": "Incumbent relationship bank",
+      "lostToCompetitorEvidence": "UCC filing"
     },
     {
       "id": "opp_0217",
@@ -9211,7 +9677,9 @@ const DATASET = {
         "discountFeePct": 2.47,
         "estMonthlyARVolume": 1155000,
         "debtorConcentrationPct": 44
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0218",
@@ -9244,7 +9712,9 @@ const DATASET = {
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0219",
@@ -9279,7 +9749,9 @@ const DATASET = {
         "rateSpreadBps": 504,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.06x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0220",
@@ -9309,7 +9781,9 @@ const DATASET = {
         "rateSpreadBps": 399,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.15x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0221",
@@ -9336,7 +9810,9 @@ const DATASET = {
         "discountFeePct": 1.06,
         "estMonthlyARVolume": 2941000,
         "debtorConcentrationPct": 58
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0222",
@@ -9371,7 +9847,9 @@ const DATASET = {
         "rateSpreadBps": 413,
         "fieldExamStatus": "Complete",
         "primaryCovenant": "FCCR >= 1.17x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0223",
@@ -9403,7 +9881,9 @@ const DATASET = {
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0224",
@@ -9433,7 +9913,9 @@ const DATASET = {
         "discountFeePct": 3.13,
         "estMonthlyARVolume": 596000,
         "debtorConcentrationPct": 51
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0225",
@@ -9467,7 +9949,9 @@ const DATASET = {
         "rateSpreadBps": 630,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.08x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0226",
@@ -9494,7 +9978,9 @@ const DATASET = {
         "discountFeePct": 3.62,
         "estMonthlyARVolume": 425000,
         "debtorConcentrationPct": 23
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0227",
@@ -9527,7 +10013,9 @@ const DATASET = {
         "rateSpreadBps": 436,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.07x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0228",
@@ -9562,7 +10050,9 @@ const DATASET = {
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0229",
@@ -9591,7 +10081,9 @@ const DATASET = {
         "discountFeePct": 3.01,
         "estMonthlyARVolume": 1446000,
         "debtorConcentrationPct": 20
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0230",
@@ -9624,7 +10116,9 @@ const DATASET = {
         "rateSpreadBps": 358,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.19x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0231",
@@ -9656,7 +10150,9 @@ const DATASET = {
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0232",
@@ -9685,7 +10181,9 @@ const DATASET = {
         "discountFeePct": 3.37,
         "estMonthlyARVolume": 2201000,
         "debtorConcentrationPct": 44
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0233",
@@ -9718,7 +10216,9 @@ const DATASET = {
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0234",
@@ -9753,7 +10253,9 @@ const DATASET = {
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0235",
@@ -9788,7 +10290,9 @@ const DATASET = {
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0236",
@@ -9818,7 +10322,9 @@ const DATASET = {
         "discountFeePct": 3.97,
         "estMonthlyARVolume": 2376000,
         "debtorConcentrationPct": 42
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0237",
@@ -9850,7 +10356,9 @@ const DATASET = {
         "rateSpreadBps": 421,
         "fieldExamStatus": "Complete",
         "primaryCovenant": "FCCR >= 1.09x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0238",
@@ -9879,7 +10387,9 @@ const DATASET = {
         "discountFeePct": 1.93,
         "estMonthlyARVolume": 1765000,
         "debtorConcentrationPct": 59
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0239",
@@ -9906,7 +10416,9 @@ const DATASET = {
         "discountFeePct": 3.78,
         "estMonthlyARVolume": 848000,
         "debtorConcentrationPct": 50
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0240",
@@ -9942,7 +10454,9 @@ const DATASET = {
         "rateSpreadBps": 644,
         "fieldExamStatus": "Complete",
         "primaryCovenant": "FCCR >= 1.16x"
-      }
+      },
+      "lostToCompetitor": "Incumbent relationship bank",
+      "lostToCompetitorEvidence": "UCC filing"
     },
     {
       "id": "opp_0241",
@@ -9975,7 +10489,9 @@ const DATASET = {
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "1% Yr1 stepdown"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0242",
@@ -10002,7 +10518,9 @@ const DATASET = {
         "discountFeePct": 2.17,
         "estMonthlyARVolume": 3060000,
         "debtorConcentrationPct": 38
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0243",
@@ -10037,7 +10555,9 @@ const DATASET = {
         "rateSpreadBps": 628,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.07x"
-      }
+      },
+      "lostToCompetitor": "Community bank line",
+      "lostToCompetitorEvidence": "UCC filing"
     },
     {
       "id": "opp_0244",
@@ -10064,7 +10584,9 @@ const DATASET = {
         "discountFeePct": 2.27,
         "estMonthlyARVolume": 2827000,
         "debtorConcentrationPct": 16
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0245",
@@ -10093,7 +10615,9 @@ const DATASET = {
         "discountFeePct": 2.78,
         "estMonthlyARVolume": 1773000,
         "debtorConcentrationPct": 44
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0246",
@@ -10125,7 +10649,9 @@ const DATASET = {
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "2yr soft call"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0247",
@@ -10155,7 +10681,9 @@ const DATASET = {
         "rateSpreadBps": 431,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.05x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0248",
@@ -10188,7 +10716,9 @@ const DATASET = {
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0249",
@@ -10218,7 +10748,9 @@ const DATASET = {
         "rateSpreadBps": 475,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.06x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0250",
@@ -10250,7 +10782,9 @@ const DATASET = {
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "1% Yr1 stepdown"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     }
   ],
   "stageHistory": {
@@ -19355,6 +19889,182 @@ const DATASET = {
       "collateralDescription": "Accounts receivable",
       "priorityRank": 4,
       "subordinated": true
+    },
+    {
+      "id": "lien_0278",
+      "accountId": "acct_c_0002",
+      "filingNumber": "UCC-2026-295904",
+      "filingDate": "2026-06-17",
+      "securedParty": "Regional factoring company",
+      "collateralDescription": "Accounts receivable",
+      "priorityRank": 1,
+      "subordinated": false,
+      "wonDealWeLost": "opp_0005"
+    },
+    {
+      "id": "lien_0279",
+      "accountId": "acct_c_0008",
+      "filingNumber": "UCC-2026-819022",
+      "filingDate": "2026-08-05",
+      "securedParty": "Another private credit firm",
+      "collateralDescription": "Accounts receivable",
+      "priorityRank": 1,
+      "subordinated": false,
+      "wonDealWeLost": "opp_0024"
+    },
+    {
+      "id": "lien_0280",
+      "accountId": "acct_c_0010",
+      "filingNumber": "UCC-2026-695917",
+      "filingDate": "2026-02-21",
+      "securedParty": "Community bank line",
+      "collateralDescription": "Inventory",
+      "priorityRank": 1,
+      "subordinated": false,
+      "wonDealWeLost": "opp_0031"
+    },
+    {
+      "id": "lien_0281",
+      "accountId": "acct_c_0023",
+      "filingNumber": "UCC-2026-968155",
+      "filingDate": "2026-07-17",
+      "securedParty": "Community bank line",
+      "collateralDescription": "Inventory",
+      "priorityRank": 1,
+      "subordinated": false,
+      "wonDealWeLost": "opp_0056"
+    },
+    {
+      "id": "lien_0282",
+      "accountId": "acct_c_0031",
+      "filingNumber": "UCC-2026-898491",
+      "filingDate": "2026-01-09",
+      "securedParty": "Another private credit firm",
+      "collateralDescription": "All assets",
+      "priorityRank": 1,
+      "subordinated": false,
+      "wonDealWeLost": "opp_0073"
+    },
+    {
+      "id": "lien_0283",
+      "accountId": "acct_c_0034",
+      "filingNumber": "UCC-2025-813135",
+      "filingDate": "2025-09-10",
+      "securedParty": "Incumbent relationship bank",
+      "collateralDescription": "Accounts receivable",
+      "priorityRank": 1,
+      "subordinated": false,
+      "wonDealWeLost": "opp_0077"
+    },
+    {
+      "id": "lien_0284",
+      "accountId": "acct_c_0036",
+      "filingNumber": "UCC-2026-505276",
+      "filingDate": "2026-06-03",
+      "securedParty": "Incumbent relationship bank",
+      "collateralDescription": "Accounts receivable",
+      "priorityRank": 1,
+      "subordinated": false,
+      "wonDealWeLost": "opp_0079"
+    },
+    {
+      "id": "lien_0285",
+      "accountId": "acct_c_0041",
+      "filingNumber": "UCC-2026-355831",
+      "filingDate": "2026-06-20",
+      "securedParty": "Another private credit firm",
+      "collateralDescription": "All assets",
+      "priorityRank": 1,
+      "subordinated": false,
+      "wonDealWeLost": "opp_0093"
+    },
+    {
+      "id": "lien_0286",
+      "accountId": "acct_c_0042",
+      "filingNumber": "UCC-2026-665930",
+      "filingDate": "2026-04-22",
+      "securedParty": "Regional factoring company",
+      "collateralDescription": "Accounts receivable",
+      "priorityRank": 1,
+      "subordinated": false,
+      "wonDealWeLost": "opp_0095"
+    },
+    {
+      "id": "lien_0287",
+      "accountId": "acct_c_0044",
+      "filingNumber": "UCC-2025-863054",
+      "filingDate": "2025-12-24",
+      "securedParty": "National ABL lender",
+      "collateralDescription": "Accounts receivable and inventory",
+      "priorityRank": 1,
+      "subordinated": false,
+      "wonDealWeLost": "opp_0100"
+    },
+    {
+      "id": "lien_0288",
+      "accountId": "acct_c_0058",
+      "filingNumber": "UCC-2025-083168",
+      "filingDate": "2025-10-05",
+      "securedParty": "Incumbent relationship bank",
+      "collateralDescription": "Inventory",
+      "priorityRank": 1,
+      "subordinated": false,
+      "wonDealWeLost": "opp_0130"
+    },
+    {
+      "id": "lien_0289",
+      "accountId": "acct_c_0058",
+      "filingNumber": "UCC-2026-909060",
+      "filingDate": "2026-02-13",
+      "securedParty": "Incumbent relationship bank",
+      "collateralDescription": "Accounts receivable",
+      "priorityRank": 1,
+      "subordinated": false,
+      "wonDealWeLost": "opp_0132"
+    },
+    {
+      "id": "lien_0290",
+      "accountId": "acct_c_0093",
+      "filingNumber": "UCC-2025-493686",
+      "filingDate": "2025-11-16",
+      "securedParty": "Incumbent relationship bank",
+      "collateralDescription": "All assets",
+      "priorityRank": 1,
+      "subordinated": false,
+      "wonDealWeLost": "opp_0206"
+    },
+    {
+      "id": "lien_0291",
+      "accountId": "acct_c_0099",
+      "filingNumber": "UCC-2026-697533",
+      "filingDate": "2026-05-27",
+      "securedParty": "Incumbent relationship bank",
+      "collateralDescription": "Accounts receivable and inventory",
+      "priorityRank": 1,
+      "subordinated": false,
+      "wonDealWeLost": "opp_0216"
+    },
+    {
+      "id": "lien_0292",
+      "accountId": "acct_c_0111",
+      "filingNumber": "UCC-2026-641397",
+      "filingDate": "2026-05-20",
+      "securedParty": "Incumbent relationship bank",
+      "collateralDescription": "Inventory",
+      "priorityRank": 1,
+      "subordinated": false,
+      "wonDealWeLost": "opp_0240"
+    },
+    {
+      "id": "lien_0293",
+      "accountId": "acct_c_0114",
+      "filingNumber": "UCC-2026-085784",
+      "filingDate": "2026-08-17",
+      "securedParty": "Community bank line",
+      "collateralDescription": "Accounts receivable and inventory",
+      "priorityRank": 1,
+      "subordinated": false,
+      "wonDealWeLost": "opp_0243"
     }
   ],
   "networkEdges": [
@@ -44721,11 +45431,23 @@ function buildFeed(bdoId){
     const days=daysBetween(l.filingDate,TODAY);
     if(days>60) return;
     const rel = myOpen.find(o=>o.accountId===l.accountId) || myOpps.find(o=>o.accountId===l.accountId);
+    /* A filing by a competitor who just beat us on this account is a sharper signal than a
+       generic new lien — especially when we still have open deals there. Say so, and rank it
+       above an ordinary filing, rather than making the reader join the dots. */
+    const beatUs = l.wonDealWeLost ? OPPS[l.wonDealWeLost] : null;
+    const stillOpen = beatUs ? myOpen.filter(o=>o.accountId===l.accountId).length : 0;
     cand.push({
-      type:'lien', score: 46 + (l.subordinated?8:0) + Math.max(0,14-days/4), oppId: rel?rel.id:null,
-      icon:'neg', glyph:'⚖', action:'Review lien',
-      title:'New lien filed against '+esc(getAccount(l.accountId).name),
-      sub:esc(l.collateralDescription)+(l.subordinated?' · subordinated':'')+' · filed '+days+' days ago'
+      type:'lien',
+      score: 46 + (l.subordinated?8:0) + Math.max(0,14-days/4) + (beatUs?10:0) + (stillOpen?4:0),
+      oppId: (beatUs && stillOpen) ? myOpen.find(o=>o.accountId===l.accountId).id : (rel?rel.id:null),
+      icon:'neg', glyph:'⚖', action: beatUs ? 'See who won' : 'Review lien',
+      title: beatUs
+        ? esc(l.securedParty)+' filed on '+esc(getAccount(l.accountId).name)
+        : 'New lien filed against '+esc(getAccount(l.accountId).name),
+      sub: beatUs
+        ? 'The lender that took '+esc(beatUs.name)+' · filed '+days+' days ago'+
+          (stillOpen ? ' · you still have '+stillOpen+' open deal'+(stillOpen===1?'':'s')+' here' : '')
+        : esc(l.collateralDescription)+(l.subordinated?' · subordinated':'')+' · filed '+days+' days ago'
     });
   });
 
@@ -44820,48 +45542,245 @@ function fundedByMonth(bdoId, months){
   return out;
 }
 
-function trendChartHtml(series){
+/* ---------- shared chart tooltip ----------
+   Standing rule: every chart mark carries data-tip, so no chart is dead on hover. One delegated
+   listener serves every chart on every screen rather than each chart wiring its own. */
+const TIP_EL = document.createElement('div');
+TIP_EL.className = 'tip';
+document.body.appendChild(TIP_EL);
+function tipAttr(title, value, sub){
+  const html = '<div class="tip-t">'+esc(title)+'</div>'+
+    '<div class="tip-v">'+value+'</div>'+
+    (sub ? '<div class="tip-s">'+esc(sub)+'</div>' : '');
+  return ' data-tip="'+html.replace(/"/g,'&quot;')+'"';
+}
+function moveTip(e){
+  const pad = 12;
+  let x = e.clientX + pad, y = e.clientY + pad;
+  const r = TIP_EL.getBoundingClientRect();
+  if(x + r.width > window.innerWidth - pad) x = e.clientX - r.width - pad;
+  if(y + r.height > window.innerHeight - pad) y = e.clientY - r.height - pad;
+  TIP_EL.style.left = Math.max(pad, x)+'px';
+  TIP_EL.style.top = Math.max(pad, y)+'px';
+}
+document.addEventListener('mouseover', function(e){
+  const t = e.target.closest && e.target.closest('[data-tip]');
+  if(!t) return;
+  TIP_EL.innerHTML = t.getAttribute('data-tip');
+  TIP_EL.style.display = 'block';
+  moveTip(e);
+});
+document.addEventListener('mousemove', function(e){
+  if(TIP_EL.style.display!=='block') return;
+  if(!(e.target.closest && e.target.closest('[data-tip]'))){ TIP_EL.style.display='none'; return; }
+  moveTip(e);
+});
+document.addEventListener('mouseout', function(e){
+  if(e.target.closest && e.target.closest('[data-tip]')) TIP_EL.style.display='none';
+});
+window.addEventListener('hashchange', ()=>{ TIP_EL.style.display='none'; });
+
+/* Funded volume by month as BARS, not a line: this series is lumpy and sparse (a BDO funds a
+   few deals a year), and a line implies a continuous quantity moving between months. Bars read
+   each month as the discrete event it is, and zero months read as genuinely zero. */
+function fundedBarsHtml(series){
   const max = Math.max(1, ...series.map(p=>p.value));
-  const avg = series.reduce((s,p)=>s+p.value,0)/series.length;
-  const n = series.length;
-  const x = i => (n===1?0:(i/(n-1))*100);
-  const y = v => 100 - (v/max)*100;
-  const pts = series.map((p,i)=>x(i).toFixed(2)+','+y(p.value).toFixed(2));
-  const area = 'M0,100 L'+pts.join(' L')+' L100,100 Z';
-  const line = 'M'+pts.join(' L');
-  const refY = y(avg).toFixed(2);
-  /* preserveAspectRatio="none" stretches the plot to the panel; vector-effect keeps every
-     stroke a true 1px (and the dashes even) instead of scaling with it. */
+  const active = series.filter(p=>p.value>0);
+  const avg = active.length ? active.reduce((s,p)=>s+p.value,0)/active.length : 0;
   return '<div class="chart-head"><span></span>'+
       '<span class="peak">peak '+moneyShort(max)+'</span></div>'+
     '<div class="plot tall">'+
-      '<svg class="trend" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">'+
-        [25,50,75].map(g=>'<line class="trend-grid" x1="0" y1="'+g+'" x2="100" y2="'+g+
-          '" vector-effect="non-scaling-stroke"></line>').join('')+
-        '<path class="trend-area" d="'+area+'"></path>'+
-        '<line class="trend-ref" x1="0" y1="'+refY+'" x2="100" y2="'+refY+
-          '" vector-effect="non-scaling-stroke"></line>'+
-        '<path class="trend-line" d="'+line+'" vector-effect="non-scaling-stroke"></path>'+
-      '</svg>'+
+      (avg>0 ? '<div class="chart-ref" style="bottom:'+((avg/max)*100).toFixed(1)+'%"></div>' : '')+
+      '<div class="cols">'+series.map(p=>{
+        const h = p.value>0 ? Math.max(2,(p.value/max)*100) : 1.5;
+        const tip = tipAttr(p.full, p.value>0?moneyShort(p.value):'No deals funded',
+          p.value>0 ? p.count+' deal'+(p.count===1?'':'s')+' funded' : null);
+        return '<div class="vcol"'+tip+'><div class="vcol-bar'+(p.value>0?'':' zero')+
+          '" style="height:'+h.toFixed(1)+'%"></div></div>';
+      }).join('')+'</div>'+
     '</div>'+
     '<div class="chart-x dense">'+series.map(p=>'<span>'+p.label+'</span>').join('')+'</div>'+
-    '<div class="chart-note">Dashed line is the '+n+'-month average, '+moneyShort(avg)+' per month.</div>';
+    '<div class="chart-note">Dashed line is the average funding month, '+moneyShort(avg)+
+      ' across '+active.length+' month'+(active.length===1?'':'s')+' with deals.</div>';
 }
 
-function stageChartHtml(byStage){
-  const max = Math.max(1, ...byStage.map(b=>b.value));
-  const avg = byStage.reduce((s,b)=>s+b.value,0)/byStage.length;
+/* Open pipeline as one horizontal stacked funnel rather than a four-row table. The shape — how
+   much of the book sits in which stage — is the insight; four numbers in a table are not.
+   Tint deepens by stage, echoing the record page's stage track so the two read as one system. */
+function stageFunnelHtml(byStage, total){
   const tint = ['','t2','t3','t4'];
-  return '<div class="chart-head"><span>Open facility by stage</span>'+
-      '<span class="peak">'+moneyShort(max)+' peak</span></div>'+
-    '<div class="plot">'+
-      '<div class="chart-ref" style="bottom:'+((avg/max)*100).toFixed(1)+'%"></div>'+
-      '<div class="cols">'+byStage.map((b,i)=>
-        '<div class="colw"><div class="'+('colbar '+tint[i]).trim()+'" style="height:'+
-          Math.max(b.value>0?2:0,(b.value/max)*100).toFixed(1)+'%"></div></div>').join('')+
-      '</div>'+
+  const segs = byStage.map((b,i)=>{
+    if(!b.value) return '';
+    const pctOf = (b.value/total)*100;
+    return '<div class="'+('funnel-seg '+tint[i]).trim()+'" style="width:'+pctOf.toFixed(2)+'%"'+
+      tipAttr(b.stage, b.count+' deal'+(b.count===1?'':'s')+' · '+moneyShort(b.value),
+        pct(b.value/total)+' of open pipeline')+'></div>';
+  }).join('');
+  return '<div class="funnel">'+segs+'</div>'+
+    '<div class="mt-3">'+byStage.map(b=>
+      '<div class="kv-line"><span class="k">'+b.stage+'</span>'+
+        '<span class="v">'+b.count+' <span class="sec">·</span> '+moneyShort(b.value)+'</span></div>'
+    ).join('')+'</div>';
+}
+
+/* ---------- partners: one dataset, three views ----------
+   Dormancy is the default because it is the only one of the three that is time-critical — a
+   decaying referral source is a thing to act on today, which is what this screen is for.
+   Volume counts referrals to THIS BDO (her relationship); Quality uses each partner's full
+   firm-wide record, because a win rate over one or two personal deals is noise, not signal.
+   The scope line changes with the view so the mixed scope is stated, never implied. */
+const PARTNER_VIEWS = [
+  {key:'dormancy', label:'Dormancy'},
+  {key:'volume',   label:'Volume'},
+  {key:'quality',  label:'Quality'},
+];
+let PARTNER_VIEW = 'dormancy';
+window.setPartnerView = function(v){ PARTNER_VIEW=v; renderHome(); };
+
+function partnerStats(bdoId){
+  const mine = Object.values(OPPS).filter(o=>o.bdoId===bdoId);
+  const ids = [...new Set(mine.map(o=>o.referralPartnerId).filter(id=>id && PARTNERS[id]))];
+  return ids.map(id=>{
+    const p = PARTNERS[id];
+    const all = Object.values(OPPS).filter(o=>o.referralPartnerId===id);
+    const won = all.filter(o=>o.outcome==='won').length;
+    const lost = all.filter(o=>o.outcome==='lost').length;
+    return {
+      p, mine: mine.filter(o=>o.referralPartnerId===id).length,
+      firmTotal: all.length, won, lost,
+      winRate: (won+lost) ? won/(won+lost) : null,
+      days: p.lastReferralDate ? daysBetween(p.lastReferralDate,TODAY) : null,
+    };
+  });
+}
+
+function partnersPanelHtml(stats){
+  const view = PARTNER_VIEW;
+  let rows, scope, max;
+  if(view==='volume'){
+    rows = stats.slice().sort((a,b)=>b.mine-a.mine || a.p.name.localeCompare(b.p.name)).slice(0,6);
+    max = Math.max(1,...rows.map(r=>r.mine));
+    scope = 'Referrals sent to you · ranked';
+  } else if(view==='quality'){
+    rows = stats.filter(r=>r.winRate!=null)
+      .sort((a,b)=>b.winRate-a.winRate || a.p.name.localeCompare(b.p.name)).slice(0,6);
+    max = 1;
+    scope = 'Closed-won rate on all their referrals, firm-wide';
+  } else {
+    rows = stats.filter(r=>r.days!=null)
+      .sort((a,b)=>b.days-a.days || a.p.name.localeCompare(b.p.name)).slice(0,6);
+    max = Math.max(1,...rows.map(r=>r.days));
+    scope = 'Days since their last referral · longest first';
+  }
+
+  const body = rows.map(r=>{
+    let width, val, cls='', rowCls='', tip;
+    if(view==='volume'){
+      width = (r.mine/max)*100; val = r.mine+'';
+      tip = tipAttr(r.p.name, r.mine+' referral'+(r.mine===1?'':'s')+' to you',
+        r.firmTotal+' firm-wide · '+r.p.partnerType);
+    } else if(view==='quality'){
+      width = r.winRate*100; val = pct(r.winRate);
+      cls = r.winRate>=0.5 ? '' : 'muted';
+      tip = tipAttr(r.p.name, pct(r.winRate)+' closed-won',
+        r.won+' won / '+r.lost+' lost of '+r.firmTotal+' referred');
+    } else {
+      width = (r.days/max)*100; val = r.days+'d';
+      cls = r.p.isDormant ? 'warn' : '';
+      rowCls = r.p.isDormant ? ' warnrow' : '';
+      tip = tipAttr(r.p.name, r.days+' days since last referral',
+        (r.p.isDormant?'Dormant — no referral in 90+ days · ':'Active · ')+
+        r.p.referralCount+' sent all-time');
+    }
+    return '<div class="hbar-row'+rowCls+'"'+tip+'>'+
+      '<div class="hbar-name">'+esc(r.p.name)+'</div>'+
+      '<div class="hbar-val">'+val+'</div>'+
+      '<div class="hbar-track"><div class="'+('hbar-fill '+cls).trim()+'" style="width:'+
+        Math.max(2,width).toFixed(1)+'%"></div></div>'+
+    '</div>';
+  }).join('');
+
+  return '<div class="panel">'+
+    '<div class="panel-header"><div class="panel-header-text">'+
+      '<div class="panel-title">Partners</div>'+
+      '<div class="panel-scope">'+scope+'</div>'+
+    '</div></div>'+
+    '<div class="panel-body pad-top">'+
+      '<div class="viewtoggle seg">'+PARTNER_VIEWS.map(v=>
+        '<button class="'+(view===v.key?'active':'')+'" onclick="setPartnerView(\''+v.key+'\')">'+
+        v.label+'</button>').join('')+'</div>'+
     '</div>'+
-    '<div class="chart-x">'+byStage.map(b=>'<span>'+b.short+'</span>').join('')+'</div>';
+    '<div class="panel-body flush mt-3">'+
+      (rows.length ? body : '<div class="empty">No partner-sourced deals yet.</div>')+
+    '</div>'+
+  '</div>';
+}
+
+/* ---------- where we're losing ----------
+   Two questions with different shapes. Which stage kills deals is a small distribution, so it
+   gets bars. Who took them is a ranked list, so it gets bars too — but the "lost to" half falls
+   back to firm-wide whenever this BDO's own attributed sample is too thin to mean anything, and
+   says so in the scope line rather than presenting a one-deal sample as a trend. */
+const LOST_TO_MIN_SAMPLE = 5;
+
+function losingPanelHtml(bdoId){
+  const myLost = Object.values(OPPS).filter(o=>o.bdoId===bdoId && o.outcome==='lost');
+  const byStage = TRACK_STAGES.map(s=>{
+    const g = myLost.filter(o=>o.lostAtStage===s);
+    return {stage:s, count:g.length, value:g.reduce((t,o)=>t+o.facilitySize,0)};
+  });
+  const maxLost = Math.max(1,...byStage.map(b=>b.count));
+
+  const mineAttr = myLost.filter(o=>o.lostToCompetitor);
+  const firmLost = Object.values(OPPS).filter(o=>o.outcome==='lost' && o.lostToCompetitor);
+  const usingFirm = mineAttr.length < LOST_TO_MIN_SAMPLE;
+  const pool = usingFirm ? firmLost : mineAttr;
+  const tally = {};
+  pool.forEach(o=>{
+    const t = tally[o.lostToCompetitor] = tally[o.lostToCompetitor] || {n:0, val:0, ucc:0};
+    t.n++; t.val += o.facilitySize;
+    if(o.lostToCompetitorEvidence==='UCC filing') t.ucc++;
+  });
+  const winners = Object.entries(tally).sort((a,b)=>b[1].n-a[1].n).slice(0,5);
+  const maxWin = Math.max(1,...winners.map(w=>w[1].n));
+
+  const stageRows = byStage.map(b=>
+    '<div class="hbar-row"'+tipAttr(b.stage,
+        b.count+' lost · '+moneyShort(b.value),
+        b.count ? pct(b.count/Math.max(1,myLost.length))+' of your losses' : 'No losses at this stage')+'>'+
+      '<div class="hbar-name">'+b.stage+'</div>'+
+      '<div class="hbar-val">'+b.count+'</div>'+
+      '<div class="hbar-track"><div class="hbar-fill'+(b.count===maxLost&&b.count>0?'':' muted')+
+        '" style="width:'+Math.max(b.count?3:0,(b.count/maxLost)*100).toFixed(1)+'%"></div></div>'+
+    '</div>').join('');
+
+  const winnerRows = winners.map(([name,t])=>
+    '<div class="hbar-row"'+tipAttr(name, t.n+' deal'+(t.n===1?'':'s')+' · '+moneyShort(t.val),
+        t.ucc ? t.ucc+' confirmed by a UCC filing' : 'Reported by the borrower')+'>'+
+      '<div class="hbar-name">'+esc(name)+'</div>'+
+      '<div class="hbar-val">'+t.n+'</div>'+
+      '<div class="hbar-track"><div class="hbar-fill warn" style="width:'+
+        Math.max(3,(t.n/maxWin)*100).toFixed(1)+'%"></div></div>'+
+    '</div>').join('');
+
+  return '<div class="panel">'+
+    '<div class="panel-header"><div class="panel-header-text">'+
+      '<div class="panel-title">Where we\'re losing</div>'+
+      '<div class="panel-scope">'+myLost.length+' closed-lost deals · which stage kills them</div>'+
+    '</div></div>'+
+    '<div class="panel-body flush">'+stageRows+'</div>'+
+    '<div class="panel-header"><div class="panel-header-text">'+
+      '<div class="panel-title">Lost to</div>'+
+      '<div class="panel-scope">'+(usingFirm
+        ? 'Firm-wide · '+pool.length+' losses where the winner was identified'
+        : 'Your book · '+pool.length+' attributed losses')+'</div>'+
+    '</div></div>'+
+    '<div class="panel-body flush">'+
+      (winners.length ? winnerRows : '<div class="empty">No loss attributed to a competitor yet.</div>')+
+    '</div>'+
+    '<div class="panel-footer">Attribution comes from the borrower or a competitor&#39;s UCC filing '+
+      'after the loss — not every loss reveals a winner.</div>'+
+  '</div>';
 }
 
 function renderHome(){
@@ -44881,9 +45800,8 @@ function renderHome(){
   const lostSize = myLost.reduce((s,o)=>s+o.facilitySize,0);
   const winByCount = closedN ? myWon.length/closedN : 0;
   const winBySize = (wonSize+lostSize) ? wonSize/(wonSize+lostSize) : 0;
-  const followupsDue = myOpen.filter(o=>{
-    const d=lastActivityDays(o.id); return d==null || d>10;
-  }).length;
+  const inUW = myOpen.filter(o=>o.stage==='Underwriting');
+  const inUWValue = inUW.reduce((s,o)=>s+o.facilitySize,0);
 
   const feed = buildFeed(CURRENT_BDO_ID);
   const agenda = buildAgenda(CURRENT_BDO_ID);
@@ -44898,16 +45816,7 @@ function renderHome(){
       count:opps.length, value:opps.reduce((t,o)=>t+o.facilitySize,0)};
   });
 
-  const partners = (()=>{
-    const tally={};
-    myOpps.forEach(o=>{
-      if(!o.referralPartnerId || !PARTNERS[o.referralPartnerId]) return;
-      const p=PARTNERS[o.referralPartnerId];
-      const t = tally[p.id] = tally[p.id] || {p, mine:0};
-      t.mine++;
-    });
-    return Object.values(tally).sort((a,b)=>b.mine-a.mine || a.p.name.localeCompare(b.p.name)).slice(0,5);
-  })();
+  const partners = partnerStats(CURRENT_BDO_ID);
 
   const todayLabel = toDateObj(TODAY).toLocaleDateString('en-US',
     {weekday:'long', month:'long', day:'numeric', timeZone:'UTC'});
@@ -44931,9 +45840,9 @@ function renderHome(){
       '<div class="met"><div class="met-label">Win Rate</div>'+
         '<div class="met-figure">'+pct(winByCount)+'</div>'+
         '<div class="met-sub">by count · '+pct(winBySize)+' by size, on '+closedN+' closed</div></div>'+
-      '<div class="met"><div class="met-label">Activities Due</div>'+
-        '<div class="met-figure">'+followupsDue+'</div>'+
-        '<div class="met-sub">open deals with no touch in 10+ days</div></div>'+
+      '<div class="met"><div class="met-label">Deals in Underwriting</div>'+
+        '<div class="met-figure">'+inUW.length+'</div>'+
+        '<div class="met-sub">'+moneyShort(inUWValue)+' at the credit gate</div></div>'+
     '</div>'+
 
     '<div class="panel">'+
@@ -44941,7 +45850,7 @@ function renderHome(){
         '<div class="panel-title">Funded trend</div>'+
         '<div class="panel-scope">My closed-won volume by month · rolling 12 months</div>'+
       '</div></div>'+
-      '<div class="panel-body">'+trendChartHtml(trend)+'</div>'+
+      '<div class="panel-body">'+fundedBarsHtml(trend)+'</div>'+
     '</div>'+
 
     '<div class="two-col">'+
@@ -44973,7 +45882,7 @@ function renderHome(){
             '<div class="panel-title">Today\'s agenda</div>'+
             '<div class="panel-scope">'+agenda.filter(r=>!r.past).length+' left today · demo calendar</div>'+
           '</div></div>'+
-          '<div class="panel-body flush">'+
+          '<div class="panel-body flush agenda-scroll">'+
             agenda.map(r=>
               '<div class="agenda-row'+(r.past?' past':'')+(r.next?' next':'')+'"'+
                 (r.oppId?(' onclick="location.hash=\'#/opp/'+r.oppId+'\'"'):'')+'>'+
@@ -44987,41 +45896,17 @@ function renderHome(){
           '</div>'+
         '</div>'+
 
-        '<div class="panel">'+
-          '<div class="panel-header"><div class="panel-header-text">'+
-            '<div class="panel-title">My pipeline</div>'+
-            '<div class="panel-scope">'+myOpen.length+' open deals · '+moneyShort(pipelineValue)+' total</div>'+
-          '</div></div>'+
-          '<div class="panel-body">'+
-            stageChartHtml(byStage)+
-            '<div class="mt-5">'+byStage.map(b=>
-              '<div class="barlabel"><span>'+b.stage+'</span>'+
-                '<span>'+b.count+' · '+moneyShort(b.value)+'</span></div>').join('')+
-            '</div>'+
-          '</div>'+
-        '</div>'+
+        partnersPanelHtml(partners)+
 
         '<div class="panel">'+
           '<div class="panel-header"><div class="panel-header-text">'+
-            '<div class="panel-title">Top partners</div>'+
-            '<div class="panel-scope">My referral sources · '+
-              partners.filter(t=>t.p.isDormant).length+' going quiet</div>'+
+            '<div class="panel-title">Open pipeline</div>'+
+            '<div class="panel-scope">'+myOpen.length+' open deals · '+moneyShort(pipelineValue)+' total</div>'+
           '</div></div>'+
-          '<div class="panel-body flush">'+
-            (partners.length ? partners.map(t=>{
-              const days = t.p.lastReferralDate ? daysBetween(t.p.lastReferralDate,TODAY) : null;
-              return '<div class="partner-row'+(t.p.isDormant?' dormant':'')+'">'+
-                '<div class="partner-main">'+
-                  '<div class="partner-name">'+esc(t.p.name)+'</div>'+
-                  '<div class="partner-sub">'+(t.p.isDormant
-                    ? 'Dormant · no referral in '+(days!=null?days+' days':'record')
-                    : 'Last referral '+(days!=null?days+' days ago':'—'))+'</div>'+
-                '</div>'+
-                '<div class="partner-count">'+t.mine+'</div>'+
-              '</div>';
-            }).join('') : '<div class="empty">No partner-sourced deals yet.</div>')+
-          '</div>'+
+          '<div class="panel-body">'+stageFunnelHtml(byStage, Math.max(1,pipelineValue))+'</div>'+
         '</div>'+
+
+        losingPanelHtml(CURRENT_BDO_ID)+
 
         '<div class="panel">'+
           '<div class="panel-header"><div class="panel-header-text">'+
@@ -45034,8 +45919,8 @@ function renderHome(){
               return '<div class="feedrow" onclick="location.hash=\'#/opp/'+a.opportunityId+'\'">'+
                 '<div class="feed-icon">'+esc(a.type[0])+'</div>'+
                 '<div class="feed-main"><div class="feed-title">'+esc(a.subject)+'</div>'+
-                  '<div class="feed-sub">'+esc(opp?opp.name:'')+'</div></div>'+
-                '<div class="feed-time">'+fmtDate(a.date)+'</div>'+
+                  '<div class="feed-sub"><span class="mono-inline">'+fmtDate(a.date)+'</span> · '+
+                    esc(opp?opp.name:'')+'</div></div>'+
               '</div>';
             }).join('') : '<div class="empty">No activity logged yet.</div>')+
           '</div>'+

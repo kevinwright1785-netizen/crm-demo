@@ -1850,7 +1850,9 @@
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "1% Yr1 stepdown"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0002",
@@ -1880,7 +1882,9 @@
         "discountFeePct": 1.88,
         "estMonthlyARVolume": 1091000,
         "debtorConcentrationPct": 17
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0003",
@@ -1914,7 +1918,9 @@
         "rateSpreadBps": 628,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.19x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0004",
@@ -1943,7 +1949,9 @@
         "discountFeePct": 3.25,
         "estMonthlyARVolume": 4090000,
         "debtorConcentrationPct": 44
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0005",
@@ -1977,7 +1985,9 @@
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "1% Yr1 stepdown"
-      }
+      },
+      "lostToCompetitor": "Regional factoring company",
+      "lostToCompetitorEvidence": "UCC filing"
     },
     {
       "id": "opp_0006",
@@ -2010,7 +2020,9 @@
         "rateSpreadBps": 453,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.22x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0007",
@@ -2037,7 +2049,9 @@
         "discountFeePct": 2.7,
         "estMonthlyARVolume": 595000,
         "debtorConcentrationPct": 20
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0008",
@@ -2067,7 +2081,9 @@
         "rateSpreadBps": 588,
         "fieldExamStatus": "Complete",
         "primaryCovenant": "FCCR >= 1.09x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0009",
@@ -2099,7 +2115,9 @@
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "1% Yr1 stepdown"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0010",
@@ -2134,7 +2152,9 @@
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0011",
@@ -2166,7 +2186,9 @@
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0012",
@@ -2199,7 +2221,9 @@
         "rateSpreadBps": 544,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.1x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0013",
@@ -2229,7 +2253,9 @@
         "seniority": "Senior",
         "securedStatus": "Unsecured",
         "callProtection": "1% Yr1 stepdown"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0014",
@@ -2259,7 +2285,9 @@
         "discountFeePct": 3.34,
         "estMonthlyARVolume": 2986000,
         "debtorConcentrationPct": 48
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0015",
@@ -2290,7 +2318,9 @@
         "rateSpreadBps": 571,
         "fieldExamStatus": "Complete",
         "primaryCovenant": "FCCR >= 1.1x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0016",
@@ -2322,7 +2352,9 @@
         "seniority": "Subordinated",
         "securedStatus": "Unsecured",
         "callProtection": "1% Yr1 stepdown"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0017",
@@ -2351,7 +2383,9 @@
         "discountFeePct": 1.15,
         "estMonthlyARVolume": 1798000,
         "debtorConcentrationPct": 22
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0018",
@@ -2380,7 +2414,9 @@
         "discountFeePct": 2.13,
         "estMonthlyARVolume": 2863000,
         "debtorConcentrationPct": 27
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0019",
@@ -2412,7 +2448,9 @@
         "seniority": "Senior",
         "securedStatus": "Unsecured",
         "callProtection": "1% Yr1 stepdown"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0020",
@@ -2445,7 +2483,9 @@
         "rateSpreadBps": 414,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.08x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0021",
@@ -2472,7 +2512,9 @@
         "discountFeePct": 3.03,
         "estMonthlyARVolume": 1780000,
         "debtorConcentrationPct": 41
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0022",
@@ -2499,7 +2541,9 @@
         "discountFeePct": 1.8,
         "estMonthlyARVolume": 323000,
         "debtorConcentrationPct": 21
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0023",
@@ -2531,7 +2575,9 @@
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "2yr soft call"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0024",
@@ -2565,7 +2611,9 @@
         "rateSpreadBps": 637,
         "fieldExamStatus": "Complete",
         "primaryCovenant": "FCCR >= 1.1x"
-      }
+      },
+      "lostToCompetitor": "Another private credit firm",
+      "lostToCompetitorEvidence": "UCC filing"
     },
     {
       "id": "opp_0025",
@@ -2598,7 +2646,9 @@
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0026",
@@ -2630,7 +2680,9 @@
         "discountFeePct": 1.06,
         "estMonthlyARVolume": 1336000,
         "debtorConcentrationPct": 44
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0027",
@@ -2663,7 +2715,9 @@
         "rateSpreadBps": 467,
         "fieldExamStatus": "Complete",
         "primaryCovenant": "FCCR >= 1.18x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0028",
@@ -2695,7 +2749,9 @@
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0029",
@@ -2724,7 +2780,9 @@
         "discountFeePct": 3.77,
         "estMonthlyARVolume": 1843000,
         "debtorConcentrationPct": 54
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0030",
@@ -2758,7 +2816,9 @@
         "rateSpreadBps": 538,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.07x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0031",
@@ -2790,7 +2850,9 @@
         "discountFeePct": 2.83,
         "estMonthlyARVolume": 1487000,
         "debtorConcentrationPct": 38
-      }
+      },
+      "lostToCompetitor": "Community bank line",
+      "lostToCompetitorEvidence": "UCC filing"
     },
     {
       "id": "opp_0032",
@@ -2820,7 +2882,9 @@
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "2yr soft call"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0033",
@@ -2849,7 +2913,9 @@
         "discountFeePct": 2.27,
         "estMonthlyARVolume": 1372000,
         "debtorConcentrationPct": 23
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0034",
@@ -2879,7 +2945,9 @@
         "seniority": "Unitranche",
         "securedStatus": "Unsecured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0035",
@@ -2913,7 +2981,9 @@
         "rateSpreadBps": 417,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.23x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0036",
@@ -2948,7 +3018,9 @@
         "rateSpreadBps": 564,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.2x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0037",
@@ -2980,7 +3052,9 @@
         "rateSpreadBps": 514,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.18x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0038",
@@ -3007,7 +3081,9 @@
         "discountFeePct": 2.61,
         "estMonthlyARVolume": 2615000,
         "debtorConcentrationPct": 38
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0039",
@@ -3040,7 +3116,9 @@
         "rateSpreadBps": 589,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.2x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0040",
@@ -3067,7 +3145,9 @@
         "discountFeePct": 3.66,
         "estMonthlyARVolume": 2324000,
         "debtorConcentrationPct": 15
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0041",
@@ -3099,7 +3179,9 @@
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "1% Yr1 stepdown"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0042",
@@ -3130,7 +3212,9 @@
         "rateSpreadBps": 352,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.06x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0043",
@@ -3160,7 +3244,9 @@
         "discountFeePct": 3.58,
         "estMonthlyARVolume": 347000,
         "debtorConcentrationPct": 18
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0044",
@@ -3190,7 +3276,9 @@
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "2yr soft call"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0045",
@@ -3223,7 +3311,9 @@
         "rateSpreadBps": 559,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.14x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0046",
@@ -3255,7 +3345,9 @@
         "discountFeePct": 3.65,
         "estMonthlyARVolume": 2862000,
         "debtorConcentrationPct": 46
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0047",
@@ -3289,7 +3381,9 @@
         "rateSpreadBps": 512,
         "fieldExamStatus": "Complete",
         "primaryCovenant": "FCCR >= 1.24x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0048",
@@ -3318,7 +3412,9 @@
         "discountFeePct": 3.86,
         "estMonthlyARVolume": 1658000,
         "debtorConcentrationPct": 40
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0049",
@@ -3352,7 +3448,9 @@
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0050",
@@ -3381,7 +3479,9 @@
         "discountFeePct": 1.74,
         "estMonthlyARVolume": 2483000,
         "debtorConcentrationPct": 44
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0051",
@@ -3416,7 +3516,9 @@
         "rateSpreadBps": 636,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.22x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0052",
@@ -3448,7 +3550,9 @@
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0053",
@@ -3475,7 +3579,9 @@
         "discountFeePct": 1.61,
         "estMonthlyARVolume": 4431000,
         "debtorConcentrationPct": 16
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0054",
@@ -3508,7 +3614,9 @@
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "2yr soft call"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0055",
@@ -3543,7 +3651,9 @@
         "rateSpreadBps": 533,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.23x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0056",
@@ -3575,7 +3685,9 @@
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": "Community bank line",
+      "lostToCompetitorEvidence": "UCC filing"
     },
     {
       "id": "opp_0057",
@@ -3602,7 +3714,9 @@
         "discountFeePct": 3.07,
         "estMonthlyARVolume": 4140000,
         "debtorConcentrationPct": 21
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0058",
@@ -3634,7 +3748,9 @@
         "seniority": "Senior",
         "securedStatus": "Unsecured",
         "callProtection": "2yr soft call"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0059",
@@ -3666,7 +3782,9 @@
         "seniority": "Unitranche",
         "securedStatus": "Unsecured",
         "callProtection": "2yr soft call"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0060",
@@ -3698,7 +3816,9 @@
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "2yr soft call"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0061",
@@ -3730,7 +3850,9 @@
         "discountFeePct": 2.26,
         "estMonthlyARVolume": 3899000,
         "debtorConcentrationPct": 53
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0062",
@@ -3764,7 +3886,9 @@
         "rateSpreadBps": 418,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.12x"
-      }
+      },
+      "lostToCompetitor": "Another private credit firm",
+      "lostToCompetitorEvidence": "Reported by borrower"
     },
     {
       "id": "opp_0063",
@@ -3796,7 +3920,9 @@
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0064",
@@ -3827,7 +3953,9 @@
         "discountFeePct": 1.61,
         "estMonthlyARVolume": 3533000,
         "debtorConcentrationPct": 18
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0065",
@@ -3859,7 +3987,9 @@
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "1% Yr1 stepdown"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0066",
@@ -3888,7 +4018,9 @@
         "discountFeePct": 2.51,
         "estMonthlyARVolume": 1037000,
         "debtorConcentrationPct": 15
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0067",
@@ -3920,7 +4052,9 @@
         "seniority": "Unitranche",
         "securedStatus": "Unsecured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0068",
@@ -3950,7 +4084,9 @@
         "discountFeePct": 2.29,
         "estMonthlyARVolume": 1316000,
         "debtorConcentrationPct": 45
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0069",
@@ -3982,7 +4118,9 @@
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "2yr soft call"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0070",
@@ -4015,7 +4153,9 @@
         "seniority": "Unitranche",
         "securedStatus": "Unsecured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0071",
@@ -4048,7 +4188,9 @@
         "rateSpreadBps": 437,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.18x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0072",
@@ -4080,7 +4222,9 @@
         "discountFeePct": 1.37,
         "estMonthlyARVolume": 3874000,
         "debtorConcentrationPct": 25
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0073",
@@ -4115,7 +4259,9 @@
         "rateSpreadBps": 366,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.14x"
-      }
+      },
+      "lostToCompetitor": "Another private credit firm",
+      "lostToCompetitorEvidence": "UCC filing"
     },
     {
       "id": "opp_0074",
@@ -4148,7 +4294,9 @@
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "1% Yr1 stepdown"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0075",
@@ -4183,7 +4331,9 @@
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0076",
@@ -4215,7 +4365,9 @@
         "rateSpreadBps": 378,
         "fieldExamStatus": "Complete",
         "primaryCovenant": "FCCR >= 1.12x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0077",
@@ -4247,7 +4399,9 @@
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": "Incumbent relationship bank",
+      "lostToCompetitorEvidence": "UCC filing"
     },
     {
       "id": "opp_0078",
@@ -4277,7 +4431,9 @@
         "discountFeePct": 1.93,
         "estMonthlyARVolume": 2729000,
         "debtorConcentrationPct": 44
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0079",
@@ -4313,7 +4469,9 @@
         "rateSpreadBps": 393,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.12x"
-      }
+      },
+      "lostToCompetitor": "Incumbent relationship bank",
+      "lostToCompetitorEvidence": "UCC filing"
     },
     {
       "id": "opp_0080",
@@ -4344,7 +4502,9 @@
         "discountFeePct": 3.62,
         "estMonthlyARVolume": 2647000,
         "debtorConcentrationPct": 41
-      }
+      },
+      "lostToCompetitor": "Incumbent relationship bank",
+      "lostToCompetitorEvidence": "Reported by borrower"
     },
     {
       "id": "opp_0081",
@@ -4376,7 +4536,9 @@
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0082",
@@ -4406,7 +4568,9 @@
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0083",
@@ -4437,7 +4601,9 @@
         "rateSpreadBps": 592,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.13x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0084",
@@ -4464,7 +4630,9 @@
         "discountFeePct": 2.35,
         "estMonthlyARVolume": 397000,
         "debtorConcentrationPct": 27
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0085",
@@ -4498,7 +4666,9 @@
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0086",
@@ -4531,7 +4701,9 @@
         "rateSpreadBps": 384,
         "fieldExamStatus": "Complete",
         "primaryCovenant": "FCCR >= 1.22x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0087",
@@ -4558,7 +4730,9 @@
         "discountFeePct": 2.04,
         "estMonthlyARVolume": 4649000,
         "debtorConcentrationPct": 30
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0088",
@@ -4587,7 +4761,9 @@
         "discountFeePct": 1.39,
         "estMonthlyARVolume": 2790000,
         "debtorConcentrationPct": 50
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0089",
@@ -4622,7 +4798,9 @@
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0090",
@@ -4657,7 +4835,9 @@
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": "Incumbent relationship bank",
+      "lostToCompetitorEvidence": "Reported by borrower"
     },
     {
       "id": "opp_0091",
@@ -4687,7 +4867,9 @@
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0092",
@@ -4717,7 +4899,9 @@
         "rateSpreadBps": 439,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.17x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0093",
@@ -4749,7 +4933,9 @@
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": "Another private credit firm",
+      "lostToCompetitorEvidence": "UCC filing"
     },
     {
       "id": "opp_0094",
@@ -4779,7 +4965,9 @@
         "discountFeePct": 2.56,
         "estMonthlyARVolume": 430000,
         "debtorConcentrationPct": 18
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0095",
@@ -4814,7 +5002,9 @@
         "rateSpreadBps": 396,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.1x"
-      }
+      },
+      "lostToCompetitor": "Regional factoring company",
+      "lostToCompetitorEvidence": "UCC filing"
     },
     {
       "id": "opp_0096",
@@ -4844,7 +5034,9 @@
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0097",
@@ -4873,7 +5065,9 @@
         "discountFeePct": 3.4,
         "estMonthlyARVolume": 1154000,
         "debtorConcentrationPct": 16
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0098",
@@ -4906,7 +5100,9 @@
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0099",
@@ -4937,7 +5133,9 @@
         "rateSpreadBps": 595,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.16x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0100",
@@ -4969,7 +5167,9 @@
         "discountFeePct": 2.65,
         "estMonthlyARVolume": 3706000,
         "debtorConcentrationPct": 43
-      }
+      },
+      "lostToCompetitor": "National ABL lender",
+      "lostToCompetitorEvidence": "UCC filing"
     },
     {
       "id": "opp_0101",
@@ -5001,7 +5201,9 @@
         "rateSpreadBps": 411,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.15x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0102",
@@ -5034,7 +5236,9 @@
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0103",
@@ -5064,7 +5268,9 @@
         "discountFeePct": 3.12,
         "estMonthlyARVolume": 751000,
         "debtorConcentrationPct": 55
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0104",
@@ -5099,7 +5305,9 @@
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0105",
@@ -5132,7 +5340,9 @@
         "seniority": "Senior",
         "securedStatus": "Unsecured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0106",
@@ -5163,7 +5373,9 @@
         "rateSpreadBps": 480,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.08x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0107",
@@ -5192,7 +5404,9 @@
         "discountFeePct": 3.39,
         "estMonthlyARVolume": 4375000,
         "debtorConcentrationPct": 55
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0108",
@@ -5225,7 +5439,9 @@
         "rateSpreadBps": 620,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.19x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0109",
@@ -5254,7 +5470,9 @@
         "discountFeePct": 1.89,
         "estMonthlyARVolume": 1622000,
         "debtorConcentrationPct": 44
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0110",
@@ -5286,7 +5504,9 @@
         "rateSpreadBps": 391,
         "fieldExamStatus": "Complete",
         "primaryCovenant": "FCCR >= 1.11x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0111",
@@ -5316,7 +5536,9 @@
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0112",
@@ -5349,7 +5571,9 @@
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0113",
@@ -5379,7 +5603,9 @@
         "discountFeePct": 2.36,
         "estMonthlyARVolume": 517000,
         "debtorConcentrationPct": 42
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0114",
@@ -5411,7 +5637,9 @@
         "rateSpreadBps": 622,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.12x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0115",
@@ -5446,7 +5674,9 @@
         "rateSpreadBps": 450,
         "fieldExamStatus": "Complete",
         "primaryCovenant": "FCCR >= 1.08x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0116",
@@ -5479,7 +5709,9 @@
         "rateSpreadBps": 642,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.24x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0117",
@@ -5509,7 +5741,9 @@
         "discountFeePct": 2.39,
         "estMonthlyARVolume": 2829000,
         "debtorConcentrationPct": 28
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0118",
@@ -5539,7 +5773,9 @@
         "seniority": "Subordinated",
         "securedStatus": "Unsecured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0119",
@@ -5573,7 +5809,9 @@
         "rateSpreadBps": 513,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.15x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0120",
@@ -5603,7 +5841,9 @@
         "seniority": "Subordinated",
         "securedStatus": "Unsecured",
         "callProtection": "2yr soft call"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0121",
@@ -5636,7 +5876,9 @@
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "1% Yr1 stepdown"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0122",
@@ -5669,7 +5911,9 @@
         "rateSpreadBps": 531,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.07x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0123",
@@ -5699,7 +5943,9 @@
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "1% Yr1 stepdown"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0124",
@@ -5731,7 +5977,9 @@
         "discountFeePct": 3.46,
         "estMonthlyARVolume": 1679000,
         "debtorConcentrationPct": 60
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0125",
@@ -5760,7 +6008,9 @@
         "discountFeePct": 2.48,
         "estMonthlyARVolume": 3162000,
         "debtorConcentrationPct": 25
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0126",
@@ -5793,7 +6043,9 @@
         "rateSpreadBps": 351,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.22x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0127",
@@ -5822,7 +6074,9 @@
         "discountFeePct": 1.09,
         "estMonthlyARVolume": 3520000,
         "debtorConcentrationPct": 43
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0128",
@@ -5857,7 +6111,9 @@
         "seniority": "Subordinated",
         "securedStatus": "Unsecured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0129",
@@ -5890,7 +6146,9 @@
         "rateSpreadBps": 488,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.07x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0130",
@@ -5919,7 +6177,9 @@
         "discountFeePct": 2.73,
         "estMonthlyARVolume": 4725000,
         "debtorConcentrationPct": 57
-      }
+      },
+      "lostToCompetitor": "Incumbent relationship bank",
+      "lostToCompetitorEvidence": "UCC filing"
     },
     {
       "id": "opp_0131",
@@ -5951,7 +6211,9 @@
         "rateSpreadBps": 459,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.06x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0132",
@@ -5985,7 +6247,9 @@
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": "Incumbent relationship bank",
+      "lostToCompetitorEvidence": "UCC filing"
     },
     {
       "id": "opp_0133",
@@ -6017,7 +6281,9 @@
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0134",
@@ -6051,7 +6317,9 @@
         "rateSpreadBps": 409,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.1x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0135",
@@ -6080,7 +6348,9 @@
         "discountFeePct": 1.97,
         "estMonthlyARVolume": 2367000,
         "debtorConcentrationPct": 34
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0136",
@@ -6110,7 +6380,9 @@
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0137",
@@ -6141,7 +6413,9 @@
         "discountFeePct": 2.35,
         "estMonthlyARVolume": 2413000,
         "debtorConcentrationPct": 37
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0138",
@@ -6175,7 +6449,9 @@
         "rateSpreadBps": 353,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.25x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0139",
@@ -6210,7 +6486,9 @@
         "rateSpreadBps": 451,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.08x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0140",
@@ -6240,7 +6518,9 @@
         "discountFeePct": 2.2,
         "estMonthlyARVolume": 1817000,
         "debtorConcentrationPct": 24
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0141",
@@ -6270,7 +6550,9 @@
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0142",
@@ -6302,7 +6584,9 @@
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "1% Yr1 stepdown"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0143",
@@ -6331,7 +6615,9 @@
         "discountFeePct": 2.91,
         "estMonthlyARVolume": 2031000,
         "debtorConcentrationPct": 46
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0144",
@@ -6364,7 +6650,9 @@
         "rateSpreadBps": 375,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.2x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0145",
@@ -6394,7 +6682,9 @@
         "discountFeePct": 2.74,
         "estMonthlyARVolume": 2193000,
         "debtorConcentrationPct": 26
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0146",
@@ -6430,7 +6720,9 @@
         "rateSpreadBps": 577,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.2x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0147",
@@ -6460,7 +6752,9 @@
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0148",
@@ -6490,7 +6784,9 @@
         "rateSpreadBps": 605,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.13x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0149",
@@ -6524,7 +6820,9 @@
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0150",
@@ -6557,7 +6855,9 @@
         "rateSpreadBps": 351,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.14x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0151",
@@ -6587,7 +6887,9 @@
         "discountFeePct": 1.17,
         "estMonthlyARVolume": 3573000,
         "debtorConcentrationPct": 40
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0152",
@@ -6622,7 +6924,9 @@
         "rateSpreadBps": 473,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.08x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0153",
@@ -6649,7 +6953,9 @@
         "discountFeePct": 2.05,
         "estMonthlyARVolume": 1419000,
         "debtorConcentrationPct": 37
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0154",
@@ -6679,7 +6985,9 @@
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0155",
@@ -6711,7 +7019,9 @@
         "rateSpreadBps": 588,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.18x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0156",
@@ -6741,7 +7051,9 @@
         "discountFeePct": 2.3,
         "estMonthlyARVolume": 5044000,
         "debtorConcentrationPct": 45
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0157",
@@ -6774,7 +7086,9 @@
         "rateSpreadBps": 591,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.16x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0158",
@@ -6809,7 +7123,9 @@
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "2yr soft call"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0159",
@@ -6841,7 +7157,9 @@
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "2yr soft call"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0160",
@@ -6870,7 +7188,9 @@
         "discountFeePct": 3.88,
         "estMonthlyARVolume": 3140000,
         "debtorConcentrationPct": 29
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0161",
@@ -6903,7 +7223,9 @@
         "rateSpreadBps": 487,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.14x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0162",
@@ -6936,7 +7258,9 @@
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0163",
@@ -6966,7 +7290,9 @@
         "discountFeePct": 2.91,
         "estMonthlyARVolume": 3968000,
         "debtorConcentrationPct": 34
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0164",
@@ -6999,7 +7325,9 @@
         "seniority": "Subordinated",
         "securedStatus": "Unsecured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0165",
@@ -7033,7 +7361,9 @@
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0166",
@@ -7063,7 +7393,9 @@
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "2yr soft call"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0167",
@@ -7092,7 +7424,9 @@
         "discountFeePct": 1.56,
         "estMonthlyARVolume": 4010000,
         "debtorConcentrationPct": 18
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0168",
@@ -7124,7 +7458,9 @@
         "rateSpreadBps": 391,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.16x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0169",
@@ -7158,7 +7494,9 @@
         "rateSpreadBps": 500,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.14x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0170",
@@ -7191,7 +7529,9 @@
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0171",
@@ -7225,7 +7565,9 @@
         "rateSpreadBps": 402,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.16x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0172",
@@ -7254,7 +7596,9 @@
         "discountFeePct": 1.96,
         "estMonthlyARVolume": 1361000,
         "debtorConcentrationPct": 51
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0173",
@@ -7287,7 +7631,9 @@
         "rateSpreadBps": 382,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.18x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0174",
@@ -7322,7 +7668,9 @@
         "rateSpreadBps": 388,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.23x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0175",
@@ -7354,7 +7702,9 @@
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": "Incumbent relationship bank",
+      "lostToCompetitorEvidence": "Reported by borrower"
     },
     {
       "id": "opp_0176",
@@ -7387,7 +7737,9 @@
         "rateSpreadBps": 367,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.2x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0177",
@@ -7417,7 +7769,9 @@
         "discountFeePct": 2.22,
         "estMonthlyARVolume": 3298000,
         "debtorConcentrationPct": 40
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0178",
@@ -7447,7 +7801,9 @@
         "discountFeePct": 3.43,
         "estMonthlyARVolume": 1720000,
         "debtorConcentrationPct": 22
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0179",
@@ -7474,7 +7830,9 @@
         "discountFeePct": 2.72,
         "estMonthlyARVolume": 2305000,
         "debtorConcentrationPct": 23
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0180",
@@ -7505,7 +7863,9 @@
         "rateSpreadBps": 635,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.12x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0181",
@@ -7536,7 +7896,9 @@
         "rateSpreadBps": 407,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.08x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0182",
@@ -7569,7 +7931,9 @@
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "1% Yr1 stepdown"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0183",
@@ -7604,7 +7968,9 @@
         "seniority": "Senior",
         "securedStatus": "Unsecured",
         "callProtection": "1% Yr1 stepdown"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0184",
@@ -7634,7 +8000,9 @@
         "discountFeePct": 3.68,
         "estMonthlyARVolume": 4424000,
         "debtorConcentrationPct": 23
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0185",
@@ -7665,7 +8033,9 @@
         "rateSpreadBps": 492,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.23x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0186",
@@ -7698,7 +8068,9 @@
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "2yr soft call"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0187",
@@ -7728,7 +8100,9 @@
         "rateSpreadBps": 433,
         "fieldExamStatus": "Complete",
         "primaryCovenant": "FCCR >= 1.21x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0188",
@@ -7760,7 +8134,9 @@
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0189",
@@ -7793,7 +8169,9 @@
         "rateSpreadBps": 483,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.22x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0190",
@@ -7820,7 +8198,9 @@
         "discountFeePct": 2.42,
         "estMonthlyARVolume": 4532000,
         "debtorConcentrationPct": 20
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0191",
@@ -7852,7 +8232,9 @@
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0192",
@@ -7882,7 +8264,9 @@
         "discountFeePct": 1.59,
         "estMonthlyARVolume": 592000,
         "debtorConcentrationPct": 40
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0193",
@@ -7916,7 +8300,9 @@
         "rateSpreadBps": 558,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.09x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0194",
@@ -7946,7 +8332,9 @@
         "discountFeePct": 3.19,
         "estMonthlyARVolume": 885000,
         "debtorConcentrationPct": 42
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0195",
@@ -7978,7 +8366,9 @@
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "1% Yr1 stepdown"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0196",
@@ -8010,7 +8400,9 @@
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0197",
@@ -8044,7 +8436,9 @@
         "rateSpreadBps": 594,
         "fieldExamStatus": "Complete",
         "primaryCovenant": "FCCR >= 1.24x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0198",
@@ -8074,7 +8468,9 @@
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "1% Yr1 stepdown"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0199",
@@ -8106,7 +8502,9 @@
         "rateSpreadBps": 364,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.18x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0200",
@@ -8140,7 +8538,9 @@
         "rateSpreadBps": 454,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.24x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0201",
@@ -8172,7 +8572,9 @@
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0202",
@@ -8202,7 +8604,9 @@
         "discountFeePct": 2.31,
         "estMonthlyARVolume": 1348000,
         "debtorConcentrationPct": 48
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0203",
@@ -8234,7 +8638,9 @@
         "discountFeePct": 1.26,
         "estMonthlyARVolume": 767000,
         "debtorConcentrationPct": 22
-      }
+      },
+      "lostToCompetitor": "Community bank line",
+      "lostToCompetitorEvidence": "Reported by borrower"
     },
     {
       "id": "opp_0204",
@@ -8266,7 +8672,9 @@
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "2yr soft call"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0205",
@@ -8298,7 +8706,9 @@
         "discountFeePct": 1.36,
         "estMonthlyARVolume": 2902000,
         "debtorConcentrationPct": 53
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0206",
@@ -8332,7 +8742,9 @@
         "seniority": "Subordinated",
         "securedStatus": "Unsecured",
         "callProtection": "1% Yr1 stepdown"
-      }
+      },
+      "lostToCompetitor": "Incumbent relationship bank",
+      "lostToCompetitorEvidence": "UCC filing"
     },
     {
       "id": "opp_0207",
@@ -8359,7 +8771,9 @@
         "discountFeePct": 1.77,
         "estMonthlyARVolume": 3125000,
         "debtorConcentrationPct": 19
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0208",
@@ -8390,7 +8804,9 @@
         "rateSpreadBps": 448,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.16x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0209",
@@ -8420,7 +8836,9 @@
         "rateSpreadBps": 633,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.08x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0210",
@@ -8450,7 +8868,9 @@
         "discountFeePct": 3.17,
         "estMonthlyARVolume": 3025000,
         "debtorConcentrationPct": 56
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0211",
@@ -8480,7 +8900,9 @@
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "1% Yr1 stepdown"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0212",
@@ -8507,7 +8929,9 @@
         "discountFeePct": 3.93,
         "estMonthlyARVolume": 3076000,
         "debtorConcentrationPct": 56
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0213",
@@ -8539,7 +8963,9 @@
         "rateSpreadBps": 532,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.13x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0214",
@@ -8569,7 +8995,9 @@
         "discountFeePct": 2.93,
         "estMonthlyARVolume": 4757000,
         "debtorConcentrationPct": 29
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0215",
@@ -8604,7 +9032,9 @@
         "seniority": "Senior",
         "securedStatus": "Unsecured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0216",
@@ -8636,7 +9066,9 @@
         "rateSpreadBps": 573,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.22x"
-      }
+      },
+      "lostToCompetitor": "Incumbent relationship bank",
+      "lostToCompetitorEvidence": "UCC filing"
     },
     {
       "id": "opp_0217",
@@ -8665,7 +9097,9 @@
         "discountFeePct": 2.47,
         "estMonthlyARVolume": 1155000,
         "debtorConcentrationPct": 44
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0218",
@@ -8698,7 +9132,9 @@
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0219",
@@ -8733,7 +9169,9 @@
         "rateSpreadBps": 504,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.06x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0220",
@@ -8763,7 +9201,9 @@
         "rateSpreadBps": 399,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.15x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0221",
@@ -8790,7 +9230,9 @@
         "discountFeePct": 1.06,
         "estMonthlyARVolume": 2941000,
         "debtorConcentrationPct": 58
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0222",
@@ -8825,7 +9267,9 @@
         "rateSpreadBps": 413,
         "fieldExamStatus": "Complete",
         "primaryCovenant": "FCCR >= 1.17x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0223",
@@ -8857,7 +9301,9 @@
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0224",
@@ -8887,7 +9333,9 @@
         "discountFeePct": 3.13,
         "estMonthlyARVolume": 596000,
         "debtorConcentrationPct": 51
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0225",
@@ -8921,7 +9369,9 @@
         "rateSpreadBps": 630,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.08x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0226",
@@ -8948,7 +9398,9 @@
         "discountFeePct": 3.62,
         "estMonthlyARVolume": 425000,
         "debtorConcentrationPct": 23
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0227",
@@ -8981,7 +9433,9 @@
         "rateSpreadBps": 436,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.07x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0228",
@@ -9016,7 +9470,9 @@
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0229",
@@ -9045,7 +9501,9 @@
         "discountFeePct": 3.01,
         "estMonthlyARVolume": 1446000,
         "debtorConcentrationPct": 20
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0230",
@@ -9078,7 +9536,9 @@
         "rateSpreadBps": 358,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.19x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0231",
@@ -9110,7 +9570,9 @@
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0232",
@@ -9139,7 +9601,9 @@
         "discountFeePct": 3.37,
         "estMonthlyARVolume": 2201000,
         "debtorConcentrationPct": 44
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0233",
@@ -9172,7 +9636,9 @@
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "None"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0234",
@@ -9207,7 +9673,9 @@
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0235",
@@ -9242,7 +9710,9 @@
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0236",
@@ -9272,7 +9742,9 @@
         "discountFeePct": 3.97,
         "estMonthlyARVolume": 2376000,
         "debtorConcentrationPct": 42
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0237",
@@ -9304,7 +9776,9 @@
         "rateSpreadBps": 421,
         "fieldExamStatus": "Complete",
         "primaryCovenant": "FCCR >= 1.09x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0238",
@@ -9333,7 +9807,9 @@
         "discountFeePct": 1.93,
         "estMonthlyARVolume": 1765000,
         "debtorConcentrationPct": 59
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0239",
@@ -9360,7 +9836,9 @@
         "discountFeePct": 3.78,
         "estMonthlyARVolume": 848000,
         "debtorConcentrationPct": 50
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0240",
@@ -9396,7 +9874,9 @@
         "rateSpreadBps": 644,
         "fieldExamStatus": "Complete",
         "primaryCovenant": "FCCR >= 1.16x"
-      }
+      },
+      "lostToCompetitor": "Incumbent relationship bank",
+      "lostToCompetitorEvidence": "UCC filing"
     },
     {
       "id": "opp_0241",
@@ -9429,7 +9909,9 @@
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "1% Yr1 stepdown"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0242",
@@ -9456,7 +9938,9 @@
         "discountFeePct": 2.17,
         "estMonthlyARVolume": 3060000,
         "debtorConcentrationPct": 38
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0243",
@@ -9491,7 +9975,9 @@
         "rateSpreadBps": 628,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.07x"
-      }
+      },
+      "lostToCompetitor": "Community bank line",
+      "lostToCompetitorEvidence": "UCC filing"
     },
     {
       "id": "opp_0244",
@@ -9518,7 +10004,9 @@
         "discountFeePct": 2.27,
         "estMonthlyARVolume": 2827000,
         "debtorConcentrationPct": 16
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0245",
@@ -9547,7 +10035,9 @@
         "discountFeePct": 2.78,
         "estMonthlyARVolume": 1773000,
         "debtorConcentrationPct": 44
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0246",
@@ -9579,7 +10069,9 @@
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "2yr soft call"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0247",
@@ -9609,7 +10101,9 @@
         "rateSpreadBps": 431,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.05x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0248",
@@ -9642,7 +10136,9 @@
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0249",
@@ -9672,7 +10168,9 @@
         "rateSpreadBps": 475,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.06x"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0250",
@@ -9704,7 +10202,9 @@
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "1% Yr1 stepdown"
-      }
+      },
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     }
   ],
   "stageHistory": {
@@ -18809,6 +19309,182 @@
       "collateralDescription": "Accounts receivable",
       "priorityRank": 4,
       "subordinated": true
+    },
+    {
+      "id": "lien_0278",
+      "accountId": "acct_c_0002",
+      "filingNumber": "UCC-2026-295904",
+      "filingDate": "2026-06-17",
+      "securedParty": "Regional factoring company",
+      "collateralDescription": "Accounts receivable",
+      "priorityRank": 1,
+      "subordinated": false,
+      "wonDealWeLost": "opp_0005"
+    },
+    {
+      "id": "lien_0279",
+      "accountId": "acct_c_0008",
+      "filingNumber": "UCC-2026-819022",
+      "filingDate": "2026-08-05",
+      "securedParty": "Another private credit firm",
+      "collateralDescription": "Accounts receivable",
+      "priorityRank": 1,
+      "subordinated": false,
+      "wonDealWeLost": "opp_0024"
+    },
+    {
+      "id": "lien_0280",
+      "accountId": "acct_c_0010",
+      "filingNumber": "UCC-2026-695917",
+      "filingDate": "2026-02-21",
+      "securedParty": "Community bank line",
+      "collateralDescription": "Inventory",
+      "priorityRank": 1,
+      "subordinated": false,
+      "wonDealWeLost": "opp_0031"
+    },
+    {
+      "id": "lien_0281",
+      "accountId": "acct_c_0023",
+      "filingNumber": "UCC-2026-968155",
+      "filingDate": "2026-07-17",
+      "securedParty": "Community bank line",
+      "collateralDescription": "Inventory",
+      "priorityRank": 1,
+      "subordinated": false,
+      "wonDealWeLost": "opp_0056"
+    },
+    {
+      "id": "lien_0282",
+      "accountId": "acct_c_0031",
+      "filingNumber": "UCC-2026-898491",
+      "filingDate": "2026-01-09",
+      "securedParty": "Another private credit firm",
+      "collateralDescription": "All assets",
+      "priorityRank": 1,
+      "subordinated": false,
+      "wonDealWeLost": "opp_0073"
+    },
+    {
+      "id": "lien_0283",
+      "accountId": "acct_c_0034",
+      "filingNumber": "UCC-2025-813135",
+      "filingDate": "2025-09-10",
+      "securedParty": "Incumbent relationship bank",
+      "collateralDescription": "Accounts receivable",
+      "priorityRank": 1,
+      "subordinated": false,
+      "wonDealWeLost": "opp_0077"
+    },
+    {
+      "id": "lien_0284",
+      "accountId": "acct_c_0036",
+      "filingNumber": "UCC-2026-505276",
+      "filingDate": "2026-06-03",
+      "securedParty": "Incumbent relationship bank",
+      "collateralDescription": "Accounts receivable",
+      "priorityRank": 1,
+      "subordinated": false,
+      "wonDealWeLost": "opp_0079"
+    },
+    {
+      "id": "lien_0285",
+      "accountId": "acct_c_0041",
+      "filingNumber": "UCC-2026-355831",
+      "filingDate": "2026-06-20",
+      "securedParty": "Another private credit firm",
+      "collateralDescription": "All assets",
+      "priorityRank": 1,
+      "subordinated": false,
+      "wonDealWeLost": "opp_0093"
+    },
+    {
+      "id": "lien_0286",
+      "accountId": "acct_c_0042",
+      "filingNumber": "UCC-2026-665930",
+      "filingDate": "2026-04-22",
+      "securedParty": "Regional factoring company",
+      "collateralDescription": "Accounts receivable",
+      "priorityRank": 1,
+      "subordinated": false,
+      "wonDealWeLost": "opp_0095"
+    },
+    {
+      "id": "lien_0287",
+      "accountId": "acct_c_0044",
+      "filingNumber": "UCC-2025-863054",
+      "filingDate": "2025-12-24",
+      "securedParty": "National ABL lender",
+      "collateralDescription": "Accounts receivable and inventory",
+      "priorityRank": 1,
+      "subordinated": false,
+      "wonDealWeLost": "opp_0100"
+    },
+    {
+      "id": "lien_0288",
+      "accountId": "acct_c_0058",
+      "filingNumber": "UCC-2025-083168",
+      "filingDate": "2025-10-05",
+      "securedParty": "Incumbent relationship bank",
+      "collateralDescription": "Inventory",
+      "priorityRank": 1,
+      "subordinated": false,
+      "wonDealWeLost": "opp_0130"
+    },
+    {
+      "id": "lien_0289",
+      "accountId": "acct_c_0058",
+      "filingNumber": "UCC-2026-909060",
+      "filingDate": "2026-02-13",
+      "securedParty": "Incumbent relationship bank",
+      "collateralDescription": "Accounts receivable",
+      "priorityRank": 1,
+      "subordinated": false,
+      "wonDealWeLost": "opp_0132"
+    },
+    {
+      "id": "lien_0290",
+      "accountId": "acct_c_0093",
+      "filingNumber": "UCC-2025-493686",
+      "filingDate": "2025-11-16",
+      "securedParty": "Incumbent relationship bank",
+      "collateralDescription": "All assets",
+      "priorityRank": 1,
+      "subordinated": false,
+      "wonDealWeLost": "opp_0206"
+    },
+    {
+      "id": "lien_0291",
+      "accountId": "acct_c_0099",
+      "filingNumber": "UCC-2026-697533",
+      "filingDate": "2026-05-27",
+      "securedParty": "Incumbent relationship bank",
+      "collateralDescription": "Accounts receivable and inventory",
+      "priorityRank": 1,
+      "subordinated": false,
+      "wonDealWeLost": "opp_0216"
+    },
+    {
+      "id": "lien_0292",
+      "accountId": "acct_c_0111",
+      "filingNumber": "UCC-2026-641397",
+      "filingDate": "2026-05-20",
+      "securedParty": "Incumbent relationship bank",
+      "collateralDescription": "Inventory",
+      "priorityRank": 1,
+      "subordinated": false,
+      "wonDealWeLost": "opp_0240"
+    },
+    {
+      "id": "lien_0293",
+      "accountId": "acct_c_0114",
+      "filingNumber": "UCC-2026-085784",
+      "filingDate": "2026-08-17",
+      "securedParty": "Community bank line",
+      "collateralDescription": "Accounts receivable and inventory",
+      "priorityRank": 1,
+      "subordinated": false,
+      "wonDealWeLost": "opp_0243"
     }
   ],
   "networkEdges": [
