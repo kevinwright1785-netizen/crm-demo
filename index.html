@@ -37,6 +37,11 @@
 /* ---------- base ---------- */
 *,*::before,*::after{box-sizing:border-box}
 html,body{margin:0;padding:0}
+/* Reserve the scrollbar gutter permanently so pinning the body during a modal can't shift the
+   layout sideways when the scrollbar disappears. */
+html{scrollbar-gutter:stable}
+/* Body pinned while a modal is open — the inline top offset carries the scroll position. */
+body.scroll-locked{position:fixed;left:0;right:0;width:100%;overflow:hidden}
 body{background:var(--page);color:var(--ink);font-family:var(--ui);font-size:14px;line-height:1.45;
   font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
 a{color:inherit;text-decoration:none}
@@ -45761,6 +45766,31 @@ function stageFunnelHtml(byStage, total){
 const MODALS = {};
 let MODAL_RETURN_FOCUS = null;
 
+/* Background scroll lock. position:fixed on the body is used rather than overflow:hidden
+   because overflow:hidden still lets the page scroll under a fixed overlay in several browsers.
+   The offset the body is pinned at IS the scroll position, so it is restored exactly on close —
+   no jump to top. Both halves are idempotent and keyed off SCROLL_LOCK_Y, so a rapid
+   open/close/open (openModal calls closeModal first) can never strand the body locked, and
+   unlockScroll() run without a lock is a no-op. The reserved scrollbar gutter is handled in CSS
+   (scrollbar-gutter), so nothing shifts sideways when the scrollbar goes away. */
+let SCROLL_LOCK_Y = null;
+function lockScroll(){
+  if(SCROLL_LOCK_Y !== null) return;
+  SCROLL_LOCK_Y = window.scrollY || window.pageYOffset || 0;
+  const b = document.body;
+  b.classList.add('scroll-locked');
+  b.style.top = (-SCROLL_LOCK_Y) + 'px';
+}
+function unlockScroll(){
+  if(SCROLL_LOCK_Y === null) return;
+  const y = SCROLL_LOCK_Y;
+  SCROLL_LOCK_Y = null;
+  const b = document.body;
+  b.classList.remove('scroll-locked');
+  b.style.top = '';
+  window.scrollTo(0, y);
+}
+
 function modalRow(cells, cls){
   return '<tr'+(cls?' class="'+cls+'"':'')+'>'+cells.map(c=>
     typeof c==='object' ? '<td class="'+(c.cls||'')+'">'+c.v+'</td>' : '<td>'+c+'</td>').join('')+'</tr>';
@@ -45808,6 +45838,7 @@ window.openModal = function(key){
       '<div class="modal-body">'+d.body+'</div>'+
     '</div>';
   document.body.appendChild(scrim);
+  lockScroll();
   const box = scrim.querySelector('.modal');
   scrim.querySelector('.modal-close').addEventListener('click', closeModal);
   scrim.addEventListener('mousedown', e=>{ if(e.target===scrim) closeModal(); });
@@ -45829,8 +45860,10 @@ window.openModal = function(key){
 };
 window.closeModal = function(){
   const s = document.getElementById('modal-scrim');
+  if(s) s.remove();
+  /* run unconditionally: it is a no-op without a lock, and it clears a stranded one */
+  unlockScroll();
   if(!s) return;
-  s.remove();
   if(MODAL_RETURN_FOCUS && MODAL_RETURN_FOCUS.focus) MODAL_RETURN_FOCUS.focus();
   MODAL_RETURN_FOCUS = null;
 };
@@ -45913,7 +45946,25 @@ const PARTNER_VIEWS = [
   {key:'quality',  label:'Quality'},
 ];
 let PARTNER_VIEW = 'dormancy';
-window.setPartnerView = function(v){ PARTNER_VIEW=v; renderHome(); };
+/* Swap one card in place. Calling renderHome() for a view toggle rebuilt the whole home and
+   emptied the grid container to re-pack it, which collapsed the document height for a frame and
+   made the browser clamp scroll toward the top — the visible jump. Replacing just this card's
+   node leaves every other node, and the scroll position, untouched. Deliberately does NOT
+   re-pack the grid: re-packing moves cards between columns, which is itself a scroll jump. */
+function swapPanel(id, html){
+  const el = document.getElementById(id);
+  if(!el) return false;
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  const fresh = tmp.firstElementChild;
+  if(!fresh) return false;
+  el.replaceWith(fresh);
+  return true;
+}
+window.setPartnerView = function(v){
+  PARTNER_VIEW = v;
+  if(!swapPanel('panel-partners', partnersPanelHtml(partnerStats(CURRENT_BDO_ID)))) renderHome();
+};
 
 function partnerStats(bdoId){
   const mine = Object.values(OPPS).filter(o=>o.bdoId===bdoId);
@@ -45978,7 +46029,7 @@ function partnersPanelHtml(stats){
     '</div>';
   }).join('');
 
-  return '<div class="panel expandable" onclick="openModal(\'partners\')">'+
+  return '<div class="panel expandable" id="panel-partners" onclick="openModal(\'partners\')">'+
     '<div class="panel-header"><div class="panel-header-text">'+
       '<div class="panel-title">Partners</div>'+
       '<div class="panel-scope">'+scope+'</div>'+
@@ -46009,7 +46060,10 @@ const LOSS_VIEWS = [
   {key:'competitor', label:'Lost to'},
 ];
 let LOSS_VIEW = 'stage';
-window.setLossView = function(v){ LOSS_VIEW=v; renderHome(); };
+window.setLossView = function(v){
+  LOSS_VIEW = v;
+  if(!swapPanel('panel-loss', lossPanelHtml(CURRENT_BDO_ID))) renderHome();
+};
 const LOSS_MIN_SAMPLE = 5;
 
 function lossTally(opps, keyFn){
@@ -46077,7 +46131,7 @@ function lossPanelHtml(bdoId){
     '</div>';
   }).join('');
 
-  return '<div class="panel expandable" onclick="openModal(\'loss\')">'+
+  return '<div class="panel expandable" id="panel-loss" onclick="openModal(\'loss\')">'+
     '<div class="panel-header"><div class="panel-header-text">'+
       '<div class="panel-title">Where we\'re losing</div>'+
       '<div class="panel-scope">'+d.scope+'</div>'+
