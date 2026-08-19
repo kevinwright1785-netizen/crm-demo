@@ -24,6 +24,7 @@
   --r-s:6px; --r-m:10px; --r-l:16px;
   /* full-round. Approved deviation from the three-radius cap (D31) — stage-track nodes only. */
   --r-full:999px;
+  --scrim:rgba(20,22,20,.32); /* tier-3 modal backdrop — the rules always specified a scrim, this names it */
   --lift:0 1px 1px rgba(20,22,20,.03),0 8px 28px -12px rgba(20,22,20,.14);
   --lift-hi:0 2px 4px rgba(20,22,20,.04),0 24px 56px -20px rgba(20,22,20,.20);
   --h:32px;
@@ -181,7 +182,8 @@ h1,h2,h3,p,dl,dd{margin:0}
 .agenda-row{display:flex;align-items:flex-start;gap:var(--s3);padding:var(--s3) var(--s5);
   box-shadow:inset 0 1px 0 var(--row-sep)}
 .agenda-row:first-child{box-shadow:none}
-.agenda-time{font-family:var(--mono);font-size:11px;color:var(--ink-3);flex:0 0 42px;padding-top:var(--s1)}
+.agenda-time{font-family:var(--mono);font-size:11px;color:var(--ink-3);padding-top:var(--s1);
+  flex:0 0 calc(var(--s7) + var(--s4));white-space:nowrap}
 .agenda-row.past{opacity:.55}
 .agenda-row.next{background:var(--brand-a05)}
 .agenda-row.next .agenda-time{color:var(--brand-ink)}
@@ -193,20 +195,6 @@ h1,h2,h3,p,dl,dd{margin:0}
 /* ---------- charts (v7: brand ink, 3–4 gridlines, dashed reference, tint ramp, no gradients) ----------
    Gridlines are a repeating background rather than elements, so the plot stays one box and the
    only inline styles on a chart are the data-driven ones (bar height, point geometry). */
-.chart-head{display:flex;align-items:baseline;justify-content:space-between;gap:var(--s3);
-  margin-bottom:var(--s3);font-size:11px;color:var(--ink-3)}
-.chart-head .peak{font-family:var(--mono);color:var(--ink-2)}
-.plot{position:relative;height:calc(var(--s7) * 2);
-  background:repeating-linear-gradient(to top,var(--line) 0 1px,transparent 1px 25%)}
-.plot.tall{height:calc(var(--s5) * 5)}
-.chart-ref{position:absolute;left:0;right:0;height:0;border-top:1px dashed var(--line-2)}
-.chart-ref-lab{position:absolute;right:0;top:calc(var(--s1) * -1);transform:translateY(-100%);
-  font-size:11px;color:var(--ink-3);background:var(--paper);padding-left:var(--s1)}
-.cols{position:absolute;inset:0;display:flex;align-items:flex-end;gap:var(--s2)}
-.chart-x{display:flex;gap:var(--s2);margin-top:var(--s2)}
-.chart-x span{flex:1;min-width:0;font-size:11px;color:var(--ink-3);text-align:center;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.chart-x.dense span{text-align:left}
 .chart-note{font-size:11px;color:var(--ink-3);margin-top:var(--s2)}
 
 /* ---------- chart tooltip ----------
@@ -219,13 +207,6 @@ h1,h2,h3,p,dl,dd{margin:0}
 .tip-t{font-weight:500}
 .tip-v{font-family:var(--mono);color:var(--paper)}
 .tip-s{color:var(--ink-3)}
-
-/* ---------- vertical bar chart (funded by month) ---------- */
-.vcol{position:relative;flex:1;min-width:0;height:100%;display:flex;align-items:flex-end;cursor:default}
-.vcol-bar{width:100%;background:var(--brand-a65);transition:background .12s var(--ease)}
-.vcol:hover .vcol-bar{background:var(--brand)}
-.vcol-bar.zero{background:var(--line-2)}
-.vcol:hover .vcol-bar.zero{background:var(--ink-3)}
 
 /* ---------- horizontal stage funnel (echoes the record page's stage track) ---------- */
 .funnel{display:flex;height:var(--s5);border-radius:var(--r-s);overflow:hidden;background:var(--sunken)}
@@ -256,6 +237,59 @@ h1,h2,h3,p,dl,dd{margin:0}
 
 /* ---------- agenda: fixed height, scrolls internally like a real calendar pane ---------- */
 .agenda-scroll{max-height:calc(var(--s7) * 5);overflow-y:auto}
+
+/* ---------- home body: multi-column packing ----------
+   Replaces the rigid 2fr/1fr split. That split stacked every rail card in one tall column, so
+   whenever the action feed was shorter than the rail, everything below the agenda sat beside
+   nothing and left a dead void under the feed. Multi-column lets the cards balance across both
+   columns instead, filling the space. break-inside keeps a card whole. */
+.home-grid{display:flex;gap:var(--s5);align-items:flex-start}
+.home-col{flex:1;min-width:0;display:flex;flex-direction:column}
+
+/* ---------- expandable cards + modal (v7 tier 3: scrim + --lift-hi) ---------- */
+.panel.expandable{cursor:pointer;transition:border-color .12s var(--ease)}
+.panel.expandable:hover{border-color:var(--line-2)}
+.expand-hint{margin-left:auto;font-size:11px;color:var(--ink-3);white-space:nowrap;flex:0 0 auto}
+.panel.expandable:hover .expand-hint{color:var(--brand)}
+.met.expandable{cursor:pointer;position:relative;transition:background .12s var(--ease)}
+.met.expandable:hover{background:var(--hover)}
+
+.scrim{position:fixed;inset:0;z-index:80;background:var(--scrim);display:flex;
+  align-items:flex-start;justify-content:center;padding:var(--s7) var(--s5);overflow-y:auto}
+.modal{background:var(--paper);border-radius:var(--r-l);box-shadow:var(--lift-hi);
+  width:100%;max-width:880px;outline:none}
+.modal-head{display:flex;align-items:flex-start;gap:var(--s4);padding:var(--s5) var(--s5) var(--s4)}
+.modal-head-text{flex:1;min-width:0}
+.modal-title{font-family:var(--display);font-size:20px;color:var(--ink)}
+.modal-scope{font-size:12px;color:var(--ink-3);margin-top:var(--s1)}
+.modal-close{height:var(--h);width:var(--h);border:1px solid var(--line-2);border-radius:var(--r-s);
+  background:var(--paper);color:var(--ink-2);font-size:14px;line-height:1;flex:0 0 auto}
+.modal-close:hover{background:var(--sunken);color:var(--ink)}
+.modal-body{padding:0 var(--s5) var(--s5)}
+.modal-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s5);
+  padding:var(--s4) 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  margin-bottom:var(--s4)}
+.modal-fig{font-family:var(--display);font-size:22px;font-weight:500;letter-spacing:-.03em;color:var(--ink)}
+.modal-lab{font-size:11px;font-weight:500;color:var(--ink-3)}
+
+/* ---------- pipeline coverage ---------- */
+.cov-bar{position:relative;height:var(--s5);background:var(--sunken);border-radius:var(--r-s);
+  overflow:hidden;display:flex}
+.cov-seg{height:100%;background:var(--brand-a30)}
+.cov-seg.t2{background:var(--brand-a65)}
+.cov-seg.t3{background:var(--brand-a80)}
+.cov-seg.t4{background:var(--brand)}
+.cov-mark{position:absolute;top:0;bottom:0;width:0;border-left:1px dashed var(--ink-2)}
+.cov-marklab{font-size:11px;color:var(--ink-2);margin-top:var(--s2);display:flex;
+  justify-content:space-between;gap:var(--s3)}
+.cov-head{display:flex;align-items:baseline;gap:var(--s3);margin-bottom:var(--s3);flex-wrap:wrap}
+.cov-ratio{font-family:var(--display);font-size:29px;font-weight:500;letter-spacing:-.03em;color:var(--ink)}
+.cov-ratio.short{color:var(--warn-ink)}
+.cov-ratio.met{color:var(--pos-ink)}
+.cov-verdict{font-size:11px;font-weight:500;padding:0 var(--s2);height:20px;display:inline-flex;
+  align-items:center;border-radius:var(--r-s)}
+.cov-verdict.ok{background:var(--pos-soft);color:var(--pos-ink)}
+.cov-verdict.warn{background:var(--warn-soft);color:var(--warn-ink)}
 
 /* ---------- compact label/value rows (no hard-right islands with an empty middle) ---------- */
 .kv-line{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--s3);align-items:baseline;
@@ -593,7 +627,8 @@ const DATASET = {
       "title": "Business Development Officer",
       "hireDate": "2022-10-08",
       "email": "kavya.nakamura@ridgemarkcapital.com",
-      "capacityWeight": 0.92
+      "capacityWeight": 0.92,
+      "annualQuota": 45500000
     },
     {
       "id": "bdo_02",
@@ -601,7 +636,8 @@ const DATASET = {
       "title": "Business Development Officer",
       "hireDate": "2024-08-20",
       "email": "grant.whitcombe@ridgemarkcapital.com",
-      "capacityWeight": 0.95
+      "capacityWeight": 0.95,
+      "annualQuota": 32000000
     },
     {
       "id": "bdo_03",
@@ -609,7 +645,8 @@ const DATASET = {
       "title": "Business Development Officer",
       "hireDate": "2023-05-21",
       "email": "emma.ashworth@ridgemarkcapital.com",
-      "capacityWeight": 1.07
+      "capacityWeight": 1.07,
+      "annualQuota": 45500000
     },
     {
       "id": "bdo_04",
@@ -617,7 +654,8 @@ const DATASET = {
       "title": "Business Development Officer",
       "hireDate": "2024-12-19",
       "email": "wei.ashworth@ridgemarkcapital.com",
-      "capacityWeight": 1.04
+      "capacityWeight": 1.04,
+      "annualQuota": 51500000
     },
     {
       "id": "bdo_05",
@@ -625,7 +663,8 @@ const DATASET = {
       "title": "Business Development Officer",
       "hireDate": "2024-05-24",
       "email": "priscilla.whitfield@ridgemarkcapital.com",
-      "capacityWeight": 0.83
+      "capacityWeight": 0.83,
+      "annualQuota": 50500000
     },
     {
       "id": "bdo_06",
@@ -633,7 +672,8 @@ const DATASET = {
       "title": "Business Development Officer",
       "hireDate": "2024-02-15",
       "email": "noah.okafor@ridgemarkcapital.com",
-      "capacityWeight": 1.23
+      "capacityWeight": 1.23,
+      "annualQuota": 75000000
     },
     {
       "id": "bdo_07",
@@ -641,7 +681,8 @@ const DATASET = {
       "title": "Business Development Officer",
       "hireDate": "2024-08-17",
       "email": "boris.corrigan@ridgemarkcapital.com",
-      "capacityWeight": 1.14
+      "capacityWeight": 1.14,
+      "annualQuota": 75500000
     },
     {
       "id": "bdo_08",
@@ -649,7 +690,8 @@ const DATASET = {
       "title": "Business Development Officer",
       "hireDate": "2026-03-26",
       "email": "jonas.fontaine@ridgemarkcapital.com",
-      "capacityWeight": 0.5
+      "capacityWeight": 0.5,
+      "annualQuota": 43000000
     }
   ],
   "partners": [
@@ -2409,8 +2451,8 @@ const DATASET = {
       "industryCode": "2131",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "Community bank line",
-        "National ABL lender"
+        "Bank of America Business Capital",
+        "JPMorgan Chase"
       ],
       "outcome": "lost",
       "lostAtStage": "Underwriting",
@@ -2446,8 +2488,8 @@ const DATASET = {
       "industryCode": "2131",
       "useOfProceeds": "Seasonal inventory build",
       "competitors": [
-        "Regional factoring company",
-        "Incumbent relationship bank"
+        "PNC Business Credit",
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -2478,11 +2520,11 @@ const DATASET = {
       "industryCode": "2131",
       "useOfProceeds": "Recapitalization",
       "competitors": [
-        "Community bank line",
-        "Competing direct lender"
+        "Bank of America Business Capital",
+        "Ares Capital"
       ],
       "outcome": "open",
-      "stage": "Analysis",
+      "stage": "Underwriting",
       "createdDate": "2026-07-15",
       "expectedCloseDate": "2026-12-05",
       "fundedDate": null,
@@ -2545,7 +2587,7 @@ const DATASET = {
       "industryCode": "4244",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Regional factoring company"
+        "PNC Business Credit"
       ],
       "outcome": "lost",
       "lostAtStage": "Proposal",
@@ -2566,7 +2608,7 @@ const DATASET = {
         "securedStatus": "Secured",
         "callProtection": "1% Yr1 stepdown"
       },
-      "lostToCompetitor": "Regional factoring company",
+      "lostToCompetitor": "PNC Business Credit",
       "lostToCompetitorEvidence": "UCC filing"
     },
     {
@@ -2677,10 +2719,10 @@ const DATASET = {
       "industryCode": "4841",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Regional factoring company"
+        "PNC Business Credit"
       ],
       "outcome": "open",
-      "stage": "Proposal",
+      "stage": "Underwriting",
       "createdDate": "2026-07-23",
       "expectedCloseDate": "2026-10-01",
       "fundedDate": null,
@@ -2711,8 +2753,8 @@ const DATASET = {
       "industryCode": "3231",
       "useOfProceeds": "Equipment purchase",
       "competitors": [
-        "Mezzanine fund",
-        "Regional factoring company"
+        "Golub Capital",
+        "PNC Business Credit"
       ],
       "outcome": "lost",
       "lostAtStage": "Analysis",
@@ -2748,10 +2790,10 @@ const DATASET = {
       "industryCode": "3113",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "National ABL lender"
+        "JPMorgan Chase"
       ],
       "outcome": "open",
-      "stage": "Analysis",
+      "stage": "Underwriting",
       "createdDate": "2026-07-18",
       "expectedCloseDate": "2026-09-26",
       "fundedDate": null,
@@ -2782,7 +2824,7 @@ const DATASET = {
       "industryCode": "2361",
       "useOfProceeds": "Acquisition financing",
       "competitors": [
-        "Another private credit firm"
+        "White Oak Commercial Finance"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -2818,7 +2860,7 @@ const DATASET = {
       "useOfProceeds": "Recapitalization",
       "competitors": [],
       "outcome": "open",
-      "stage": "Analysis",
+      "stage": "Underwriting",
       "createdDate": "2026-07-09",
       "expectedCloseDate": "2026-11-12",
       "fundedDate": null,
@@ -2849,8 +2891,8 @@ const DATASET = {
       "industryCode": "2361",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "Mezzanine fund",
-        "Incumbent relationship bank"
+        "Golub Capital",
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -2948,7 +2990,7 @@ const DATASET = {
       "industryCode": "2361",
       "useOfProceeds": "Acquisition financing",
       "competitors": [
-        "Another private credit firm"
+        "White Oak Commercial Finance"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -3010,7 +3052,7 @@ const DATASET = {
       "industryCode": "4238",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "Another private credit firm"
+        "White Oak Commercial Finance"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -3044,7 +3086,7 @@ const DATASET = {
       "industryCode": "4238",
       "useOfProceeds": "Debt consolidation",
       "competitors": [
-        "Competing direct lender"
+        "Ares Capital"
       ],
       "outcome": "open",
       "stage": "Qualification",
@@ -3137,7 +3179,7 @@ const DATASET = {
       "industryCode": "3231",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Regional factoring company"
+        "PNC Business Credit"
       ],
       "outcome": "open",
       "stage": "Analysis",
@@ -3171,7 +3213,7 @@ const DATASET = {
       "industryCode": "3231",
       "useOfProceeds": "Recapitalization",
       "competitors": [
-        "Another private credit firm"
+        "White Oak Commercial Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Proposal",
@@ -3192,7 +3234,7 @@ const DATASET = {
         "fieldExamStatus": "Complete",
         "primaryCovenant": "FCCR >= 1.1x"
       },
-      "lostToCompetitor": "Another private credit firm",
+      "lostToCompetitor": "White Oak Commercial Finance",
       "lostToCompetitorEvidence": "UCC filing"
     },
     {
@@ -3207,8 +3249,8 @@ const DATASET = {
       "industryCode": "3231",
       "useOfProceeds": "Seasonal inventory build",
       "competitors": [
-        "Mezzanine fund",
-        "Incumbent relationship bank"
+        "Golub Capital",
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "open",
       "stage": "Underwriting",
@@ -3242,8 +3284,8 @@ const DATASET = {
       "industryCode": "3231",
       "useOfProceeds": "Recapitalization",
       "competitors": [
-        "Competing direct lender",
-        "Incumbent relationship bank"
+        "Ares Capital",
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Qualification",
@@ -3276,11 +3318,11 @@ const DATASET = {
       "industryCode": "3231",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Mezzanine fund",
-        "National ABL lender"
+        "Golub Capital",
+        "JPMorgan Chase"
       ],
       "outcome": "open",
-      "stage": "Proposal",
+      "stage": "Underwriting",
       "createdDate": "2026-07-12",
       "expectedCloseDate": "2026-10-25",
       "fundedDate": null,
@@ -3345,7 +3387,7 @@ const DATASET = {
       "industryCode": "3327",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Community bank line"
+        "Bank of America Business Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -3376,8 +3418,8 @@ const DATASET = {
       "industryCode": "3327",
       "useOfProceeds": "Equipment purchase",
       "competitors": [
-        "Regional factoring company",
-        "Another private credit firm"
+        "PNC Business Credit",
+        "White Oak Commercial Finance"
       ],
       "outcome": "open",
       "stage": "Proposal",
@@ -3412,8 +3454,8 @@ const DATASET = {
       "industryCode": "3327",
       "useOfProceeds": "Acquisition financing",
       "competitors": [
-        "Community bank line",
-        "Incumbent relationship bank"
+        "Bank of America Business Capital",
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Proposal",
@@ -3431,7 +3473,7 @@ const DATASET = {
         "estMonthlyARVolume": 1487000,
         "debtorConcentrationPct": 38
       },
-      "lostToCompetitor": "Community bank line",
+      "lostToCompetitor": "Bank of America Business Capital",
       "lostToCompetitorEvidence": "UCC filing"
     },
     {
@@ -3478,7 +3520,7 @@ const DATASET = {
       "industryCode": "3113",
       "useOfProceeds": "Recapitalization",
       "competitors": [
-        "Another private credit firm"
+        "White Oak Commercial Finance"
       ],
       "outcome": "open",
       "stage": "Underwriting",
@@ -3541,8 +3583,8 @@ const DATASET = {
       "industryCode": "3231",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "Incumbent relationship bank",
-        "Regional factoring company"
+        "Wells Fargo Capital Finance",
+        "PNC Business Credit"
       ],
       "outcome": "open",
       "stage": "Qualification",
@@ -3577,8 +3619,8 @@ const DATASET = {
       "industryCode": "6216",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Community bank line",
-        "Another private credit firm"
+        "Bank of America Business Capital",
+        "White Oak Commercial Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Analysis",
@@ -3614,10 +3656,10 @@ const DATASET = {
       "industryCode": "3399",
       "useOfProceeds": "Debt consolidation",
       "competitors": [
-        "National ABL lender"
+        "JPMorgan Chase"
       ],
       "outcome": "open",
-      "stage": "Analysis",
+      "stage": "Underwriting",
       "createdDate": "2026-07-09",
       "expectedCloseDate": "2026-10-12",
       "fundedDate": null,
@@ -3677,8 +3719,8 @@ const DATASET = {
       "industryCode": "6216",
       "useOfProceeds": "Recapitalization",
       "competitors": [
-        "Community bank line",
-        "Another private credit firm"
+        "Bank of America Business Capital",
+        "White Oak Commercial Finance"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -3741,7 +3783,7 @@ const DATASET = {
       "industryCode": "6216",
       "useOfProceeds": "Debt consolidation",
       "competitors": [
-        "Another private credit firm"
+        "White Oak Commercial Finance"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -3808,8 +3850,8 @@ const DATASET = {
       "industryCode": "6216",
       "useOfProceeds": "Seasonal inventory build",
       "competitors": [
-        "Another private credit firm",
-        "Competing direct lender"
+        "White Oak Commercial Finance",
+        "Ares Capital"
       ],
       "outcome": "open",
       "stage": "Underwriting",
@@ -3907,8 +3949,8 @@ const DATASET = {
       "industryCode": "3327",
       "useOfProceeds": "Debt consolidation",
       "competitors": [
-        "Community bank line",
-        "Incumbent relationship bank"
+        "Bank of America Business Capital",
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Qualification",
@@ -3941,8 +3983,8 @@ const DATASET = {
       "industryCode": "3231",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Incumbent relationship bank",
-        "Mezzanine fund"
+        "Wells Fargo Capital Finance",
+        "Golub Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -3977,10 +4019,10 @@ const DATASET = {
       "industryCode": "1119",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Incumbent relationship bank"
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "open",
-      "stage": "Proposal",
+      "stage": "Underwriting",
       "createdDate": "2026-07-17",
       "expectedCloseDate": "2026-11-25",
       "fundedDate": null,
@@ -4008,7 +4050,7 @@ const DATASET = {
       "industryCode": "1119",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "National ABL lender"
+        "JPMorgan Chase"
       ],
       "outcome": "lost",
       "lostAtStage": "Qualification",
@@ -4044,7 +4086,7 @@ const DATASET = {
       "industryCode": "1119",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "Mezzanine fund"
+        "Golub Capital"
       ],
       "outcome": "open",
       "stage": "Qualification",
@@ -4075,8 +4117,8 @@ const DATASET = {
       "industryCode": "1119",
       "useOfProceeds": "Equipment purchase",
       "competitors": [
-        "Regional factoring company",
-        "Incumbent relationship bank"
+        "PNC Business Credit",
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Underwriting",
@@ -4112,7 +4154,7 @@ const DATASET = {
       "industryCode": "1119",
       "useOfProceeds": "Equipment purchase",
       "competitors": [
-        "Regional factoring company"
+        "PNC Business Credit"
       ],
       "outcome": "open",
       "stage": "Analysis",
@@ -4175,8 +4217,8 @@ const DATASET = {
       "industryCode": "3159",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "National ABL lender",
-        "Competing direct lender"
+        "JPMorgan Chase",
+        "Ares Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -4210,8 +4252,8 @@ const DATASET = {
       "industryCode": "3159",
       "useOfProceeds": "Recapitalization",
       "competitors": [
-        "Another private credit firm",
-        "Mezzanine fund"
+        "White Oak Commercial Finance",
+        "Golub Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Underwriting",
@@ -4266,7 +4308,7 @@ const DATASET = {
         "securedStatus": "Secured",
         "callProtection": "None"
       },
-      "lostToCompetitor": "Community bank line",
+      "lostToCompetitor": "Bank of America Business Capital",
       "lostToCompetitorEvidence": "UCC filing"
     },
     {
@@ -4310,7 +4352,7 @@ const DATASET = {
       "industryCode": "3399",
       "useOfProceeds": "Acquisition financing",
       "competitors": [
-        "Incumbent relationship bank"
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "open",
       "stage": "Underwriting",
@@ -4344,7 +4386,7 @@ const DATASET = {
       "industryCode": "5613",
       "useOfProceeds": "Acquisition financing",
       "competitors": [
-        "National ABL lender"
+        "JPMorgan Chase"
       ],
       "outcome": "open",
       "stage": "Analysis",
@@ -4412,8 +4454,8 @@ const DATASET = {
       "industryCode": "2131",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Regional factoring company",
-        "Mezzanine fund"
+        "PNC Business Credit",
+        "Golub Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Qualification",
@@ -4446,7 +4488,7 @@ const DATASET = {
       "industryCode": "3273",
       "useOfProceeds": "Seasonal inventory build",
       "competitors": [
-        "Another private credit firm"
+        "White Oak Commercial Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Proposal",
@@ -4467,7 +4509,7 @@ const DATASET = {
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.12x"
       },
-      "lostToCompetitor": "Another private credit firm",
+      "lostToCompetitor": "White Oak Commercial Finance",
       "lostToCompetitorEvidence": "Reported by borrower"
     },
     {
@@ -4482,7 +4524,7 @@ const DATASET = {
       "industryCode": "3273",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "Community bank line"
+        "Bank of America Business Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -4516,7 +4558,7 @@ const DATASET = {
       "industryCode": "3273",
       "useOfProceeds": "Recapitalization",
       "competitors": [
-        "Another private credit firm"
+        "White Oak Commercial Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Underwriting",
@@ -4583,7 +4625,7 @@ const DATASET = {
       "industryCode": "3273",
       "useOfProceeds": "Recapitalization",
       "competitors": [
-        "National ABL lender"
+        "JPMorgan Chase"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -4614,7 +4656,7 @@ const DATASET = {
       "industryCode": "3273",
       "useOfProceeds": "Recapitalization",
       "competitors": [
-        "Mezzanine fund"
+        "Golub Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -4648,8 +4690,8 @@ const DATASET = {
       "industryCode": "3327",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Another private credit firm",
-        "Incumbent relationship bank"
+        "White Oak Commercial Finance",
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -4714,8 +4756,8 @@ const DATASET = {
       "industryCode": "3273",
       "useOfProceeds": "Equipment purchase",
       "competitors": [
-        "Regional factoring company",
-        "Incumbent relationship bank"
+        "PNC Business Credit",
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -4749,10 +4791,10 @@ const DATASET = {
       "industryCode": "3273",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "National ABL lender"
+        "JPMorgan Chase"
       ],
       "outcome": "open",
-      "stage": "Proposal",
+      "stage": "Underwriting",
       "createdDate": "2026-07-21",
       "expectedCloseDate": "2026-12-13",
       "fundedDate": null,
@@ -4784,8 +4826,8 @@ const DATASET = {
       "industryCode": "3273",
       "useOfProceeds": "Seasonal inventory build",
       "competitors": [
-        "National ABL lender",
-        "Competing direct lender"
+        "JPMorgan Chase",
+        "Ares Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Proposal",
@@ -4818,7 +4860,7 @@ const DATASET = {
       "industryCode": "3273",
       "useOfProceeds": "Debt consolidation",
       "competitors": [
-        "Another private credit firm"
+        "White Oak Commercial Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Proposal",
@@ -4840,7 +4882,7 @@ const DATASET = {
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.14x"
       },
-      "lostToCompetitor": "Another private credit firm",
+      "lostToCompetitor": "White Oak Commercial Finance",
       "lostToCompetitorEvidence": "UCC filing"
     },
     {
@@ -4855,8 +4897,8 @@ const DATASET = {
       "industryCode": "3273",
       "useOfProceeds": "Acquisition financing",
       "competitors": [
-        "Competing direct lender",
-        "Mezzanine fund"
+        "Ares Capital",
+        "Golub Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -4890,8 +4932,8 @@ const DATASET = {
       "industryCode": "3113",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "Competing direct lender",
-        "Regional factoring company"
+        "Ares Capital",
+        "PNC Business Credit"
       ],
       "outcome": "lost",
       "lostAtStage": "Proposal",
@@ -4980,8 +5022,8 @@ const DATASET = {
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
       },
-      "lostToCompetitor": "Incumbent relationship bank",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitor": "Wells Fargo Capital Finance",
+      "lostToCompetitorEvidence": "Reported by borrower"
     },
     {
       "id": "opp_0078",
@@ -4995,8 +5037,8 @@ const DATASET = {
       "industryCode": "5613",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "Competing direct lender",
-        "Regional factoring company"
+        "Ares Capital",
+        "PNC Business Credit"
       ],
       "outcome": "open",
       "stage": "Qualification",
@@ -5027,8 +5069,8 @@ const DATASET = {
       "industryCode": "3327",
       "useOfProceeds": "Acquisition financing",
       "competitors": [
-        "Another private credit firm",
-        "Mezzanine fund"
+        "White Oak Commercial Finance",
+        "Golub Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Analysis",
@@ -5050,7 +5092,7 @@ const DATASET = {
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.12x"
       },
-      "lostToCompetitor": "Incumbent relationship bank",
+      "lostToCompetitor": "Bank of America Business Capital",
       "lostToCompetitorEvidence": "UCC filing"
     },
     {
@@ -5065,7 +5107,7 @@ const DATASET = {
       "industryCode": "3327",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "Another private credit firm"
+        "White Oak Commercial Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Analysis",
@@ -5083,7 +5125,7 @@ const DATASET = {
         "estMonthlyARVolume": 2647000,
         "debtorConcentrationPct": 41
       },
-      "lostToCompetitor": "Incumbent relationship bank",
+      "lostToCompetitor": "JPMorgan Chase",
       "lostToCompetitorEvidence": "Reported by borrower"
     },
     {
@@ -5226,7 +5268,7 @@ const DATASET = {
       "industryCode": "3159",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "Community bank line"
+        "Bank of America Business Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Proposal",
@@ -5247,8 +5289,8 @@ const DATASET = {
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
       },
-      "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitor": "Bank of America Business Capital",
+      "lostToCompetitorEvidence": "UCC filing"
     },
     {
       "id": "opp_0086",
@@ -5262,8 +5304,8 @@ const DATASET = {
       "industryCode": "3159",
       "useOfProceeds": "Acquisition financing",
       "competitors": [
-        "Another private credit firm",
-        "Incumbent relationship bank"
+        "White Oak Commercial Finance",
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "open",
       "stage": "Proposal",
@@ -5326,7 +5368,7 @@ const DATASET = {
       "industryCode": "3159",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "Community bank line"
+        "Bank of America Business Capital"
       ],
       "outcome": "open",
       "stage": "Qualification",
@@ -5357,8 +5399,8 @@ const DATASET = {
       "industryCode": "3159",
       "useOfProceeds": "Debt consolidation",
       "competitors": [
-        "National ABL lender",
-        "Community bank line"
+        "JPMorgan Chase",
+        "Bank of America Business Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Underwriting",
@@ -5394,8 +5436,8 @@ const DATASET = {
       "industryCode": "3159",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Regional factoring company",
-        "Community bank line"
+        "PNC Business Credit",
+        "Bank of America Business Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Analysis",
@@ -5416,8 +5458,8 @@ const DATASET = {
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
       },
-      "lostToCompetitor": "Incumbent relationship bank",
-      "lostToCompetitorEvidence": "Reported by borrower"
+      "lostToCompetitor": "PNC Business Credit",
+      "lostToCompetitorEvidence": "UCC filing"
     },
     {
       "id": "opp_0091",
@@ -5514,8 +5556,8 @@ const DATASET = {
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
       },
-      "lostToCompetitor": "Another private credit firm",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0094",
@@ -5529,8 +5571,8 @@ const DATASET = {
       "industryCode": "2361",
       "useOfProceeds": "Equipment purchase",
       "competitors": [
-        "Incumbent relationship bank",
-        "Community bank line"
+        "Wells Fargo Capital Finance",
+        "Bank of America Business Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -5561,8 +5603,8 @@ const DATASET = {
       "industryCode": "2361",
       "useOfProceeds": "Seasonal inventory build",
       "competitors": [
-        "Regional factoring company",
-        "Competing direct lender"
+        "PNC Business Credit",
+        "Ares Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Proposal",
@@ -5583,8 +5625,8 @@ const DATASET = {
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.1x"
       },
-      "lostToCompetitor": "Regional factoring company",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0096",
@@ -5630,7 +5672,7 @@ const DATASET = {
       "industryCode": "4238",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Competing direct lender"
+        "Ares Capital"
       ],
       "outcome": "open",
       "stage": "Analysis",
@@ -5661,8 +5703,8 @@ const DATASET = {
       "industryCode": "3327",
       "useOfProceeds": "Debt consolidation",
       "competitors": [
-        "Competing direct lender",
-        "Mezzanine fund"
+        "Ares Capital",
+        "Golub Capital"
       ],
       "outcome": "open",
       "stage": "Analysis",
@@ -5729,8 +5771,8 @@ const DATASET = {
       "industryCode": "3327",
       "useOfProceeds": "Acquisition financing",
       "competitors": [
-        "National ABL lender",
-        "Mezzanine fund"
+        "JPMorgan Chase",
+        "Golub Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Proposal",
@@ -5748,8 +5790,8 @@ const DATASET = {
         "estMonthlyARVolume": 3706000,
         "debtorConcentrationPct": 43
       },
-      "lostToCompetitor": "National ABL lender",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitor": "JPMorgan Chase",
+      "lostToCompetitorEvidence": "Reported by borrower"
     },
     {
       "id": "opp_0101",
@@ -5797,8 +5839,8 @@ const DATASET = {
       "industryCode": "2131",
       "useOfProceeds": "Acquisition financing",
       "competitors": [
-        "National ABL lender",
-        "Another private credit firm"
+        "JPMorgan Chase",
+        "White Oak Commercial Finance"
       ],
       "outcome": "open",
       "stage": "Qualification",
@@ -5832,11 +5874,11 @@ const DATASET = {
       "industryCode": "2361",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "Mezzanine fund",
-        "Incumbent relationship bank"
+        "Golub Capital",
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "open",
-      "stage": "Proposal",
+      "stage": "Underwriting",
       "createdDate": "2026-07-06",
       "expectedCloseDate": "2026-10-06",
       "fundedDate": null,
@@ -5864,8 +5906,8 @@ const DATASET = {
       "industryCode": "4244",
       "useOfProceeds": "Equipment purchase",
       "competitors": [
-        "Competing direct lender",
-        "Mezzanine fund"
+        "Ares Capital",
+        "Golub Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Underwriting",
@@ -5901,8 +5943,8 @@ const DATASET = {
       "industryCode": "2361",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "Another private credit firm",
-        "Regional factoring company"
+        "White Oak Commercial Finance",
+        "PNC Business Credit"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -5969,7 +6011,7 @@ const DATASET = {
       "industryCode": "3399",
       "useOfProceeds": "Recapitalization",
       "competitors": [
-        "Community bank line"
+        "Bank of America Business Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -6000,8 +6042,8 @@ const DATASET = {
       "industryCode": "3113",
       "useOfProceeds": "Debt consolidation",
       "competitors": [
-        "Mezzanine fund",
-        "Another private credit firm"
+        "Golub Capital",
+        "White Oak Commercial Finance"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -6035,10 +6077,10 @@ const DATASET = {
       "industryCode": "2131",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "Incumbent relationship bank"
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "open",
-      "stage": "Proposal",
+      "stage": "Underwriting",
       "createdDate": "2026-06-18",
       "expectedCloseDate": "2026-08-26",
       "fundedDate": null,
@@ -6066,7 +6108,7 @@ const DATASET = {
       "industryCode": "2131",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "Community bank line"
+        "Bank of America Business Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -6132,8 +6174,8 @@ const DATASET = {
       "industryCode": "3113",
       "useOfProceeds": "Equipment purchase",
       "competitors": [
-        "Mezzanine fund",
-        "National ABL lender"
+        "Golub Capital",
+        "JPMorgan Chase"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -6167,8 +6209,8 @@ const DATASET = {
       "industryCode": "3113",
       "useOfProceeds": "Seasonal inventory build",
       "competitors": [
-        "Regional factoring company",
-        "Competing direct lender"
+        "PNC Business Credit",
+        "Ares Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -6233,7 +6275,7 @@ const DATASET = {
       "industryCode": "6216",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "Mezzanine fund"
+        "Golub Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Underwriting",
@@ -6290,8 +6332,8 @@ const DATASET = {
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.24x"
       },
-      "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitor": "Bank of America Business Capital",
+      "lostToCompetitorEvidence": "Reported by borrower"
     },
     {
       "id": "opp_0117",
@@ -6305,8 +6347,8 @@ const DATASET = {
       "industryCode": "3327",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Community bank line",
-        "Regional factoring company"
+        "Bank of America Business Capital",
+        "PNC Business Credit"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -6369,8 +6411,8 @@ const DATASET = {
       "industryCode": "3327",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "Another private credit firm",
-        "Competing direct lender"
+        "White Oak Commercial Finance",
+        "Ares Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -6437,11 +6479,11 @@ const DATASET = {
       "industryCode": "3327",
       "useOfProceeds": "Recapitalization",
       "competitors": [
-        "Incumbent relationship bank",
-        "Regional factoring company"
+        "Wells Fargo Capital Finance",
+        "PNC Business Credit"
       ],
       "outcome": "open",
-      "stage": "Analysis",
+      "stage": "Underwriting",
       "createdDate": "2026-07-21",
       "expectedCloseDate": "2026-11-14",
       "fundedDate": null,
@@ -6472,8 +6514,8 @@ const DATASET = {
       "industryCode": "3327",
       "useOfProceeds": "Equipment purchase",
       "competitors": [
-        "Community bank line",
-        "Competing direct lender"
+        "Bank of America Business Capital",
+        "Ares Capital"
       ],
       "outcome": "open",
       "stage": "Proposal",
@@ -6539,8 +6581,8 @@ const DATASET = {
       "industryCode": "3327",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Another private credit firm",
-        "Mezzanine fund"
+        "White Oak Commercial Finance",
+        "Golub Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Underwriting",
@@ -6573,7 +6615,7 @@ const DATASET = {
       "industryCode": "3327",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Competing direct lender"
+        "Ares Capital"
       ],
       "outcome": "open",
       "stage": "Proposal",
@@ -6604,8 +6646,8 @@ const DATASET = {
       "industryCode": "3327",
       "useOfProceeds": "Acquisition financing",
       "competitors": [
-        "Mezzanine fund",
-        "Competing direct lender"
+        "Golub Capital",
+        "Ares Capital"
       ],
       "outcome": "open",
       "stage": "Proposal",
@@ -6639,7 +6681,7 @@ const DATASET = {
       "industryCode": "3113",
       "useOfProceeds": "Acquisition financing",
       "competitors": [
-        "Mezzanine fund"
+        "Golub Capital"
       ],
       "outcome": "open",
       "stage": "Qualification",
@@ -6670,8 +6712,8 @@ const DATASET = {
       "industryCode": "3113",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "Incumbent relationship bank",
-        "Mezzanine fund"
+        "Wells Fargo Capital Finance",
+        "Golub Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Analysis",
@@ -6758,7 +6800,7 @@ const DATASET = {
         "estMonthlyARVolume": 4725000,
         "debtorConcentrationPct": 57
       },
-      "lostToCompetitor": "Incumbent relationship bank",
+      "lostToCompetitor": "JPMorgan Chase",
       "lostToCompetitorEvidence": "UCC filing"
     },
     {
@@ -6792,8 +6834,8 @@ const DATASET = {
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.06x"
       },
-      "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitor": "Wells Fargo Capital Finance",
+      "lostToCompetitorEvidence": "Reported by borrower"
     },
     {
       "id": "opp_0132",
@@ -6807,7 +6849,7 @@ const DATASET = {
       "industryCode": "5613",
       "useOfProceeds": "Acquisition financing",
       "competitors": [
-        "Incumbent relationship bank"
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Analysis",
@@ -6828,7 +6870,7 @@ const DATASET = {
         "securedStatus": "Secured",
         "callProtection": "None"
       },
-      "lostToCompetitor": "Incumbent relationship bank",
+      "lostToCompetitor": "Wells Fargo Capital Finance",
       "lostToCompetitorEvidence": "UCC filing"
     },
     {
@@ -6843,7 +6885,7 @@ const DATASET = {
       "industryCode": "4244",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "Regional factoring company"
+        "PNC Business Credit"
       ],
       "outcome": "open",
       "stage": "Qualification",
@@ -6877,7 +6919,7 @@ const DATASET = {
       "industryCode": "3159",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "Community bank line"
+        "Bank of America Business Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Qualification",
@@ -6976,7 +7018,7 @@ const DATASET = {
       "industryCode": "5613",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "Regional factoring company"
+        "PNC Business Credit"
       ],
       "outcome": "lost",
       "lostAtStage": "Underwriting",
@@ -7009,8 +7051,8 @@ const DATASET = {
       "industryCode": "3113",
       "useOfProceeds": "Recapitalization",
       "competitors": [
-        "National ABL lender",
-        "Mezzanine fund"
+        "JPMorgan Chase",
+        "Golub Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -7045,8 +7087,8 @@ const DATASET = {
       "industryCode": "3113",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "Community bank line",
-        "National ABL lender"
+        "Bank of America Business Capital",
+        "JPMorgan Chase"
       ],
       "outcome": "lost",
       "lostAtStage": "Qualification",
@@ -7082,8 +7124,8 @@ const DATASET = {
       "industryCode": "3113",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Competing direct lender",
-        "Another private credit firm"
+        "Ares Capital",
+        "White Oak Commercial Finance"
       ],
       "outcome": "open",
       "stage": "Analysis",
@@ -7146,7 +7188,7 @@ const DATASET = {
       "industryCode": "3113",
       "useOfProceeds": "Debt consolidation",
       "competitors": [
-        "Incumbent relationship bank"
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "open",
       "stage": "Proposal",
@@ -7180,7 +7222,7 @@ const DATASET = {
       "industryCode": "3231",
       "useOfProceeds": "Acquisition financing",
       "competitors": [
-        "Another private credit firm"
+        "White Oak Commercial Finance"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -7211,10 +7253,10 @@ const DATASET = {
       "industryCode": "3231",
       "useOfProceeds": "Acquisition financing",
       "competitors": [
-        "Competing direct lender"
+        "Ares Capital"
       ],
       "outcome": "open",
-      "stage": "Analysis",
+      "stage": "Underwriting",
       "createdDate": "2026-07-23",
       "expectedCloseDate": "2026-12-16",
       "fundedDate": null,
@@ -7246,8 +7288,8 @@ const DATASET = {
       "industryCode": "3231",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "National ABL lender",
-        "Incumbent relationship bank"
+        "JPMorgan Chase",
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "open",
       "stage": "Qualification",
@@ -7278,8 +7320,8 @@ const DATASET = {
       "industryCode": "1119",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "Regional factoring company",
-        "Another private credit firm"
+        "PNC Business Credit",
+        "White Oak Commercial Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Qualification",
@@ -7380,7 +7422,7 @@ const DATASET = {
       "industryCode": "6216",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Another private credit firm"
+        "White Oak Commercial Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Proposal",
@@ -7451,8 +7493,8 @@ const DATASET = {
       "industryCode": "6216",
       "useOfProceeds": "Seasonal inventory build",
       "competitors": [
-        "National ABL lender",
-        "Regional factoring company"
+        "JPMorgan Chase",
+        "PNC Business Credit"
       ],
       "outcome": "open",
       "stage": "Qualification",
@@ -7483,7 +7525,7 @@ const DATASET = {
       "industryCode": "3327",
       "useOfProceeds": "Recapitalization",
       "competitors": [
-        "Another private credit firm"
+        "White Oak Commercial Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Proposal",
@@ -7615,8 +7657,8 @@ const DATASET = {
       "industryCode": "1119",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "Incumbent relationship bank",
-        "Mezzanine fund"
+        "Wells Fargo Capital Finance",
+        "Golub Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -7647,8 +7689,8 @@ const DATASET = {
       "industryCode": "1119",
       "useOfProceeds": "Equipment purchase",
       "competitors": [
-        "Incumbent relationship bank",
-        "Competing direct lender"
+        "Wells Fargo Capital Finance",
+        "Ares Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -7682,8 +7724,8 @@ const DATASET = {
       "industryCode": "1119",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "Mezzanine fund",
-        "Community bank line"
+        "Golub Capital",
+        "Bank of America Business Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Analysis",
@@ -7819,8 +7861,8 @@ const DATASET = {
       "industryCode": "3231",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "Another private credit firm",
-        "Community bank line"
+        "White Oak Commercial Finance",
+        "Bank of America Business Capital"
       ],
       "outcome": "open",
       "stage": "Analysis",
@@ -7854,8 +7896,8 @@ const DATASET = {
       "industryCode": "3231",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "Incumbent relationship bank",
-        "Another private credit firm"
+        "Wells Fargo Capital Finance",
+        "White Oak Commercial Finance"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -7886,8 +7928,8 @@ const DATASET = {
       "industryCode": "3231",
       "useOfProceeds": "Seasonal inventory build",
       "competitors": [
-        "Mezzanine fund",
-        "Regional factoring company"
+        "Golub Capital",
+        "PNC Business Credit"
       ],
       "outcome": "open",
       "stage": "Qualification",
@@ -7921,7 +7963,7 @@ const DATASET = {
       "industryCode": "3231",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "Another private credit firm"
+        "White Oak Commercial Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Qualification",
@@ -7989,7 +8031,7 @@ const DATASET = {
       "industryCode": "3113",
       "useOfProceeds": "Seasonal inventory build",
       "competitors": [
-        "Mezzanine fund"
+        "Golub Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -8054,8 +8096,8 @@ const DATASET = {
       "industryCode": "4244",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Regional factoring company",
-        "Community bank line"
+        "PNC Business Credit",
+        "Bank of America Business Capital"
       ],
       "outcome": "open",
       "stage": "Proposal",
@@ -8090,8 +8132,8 @@ const DATASET = {
       "industryCode": "2131",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "Regional factoring company",
-        "Incumbent relationship bank"
+        "PNC Business Credit",
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -8125,7 +8167,7 @@ const DATASET = {
       "industryCode": "2131",
       "useOfProceeds": "Equipment purchase",
       "competitors": [
-        "Incumbent relationship bank"
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Qualification",
@@ -8161,7 +8203,7 @@ const DATASET = {
       "industryCode": "2131",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "National ABL lender"
+        "JPMorgan Chase"
       ],
       "outcome": "open",
       "stage": "Qualification",
@@ -8192,7 +8234,7 @@ const DATASET = {
       "industryCode": "4238",
       "useOfProceeds": "Acquisition financing",
       "competitors": [
-        "Another private credit firm"
+        "White Oak Commercial Finance"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -8227,7 +8269,7 @@ const DATASET = {
       "industryCode": "3399",
       "useOfProceeds": "Recapitalization",
       "competitors": [
-        "Competing direct lender"
+        "Ares Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Analysis",
@@ -8283,8 +8325,8 @@ const DATASET = {
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
       },
-      "lostToCompetitor": "Incumbent relationship bank",
-      "lostToCompetitorEvidence": "Reported by borrower"
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0176",
@@ -8298,7 +8340,7 @@ const DATASET = {
       "industryCode": "3113",
       "useOfProceeds": "Recapitalization",
       "competitors": [
-        "Another private credit firm"
+        "White Oak Commercial Finance"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -8333,8 +8375,8 @@ const DATASET = {
       "industryCode": "3113",
       "useOfProceeds": "Equipment purchase",
       "competitors": [
-        "National ABL lender",
-        "Incumbent relationship bank"
+        "JPMorgan Chase",
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "open",
       "stage": "Qualification",
@@ -8365,8 +8407,8 @@ const DATASET = {
       "industryCode": "3113",
       "useOfProceeds": "Acquisition financing",
       "competitors": [
-        "Regional factoring company",
-        "National ABL lender"
+        "PNC Business Credit",
+        "JPMorgan Chase"
       ],
       "outcome": "open",
       "stage": "Proposal",
@@ -8492,8 +8534,8 @@ const DATASET = {
       "industryCode": "3231",
       "useOfProceeds": "Seasonal inventory build",
       "competitors": [
-        "Another private credit firm",
-        "Mezzanine fund"
+        "White Oak Commercial Finance",
+        "Golub Capital"
       ],
       "outcome": "open",
       "stage": "Qualification",
@@ -8527,8 +8569,8 @@ const DATASET = {
       "industryCode": "3159",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Another private credit firm",
-        "Competing direct lender"
+        "White Oak Commercial Finance",
+        "Ares Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Analysis",
@@ -8564,8 +8606,8 @@ const DATASET = {
       "industryCode": "3159",
       "useOfProceeds": "Equipment purchase",
       "competitors": [
-        "Competing direct lender",
-        "Another private credit firm"
+        "Ares Capital",
+        "White Oak Commercial Finance"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -8629,8 +8671,8 @@ const DATASET = {
       "industryCode": "3159",
       "useOfProceeds": "Debt consolidation",
       "competitors": [
-        "Community bank line",
-        "Another private credit firm"
+        "Bank of America Business Capital",
+        "White Oak Commercial Finance"
       ],
       "outcome": "open",
       "stage": "Proposal",
@@ -8696,7 +8738,7 @@ const DATASET = {
       "industryCode": "3231",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "Community bank line"
+        "Bank of America Business Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -8730,7 +8772,7 @@ const DATASET = {
       "industryCode": "3231",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "Incumbent relationship bank"
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "open",
       "stage": "Qualification",
@@ -8813,8 +8855,8 @@ const DATASET = {
         "securedStatus": "Secured",
         "callProtection": "None"
       },
-      "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitor": "PNC Business Credit",
+      "lostToCompetitorEvidence": "Reported by borrower"
     },
     {
       "id": "opp_0192",
@@ -8828,8 +8870,8 @@ const DATASET = {
       "industryCode": "3159",
       "useOfProceeds": "Equipment purchase",
       "competitors": [
-        "Regional factoring company",
-        "Another private credit firm"
+        "PNC Business Credit",
+        "White Oak Commercial Finance"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -8860,7 +8902,7 @@ const DATASET = {
       "industryCode": "3231",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Incumbent relationship bank"
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Proposal",
@@ -8896,8 +8938,8 @@ const DATASET = {
       "industryCode": "3231",
       "useOfProceeds": "Recapitalization",
       "competitors": [
-        "Regional factoring company",
-        "Mezzanine fund"
+        "PNC Business Credit",
+        "Golub Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -8928,7 +8970,7 @@ const DATASET = {
       "industryCode": "3231",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "Mezzanine fund"
+        "Golub Capital"
       ],
       "outcome": "open",
       "stage": "Analysis",
@@ -8981,8 +9023,8 @@ const DATASET = {
         "securedStatus": "Secured",
         "callProtection": "None"
       },
-      "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitor": "Wells Fargo Capital Finance",
+      "lostToCompetitorEvidence": "UCC filing"
     },
     {
       "id": "opp_0197",
@@ -8996,7 +9038,7 @@ const DATASET = {
       "industryCode": "3113",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "Another private credit firm"
+        "White Oak Commercial Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Proposal",
@@ -9098,8 +9140,8 @@ const DATASET = {
       "industryCode": "5613",
       "useOfProceeds": "Debt consolidation",
       "competitors": [
-        "National ABL lender",
-        "Competing direct lender"
+        "JPMorgan Chase",
+        "Ares Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -9168,8 +9210,8 @@ const DATASET = {
       "industryCode": "5613",
       "useOfProceeds": "Seasonal inventory build",
       "competitors": [
-        "Community bank line",
-        "National ABL lender"
+        "Bank of America Business Capital",
+        "JPMorgan Chase"
       ],
       "outcome": "open",
       "stage": "Analysis",
@@ -9200,8 +9242,8 @@ const DATASET = {
       "industryCode": "5613",
       "useOfProceeds": "Seasonal inventory build",
       "competitors": [
-        "Community bank line",
-        "Competing direct lender"
+        "Bank of America Business Capital",
+        "Ares Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Proposal",
@@ -9219,8 +9261,8 @@ const DATASET = {
         "estMonthlyARVolume": 767000,
         "debtorConcentrationPct": 22
       },
-      "lostToCompetitor": "Community bank line",
-      "lostToCompetitorEvidence": "Reported by borrower"
+      "lostToCompetitor": "Ares Capital",
+      "lostToCompetitorEvidence": "UCC filing"
     },
     {
       "id": "opp_0204",
@@ -9234,7 +9276,7 @@ const DATASET = {
       "industryCode": "5613",
       "useOfProceeds": "Acquisition financing",
       "competitors": [
-        "Mezzanine fund"
+        "Golub Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -9268,8 +9310,8 @@ const DATASET = {
       "industryCode": "3113",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Another private credit firm",
-        "National ABL lender"
+        "White Oak Commercial Finance",
+        "JPMorgan Chase"
       ],
       "outcome": "lost",
       "lostAtStage": "Proposal",
@@ -9302,7 +9344,7 @@ const DATASET = {
       "industryCode": "3399",
       "useOfProceeds": "Equipment purchase",
       "competitors": [
-        "Another private credit firm"
+        "White Oak Commercial Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Analysis",
@@ -9323,7 +9365,7 @@ const DATASET = {
         "securedStatus": "Unsecured",
         "callProtection": "1% Yr1 stepdown"
       },
-      "lostToCompetitor": "Incumbent relationship bank",
+      "lostToCompetitor": "JPMorgan Chase",
       "lostToCompetitorEvidence": "UCC filing"
     },
     {
@@ -9432,8 +9474,8 @@ const DATASET = {
       "industryCode": "1119",
       "useOfProceeds": "Equipment purchase",
       "competitors": [
-        "Mezzanine fund",
-        "Incumbent relationship bank"
+        "Golub Capital",
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -9525,7 +9567,7 @@ const DATASET = {
       "industryCode": "1119",
       "useOfProceeds": "Acquisition financing",
       "competitors": [
-        "Regional factoring company"
+        "PNC Business Credit"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -9559,8 +9601,8 @@ const DATASET = {
       "industryCode": "1119",
       "useOfProceeds": "Seasonal inventory build",
       "competitors": [
-        "Another private credit firm",
-        "National ABL lender"
+        "White Oak Commercial Finance",
+        "JPMorgan Chase"
       ],
       "outcome": "open",
       "stage": "Proposal",
@@ -9591,8 +9633,8 @@ const DATASET = {
       "industryCode": "3399",
       "useOfProceeds": "Debt consolidation",
       "competitors": [
-        "National ABL lender",
-        "Regional factoring company"
+        "JPMorgan Chase",
+        "PNC Business Credit"
       ],
       "outcome": "lost",
       "lostAtStage": "Underwriting",
@@ -9647,7 +9689,7 @@ const DATASET = {
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.22x"
       },
-      "lostToCompetitor": "Incumbent relationship bank",
+      "lostToCompetitor": "Bank of America Business Capital",
       "lostToCompetitorEvidence": "UCC filing"
     },
     {
@@ -9662,7 +9704,7 @@ const DATASET = {
       "industryCode": "3399",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "Community bank line"
+        "Bank of America Business Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -9693,8 +9735,8 @@ const DATASET = {
       "industryCode": "3399",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Community bank line",
-        "Competing direct lender"
+        "Bank of America Business Capital",
+        "Ares Capital"
       ],
       "outcome": "open",
       "stage": "Qualification",
@@ -9728,7 +9770,7 @@ const DATASET = {
       "industryCode": "3399",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "Competing direct lender"
+        "Ares Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Analysis",
@@ -9826,8 +9868,8 @@ const DATASET = {
       "industryCode": "1119",
       "useOfProceeds": "Debt consolidation",
       "competitors": [
-        "Mezzanine fund",
-        "Another private credit firm"
+        "Golub Capital",
+        "White Oak Commercial Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Proposal",
@@ -9863,7 +9905,7 @@ const DATASET = {
       "industryCode": "1119",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "Competing direct lender"
+        "Ares Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -9897,11 +9939,11 @@ const DATASET = {
       "industryCode": "2131",
       "useOfProceeds": "Debt consolidation",
       "competitors": [
-        "National ABL lender",
-        "Incumbent relationship bank"
+        "JPMorgan Chase",
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "open",
-      "stage": "Analysis",
+      "stage": "Underwriting",
       "createdDate": "2026-07-06",
       "expectedCloseDate": "2026-09-19",
       "fundedDate": null,
@@ -9929,7 +9971,7 @@ const DATASET = {
       "industryCode": "4244",
       "useOfProceeds": "Recapitalization",
       "competitors": [
-        "Incumbent relationship bank"
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Proposal",
@@ -9994,8 +10036,8 @@ const DATASET = {
       "industryCode": "4841",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "Regional factoring company",
-        "Another private credit firm"
+        "PNC Business Credit",
+        "White Oak Commercial Finance"
       ],
       "outcome": "open",
       "stage": "Qualification",
@@ -10029,8 +10071,8 @@ const DATASET = {
       "industryCode": "4841",
       "useOfProceeds": "Debt consolidation",
       "competitors": [
-        "Another private credit firm",
-        "Mezzanine fund"
+        "White Oak Commercial Finance",
+        "Golub Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Analysis",
@@ -10066,7 +10108,7 @@ const DATASET = {
       "industryCode": "4841",
       "useOfProceeds": "Debt consolidation",
       "competitors": [
-        "Another private credit firm"
+        "White Oak Commercial Finance"
       ],
       "outcome": "open",
       "stage": "Proposal",
@@ -10097,7 +10139,7 @@ const DATASET = {
       "industryCode": "4841",
       "useOfProceeds": "Debt consolidation",
       "competitors": [
-        "Competing direct lender"
+        "Ares Capital"
       ],
       "outcome": "open",
       "stage": "Analysis",
@@ -10132,7 +10174,7 @@ const DATASET = {
       "industryCode": "4841",
       "useOfProceeds": "Acquisition financing",
       "competitors": [
-        "Community bank line"
+        "Bank of America Business Capital"
       ],
       "outcome": "open",
       "stage": "Underwriting",
@@ -10166,7 +10208,7 @@ const DATASET = {
       "industryCode": "4841",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "National ABL lender"
+        "JPMorgan Chase"
       ],
       "outcome": "open",
       "stage": "Proposal",
@@ -10197,8 +10239,8 @@ const DATASET = {
       "industryCode": "4841",
       "useOfProceeds": "Seasonal inventory build",
       "competitors": [
-        "Competing direct lender",
-        "Another private credit firm"
+        "Ares Capital",
+        "White Oak Commercial Finance"
       ],
       "outcome": "open",
       "stage": "Qualification",
@@ -10232,8 +10274,8 @@ const DATASET = {
       "industryCode": "3399",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Community bank line",
-        "Another private credit firm"
+        "Bank of America Business Capital",
+        "White Oak Commercial Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Qualification",
@@ -10269,8 +10311,8 @@ const DATASET = {
       "industryCode": "4841",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Another private credit firm",
-        "Regional factoring company"
+        "White Oak Commercial Finance",
+        "PNC Business Credit"
       ],
       "outcome": "lost",
       "lostAtStage": "Qualification",
@@ -10306,8 +10348,8 @@ const DATASET = {
       "industryCode": "2131",
       "useOfProceeds": "Seasonal inventory build",
       "competitors": [
-        "Community bank line",
-        "National ABL lender"
+        "Bank of America Business Capital",
+        "JPMorgan Chase"
       ],
       "outcome": "open",
       "stage": "Qualification",
@@ -10338,7 +10380,7 @@ const DATASET = {
       "industryCode": "2361",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Community bank line"
+        "Bank of America Business Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -10372,7 +10414,7 @@ const DATASET = {
       "industryCode": "3231",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "Incumbent relationship bank"
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "open",
       "stage": "Qualification",
@@ -10432,8 +10474,8 @@ const DATASET = {
       "industryCode": "3231",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "Another private credit firm",
-        "Community bank line"
+        "White Oak Commercial Finance",
+        "Bank of America Business Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Analysis",
@@ -10455,7 +10497,7 @@ const DATASET = {
         "fieldExamStatus": "Complete",
         "primaryCovenant": "FCCR >= 1.16x"
       },
-      "lostToCompetitor": "Incumbent relationship bank",
+      "lostToCompetitor": "Bank of America Business Capital",
       "lostToCompetitorEvidence": "UCC filing"
     },
     {
@@ -10470,8 +10512,8 @@ const DATASET = {
       "industryCode": "5613",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "Community bank line",
-        "Incumbent relationship bank"
+        "Bank of America Business Capital",
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "open",
       "stage": "Analysis",
@@ -10534,7 +10576,7 @@ const DATASET = {
       "industryCode": "3231",
       "useOfProceeds": "Equipment purchase",
       "competitors": [
-        "Community bank line"
+        "Bank of America Business Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Proposal",
@@ -10556,8 +10598,8 @@ const DATASET = {
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.07x"
       },
-      "lostToCompetitor": "Community bank line",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitor": "Bank of America Business Capital",
+      "lostToCompetitorEvidence": "Reported by borrower"
     },
     {
       "id": "opp_0244",
@@ -10600,7 +10642,7 @@ const DATASET = {
       "industryCode": "4841",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "Another private credit firm"
+        "White Oak Commercial Finance"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -10631,7 +10673,7 @@ const DATASET = {
       "industryCode": "4841",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Mezzanine fund"
+        "Golub Capital"
       ],
       "outcome": "open",
       "stage": "Analysis",
@@ -10697,8 +10739,8 @@ const DATASET = {
       "industryCode": "3273",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "Another private credit firm",
-        "National ABL lender"
+        "White Oak Commercial Finance",
+        "JPMorgan Chase"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -10783,8 +10825,8 @@ const DATASET = {
         "securedStatus": "Secured",
         "callProtection": "1% Yr1 stepdown"
       },
-      "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitor": "Golub Capital",
+      "lostToCompetitorEvidence": "UCC filing"
     }
   ],
   "stageHistory": {
@@ -10858,18 +10900,30 @@ const DATASET = {
       {
         "stage": "Qualification",
         "enteredDate": "2026-07-15",
-        "exitedDate": "2026-07-27",
-        "durationDays": 12
+        "exitedDate": "2026-07-16",
+        "durationDays": 1
       },
       {
         "stage": "Analysis",
-        "enteredDate": "2026-07-27",
+        "enteredDate": "2026-07-16",
+        "exitedDate": "2026-07-18",
+        "durationDays": 2
+      },
+      {
+        "stage": "Proposal",
+        "enteredDate": "2026-07-18",
+        "exitedDate": "2026-07-19",
+        "durationDays": 1
+      },
+      {
+        "stage": "Underwriting",
+        "enteredDate": "2026-07-19",
         "exitedDate": null,
         "durationDays": null
       },
       {
-        "stage": "Analysis",
-        "enteredDate": "2026-07-27",
+        "stage": "Underwriting",
+        "enteredDate": "2026-07-19",
         "exitedDate": null,
         "durationDays": null,
         "terminal": false
@@ -11014,24 +11068,30 @@ const DATASET = {
       {
         "stage": "Qualification",
         "enteredDate": "2026-07-23",
-        "exitedDate": "2026-07-29",
-        "durationDays": 6
+        "exitedDate": "2026-07-24",
+        "durationDays": 1
       },
       {
         "stage": "Analysis",
-        "enteredDate": "2026-07-29",
-        "exitedDate": "2026-08-15",
-        "durationDays": 17
+        "enteredDate": "2026-07-24",
+        "exitedDate": "2026-07-25",
+        "durationDays": 1
       },
       {
         "stage": "Proposal",
-        "enteredDate": "2026-08-15",
+        "enteredDate": "2026-07-25",
+        "exitedDate": "2026-07-26",
+        "durationDays": 1
+      },
+      {
+        "stage": "Underwriting",
+        "enteredDate": "2026-07-26",
         "exitedDate": null,
         "durationDays": null
       },
       {
-        "stage": "Proposal",
-        "enteredDate": "2026-08-15",
+        "stage": "Underwriting",
+        "enteredDate": "2026-07-26",
         "exitedDate": null,
         "durationDays": null,
         "terminal": false
@@ -11062,18 +11122,30 @@ const DATASET = {
       {
         "stage": "Qualification",
         "enteredDate": "2026-07-18",
-        "exitedDate": "2026-07-26",
-        "durationDays": 8
+        "exitedDate": "2026-07-22",
+        "durationDays": 4
       },
       {
         "stage": "Analysis",
-        "enteredDate": "2026-07-26",
+        "enteredDate": "2026-07-22",
+        "exitedDate": "2026-07-28",
+        "durationDays": 6
+      },
+      {
+        "stage": "Proposal",
+        "enteredDate": "2026-07-28",
+        "exitedDate": "2026-08-01",
+        "durationDays": 4
+      },
+      {
+        "stage": "Underwriting",
+        "enteredDate": "2026-08-01",
         "exitedDate": null,
         "durationDays": null
       },
       {
-        "stage": "Analysis",
-        "enteredDate": "2026-07-26",
+        "stage": "Underwriting",
+        "enteredDate": "2026-08-01",
         "exitedDate": null,
         "durationDays": null,
         "terminal": false
@@ -11116,18 +11188,30 @@ const DATASET = {
       {
         "stage": "Qualification",
         "enteredDate": "2026-07-09",
-        "exitedDate": "2026-07-22",
-        "durationDays": 13
+        "exitedDate": "2026-07-13",
+        "durationDays": 4
       },
       {
         "stage": "Analysis",
-        "enteredDate": "2026-07-22",
+        "enteredDate": "2026-07-13",
+        "exitedDate": "2026-07-20",
+        "durationDays": 7
+      },
+      {
+        "stage": "Proposal",
+        "enteredDate": "2026-07-20",
+        "exitedDate": "2026-07-25",
+        "durationDays": 5
+      },
+      {
+        "stage": "Underwriting",
+        "enteredDate": "2026-07-25",
         "exitedDate": null,
         "durationDays": null
       },
       {
-        "stage": "Analysis",
-        "enteredDate": "2026-07-22",
+        "stage": "Underwriting",
+        "enteredDate": "2026-07-25",
         "exitedDate": null,
         "durationDays": null,
         "terminal": false
@@ -11470,24 +11554,30 @@ const DATASET = {
       {
         "stage": "Qualification",
         "enteredDate": "2026-07-12",
-        "exitedDate": "2026-07-19",
-        "durationDays": 7
+        "exitedDate": "2026-07-14",
+        "durationDays": 2
       },
       {
         "stage": "Analysis",
-        "enteredDate": "2026-07-19",
-        "exitedDate": "2026-08-14",
-        "durationDays": 26
+        "enteredDate": "2026-07-14",
+        "exitedDate": "2026-07-17",
+        "durationDays": 3
       },
       {
         "stage": "Proposal",
-        "enteredDate": "2026-08-14",
+        "enteredDate": "2026-07-17",
+        "exitedDate": "2026-07-18",
+        "durationDays": 1
+      },
+      {
+        "stage": "Underwriting",
+        "enteredDate": "2026-07-18",
         "exitedDate": null,
         "durationDays": null
       },
       {
-        "stage": "Proposal",
-        "enteredDate": "2026-08-14",
+        "stage": "Underwriting",
+        "enteredDate": "2026-07-18",
         "exitedDate": null,
         "durationDays": null,
         "terminal": false
@@ -11698,18 +11788,30 @@ const DATASET = {
       {
         "stage": "Qualification",
         "enteredDate": "2026-07-09",
-        "exitedDate": "2026-07-24",
-        "durationDays": 15
+        "exitedDate": "2026-07-15",
+        "durationDays": 6
       },
       {
         "stage": "Analysis",
-        "enteredDate": "2026-07-24",
+        "enteredDate": "2026-07-15",
+        "exitedDate": "2026-07-25",
+        "durationDays": 10
+      },
+      {
+        "stage": "Proposal",
+        "enteredDate": "2026-07-25",
+        "exitedDate": "2026-08-02",
+        "durationDays": 8
+      },
+      {
+        "stage": "Underwriting",
+        "enteredDate": "2026-08-02",
         "exitedDate": null,
         "durationDays": null
       },
       {
-        "stage": "Analysis",
-        "enteredDate": "2026-07-24",
+        "stage": "Underwriting",
+        "enteredDate": "2026-08-02",
         "exitedDate": null,
         "durationDays": null,
         "terminal": false
@@ -12007,24 +12109,30 @@ const DATASET = {
       {
         "stage": "Qualification",
         "enteredDate": "2026-07-17",
-        "exitedDate": "2026-07-30",
-        "durationDays": 13
+        "exitedDate": "2026-07-18",
+        "durationDays": 1
       },
       {
         "stage": "Analysis",
-        "enteredDate": "2026-07-30",
-        "exitedDate": "2026-08-13",
-        "durationDays": 14
+        "enteredDate": "2026-07-18",
+        "exitedDate": "2026-07-19",
+        "durationDays": 1
       },
       {
         "stage": "Proposal",
-        "enteredDate": "2026-08-13",
+        "enteredDate": "2026-07-19",
+        "exitedDate": "2026-07-20",
+        "durationDays": 1
+      },
+      {
+        "stage": "Underwriting",
+        "enteredDate": "2026-07-20",
         "exitedDate": null,
         "durationDays": null
       },
       {
-        "stage": "Proposal",
-        "enteredDate": "2026-08-13",
+        "stage": "Underwriting",
+        "enteredDate": "2026-07-20",
         "exitedDate": null,
         "durationDays": null,
         "terminal": false
@@ -12640,24 +12748,30 @@ const DATASET = {
       {
         "stage": "Qualification",
         "enteredDate": "2026-07-21",
-        "exitedDate": "2026-07-26",
-        "durationDays": 5
+        "exitedDate": "2026-07-22",
+        "durationDays": 1
       },
       {
         "stage": "Analysis",
-        "enteredDate": "2026-07-26",
-        "exitedDate": "2026-08-14",
-        "durationDays": 19
+        "enteredDate": "2026-07-22",
+        "exitedDate": "2026-07-23",
+        "durationDays": 1
       },
       {
         "stage": "Proposal",
-        "enteredDate": "2026-08-14",
+        "enteredDate": "2026-07-23",
+        "exitedDate": "2026-07-24",
+        "durationDays": 1
+      },
+      {
+        "stage": "Underwriting",
+        "enteredDate": "2026-07-24",
         "exitedDate": null,
         "durationDays": null
       },
       {
-        "stage": "Proposal",
-        "enteredDate": "2026-08-14",
+        "stage": "Underwriting",
+        "enteredDate": "2026-07-24",
         "exitedDate": null,
         "durationDays": null,
         "terminal": false
@@ -13402,24 +13516,30 @@ const DATASET = {
       {
         "stage": "Qualification",
         "enteredDate": "2026-07-06",
-        "exitedDate": "2026-07-12",
-        "durationDays": 6
+        "exitedDate": "2026-07-09",
+        "durationDays": 3
       },
       {
         "stage": "Analysis",
-        "enteredDate": "2026-07-12",
-        "exitedDate": "2026-08-07",
-        "durationDays": 26
+        "enteredDate": "2026-07-09",
+        "exitedDate": "2026-07-14",
+        "durationDays": 5
       },
       {
         "stage": "Proposal",
-        "enteredDate": "2026-08-07",
+        "enteredDate": "2026-07-14",
+        "exitedDate": "2026-07-17",
+        "durationDays": 3
+      },
+      {
+        "stage": "Underwriting",
+        "enteredDate": "2026-07-17",
         "exitedDate": null,
         "durationDays": null
       },
       {
-        "stage": "Proposal",
-        "enteredDate": "2026-08-07",
+        "stage": "Underwriting",
+        "enteredDate": "2026-07-17",
         "exitedDate": null,
         "durationDays": null,
         "terminal": false
@@ -13576,24 +13696,30 @@ const DATASET = {
       {
         "stage": "Qualification",
         "enteredDate": "2026-06-18",
-        "exitedDate": "2026-07-08",
-        "durationDays": 20
+        "exitedDate": "2026-06-30",
+        "durationDays": 12
       },
       {
         "stage": "Analysis",
-        "enteredDate": "2026-07-08",
-        "exitedDate": "2026-07-30",
-        "durationDays": 22
+        "enteredDate": "2026-06-30",
+        "exitedDate": "2026-07-19",
+        "durationDays": 19
       },
       {
         "stage": "Proposal",
-        "enteredDate": "2026-07-30",
+        "enteredDate": "2026-07-19",
+        "exitedDate": "2026-08-02",
+        "durationDays": 14
+      },
+      {
+        "stage": "Underwriting",
+        "enteredDate": "2026-08-02",
         "exitedDate": null,
         "durationDays": null
       },
       {
-        "stage": "Proposal",
-        "enteredDate": "2026-07-30",
+        "stage": "Underwriting",
+        "enteredDate": "2026-08-02",
         "exitedDate": null,
         "durationDays": null,
         "terminal": false
@@ -13930,18 +14056,30 @@ const DATASET = {
       {
         "stage": "Qualification",
         "enteredDate": "2026-07-21",
-        "exitedDate": "2026-08-03",
-        "durationDays": 13
+        "exitedDate": "2026-07-22",
+        "durationDays": 1
       },
       {
         "stage": "Analysis",
-        "enteredDate": "2026-08-03",
+        "enteredDate": "2026-07-22",
+        "exitedDate": "2026-07-23",
+        "durationDays": 1
+      },
+      {
+        "stage": "Proposal",
+        "enteredDate": "2026-07-23",
+        "exitedDate": "2026-07-24",
+        "durationDays": 1
+      },
+      {
+        "stage": "Underwriting",
+        "enteredDate": "2026-07-24",
         "exitedDate": null,
         "durationDays": null
       },
       {
-        "stage": "Analysis",
-        "enteredDate": "2026-08-03",
+        "stage": "Underwriting",
+        "enteredDate": "2026-07-24",
         "exitedDate": null,
         "durationDays": null,
         "terminal": false
@@ -14461,17 +14599,29 @@ const DATASET = {
       {
         "stage": "Qualification",
         "enteredDate": "2026-07-23",
-        "exitedDate": "2026-08-02",
-        "durationDays": 10
+        "exitedDate": "2026-07-26",
+        "durationDays": 3
       },
       {
         "stage": "Analysis",
+        "enteredDate": "2026-07-26",
+        "exitedDate": "2026-07-30",
+        "durationDays": 4
+      },
+      {
+        "stage": "Proposal",
+        "enteredDate": "2026-07-30",
+        "exitedDate": "2026-08-02",
+        "durationDays": 3
+      },
+      {
+        "stage": "Underwriting",
         "enteredDate": "2026-08-02",
         "exitedDate": null,
         "durationDays": null
       },
       {
-        "stage": "Analysis",
+        "stage": "Underwriting",
         "enteredDate": "2026-08-02",
         "exitedDate": null,
         "durationDays": null,
@@ -16477,18 +16627,30 @@ const DATASET = {
       {
         "stage": "Qualification",
         "enteredDate": "2026-07-06",
-        "exitedDate": "2026-07-22",
-        "durationDays": 16
+        "exitedDate": "2026-07-14",
+        "durationDays": 8
       },
       {
         "stage": "Analysis",
-        "enteredDate": "2026-07-22",
+        "enteredDate": "2026-07-14",
+        "exitedDate": "2026-07-26",
+        "durationDays": 12
+      },
+      {
+        "stage": "Proposal",
+        "enteredDate": "2026-07-26",
+        "exitedDate": "2026-08-04",
+        "durationDays": 9
+      },
+      {
+        "stage": "Underwriting",
+        "enteredDate": "2026-08-04",
         "exitedDate": null,
         "durationDays": null
       },
       {
-        "stage": "Analysis",
-        "enteredDate": "2026-07-22",
+        "stage": "Underwriting",
+        "enteredDate": "2026-08-04",
         "exitedDate": null,
         "durationDays": null,
         "terminal": false
@@ -17145,7 +17307,7 @@ const DATASET = {
       "accountId": "acct_c_0002",
       "filingNumber": "UCC-2023-254029",
       "filingDate": "2025-08-15",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 2,
       "subordinated": false
@@ -17165,7 +17327,7 @@ const DATASET = {
       "accountId": "acct_c_0003",
       "filingNumber": "UCC-2023-054853",
       "filingDate": "2024-11-21",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": false
@@ -17175,7 +17337,7 @@ const DATASET = {
       "accountId": "acct_c_0003",
       "filingNumber": "UCC-2023-819402",
       "filingDate": "2025-02-26",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 3,
       "subordinated": false
@@ -17185,7 +17347,7 @@ const DATASET = {
       "accountId": "acct_c_0003",
       "filingNumber": "UCC-2024-508342",
       "filingDate": "2025-02-15",
-      "securedParty": "National ABL lender",
+      "securedParty": "JPMorgan Chase",
       "collateralDescription": "Inventory",
       "priorityRank": 4,
       "subordinated": false
@@ -17205,7 +17367,7 @@ const DATASET = {
       "accountId": "acct_c_0004",
       "filingNumber": "UCC-2025-851077",
       "filingDate": "2025-10-01",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 2,
       "subordinated": true
@@ -17215,7 +17377,7 @@ const DATASET = {
       "accountId": "acct_c_0004",
       "filingNumber": "UCC-2026-714275",
       "filingDate": "2026-02-17",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 3,
       "subordinated": true
@@ -17225,7 +17387,7 @@ const DATASET = {
       "accountId": "acct_c_0004",
       "filingNumber": "UCC-2025-077020",
       "filingDate": "2025-07-26",
-      "securedParty": "National ABL lender",
+      "securedParty": "JPMorgan Chase",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 4,
       "subordinated": false
@@ -17245,7 +17407,7 @@ const DATASET = {
       "accountId": "acct_c_0005",
       "filingNumber": "UCC-2025-963855",
       "filingDate": "2025-06-16",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 2,
       "subordinated": false
@@ -17255,7 +17417,7 @@ const DATASET = {
       "accountId": "acct_c_0005",
       "filingNumber": "UCC-2023-316444",
       "filingDate": "2024-11-09",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Inventory",
       "priorityRank": 3,
       "subordinated": true
@@ -17265,7 +17427,7 @@ const DATASET = {
       "accountId": "acct_c_0005",
       "filingNumber": "UCC-2025-304385",
       "filingDate": "2025-06-18",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "All assets",
       "priorityRank": 4,
       "subordinated": true
@@ -17295,7 +17457,7 @@ const DATASET = {
       "accountId": "acct_c_0007",
       "filingNumber": "UCC-2025-286500",
       "filingDate": "2024-11-04",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 2,
       "subordinated": false
@@ -17305,7 +17467,7 @@ const DATASET = {
       "accountId": "acct_c_0007",
       "filingNumber": "UCC-2025-753688",
       "filingDate": "2025-11-09",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "All assets",
       "priorityRank": 3,
       "subordinated": false
@@ -17325,7 +17487,7 @@ const DATASET = {
       "accountId": "acct_c_0008",
       "filingNumber": "UCC-2026-661686",
       "filingDate": "2025-01-06",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 2,
       "subordinated": true
@@ -17335,7 +17497,7 @@ const DATASET = {
       "accountId": "acct_c_0008",
       "filingNumber": "UCC-2025-598488",
       "filingDate": "2024-11-26",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 3,
       "subordinated": true
@@ -17355,7 +17517,7 @@ const DATASET = {
       "accountId": "acct_c_0009",
       "filingNumber": "UCC-2024-167634",
       "filingDate": "2025-03-27",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -17365,7 +17527,7 @@ const DATASET = {
       "accountId": "acct_c_0009",
       "filingNumber": "UCC-2023-142465",
       "filingDate": "2025-07-01",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 3,
       "subordinated": false
@@ -17385,7 +17547,7 @@ const DATASET = {
       "accountId": "acct_c_0010",
       "filingNumber": "UCC-2025-721732",
       "filingDate": "2024-12-11",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 2,
       "subordinated": false
@@ -17405,7 +17567,7 @@ const DATASET = {
       "accountId": "acct_c_0011",
       "filingNumber": "UCC-2026-830091",
       "filingDate": "2024-10-18",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -17415,7 +17577,7 @@ const DATASET = {
       "accountId": "acct_c_0011",
       "filingNumber": "UCC-2023-386746",
       "filingDate": "2024-11-16",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 3,
       "subordinated": true
@@ -17435,7 +17597,7 @@ const DATASET = {
       "accountId": "acct_c_0012",
       "filingNumber": "UCC-2026-125173",
       "filingDate": "2024-12-20",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 2,
       "subordinated": false
@@ -17445,7 +17607,7 @@ const DATASET = {
       "accountId": "acct_c_0012",
       "filingNumber": "UCC-2026-863978",
       "filingDate": "2025-05-11",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 3,
       "subordinated": false
@@ -17465,7 +17627,7 @@ const DATASET = {
       "accountId": "acct_c_0013",
       "filingNumber": "UCC-2023-400692",
       "filingDate": "2025-07-29",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": false
@@ -17475,7 +17637,7 @@ const DATASET = {
       "accountId": "acct_c_0013",
       "filingNumber": "UCC-2024-553896",
       "filingDate": "2025-03-10",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "All assets",
       "priorityRank": 3,
       "subordinated": false
@@ -17495,7 +17657,7 @@ const DATASET = {
       "accountId": "acct_c_0014",
       "filingNumber": "UCC-2024-502429",
       "filingDate": "2025-02-12",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "All assets",
       "priorityRank": 2,
       "subordinated": false
@@ -17505,7 +17667,7 @@ const DATASET = {
       "accountId": "acct_c_0014",
       "filingNumber": "UCC-2023-195937",
       "filingDate": "2024-12-23",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 3,
       "subordinated": true
@@ -17525,7 +17687,7 @@ const DATASET = {
       "accountId": "acct_c_0016",
       "filingNumber": "UCC-2023-186944",
       "filingDate": "2025-08-31",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 2,
       "subordinated": true
@@ -17535,7 +17697,7 @@ const DATASET = {
       "accountId": "acct_c_0016",
       "filingNumber": "UCC-2023-771326",
       "filingDate": "2025-06-17",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 3,
       "subordinated": false
@@ -17555,7 +17717,7 @@ const DATASET = {
       "accountId": "acct_c_0017",
       "filingNumber": "UCC-2025-599784",
       "filingDate": "2025-01-23",
-      "securedParty": "National ABL lender",
+      "securedParty": "JPMorgan Chase",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -17565,7 +17727,7 @@ const DATASET = {
       "accountId": "acct_c_0017",
       "filingNumber": "UCC-2023-497238",
       "filingDate": "2024-10-02",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 3,
       "subordinated": true
@@ -17585,7 +17747,7 @@ const DATASET = {
       "accountId": "acct_c_0018",
       "filingNumber": "UCC-2024-729956",
       "filingDate": "2025-09-01",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": false
@@ -17615,7 +17777,7 @@ const DATASET = {
       "accountId": "acct_c_0020",
       "filingNumber": "UCC-2024-466838",
       "filingDate": "2025-10-04",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 2,
       "subordinated": false
@@ -17645,7 +17807,7 @@ const DATASET = {
       "accountId": "acct_c_0022",
       "filingNumber": "UCC-2025-183812",
       "filingDate": "2025-05-26",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": false
@@ -17675,7 +17837,7 @@ const DATASET = {
       "accountId": "acct_c_0024",
       "filingNumber": "UCC-2023-257820",
       "filingDate": "2025-11-04",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 2,
       "subordinated": false
@@ -17695,7 +17857,7 @@ const DATASET = {
       "accountId": "acct_c_0025",
       "filingNumber": "UCC-2023-755156",
       "filingDate": "2025-02-01",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "All assets",
       "priorityRank": 2,
       "subordinated": true
@@ -17715,7 +17877,7 @@ const DATASET = {
       "accountId": "acct_c_0026",
       "filingNumber": "UCC-2024-465788",
       "filingDate": "2026-02-06",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "All assets",
       "priorityRank": 2,
       "subordinated": false
@@ -17725,7 +17887,7 @@ const DATASET = {
       "accountId": "acct_c_0026",
       "filingNumber": "UCC-2024-988490",
       "filingDate": "2025-08-23",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "All assets",
       "priorityRank": 3,
       "subordinated": false
@@ -17745,7 +17907,7 @@ const DATASET = {
       "accountId": "acct_c_0027",
       "filingNumber": "UCC-2025-209000",
       "filingDate": "2024-07-12",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -17755,7 +17917,7 @@ const DATASET = {
       "accountId": "acct_c_0027",
       "filingNumber": "UCC-2024-952132",
       "filingDate": "2025-03-04",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 3,
       "subordinated": false
@@ -17765,7 +17927,7 @@ const DATASET = {
       "accountId": "acct_c_0027",
       "filingNumber": "UCC-2024-216033",
       "filingDate": "2025-02-15",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "Inventory",
       "priorityRank": 4,
       "subordinated": true
@@ -17785,7 +17947,7 @@ const DATASET = {
       "accountId": "acct_c_0028",
       "filingNumber": "UCC-2024-677200",
       "filingDate": "2025-12-28",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 2,
       "subordinated": true
@@ -17795,7 +17957,7 @@ const DATASET = {
       "accountId": "acct_c_0028",
       "filingNumber": "UCC-2025-925632",
       "filingDate": "2024-12-18",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 3,
       "subordinated": false
@@ -17805,7 +17967,7 @@ const DATASET = {
       "accountId": "acct_c_0028",
       "filingNumber": "UCC-2025-088994",
       "filingDate": "2024-10-28",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 4,
       "subordinated": true
@@ -17835,7 +17997,7 @@ const DATASET = {
       "accountId": "acct_c_0030",
       "filingNumber": "UCC-2026-595116",
       "filingDate": "2025-10-30",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -17845,7 +18007,7 @@ const DATASET = {
       "accountId": "acct_c_0030",
       "filingNumber": "UCC-2026-301259",
       "filingDate": "2024-09-09",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Inventory",
       "priorityRank": 3,
       "subordinated": false
@@ -17865,7 +18027,7 @@ const DATASET = {
       "accountId": "acct_c_0031",
       "filingNumber": "UCC-2023-666386",
       "filingDate": "2026-03-15",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -17925,7 +18087,7 @@ const DATASET = {
       "accountId": "acct_c_0036",
       "filingNumber": "UCC-2025-340241",
       "filingDate": "2024-11-12",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -17945,7 +18107,7 @@ const DATASET = {
       "accountId": "acct_c_0037",
       "filingNumber": "UCC-2025-374013",
       "filingDate": "2025-07-17",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -17955,7 +18117,7 @@ const DATASET = {
       "accountId": "acct_c_0037",
       "filingNumber": "UCC-2026-589807",
       "filingDate": "2025-05-26",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "All assets",
       "priorityRank": 3,
       "subordinated": true
@@ -17965,7 +18127,7 @@ const DATASET = {
       "accountId": "acct_c_0037",
       "filingNumber": "UCC-2025-899362",
       "filingDate": "2024-10-18",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 4,
       "subordinated": true
@@ -17985,7 +18147,7 @@ const DATASET = {
       "accountId": "acct_c_0038",
       "filingNumber": "UCC-2025-743949",
       "filingDate": "2024-10-27",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "All assets",
       "priorityRank": 2,
       "subordinated": false
@@ -17995,7 +18157,7 @@ const DATASET = {
       "accountId": "acct_c_0038",
       "filingNumber": "UCC-2026-320732",
       "filingDate": "2024-11-26",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 3,
       "subordinated": true
@@ -18025,7 +18187,7 @@ const DATASET = {
       "accountId": "acct_c_0040",
       "filingNumber": "UCC-2023-680588",
       "filingDate": "2024-07-17",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 2,
       "subordinated": false
@@ -18035,7 +18197,7 @@ const DATASET = {
       "accountId": "acct_c_0040",
       "filingNumber": "UCC-2023-978049",
       "filingDate": "2025-04-28",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 3,
       "subordinated": true
@@ -18045,7 +18207,7 @@ const DATASET = {
       "accountId": "acct_c_0040",
       "filingNumber": "UCC-2026-655553",
       "filingDate": "2025-02-06",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 4,
       "subordinated": false
@@ -18065,7 +18227,7 @@ const DATASET = {
       "accountId": "acct_c_0041",
       "filingNumber": "UCC-2023-043423",
       "filingDate": "2025-10-17",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 2,
       "subordinated": true
@@ -18075,7 +18237,7 @@ const DATASET = {
       "accountId": "acct_c_0041",
       "filingNumber": "UCC-2026-701515",
       "filingDate": "2026-01-12",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 3,
       "subordinated": false
@@ -18095,7 +18257,7 @@ const DATASET = {
       "accountId": "acct_c_0042",
       "filingNumber": "UCC-2025-424335",
       "filingDate": "2025-11-09",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "All assets",
       "priorityRank": 2,
       "subordinated": true
@@ -18125,7 +18287,7 @@ const DATASET = {
       "accountId": "acct_c_0044",
       "filingNumber": "UCC-2024-079931",
       "filingDate": "2025-03-21",
-      "securedParty": "National ABL lender",
+      "securedParty": "JPMorgan Chase",
       "collateralDescription": "All assets",
       "priorityRank": 2,
       "subordinated": true
@@ -18135,7 +18297,7 @@ const DATASET = {
       "accountId": "acct_c_0044",
       "filingNumber": "UCC-2026-218622",
       "filingDate": "2025-07-27",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 3,
       "subordinated": true
@@ -18165,7 +18327,7 @@ const DATASET = {
       "accountId": "acct_c_0046",
       "filingNumber": "UCC-2023-761352",
       "filingDate": "2025-07-01",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "All assets",
       "priorityRank": 2,
       "subordinated": true
@@ -18185,7 +18347,7 @@ const DATASET = {
       "accountId": "acct_c_0047",
       "filingNumber": "UCC-2024-590902",
       "filingDate": "2025-11-24",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": false
@@ -18195,7 +18357,7 @@ const DATASET = {
       "accountId": "acct_c_0047",
       "filingNumber": "UCC-2026-402194",
       "filingDate": "2025-09-13",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 3,
       "subordinated": false
@@ -18205,7 +18367,7 @@ const DATASET = {
       "accountId": "acct_c_0047",
       "filingNumber": "UCC-2026-814719",
       "filingDate": "2025-06-16",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 4,
       "subordinated": false
@@ -18225,7 +18387,7 @@ const DATASET = {
       "accountId": "acct_c_0048",
       "filingNumber": "UCC-2023-488496",
       "filingDate": "2025-06-16",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 2,
       "subordinated": true
@@ -18235,7 +18397,7 @@ const DATASET = {
       "accountId": "acct_c_0048",
       "filingNumber": "UCC-2024-596085",
       "filingDate": "2025-02-20",
-      "securedParty": "National ABL lender",
+      "securedParty": "JPMorgan Chase",
       "collateralDescription": "Inventory",
       "priorityRank": 3,
       "subordinated": false
@@ -18255,7 +18417,7 @@ const DATASET = {
       "accountId": "acct_c_0049",
       "filingNumber": "UCC-2025-403795",
       "filingDate": "2025-06-26",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 2,
       "subordinated": false
@@ -18265,7 +18427,7 @@ const DATASET = {
       "accountId": "acct_c_0049",
       "filingNumber": "UCC-2026-249154",
       "filingDate": "2025-04-12",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Inventory",
       "priorityRank": 3,
       "subordinated": true
@@ -18285,7 +18447,7 @@ const DATASET = {
       "accountId": "acct_c_0050",
       "filingNumber": "UCC-2026-711404",
       "filingDate": "2025-04-03",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -18295,7 +18457,7 @@ const DATASET = {
       "accountId": "acct_c_0050",
       "filingNumber": "UCC-2024-923164",
       "filingDate": "2026-05-05",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 3,
       "subordinated": true
@@ -18305,7 +18467,7 @@ const DATASET = {
       "accountId": "acct_c_0050",
       "filingNumber": "UCC-2024-739442",
       "filingDate": "2025-12-18",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 4,
       "subordinated": false
@@ -18335,7 +18497,7 @@ const DATASET = {
       "accountId": "acct_c_0052",
       "filingNumber": "UCC-2025-960084",
       "filingDate": "2025-04-18",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 2,
       "subordinated": false
@@ -18345,7 +18507,7 @@ const DATASET = {
       "accountId": "acct_c_0052",
       "filingNumber": "UCC-2025-196270",
       "filingDate": "2025-07-04",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "Inventory",
       "priorityRank": 3,
       "subordinated": true
@@ -18365,7 +18527,7 @@ const DATASET = {
       "accountId": "acct_c_0053",
       "filingNumber": "UCC-2026-124146",
       "filingDate": "2025-09-04",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "All assets",
       "priorityRank": 2,
       "subordinated": false
@@ -18375,7 +18537,7 @@ const DATASET = {
       "accountId": "acct_c_0053",
       "filingNumber": "UCC-2024-873604",
       "filingDate": "2025-08-04",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 3,
       "subordinated": false
@@ -18395,7 +18557,7 @@ const DATASET = {
       "accountId": "acct_c_0054",
       "filingNumber": "UCC-2023-078793",
       "filingDate": "2025-10-16",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -18405,7 +18567,7 @@ const DATASET = {
       "accountId": "acct_c_0054",
       "filingNumber": "UCC-2024-660942",
       "filingDate": "2025-11-20",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 3,
       "subordinated": true
@@ -18435,7 +18597,7 @@ const DATASET = {
       "accountId": "acct_c_0056",
       "filingNumber": "UCC-2023-491530",
       "filingDate": "2025-07-04",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": false
@@ -18445,7 +18607,7 @@ const DATASET = {
       "accountId": "acct_c_0056",
       "filingNumber": "UCC-2024-358072",
       "filingDate": "2025-10-12",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 3,
       "subordinated": true
@@ -18455,7 +18617,7 @@ const DATASET = {
       "accountId": "acct_c_0056",
       "filingNumber": "UCC-2026-364019",
       "filingDate": "2026-08-07",
-      "securedParty": "National ABL lender",
+      "securedParty": "JPMorgan Chase",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 4,
       "subordinated": false
@@ -18485,7 +18647,7 @@ const DATASET = {
       "accountId": "acct_c_0058",
       "filingNumber": "UCC-2025-700795",
       "filingDate": "2025-06-14",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": false
@@ -18495,7 +18657,7 @@ const DATASET = {
       "accountId": "acct_c_0058",
       "filingNumber": "UCC-2026-513650",
       "filingDate": "2024-11-08",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "All assets",
       "priorityRank": 3,
       "subordinated": true
@@ -18505,7 +18667,7 @@ const DATASET = {
       "accountId": "acct_c_0058",
       "filingNumber": "UCC-2023-262225",
       "filingDate": "2025-04-19",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 4,
       "subordinated": true
@@ -18525,7 +18687,7 @@ const DATASET = {
       "accountId": "acct_c_0059",
       "filingNumber": "UCC-2024-282122",
       "filingDate": "2025-05-26",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -18535,7 +18697,7 @@ const DATASET = {
       "accountId": "acct_c_0059",
       "filingNumber": "UCC-2024-431127",
       "filingDate": "2025-02-13",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 3,
       "subordinated": true
@@ -18545,7 +18707,7 @@ const DATASET = {
       "accountId": "acct_c_0059",
       "filingNumber": "UCC-2026-385484",
       "filingDate": "2025-03-24",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 4,
       "subordinated": true
@@ -18565,7 +18727,7 @@ const DATASET = {
       "accountId": "acct_c_0060",
       "filingNumber": "UCC-2026-347501",
       "filingDate": "2024-10-04",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": false
@@ -18595,7 +18757,7 @@ const DATASET = {
       "accountId": "acct_c_0062",
       "filingNumber": "UCC-2024-785587",
       "filingDate": "2024-11-03",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 2,
       "subordinated": false
@@ -18605,7 +18767,7 @@ const DATASET = {
       "accountId": "acct_c_0062",
       "filingNumber": "UCC-2026-447107",
       "filingDate": "2025-10-08",
-      "securedParty": "National ABL lender",
+      "securedParty": "JPMorgan Chase",
       "collateralDescription": "Inventory",
       "priorityRank": 3,
       "subordinated": false
@@ -18615,7 +18777,7 @@ const DATASET = {
       "accountId": "acct_c_0062",
       "filingNumber": "UCC-2024-798748",
       "filingDate": "2025-07-31",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "All assets",
       "priorityRank": 4,
       "subordinated": false
@@ -18655,7 +18817,7 @@ const DATASET = {
       "accountId": "acct_c_0065",
       "filingNumber": "UCC-2026-330323",
       "filingDate": "2025-11-17",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -18665,7 +18827,7 @@ const DATASET = {
       "accountId": "acct_c_0065",
       "filingNumber": "UCC-2024-051767",
       "filingDate": "2025-10-01",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 3,
       "subordinated": true
@@ -18685,7 +18847,7 @@ const DATASET = {
       "accountId": "acct_c_0066",
       "filingNumber": "UCC-2024-195609",
       "filingDate": "2025-08-19",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 2,
       "subordinated": true
@@ -18705,7 +18867,7 @@ const DATASET = {
       "accountId": "acct_c_0067",
       "filingNumber": "UCC-2024-192242",
       "filingDate": "2025-06-09",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -18735,7 +18897,7 @@ const DATASET = {
       "accountId": "acct_c_0069",
       "filingNumber": "UCC-2025-041246",
       "filingDate": "2025-06-15",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 2,
       "subordinated": false
@@ -18765,7 +18927,7 @@ const DATASET = {
       "accountId": "acct_c_0071",
       "filingNumber": "UCC-2025-793923",
       "filingDate": "2025-02-21",
-      "securedParty": "National ABL lender",
+      "securedParty": "JPMorgan Chase",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": false
@@ -18775,7 +18937,7 @@ const DATASET = {
       "accountId": "acct_c_0071",
       "filingNumber": "UCC-2026-154371",
       "filingDate": "2025-06-03",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 3,
       "subordinated": true
@@ -18785,7 +18947,7 @@ const DATASET = {
       "accountId": "acct_c_0071",
       "filingNumber": "UCC-2025-325864",
       "filingDate": "2025-09-18",
-      "securedParty": "National ABL lender",
+      "securedParty": "JPMorgan Chase",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 4,
       "subordinated": true
@@ -18805,7 +18967,7 @@ const DATASET = {
       "accountId": "acct_c_0072",
       "filingNumber": "UCC-2025-299656",
       "filingDate": "2026-03-18",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -18815,7 +18977,7 @@ const DATASET = {
       "accountId": "acct_c_0072",
       "filingNumber": "UCC-2024-750164",
       "filingDate": "2026-01-16",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 3,
       "subordinated": true
@@ -18835,7 +18997,7 @@ const DATASET = {
       "accountId": "acct_c_0073",
       "filingNumber": "UCC-2026-850392",
       "filingDate": "2024-10-25",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "All assets",
       "priorityRank": 2,
       "subordinated": true
@@ -18875,7 +19037,7 @@ const DATASET = {
       "accountId": "acct_c_0076",
       "filingNumber": "UCC-2025-523709",
       "filingDate": "2025-09-24",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "All assets",
       "priorityRank": 2,
       "subordinated": false
@@ -18905,7 +19067,7 @@ const DATASET = {
       "accountId": "acct_c_0078",
       "filingNumber": "UCC-2025-846034",
       "filingDate": "2025-04-06",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -18915,7 +19077,7 @@ const DATASET = {
       "accountId": "acct_c_0078",
       "filingNumber": "UCC-2024-193009",
       "filingDate": "2024-12-29",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 3,
       "subordinated": true
@@ -18925,7 +19087,7 @@ const DATASET = {
       "accountId": "acct_c_0078",
       "filingNumber": "UCC-2024-862337",
       "filingDate": "2024-08-17",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 4,
       "subordinated": true
@@ -18945,7 +19107,7 @@ const DATASET = {
       "accountId": "acct_c_0079",
       "filingNumber": "UCC-2026-194988",
       "filingDate": "2024-11-27",
-      "securedParty": "National ABL lender",
+      "securedParty": "JPMorgan Chase",
       "collateralDescription": "All assets",
       "priorityRank": 2,
       "subordinated": false
@@ -18965,7 +19127,7 @@ const DATASET = {
       "accountId": "acct_c_0080",
       "filingNumber": "UCC-2023-259580",
       "filingDate": "2024-11-11",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 2,
       "subordinated": true
@@ -18975,7 +19137,7 @@ const DATASET = {
       "accountId": "acct_c_0080",
       "filingNumber": "UCC-2025-259959",
       "filingDate": "2025-05-23",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 3,
       "subordinated": false
@@ -18995,7 +19157,7 @@ const DATASET = {
       "accountId": "acct_c_0081",
       "filingNumber": "UCC-2026-609667",
       "filingDate": "2025-08-05",
-      "securedParty": "National ABL lender",
+      "securedParty": "JPMorgan Chase",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": false
@@ -19005,7 +19167,7 @@ const DATASET = {
       "accountId": "acct_c_0081",
       "filingNumber": "UCC-2023-611334",
       "filingDate": "2025-10-05",
-      "securedParty": "National ABL lender",
+      "securedParty": "JPMorgan Chase",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 3,
       "subordinated": false
@@ -19015,7 +19177,7 @@ const DATASET = {
       "accountId": "acct_c_0081",
       "filingNumber": "UCC-2023-242909",
       "filingDate": "2025-10-21",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 4,
       "subordinated": false
@@ -19035,7 +19197,7 @@ const DATASET = {
       "accountId": "acct_c_0082",
       "filingNumber": "UCC-2025-061721",
       "filingDate": "2025-10-25",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -19045,7 +19207,7 @@ const DATASET = {
       "accountId": "acct_c_0082",
       "filingNumber": "UCC-2023-757691",
       "filingDate": "2025-05-24",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 3,
       "subordinated": true
@@ -19075,7 +19237,7 @@ const DATASET = {
       "accountId": "acct_c_0084",
       "filingNumber": "UCC-2024-027362",
       "filingDate": "2025-07-10",
-      "securedParty": "National ABL lender",
+      "securedParty": "JPMorgan Chase",
       "collateralDescription": "All assets",
       "priorityRank": 2,
       "subordinated": false
@@ -19085,7 +19247,7 @@ const DATASET = {
       "accountId": "acct_c_0084",
       "filingNumber": "UCC-2024-261791",
       "filingDate": "2025-09-03",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "Inventory",
       "priorityRank": 3,
       "subordinated": true
@@ -19095,7 +19257,7 @@ const DATASET = {
       "accountId": "acct_c_0084",
       "filingNumber": "UCC-2025-437512",
       "filingDate": "2025-08-24",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 4,
       "subordinated": true
@@ -19115,7 +19277,7 @@ const DATASET = {
       "accountId": "acct_c_0086",
       "filingNumber": "UCC-2026-398544",
       "filingDate": "2025-02-11",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 2,
       "subordinated": false
@@ -19145,7 +19307,7 @@ const DATASET = {
       "accountId": "acct_c_0088",
       "filingNumber": "UCC-2023-326417",
       "filingDate": "2025-09-30",
-      "securedParty": "National ABL lender",
+      "securedParty": "JPMorgan Chase",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -19155,7 +19317,7 @@ const DATASET = {
       "accountId": "acct_c_0088",
       "filingNumber": "UCC-2024-099973",
       "filingDate": "2024-12-09",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 3,
       "subordinated": true
@@ -19165,7 +19327,7 @@ const DATASET = {
       "accountId": "acct_c_0088",
       "filingNumber": "UCC-2023-885710",
       "filingDate": "2025-11-24",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "All assets",
       "priorityRank": 4,
       "subordinated": false
@@ -19195,7 +19357,7 @@ const DATASET = {
       "accountId": "acct_c_0090",
       "filingNumber": "UCC-2023-557885",
       "filingDate": "2025-09-25",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 2,
       "subordinated": false
@@ -19205,7 +19367,7 @@ const DATASET = {
       "accountId": "acct_c_0090",
       "filingNumber": "UCC-2024-845438",
       "filingDate": "2025-01-23",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 3,
       "subordinated": false
@@ -19225,7 +19387,7 @@ const DATASET = {
       "accountId": "acct_c_0091",
       "filingNumber": "UCC-2023-757898",
       "filingDate": "2024-08-05",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -19245,7 +19407,7 @@ const DATASET = {
       "accountId": "acct_c_0092",
       "filingNumber": "UCC-2026-344490",
       "filingDate": "2025-07-17",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 2,
       "subordinated": false
@@ -19265,7 +19427,7 @@ const DATASET = {
       "accountId": "acct_c_0093",
       "filingNumber": "UCC-2026-280277",
       "filingDate": "2026-01-16",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -19275,7 +19437,7 @@ const DATASET = {
       "accountId": "acct_c_0093",
       "filingNumber": "UCC-2024-807034",
       "filingDate": "2025-03-27",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 3,
       "subordinated": true
@@ -19295,7 +19457,7 @@ const DATASET = {
       "accountId": "acct_c_0094",
       "filingNumber": "UCC-2026-612407",
       "filingDate": "2024-12-10",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -19315,7 +19477,7 @@ const DATASET = {
       "accountId": "acct_c_0095",
       "filingNumber": "UCC-2026-026733",
       "filingDate": "2026-03-24",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 2,
       "subordinated": true
@@ -19325,7 +19487,7 @@ const DATASET = {
       "accountId": "acct_c_0095",
       "filingNumber": "UCC-2023-447393",
       "filingDate": "2025-05-03",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 3,
       "subordinated": true
@@ -19335,7 +19497,7 @@ const DATASET = {
       "accountId": "acct_c_0095",
       "filingNumber": "UCC-2023-621460",
       "filingDate": "2025-03-13",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "All assets",
       "priorityRank": 4,
       "subordinated": true
@@ -19365,7 +19527,7 @@ const DATASET = {
       "accountId": "acct_c_0098",
       "filingNumber": "UCC-2025-021492",
       "filingDate": "2026-07-12",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -19375,7 +19537,7 @@ const DATASET = {
       "accountId": "acct_c_0098",
       "filingNumber": "UCC-2023-863175",
       "filingDate": "2026-07-30",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 3,
       "subordinated": true
@@ -19395,7 +19557,7 @@ const DATASET = {
       "accountId": "acct_c_0099",
       "filingNumber": "UCC-2023-037440",
       "filingDate": "2026-01-15",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 2,
       "subordinated": true
@@ -19405,7 +19567,7 @@ const DATASET = {
       "accountId": "acct_c_0099",
       "filingNumber": "UCC-2024-252152",
       "filingDate": "2026-02-18",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Inventory",
       "priorityRank": 3,
       "subordinated": true
@@ -19425,7 +19587,7 @@ const DATASET = {
       "accountId": "acct_c_0100",
       "filingNumber": "UCC-2024-848878",
       "filingDate": "2026-01-14",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 2,
       "subordinated": true
@@ -19435,7 +19597,7 @@ const DATASET = {
       "accountId": "acct_c_0100",
       "filingNumber": "UCC-2025-790677",
       "filingDate": "2025-05-25",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 3,
       "subordinated": true
@@ -19455,7 +19617,7 @@ const DATASET = {
       "accountId": "acct_c_0101",
       "filingNumber": "UCC-2023-980825",
       "filingDate": "2025-01-09",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": false
@@ -19465,7 +19627,7 @@ const DATASET = {
       "accountId": "acct_c_0101",
       "filingNumber": "UCC-2023-825721",
       "filingDate": "2024-11-08",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 3,
       "subordinated": true
@@ -19485,7 +19647,7 @@ const DATASET = {
       "accountId": "acct_c_0103",
       "filingNumber": "UCC-2026-751842",
       "filingDate": "2025-12-13",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 2,
       "subordinated": true
@@ -19495,7 +19657,7 @@ const DATASET = {
       "accountId": "acct_c_0103",
       "filingNumber": "UCC-2025-520656",
       "filingDate": "2025-10-17",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Inventory",
       "priorityRank": 3,
       "subordinated": false
@@ -19505,7 +19667,7 @@ const DATASET = {
       "accountId": "acct_c_0103",
       "filingNumber": "UCC-2024-446338",
       "filingDate": "2025-06-20",
-      "securedParty": "National ABL lender",
+      "securedParty": "JPMorgan Chase",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 4,
       "subordinated": false
@@ -19525,7 +19687,7 @@ const DATASET = {
       "accountId": "acct_c_0105",
       "filingNumber": "UCC-2026-595382",
       "filingDate": "2025-03-24",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": false
@@ -19545,7 +19707,7 @@ const DATASET = {
       "accountId": "acct_c_0106",
       "filingNumber": "UCC-2026-409455",
       "filingDate": "2025-04-14",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -19555,7 +19717,7 @@ const DATASET = {
       "accountId": "acct_c_0106",
       "filingNumber": "UCC-2026-328451",
       "filingDate": "2025-08-14",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 3,
       "subordinated": false
@@ -19575,7 +19737,7 @@ const DATASET = {
       "accountId": "acct_c_0107",
       "filingNumber": "UCC-2023-161582",
       "filingDate": "2025-01-23",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -19585,7 +19747,7 @@ const DATASET = {
       "accountId": "acct_c_0107",
       "filingNumber": "UCC-2025-544229",
       "filingDate": "2025-05-07",
-      "securedParty": "National ABL lender",
+      "securedParty": "JPMorgan Chase",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 3,
       "subordinated": true
@@ -19595,7 +19757,7 @@ const DATASET = {
       "accountId": "acct_c_0107",
       "filingNumber": "UCC-2026-383139",
       "filingDate": "2025-08-09",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 4,
       "subordinated": false
@@ -19615,7 +19777,7 @@ const DATASET = {
       "accountId": "acct_c_0109",
       "filingNumber": "UCC-2023-905545",
       "filingDate": "2025-09-17",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -19625,7 +19787,7 @@ const DATASET = {
       "accountId": "acct_c_0109",
       "filingNumber": "UCC-2024-050593",
       "filingDate": "2025-04-21",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 3,
       "subordinated": true
@@ -19655,7 +19817,7 @@ const DATASET = {
       "accountId": "acct_c_0111",
       "filingNumber": "UCC-2024-068428",
       "filingDate": "2026-07-14",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 2,
       "subordinated": false
@@ -19675,7 +19837,7 @@ const DATASET = {
       "accountId": "acct_c_0112",
       "filingNumber": "UCC-2025-102076",
       "filingDate": "2025-03-03",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": false
@@ -19685,7 +19847,7 @@ const DATASET = {
       "accountId": "acct_c_0112",
       "filingNumber": "UCC-2026-615818",
       "filingDate": "2025-10-03",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 3,
       "subordinated": false
@@ -19695,7 +19857,7 @@ const DATASET = {
       "accountId": "acct_c_0112",
       "filingNumber": "UCC-2023-657314",
       "filingDate": "2026-05-21",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 4,
       "subordinated": true
@@ -19715,7 +19877,7 @@ const DATASET = {
       "accountId": "acct_c_0114",
       "filingNumber": "UCC-2026-026756",
       "filingDate": "2025-01-13",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 2,
       "subordinated": false
@@ -19725,7 +19887,7 @@ const DATASET = {
       "accountId": "acct_c_0114",
       "filingNumber": "UCC-2023-692198",
       "filingDate": "2025-08-01",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 3,
       "subordinated": true
@@ -19735,7 +19897,7 @@ const DATASET = {
       "accountId": "acct_c_0114",
       "filingNumber": "UCC-2024-909234",
       "filingDate": "2025-05-06",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 4,
       "subordinated": true
@@ -19755,7 +19917,7 @@ const DATASET = {
       "accountId": "acct_c_0116",
       "filingNumber": "UCC-2026-552559",
       "filingDate": "2025-08-08",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 2,
       "subordinated": false
@@ -19765,7 +19927,7 @@ const DATASET = {
       "accountId": "acct_c_0116",
       "filingNumber": "UCC-2025-398015",
       "filingDate": "2025-11-25",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 3,
       "subordinated": false
@@ -19775,7 +19937,7 @@ const DATASET = {
       "accountId": "acct_c_0116",
       "filingNumber": "UCC-2024-795563",
       "filingDate": "2024-09-28",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 4,
       "subordinated": false
@@ -19795,7 +19957,7 @@ const DATASET = {
       "accountId": "acct_c_0117",
       "filingNumber": "UCC-2023-582124",
       "filingDate": "2026-01-15",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -19815,7 +19977,7 @@ const DATASET = {
       "accountId": "acct_c_0118",
       "filingNumber": "UCC-2024-231212",
       "filingDate": "2025-12-12",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 2,
       "subordinated": false
@@ -19835,7 +19997,7 @@ const DATASET = {
       "accountId": "acct_c_0119",
       "filingNumber": "UCC-2023-361638",
       "filingDate": "2025-10-23",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": false
@@ -19845,7 +20007,7 @@ const DATASET = {
       "accountId": "acct_c_0119",
       "filingNumber": "UCC-2023-590802",
       "filingDate": "2024-12-30",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 3,
       "subordinated": true
@@ -19865,7 +20027,7 @@ const DATASET = {
       "accountId": "acct_c_0120",
       "filingNumber": "UCC-2024-395036",
       "filingDate": "2026-03-05",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -19875,7 +20037,7 @@ const DATASET = {
       "accountId": "acct_c_0120",
       "filingNumber": "UCC-2023-622169",
       "filingDate": "2024-11-16",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "All assets",
       "priorityRank": 3,
       "subordinated": false
@@ -19885,7 +20047,7 @@ const DATASET = {
       "accountId": "acct_c_0120",
       "filingNumber": "UCC-2025-990336",
       "filingDate": "2026-02-10",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 4,
       "subordinated": true
@@ -19895,7 +20057,7 @@ const DATASET = {
       "accountId": "acct_c_0002",
       "filingNumber": "UCC-2026-295904",
       "filingDate": "2026-06-17",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 1,
       "subordinated": false,
@@ -19906,7 +20068,7 @@ const DATASET = {
       "accountId": "acct_c_0008",
       "filingNumber": "UCC-2026-819022",
       "filingDate": "2026-08-05",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 1,
       "subordinated": false,
@@ -19917,7 +20079,7 @@ const DATASET = {
       "accountId": "acct_c_0010",
       "filingNumber": "UCC-2026-695917",
       "filingDate": "2026-02-21",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Inventory",
       "priorityRank": 1,
       "subordinated": false,
@@ -19928,7 +20090,7 @@ const DATASET = {
       "accountId": "acct_c_0023",
       "filingNumber": "UCC-2026-968155",
       "filingDate": "2026-07-17",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Inventory",
       "priorityRank": 1,
       "subordinated": false,
@@ -19939,7 +20101,7 @@ const DATASET = {
       "accountId": "acct_c_0031",
       "filingNumber": "UCC-2026-898491",
       "filingDate": "2026-01-09",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "All assets",
       "priorityRank": 1,
       "subordinated": false,
@@ -19947,87 +20109,87 @@ const DATASET = {
     },
     {
       "id": "lien_0283",
-      "accountId": "acct_c_0034",
-      "filingNumber": "UCC-2025-813135",
-      "filingDate": "2025-09-10",
-      "securedParty": "Incumbent relationship bank",
-      "collateralDescription": "Accounts receivable",
-      "priorityRank": 1,
-      "subordinated": false,
-      "wonDealWeLost": "opp_0077"
-    },
-    {
-      "id": "lien_0284",
       "accountId": "acct_c_0036",
       "filingNumber": "UCC-2026-505276",
       "filingDate": "2026-06-03",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 1,
       "subordinated": false,
       "wonDealWeLost": "opp_0079"
     },
     {
-      "id": "lien_0285",
-      "accountId": "acct_c_0041",
-      "filingNumber": "UCC-2026-355831",
-      "filingDate": "2026-06-20",
-      "securedParty": "Another private credit firm",
+      "id": "lien_0284",
+      "accountId": "acct_c_0040",
+      "filingNumber": "UCC-2026-890597",
+      "filingDate": "2026-01-11",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "All assets",
       "priorityRank": 1,
       "subordinated": false,
-      "wonDealWeLost": "opp_0093"
+      "wonDealWeLost": "opp_0085"
+    },
+    {
+      "id": "lien_0285",
+      "accountId": "acct_c_0040",
+      "filingNumber": "UCC-2026-415576",
+      "filingDate": "2026-01-18",
+      "securedParty": "PNC Business Credit",
+      "collateralDescription": "Inventory",
+      "priorityRank": 1,
+      "subordinated": false,
+      "wonDealWeLost": "opp_0090"
     },
     {
       "id": "lien_0286",
-      "accountId": "acct_c_0042",
-      "filingNumber": "UCC-2026-665930",
-      "filingDate": "2026-04-22",
-      "securedParty": "Regional factoring company",
-      "collateralDescription": "Accounts receivable",
-      "priorityRank": 1,
-      "subordinated": false,
-      "wonDealWeLost": "opp_0095"
-    },
-    {
-      "id": "lien_0287",
-      "accountId": "acct_c_0044",
-      "filingNumber": "UCC-2025-863054",
-      "filingDate": "2025-12-24",
-      "securedParty": "National ABL lender",
-      "collateralDescription": "Accounts receivable and inventory",
-      "priorityRank": 1,
-      "subordinated": false,
-      "wonDealWeLost": "opp_0100"
-    },
-    {
-      "id": "lien_0288",
       "accountId": "acct_c_0058",
-      "filingNumber": "UCC-2025-083168",
-      "filingDate": "2025-10-05",
-      "securedParty": "Incumbent relationship bank",
+      "filingNumber": "UCC-2025-737398",
+      "filingDate": "2025-09-25",
+      "securedParty": "JPMorgan Chase",
       "collateralDescription": "Inventory",
       "priorityRank": 1,
       "subordinated": false,
       "wonDealWeLost": "opp_0130"
     },
     {
-      "id": "lien_0289",
+      "id": "lien_0287",
       "accountId": "acct_c_0058",
-      "filingNumber": "UCC-2026-909060",
-      "filingDate": "2026-02-13",
-      "securedParty": "Incumbent relationship bank",
-      "collateralDescription": "Accounts receivable",
+      "filingNumber": "UCC-2026-920319",
+      "filingDate": "2026-02-12",
+      "securedParty": "Wells Fargo Capital Finance",
+      "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 1,
       "subordinated": false,
       "wonDealWeLost": "opp_0132"
     },
     {
+      "id": "lien_0288",
+      "accountId": "acct_c_0087",
+      "filingNumber": "UCC-2025-038139",
+      "filingDate": "2025-11-15",
+      "securedParty": "Wells Fargo Capital Finance",
+      "collateralDescription": "All assets",
+      "priorityRank": 1,
+      "subordinated": false,
+      "wonDealWeLost": "opp_0196"
+    },
+    {
+      "id": "lien_0289",
+      "accountId": "acct_c_0090",
+      "filingNumber": "UCC-2026-365642",
+      "filingDate": "2026-08-17",
+      "securedParty": "Ares Capital",
+      "collateralDescription": "All assets",
+      "priorityRank": 1,
+      "subordinated": false,
+      "wonDealWeLost": "opp_0203"
+    },
+    {
       "id": "lien_0290",
       "accountId": "acct_c_0093",
-      "filingNumber": "UCC-2025-493686",
-      "filingDate": "2025-11-16",
-      "securedParty": "Incumbent relationship bank",
+      "filingNumber": "UCC-2025-657126",
+      "filingDate": "2025-12-04",
+      "securedParty": "JPMorgan Chase",
       "collateralDescription": "All assets",
       "priorityRank": 1,
       "subordinated": false,
@@ -20036,10 +20198,10 @@ const DATASET = {
     {
       "id": "lien_0291",
       "accountId": "acct_c_0099",
-      "filingNumber": "UCC-2026-697533",
-      "filingDate": "2026-05-27",
-      "securedParty": "Incumbent relationship bank",
-      "collateralDescription": "Accounts receivable and inventory",
+      "filingNumber": "UCC-2026-526502",
+      "filingDate": "2026-05-29",
+      "securedParty": "Bank of America Business Capital",
+      "collateralDescription": "Accounts receivable",
       "priorityRank": 1,
       "subordinated": false,
       "wonDealWeLost": "opp_0216"
@@ -20047,24 +20209,24 @@ const DATASET = {
     {
       "id": "lien_0292",
       "accountId": "acct_c_0111",
-      "filingNumber": "UCC-2026-641397",
-      "filingDate": "2026-05-20",
-      "securedParty": "Incumbent relationship bank",
-      "collateralDescription": "Inventory",
+      "filingNumber": "UCC-2026-744877",
+      "filingDate": "2026-05-17",
+      "securedParty": "Bank of America Business Capital",
+      "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 1,
       "subordinated": false,
       "wonDealWeLost": "opp_0240"
     },
     {
       "id": "lien_0293",
-      "accountId": "acct_c_0114",
-      "filingNumber": "UCC-2026-085784",
-      "filingDate": "2026-08-17",
-      "securedParty": "Community bank line",
-      "collateralDescription": "Accounts receivable and inventory",
+      "accountId": "acct_c_0120",
+      "filingNumber": "UCC-2026-775663",
+      "filingDate": "2026-07-03",
+      "securedParty": "Golub Capital",
+      "collateralDescription": "Inventory",
       "priorityRank": 1,
       "subordinated": false,
-      "wonDealWeLost": "opp_0243"
+      "wonDealWeLost": "opp_0250"
     }
   ],
   "networkEdges": [
@@ -45318,7 +45480,7 @@ function route(){
     benchmarking: 'Benchmarking',
   };
 
-  if(view==='home'){ renderHome(); showView('view-home'); }
+  if(view==='home'){ showView('view-home'); renderHome(); }
   else if(view==='pipeline'){ renderPipeline(); showView('view-pipeline'); }
   else if(view==='opp' && id){ renderOpp(id); showView('view-opp'); titles.opp = getOpp(id) ? getOpp(id).name : 'Opportunity'; }
   else if(view==='create'){ CREATE_PRODUCT='Factoring'; CREATE_ACCT_MODE='new'; CREATE_RATETYPE='Fixed'; renderCreate(); showView('view-create'); }
@@ -45505,9 +45667,19 @@ const AGENDA_SLOTS = [
   {time:'08:30', kind:'Internal', title:'Pipeline review', sub:'Weekly desk sync'},
   {time:'09:00', kind:'Call',     title:'Discovery call'},
   {time:'10:30', kind:'Meeting',  title:'Committee prep'},
+  {time:'11:45', kind:'Call',     title:'Borrowing base questions'},
   {time:'13:00', kind:'Call',     title:'Term sheet walkthrough'},
-  {time:'15:30', kind:'Meeting',  title:'Site visit debrief'}
+  {time:'14:30', kind:'Internal', title:'Credit committee', sub:'Weekly deal review'},
+  {time:'15:30', kind:'Meeting',  title:'Site visit debrief'},
+  {time:'16:30', kind:'Call',     title:'Partner check-in'}
 ];
+/* 24h in the data, US 12-hour on screen — the slots stay sortable as strings. */
+function hhmm12(t){
+  const [h,m] = t.split(':').map(Number);
+  const ap = h>=12 ? 'PM' : 'AM';
+  const h12 = h%12 === 0 ? 12 : h%12;
+  return h12+':'+String(m).padStart(2,'0')+' '+ap;
+}
 function buildAgenda(bdoId){
   const open = Object.values(OPPS).filter(o=>o.bdoId===bdoId && o.outcome==='open')
     .slice().sort((a,b)=>b.facilitySize-a.facilitySize);
@@ -45522,24 +45694,6 @@ function buildAgenda(bdoId){
   const nextIdx = rows.findIndex(r=>r.time>NOW_HHMM);
   rows.forEach((r,i)=>{ r.past = r.time<=NOW_HHMM; r.next = i===nextIdx; });
   return rows;
-}
-
-/* Last 12 months of funded volume for this BDO, zero-filled so the axis is a real continuous
-   month axis rather than only the months that happen to have deals. */
-function fundedByMonth(bdoId, months){
-  const out=[];
-  const d=toDateObj(TODAY);
-  for(let i=months-1;i>=0;i--){
-    const dt=new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth()-i, 1));
-    out.push({key:dt.toISOString().slice(0,7),
-      label:dt.toLocaleDateString('en-US',{month:'short',timeZone:'UTC'}), value:0, count:0});
-  }
-  const idx={}; out.forEach((m,i)=>idx[m.key]=i);
-  Object.values(OPPS).filter(o=>o.bdoId===bdoId && o.outcome==='won' && o.fundedDate).forEach(o=>{
-    const i=idx[o.fundedDate.slice(0,7)];
-    if(i!=null){ out[i].value+=o.facilitySize; out[i].count++; }
-  });
-  return out;
 }
 
 /* ---------- shared chart tooltip ----------
@@ -45580,30 +45734,6 @@ document.addEventListener('mouseout', function(e){
 });
 window.addEventListener('hashchange', ()=>{ TIP_EL.style.display='none'; });
 
-/* Funded volume by month as BARS, not a line: this series is lumpy and sparse (a BDO funds a
-   few deals a year), and a line implies a continuous quantity moving between months. Bars read
-   each month as the discrete event it is, and zero months read as genuinely zero. */
-function fundedBarsHtml(series){
-  const max = Math.max(1, ...series.map(p=>p.value));
-  const active = series.filter(p=>p.value>0);
-  const avg = active.length ? active.reduce((s,p)=>s+p.value,0)/active.length : 0;
-  return '<div class="chart-head"><span></span>'+
-      '<span class="peak">peak '+moneyShort(max)+'</span></div>'+
-    '<div class="plot tall">'+
-      (avg>0 ? '<div class="chart-ref" style="bottom:'+((avg/max)*100).toFixed(1)+'%"></div>' : '')+
-      '<div class="cols">'+series.map(p=>{
-        const h = p.value>0 ? Math.max(2,(p.value/max)*100) : 1.5;
-        const tip = tipAttr(p.full, p.value>0?moneyShort(p.value):'No deals funded',
-          p.value>0 ? p.count+' deal'+(p.count===1?'':'s')+' funded' : null);
-        return '<div class="vcol"'+tip+'><div class="vcol-bar'+(p.value>0?'':' zero')+
-          '" style="height:'+h.toFixed(1)+'%"></div></div>';
-      }).join('')+'</div>'+
-    '</div>'+
-    '<div class="chart-x dense">'+series.map(p=>'<span>'+p.label+'</span>').join('')+'</div>'+
-    '<div class="chart-note">Dashed line is the average funding month, '+moneyShort(avg)+
-      ' across '+active.length+' month'+(active.length===1?'':'s')+' with deals.</div>';
-}
-
 /* Open pipeline as one horizontal stacked funnel rather than a four-row table. The shape — how
    much of the book sits in which stage — is the insight; four numbers in a table are not.
    Tint deepens by stage, echoing the record page's stage track so the two read as one system. */
@@ -45621,6 +45751,154 @@ function stageFunnelHtml(byStage, total){
       '<div class="kv-line"><span class="k">'+b.stage+'</span>'+
         '<span class="v">'+b.count+' <span class="sec">·</span> '+moneyShort(b.value)+'</span></div>'
     ).join('')+'</div>';
+}
+
+/* ================================================================
+   MODAL — surface detail on the card, depth in the modal (v7 tier 3).
+   One engine: a card declares data-modal="key", the registry supplies title/scope/body.
+   Scrim + --lift-hi, Esc to close, focus trapped inside while open, focus restored on close.
+   ================================================================ */
+const MODALS = {};
+let MODAL_RETURN_FOCUS = null;
+
+function modalRow(cells, cls){
+  return '<tr'+(cls?' class="'+cls+'"':'')+'>'+cells.map(c=>
+    typeof c==='object' ? '<td class="'+(c.cls||'')+'">'+c.v+'</td>' : '<td>'+c+'</td>').join('')+'</tr>';
+}
+function modalTable(headers, rows){
+  if(!rows.length) return '<div class="empty">Nothing to show here.</div>';
+  return '<div class="tbl-wrap"><table class="tbl"><thead><tr>'+
+    headers.map(h=>'<th'+(h.num?' class="num"':'')+'>'+(h.label!=null?h.label:h)+'</th>').join('')+
+    '</tr></thead><tbody>'+rows.join('')+'</tbody></table></div>';
+}
+function modalStrip(items){
+  return '<div class="modal-strip">'+items.map(i=>
+    '<div><div class="modal-lab">'+esc(i.label)+'</div><div class="modal-fig">'+i.value+'</div></div>'
+  ).join('')+'</div>';
+}
+function oppRowsTable(opps, extra){
+  const rows = opps.slice().sort((a,b)=>b.facilitySize-a.facilitySize).map(o=>
+    '<tr onclick="closeModal();location.hash=\'#/opp/'+o.id+'\'">'+
+      '<td class="name">'+esc(getAccount(o.accountId).name)+'</td>'+
+      '<td class="sec">'+o.productType+'</td>'+
+      '<td class="sec">'+(extra?extra(o):o.stage)+'</td>'+
+      '<td class="num">'+moneyPlain(o.facilitySize)+'</td>'+
+    '</tr>');
+  if(!rows.length) return '<div class="empty">No deals in this set.</div>';
+  return '<div class="tbl-wrap"><table class="tbl clickable"><thead><tr>'+
+    '<th>Account</th><th>Product</th><th>'+(extra?'Detail':'Stage')+'</th><th class="num">Facility</th>'+
+    '</tr></thead><tbody>'+rows.join('')+'</tbody></table></div>';
+}
+
+window.openModal = function(key){
+  const def = MODALS[key];
+  if(!def) return;
+  closeModal();
+  MODAL_RETURN_FOCUS = document.activeElement;
+  const d = def();
+  const scrim = document.createElement('div');
+  scrim.className = 'scrim';
+  scrim.id = 'modal-scrim';
+  scrim.innerHTML =
+    '<div class="modal" role="dialog" aria-modal="true" aria-label="'+esc(d.title)+'" tabindex="-1">'+
+      '<div class="modal-head"><div class="modal-head-text">'+
+        '<div class="modal-title">'+esc(d.title)+'</div>'+
+        '<div class="modal-scope">'+d.scope+'</div>'+
+      '</div><button type="button" class="modal-close" aria-label="Close">&#10005;</button></div>'+
+      '<div class="modal-body">'+d.body+'</div>'+
+    '</div>';
+  document.body.appendChild(scrim);
+  const box = scrim.querySelector('.modal');
+  scrim.querySelector('.modal-close').addEventListener('click', closeModal);
+  scrim.addEventListener('mousedown', e=>{ if(e.target===scrim) closeModal(); });
+  box.focus();
+
+  /* focus trap: Tab cycles only within the dialog while it is open */
+  scrim.addEventListener('keydown', function(e){
+    if(e.key==='Escape'){ e.preventDefault(); closeModal(); return; }
+    if(e.key!=='Tab') return;
+    const f = box.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    if(!f.length){ e.preventDefault(); return; }
+    const first=f[0], last=f[f.length-1];
+    if(e.shiftKey && (document.activeElement===first || document.activeElement===box)){
+      e.preventDefault(); last.focus();
+    } else if(!e.shiftKey && document.activeElement===last){
+      e.preventDefault(); first.focus();
+    }
+  });
+};
+window.closeModal = function(){
+  const s = document.getElementById('modal-scrim');
+  if(!s) return;
+  s.remove();
+  if(MODAL_RETURN_FOCUS && MODAL_RETURN_FOCUS.focus) MODAL_RETURN_FOCUS.focus();
+  MODAL_RETURN_FOCUS = null;
+};
+window.addEventListener('hashchange', closeModal);
+
+/* ---------- pipeline coverage ----------
+   Replaces the funded-trend slot. Funded trend is a rearview mirror; coverage answers the only
+   question a BDO asks at a glance — "do I have enough in flight to hit my number?" It is
+   weighted pipeline (each open deal discounted by its stage's historical conversion) against
+   what is still LEFT of the annual target, not against the whole target: comparing a
+   point-in-time pipeline to a full-year number is apples to oranges and would read under 1x for
+   everyone forever. The shape — which stages carry the weight — is the insight, so it's a chart. */
+const STAGE_WEIGHTS = {Qualification:0.10, Analysis:0.25, Proposal:0.50, Underwriting:0.80};
+const COVERAGE_TARGET = 1.0;
+
+function coverageStats(bdoId){
+  const bdo = BDOS[bdoId];
+  const mine = Object.values(OPPS).filter(o=>o.bdoId===bdoId);
+  const open = mine.filter(o=>o.outcome==='open');
+  const fundedYTD = mine.filter(o=>o.outcome==='won' && (o.fundedDate||'').slice(0,4)===TODAY.slice(0,4))
+    .reduce((s,o)=>s+o.facilitySize,0);
+  const quota = bdo.annualQuota || 0;
+  const remaining = Math.max(0, quota - fundedYTD);
+  const byStage = TRACK_STAGES.map(s=>{
+    const g = open.filter(o=>o.stage===s);
+    const raw = g.reduce((t,o)=>t+o.facilitySize,0);
+    return {stage:s, count:g.length, raw, weighted: raw*STAGE_WEIGHTS[s]};
+  });
+  const weighted = byStage.reduce((s,b)=>s+b.weighted,0);
+  return {bdo, quota, fundedYTD, remaining, weighted, byStage,
+    raw: open.reduce((s,o)=>s+o.facilitySize,0),
+    coverage: remaining>0 ? weighted/remaining : null};
+}
+
+function coveragePanelHtml(st){
+  const met = st.remaining<=0;
+  const ratio = met ? null : st.coverage;
+  const short = !met && ratio < COVERAGE_TARGET;
+  /* the bar is scaled so the remaining-target mark sits at a fixed point, letting the weighted
+     stack read directly against it rather than against an invisible maximum */
+  const scale = Math.max(st.weighted, st.remaining) * 1.08 || 1;
+  const markPct = (st.remaining/scale)*100;
+  const segs = st.byStage.filter(b=>b.weighted>0).map((b,i)=>
+    '<div class="'+('cov-seg '+['','t2','t3','t4'][TRACK_STAGES.indexOf(b.stage)]).trim()+
+      '" style="width:'+((b.weighted/scale)*100).toFixed(2)+'%"'+
+      tipAttr(b.stage, moneyShort(b.weighted)+' weighted',
+        b.count+' deal'+(b.count===1?'':'s')+' · '+moneyShort(b.raw)+' raw · '+
+        pct(STAGE_WEIGHTS[b.stage])+' stage conversion')+'></div>').join('');
+
+  return '<div class="cov-head">'+
+      '<span class="'+('cov-ratio '+(met?'met':(short?'short':''))).trim()+'">'+
+        (met ? 'Target met' : ratio.toFixed(2)+'x')+'</span>'+
+      '<span class="'+('cov-verdict '+(met||!short?'ok':'warn')).trim()+'">'+
+        (met ? 'Quota already covered' : short ? 'Below 1.0x coverage' : 'Covered')+'</span>'+
+    '</div>'+
+    '<div class="cov-bar"'+tipAttr('Weighted pipeline', moneyShort(st.weighted),
+        'Open deals discounted by stage conversion')+'>'+segs+
+      (met ? '' : '<div class="cov-mark" style="left:'+markPct.toFixed(2)+'%"></div>')+
+    '</div>'+
+    '<div class="cov-marklab">'+
+      '<span>Weighted pipeline <b>'+moneyShort(st.weighted)+'</b></span>'+
+      '<span>'+(met ? 'Funded YTD '+moneyShort(st.fundedYTD)+' vs '+moneyShort(st.quota)+' target'
+        : 'Still to close <b>'+moneyShort(st.remaining)+'</b>')+'</span>'+
+    '</div>'+
+    '<div class="chart-note">'+(met
+      ? 'Funded YTD is already at or past the annual target.'
+      : 'Weighted pipeline against the '+moneyShort(st.remaining)+' still needed to hit '+
+        moneyShort(st.quota)+' this year. Dashed mark is that remaining target.')+'</div>';
 }
 
 /* ---------- partners: one dataset, three views ----------
@@ -45700,13 +45978,13 @@ function partnersPanelHtml(stats){
     '</div>';
   }).join('');
 
-  return '<div class="panel">'+
+  return '<div class="panel expandable" onclick="openModal(\'partners\')">'+
     '<div class="panel-header"><div class="panel-header-text">'+
       '<div class="panel-title">Partners</div>'+
       '<div class="panel-scope">'+scope+'</div>'+
-    '</div></div>'+
+    '</div><span class="expand-hint">Expand &rsaquo;</span></div>'+
     '<div class="panel-body pad-top">'+
-      '<div class="viewtoggle seg">'+PARTNER_VIEWS.map(v=>
+      '<div class="viewtoggle seg" onclick="event.stopPropagation()">'+PARTNER_VIEWS.map(v=>
         '<button class="'+(view===v.key?'active':'')+'" onclick="setPartnerView(\''+v.key+'\')">'+
         v.label+'</button>').join('')+'</div>'+
     '</div>'+
@@ -45716,72 +45994,336 @@ function partnersPanelHtml(stats){
   '</div>';
 }
 
-/* ---------- where we're losing ----------
-   Two questions with different shapes. Which stage kills deals is a small distribution, so it
-   gets bars. Who took them is a ranked list, so it gets bars too — but the "lost to" half falls
-   back to firm-wide whenever this BDO's own attributed sample is too thin to mean anything, and
-   says so in the scope line rather than presenting a one-deal sample as a trend. */
-const LOST_TO_MIN_SAMPLE = 5;
+/* ---------- loss analysis: three distinct questions, one segmented card ----------
+   WHERE deals die (stage), WHY they died (reason), and WHO took them (competitor) are three
+   different analyses, not one long scroll. They share a card with a view switcher rather than
+   stacking, because in the packed grid three separate tall cards fragmented the rail and the
+   three are read one-at-a-time anyway — you ask one of these questions, not all three at once.
 
-function losingPanelHtml(bdoId){
-  const myLost = Object.values(OPPS).filter(o=>o.bdoId===bdoId && o.outcome==='lost');
-  const byStage = TRACK_STAGES.map(s=>{
-    const g = myLost.filter(o=>o.lostAtStage===s);
-    return {stage:s, count:g.length, value:g.reduce((t,o)=>t+o.facilitySize,0)};
+   Each view falls back to firm-wide when this BDO's own sample is too thin to carry a shape,
+   and says which scope it is using. An n=7 book with seven distinct loss reasons is not a
+   finding, and drawing it as one would be exactly the decoration the governing rule forbids. */
+const LOSS_VIEWS = [
+  {key:'stage',      label:'By stage'},
+  {key:'reason',     label:'By reason'},
+  {key:'competitor', label:'Lost to'},
+];
+let LOSS_VIEW = 'stage';
+window.setLossView = function(v){ LOSS_VIEW=v; renderHome(); };
+const LOSS_MIN_SAMPLE = 5;
+
+function lossTally(opps, keyFn){
+  const t={};
+  opps.forEach(o=>{
+    const k=keyFn(o);
+    if(k==null) return;
+    const e = t[k] = t[k] || {n:0, val:0, ucc:0};
+    e.n++; e.val+=o.facilitySize;
+    if(o.lostToCompetitorEvidence==='UCC filing') e.ucc++;
   });
-  const maxLost = Math.max(1,...byStage.map(b=>b.count));
+  return t;
+}
+
+function lossViewData(bdoId){
+  const myLost = Object.values(OPPS).filter(o=>o.bdoId===bdoId && o.outcome==='lost');
+  const firmLost = Object.values(OPPS).filter(o=>o.outcome==='lost');
+
+  if(LOSS_VIEW==='stage'){
+    // stage always uses the personal book: four fixed buckets carry a shape even at n=7
+    const rows = TRACK_STAGES.map(st=>{
+      const g = myLost.filter(o=>o.lostAtStage===st);
+      return {label:st, n:g.length, val:g.reduce((t,o)=>t+o.facilitySize,0)};
+    });
+    return {rows, scope:'Your book · '+myLost.length+' closed-lost deals · where in the funnel they died',
+      total:myLost.length, tone:'', firm:false};
+  }
+
+  if(LOSS_VIEW==='reason'){
+    const usingFirm = myLost.length < LOSS_MIN_SAMPLE * 2;
+    const pool = usingFirm ? firmLost : myLost;
+    const t = lossTally(pool, o=>o.closedLostReason);
+    const rows = Object.entries(t).sort((a,b)=>b[1].n-a[1].n).slice(0,6)
+      .map(([k,v])=>({label:k, n:v.n, val:v.val}));
+    return {rows, total:pool.length, tone:'', firm:usingFirm,
+      scope:(usingFirm?'Firm-wide':'Your book')+' · '+pool.length+
+        ' losses by controlled reason'+(usingFirm?' — your own book is too small to read':'')};
+  }
 
   const mineAttr = myLost.filter(o=>o.lostToCompetitor);
-  const firmLost = Object.values(OPPS).filter(o=>o.outcome==='lost' && o.lostToCompetitor);
-  const usingFirm = mineAttr.length < LOST_TO_MIN_SAMPLE;
-  const pool = usingFirm ? firmLost : mineAttr;
-  const tally = {};
-  pool.forEach(o=>{
-    const t = tally[o.lostToCompetitor] = tally[o.lostToCompetitor] || {n:0, val:0, ucc:0};
-    t.n++; t.val += o.facilitySize;
-    if(o.lostToCompetitorEvidence==='UCC filing') t.ucc++;
-  });
-  const winners = Object.entries(tally).sort((a,b)=>b[1].n-a[1].n).slice(0,5);
-  const maxWin = Math.max(1,...winners.map(w=>w[1].n));
+  const usingFirm = mineAttr.length < LOSS_MIN_SAMPLE;
+  const pool = usingFirm ? firmLost.filter(o=>o.lostToCompetitor) : mineAttr;
+  const t = lossTally(pool, o=>o.lostToCompetitor);
+  const rows = Object.entries(t).sort((a,b)=>b[1].n-a[1].n).slice(0,6)
+    .map(([k,v])=>({label:k, n:v.n, val:v.val, ucc:v.ucc}));
+  return {rows, total:pool.length, tone:'warn', firm:usingFirm,
+    scope:(usingFirm?'Firm-wide':'Your book')+' · '+pool.length+
+      ' losses where the winner was identified'};
+}
 
-  const stageRows = byStage.map(b=>
-    '<div class="hbar-row"'+tipAttr(b.stage,
-        b.count+' lost · '+moneyShort(b.value),
-        b.count ? pct(b.count/Math.max(1,myLost.length))+' of your losses' : 'No losses at this stage')+'>'+
-      '<div class="hbar-name">'+b.stage+'</div>'+
-      '<div class="hbar-val">'+b.count+'</div>'+
-      '<div class="hbar-track"><div class="hbar-fill'+(b.count===maxLost&&b.count>0?'':' muted')+
-        '" style="width:'+Math.max(b.count?3:0,(b.count/maxLost)*100).toFixed(1)+'%"></div></div>'+
-    '</div>').join('');
+function lossPanelHtml(bdoId){
+  const d = lossViewData(bdoId);
+  const max = Math.max(1, ...d.rows.map(r=>r.n));
+  const body = d.rows.map(r=>{
+    const sub = LOSS_VIEW==='competitor'
+      ? (r.ucc ? r.ucc+' confirmed by a UCC filing' : 'Reported by the borrower')
+      : (r.n ? pct(r.n/Math.max(1,d.total))+' of these losses · '+moneyShort(r.val) : 'No losses here');
+    const isMax = r.n===max && r.n>0;
+    return '<div class="hbar-row'+(d.tone==='warn'?' warnrow':'')+'"'+
+      tipAttr(r.label, r.n+' lost · '+moneyShort(r.val), sub)+'>'+
+      '<div class="hbar-name">'+esc(r.label)+'</div>'+
+      '<div class="hbar-val">'+r.n+'</div>'+
+      '<div class="hbar-track"><div class="'+('hbar-fill '+(d.tone==='warn'?'warn':(isMax?'':'muted'))).trim()+
+        '" style="width:'+Math.max(r.n?3:0,(r.n/max)*100).toFixed(1)+'%"></div></div>'+
+    '</div>';
+  }).join('');
 
-  const winnerRows = winners.map(([name,t])=>
-    '<div class="hbar-row"'+tipAttr(name, t.n+' deal'+(t.n===1?'':'s')+' · '+moneyShort(t.val),
-        t.ucc ? t.ucc+' confirmed by a UCC filing' : 'Reported by the borrower')+'>'+
-      '<div class="hbar-name">'+esc(name)+'</div>'+
-      '<div class="hbar-val">'+t.n+'</div>'+
-      '<div class="hbar-track"><div class="hbar-fill warn" style="width:'+
-        Math.max(3,(t.n/maxWin)*100).toFixed(1)+'%"></div></div>'+
-    '</div>').join('');
-
-  return '<div class="panel">'+
+  return '<div class="panel expandable" onclick="openModal(\'loss\')">'+
     '<div class="panel-header"><div class="panel-header-text">'+
       '<div class="panel-title">Where we\'re losing</div>'+
-      '<div class="panel-scope">'+myLost.length+' closed-lost deals · which stage kills them</div>'+
-    '</div></div>'+
-    '<div class="panel-body flush">'+stageRows+'</div>'+
-    '<div class="panel-header"><div class="panel-header-text">'+
-      '<div class="panel-title">Lost to</div>'+
-      '<div class="panel-scope">'+(usingFirm
-        ? 'Firm-wide · '+pool.length+' losses where the winner was identified'
-        : 'Your book · '+pool.length+' attributed losses')+'</div>'+
-    '</div></div>'+
-    '<div class="panel-body flush">'+
-      (winners.length ? winnerRows : '<div class="empty">No loss attributed to a competitor yet.</div>')+
+      '<div class="panel-scope">'+d.scope+'</div>'+
+    '</div><span class="expand-hint">Expand &rsaquo;</span></div>'+
+    '<div class="panel-body pad-top">'+
+      '<div class="viewtoggle seg" onclick="event.stopPropagation()">'+LOSS_VIEWS.map(v=>
+        '<button class="'+(LOSS_VIEW===v.key?'active':'')+'" onclick="setLossView(\''+v.key+'\')">'+
+        v.label+'</button>').join('')+'</div>'+
     '</div>'+
-    '<div class="panel-footer">Attribution comes from the borrower or a competitor&#39;s UCC filing '+
-      'after the loss — not every loss reveals a winner.</div>'+
+    '<div class="panel-body flush mt-3">'+
+      (d.rows.length ? body : '<div class="empty">Nothing lost yet.</div>')+
+    '</div>'+
+    (LOSS_VIEW==='competitor'
+      ? '<div class="panel-footer">Attribution comes from the borrower or a competitor&#39;s UCC '+
+        'filing after the loss — not every loss reveals a winner.</div>'
+      : '')+
   '</div>';
 }
+
+/* Modal registry — each entry is the DEPTH behind a card's summary. Registered once; every
+   entry reads live from OPPS so it reflects in-session edits and stage moves. */
+function myOpps(){ return Object.values(OPPS).filter(o=>o.bdoId===CURRENT_BDO_ID); }
+
+MODALS.pipeline = function(){
+  const open = myOpps().filter(o=>o.outcome==='open');
+  const total = open.reduce((s,o)=>s+o.facilitySize,0);
+  return {
+    title:'Active pipeline',
+    scope:open.length+' open deals · '+moneyPlain(total)+' in facility commitments',
+    body: modalStrip([
+      {label:'Open deals', value:open.length},
+      {label:'Total facility', value:moneyShort(total)},
+      {label:'Average deal', value:moneyShort(open.length?total/open.length:0)},
+    ]) + oppRowsTable(open),
+  };
+};
+
+MODALS.underwriting = function(){
+  const uw = myOpps().filter(o=>o.outcome==='open' && o.stage==='Underwriting');
+  const total = uw.reduce((s,o)=>s+o.facilitySize,0);
+  return {
+    title:'Deals in Underwriting',
+    scope:'The credit gate — '+uw.length+' deal'+(uw.length===1?'':'s')+' · '+moneyPlain(total),
+    body: modalStrip([
+      {label:'At the gate', value:uw.length},
+      {label:'Facility', value:moneyShort(total)},
+      {label:'Avg days in stage', value:(uw.length
+        ? Math.round(uw.reduce((s,o)=>s+currentDaysInStage(o),0)/uw.length)+'d' : '—')},
+    ]) + oppRowsTable(uw, o=>currentDaysInStage(o)+' days in Underwriting'),
+  };
+};
+
+MODALS.winrate = function(){
+  const mine = myOpps();
+  const won = mine.filter(o=>o.outcome==='won'), lost = mine.filter(o=>o.outcome==='lost');
+  const wS = won.reduce((s,o)=>s+o.facilitySize,0), lS = lost.reduce((s,o)=>s+o.facilitySize,0);
+  const rows = ['Factoring','ABL','TermLoan'].map(pt=>{
+    const w = won.filter(o=>o.productType===pt), l = lost.filter(o=>o.productType===pt);
+    const n = w.length+l.length;
+    const ws = w.reduce((s,o)=>s+o.facilitySize,0), ls = l.reduce((s,o)=>s+o.facilitySize,0);
+    return modalRow([
+      {v:pt, cls:'name'}, {v:w.length, cls:'num'}, {v:l.length, cls:'num'},
+      {v:n?pct(w.length/n):'—', cls:'num'}, {v:(ws+ls)?pct(ws/(ws+ls)):'—', cls:'num'},
+    ]);
+  });
+  return {
+    title:'Win rate',
+    scope:'By count and by size, on '+(won.length+lost.length)+' closed deals — the divergence is the signal',
+    body: modalStrip([
+      {label:'By count', value:pct(won.length/Math.max(1,won.length+lost.length))},
+      {label:'By size', value:pct(wS/Math.max(1,wS+lS))},
+      {label:'Won / lost', value:won.length+' / '+lost.length},
+    ]) +
+    '<p class="chart-note mt-3">Winning more deals than dollars means the losses are landing on '+
+    'the bigger tickets — the count-and-size divergence this product surfaces by default.</p>'+
+    modalTable(['Product', {label:'Won',num:true}, {label:'Lost',num:true},
+      {label:'Win % count',num:true}, {label:'Win % size',num:true}], rows),
+  };
+};
+
+MODALS.funded = function(){
+  const yr = TODAY.slice(0,4);
+  const ytd = myOpps().filter(o=>o.outcome==='won' && (o.fundedDate||'').slice(0,4)===yr);
+  const total = ytd.reduce((s,o)=>s+o.facilitySize,0);
+  const st = coverageStats(CURRENT_BDO_ID);
+  return {
+    title:'Funded year to date',
+    scope:ytd.length+' deals funded in '+yr+' · '+moneyPlain(total),
+    body: modalStrip([
+      {label:'Funded YTD', value:moneyShort(total)},
+      {label:'Annual target', value:moneyShort(st.quota)},
+      {label:'Still to close', value:st.remaining>0?moneyShort(st.remaining):'Target met'},
+    ]) + oppRowsTable(ytd, o=>'Funded '+fmtDate(o.fundedDate)),
+  };
+};
+
+MODALS.coverage = function(){
+  const st = coverageStats(CURRENT_BDO_ID);
+  const rows = st.byStage.map(b=>modalRow([
+    {v:b.stage, cls:'name'}, {v:b.count, cls:'num'}, {v:moneyPlain(b.raw), cls:'num'},
+    {v:pct(STAGE_WEIGHTS[b.stage]), cls:'num sec'}, {v:moneyPlain(b.weighted), cls:'num'},
+  ]));
+  return {
+    title:'Pipeline coverage',
+    scope:'Weighted pipeline against the '+moneyShort(st.remaining)+' still needed to hit '+
+      moneyShort(st.quota)+' this year',
+    body: modalStrip([
+      {label:'Weighted pipeline', value:moneyShort(st.weighted)},
+      {label:'Still to close', value:st.remaining>0?moneyShort(st.remaining):'Target met'},
+      {label:'Coverage', value:st.coverage==null?'Met':st.coverage.toFixed(2)+'x'},
+    ]) +
+    '<p class="chart-note mt-3">Each open deal is discounted by its stage\'s historical conversion, '+
+    'so a Qualification deal counts for a tenth of its face value and an Underwriting deal for '+
+    'four fifths. Coverage compares that weighted number to what is still left of the annual '+
+    'target — not to the whole target, which a point-in-time pipeline could never cover.</p>'+
+    modalTable(['Stage', {label:'Deals',num:true}, {label:'Raw',num:true},
+      {label:'Weight',num:true}, {label:'Weighted',num:true}], rows) +
+    '<div class="mt-4">'+oppRowsTable(myOpps().filter(o=>o.outcome==='open'))+'</div>',
+  };
+};
+
+MODALS.stages = function(){
+  const open = myOpps().filter(o=>o.outcome==='open');
+  const rows = TRACK_STAGES.map(st=>{
+    const g = open.filter(o=>o.stage===st);
+    const val = g.reduce((t,o)=>t+o.facilitySize,0);
+    const avgDays = g.length ? Math.round(g.reduce((t,o)=>t+currentDaysInStage(o),0)/g.length) : null;
+    return modalRow([
+      {v:st, cls:'name'}, {v:g.length, cls:'num'}, {v:moneyPlain(val), cls:'num'},
+      {v:avgDays!=null?avgDays+'d':'—', cls:'num sec'},
+    ]);
+  });
+  return {
+    title:'Open pipeline by stage',
+    scope:open.length+' open deals · '+moneyPlain(open.reduce((s,o)=>s+o.facilitySize,0)),
+    body: modalTable(['Stage', {label:'Deals',num:true}, {label:'Facility',num:true},
+      {label:'Avg age in stage',num:true}], rows) +
+      '<div class="mt-4">'+oppRowsTable(open, o=>o.stage+' · '+currentDaysInStage(o)+'d')+'</div>',
+  };
+};
+
+MODALS.partners = function(){
+  const stats = partnerStats(CURRENT_BDO_ID)
+    .sort((a,b)=>(b.days||0)-(a.days||0));
+  const rows = stats.map(r=>modalRow([
+    {v:esc(r.p.name), cls:'name'}, {v:esc(r.p.partnerType), cls:'sec'},
+    {v:r.mine, cls:'num'}, {v:r.firmTotal, cls:'num'},
+    {v:r.winRate!=null?pct(r.winRate):'—', cls:'num'},
+    {v:r.days!=null?r.days+'d':'—', cls:'num'},
+    {v:r.p.isDormant?'Dormant':'Active', cls:r.p.isDormant?'sec':'sec'},
+  ], r.p.isDormant?'':''));
+  const dormant = stats.filter(r=>r.p.isDormant).length;
+  return {
+    title:'Partners',
+    scope:stats.length+' referral sources on your book · '+dormant+' gone quiet',
+    body: modalStrip([
+      {label:'Referral sources', value:stats.length},
+      {label:'Gone quiet', value:dormant},
+      {label:'Referrals to you', value:stats.reduce((s,r)=>s+r.mine,0)},
+    ]) +
+    '<p class="chart-note mt-3">Volume counts referrals sent to you. Win rate is each partner\'s '+
+    'full firm-wide record, because a rate over one or two of your own deals is noise.</p>'+
+    modalTable(['Partner','Type',{label:'To you',num:true},{label:'Firm-wide',num:true},
+      {label:'Win rate',num:true},{label:'Last referral',num:true},'Status'], rows),
+  };
+};
+
+MODALS.loss = function(){
+  const mineLost = myOpps().filter(o=>o.outcome==='lost');
+  const firmLost = Object.values(OPPS).filter(o=>o.outcome==='lost');
+  const attributed = firmLost.filter(o=>o.lostToCompetitor);
+  const stageRows = TRACK_STAGES.map(st=>{
+    const g = mineLost.filter(o=>o.lostAtStage===st);
+    return modalRow([{v:st, cls:'name'}, {v:g.length, cls:'num'},
+      {v:moneyPlain(g.reduce((t,o)=>t+o.facilitySize,0)), cls:'num'}]);
+  });
+  const reasonT = lossTally(firmLost, o=>o.closedLostReason);
+  const reasonRows = Object.entries(reasonT).sort((a,b)=>b[1].n-a[1].n).map(([k,v])=>
+    modalRow([{v:esc(k), cls:'name'}, {v:v.n, cls:'num'}, {v:moneyPlain(v.val), cls:'num'}]));
+  const compT = lossTally(attributed, o=>o.lostToCompetitor);
+  const compRows = Object.entries(compT).sort((a,b)=>b[1].n-a[1].n).map(([k,v])=>
+    modalRow([{v:esc(k), cls:'name'}, {v:v.n, cls:'num'}, {v:moneyPlain(v.val), cls:'num'},
+      {v:v.ucc+' UCC', cls:'num sec'}]));
+  return {
+    title:'Where we\'re losing',
+    scope:'Three views of the same losses — where they die, why, and who takes them',
+    body: modalStrip([
+      {label:'Your losses', value:mineLost.length},
+      {label:'Firm losses', value:firmLost.length},
+      {label:'Winner identified', value:attributed.length+' of '+firmLost.length},
+    ]) +
+    '<div class="panel-title mt-4">By stage — your book</div>'+
+    modalTable(['Stage',{label:'Lost',num:true},{label:'Facility',num:true}], stageRows)+
+    '<div class="panel-title mt-5">By reason — firm-wide</div>'+
+    modalTable(['Closed lost reason',{label:'Lost',num:true},{label:'Facility',num:true}], reasonRows)+
+    '<div class="panel-title mt-5">Lost to — firm-wide</div>'+
+    modalTable(['Lender',{label:'Deals',num:true},{label:'Facility',num:true},
+      {label:'Evidence',num:true}], compRows)+
+    '<p class="chart-note mt-3">Attribution comes from the borrower or from a competitor\'s UCC '+
+    'filing after the loss. '+attributed.length+' of '+firmLost.length+' losses named a winner — '+
+    'the rest never revealed one.</p>',
+  };
+};
+
+/* True shortest-column packing. CSS multi-column balances by content flow, which with
+   unbreakable cards left a 464px dead column under the shorter side — the exact void this
+   replaces. Here each card is placed into whichever column is currently shortest, measured
+   live, so the columns finish within a card's height of each other no matter what the feed
+   length is. The action feed is pinned to column one first because it is the hero; everything
+   after it packs. */
+const HOME_BREAKPOINT = 1140;
+function packHomeGrid(){
+  const grid = document.querySelector('.home-grid');
+  if(!grid) return;
+  const cards = Array.from(grid.querySelectorAll(':scope > .home-col > *, :scope > *'))
+    .filter(el => !el.classList.contains('home-col'));
+  if(!cards.length) return;
+  const colCount = window.innerWidth <= HOME_BREAKPOINT ? 1 : 2;
+  grid.innerHTML = '';
+  const cols = [];
+  for(let i=0;i<colCount;i++){
+    const c = document.createElement('div');
+    c.className = 'home-col';
+    grid.appendChild(c);
+    cols.push(c);
+  }
+  cards.forEach((card, i) => {
+    const target = i === 0
+      ? cols[0]
+      : cols.reduce((a, b) => (a.offsetHeight <= b.offsetHeight ? a : b));
+    target.appendChild(card);
+  });
+  // If we were measured inside a hidden container every height read as 0 and everything piled
+  // into column one. Detect that and re-pack once the view is actually laid out.
+  if(colCount > 1 && cols[1].children.length === 0 && cards.length > 2 &&
+     typeof requestAnimationFrame === 'function' && !packHomeGrid._retry){
+    packHomeGrid._retry = true;
+    requestAnimationFrame(()=>{ packHomeGrid._retry = false; packHomeGrid(); });
+  }
+}
+let HOME_RESIZE_TIMER = null;
+window.addEventListener('resize', function(){
+  if(!document.querySelector('.home-grid')) return;
+  clearTimeout(HOME_RESIZE_TIMER);
+  HOME_RESIZE_TIMER = setTimeout(packHomeGrid, 120);
+});
 
 function renderHome(){
   if(ROLE==='exec'){ renderExecHomeStub(); return; }
@@ -45805,7 +46347,7 @@ function renderHome(){
 
   const feed = buildFeed(CURRENT_BDO_ID);
   const agenda = buildAgenda(CURRENT_BDO_ID);
-  const trend = fundedByMonth(CURRENT_BDO_ID, 12);
+  const cov = coverageStats(CURRENT_BDO_ID);
 
   const recent = D.activities.filter(a=>a.bdoId===CURRENT_BDO_ID)
     .slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,6);
@@ -45830,31 +46372,35 @@ function renderHome(){
     '</div>'+
 
     '<div class="strip strip-4">'+
-      '<div class="met"><div class="met-label">Active Pipeline</div>'+
+      '<div class="met expandable" tabindex="0" onclick="openModal(\'pipeline\')">'+
+        '<div class="met-label">Active Pipeline</div>'+
         '<div class="met-figure emphasis">'+money(pipelineValue)+'</div>'+
         '<div class="met-sub">'+myOpen.length+' open deals · '+
           new Set(myOpen.map(o=>o.accountId)).size+' accounts</div></div>'+
-      '<div class="met"><div class="met-label">Funded YTD</div>'+
-        '<div class="met-figure">'+money(wonYTDValue)+'</div>'+
-        '<div class="met-sub">'+wonYTD.length+' deal'+(wonYTD.length===1?'':'s')+' funded this year</div></div>'+
-      '<div class="met"><div class="met-label">Win Rate</div>'+
-        '<div class="met-figure">'+pct(winByCount)+'</div>'+
-        '<div class="met-sub">by count · '+pct(winBySize)+' by size, on '+closedN+' closed</div></div>'+
-      '<div class="met"><div class="met-label">Deals in Underwriting</div>'+
+      '<div class="met expandable" tabindex="0" onclick="openModal(\'underwriting\')">'+
+        '<div class="met-label">Deals in Underwriting</div>'+
         '<div class="met-figure">'+inUW.length+'</div>'+
         '<div class="met-sub">'+moneyShort(inUWValue)+' at the credit gate</div></div>'+
+      '<div class="met expandable" tabindex="0" onclick="openModal(\'winrate\')">'+
+        '<div class="met-label">Win Rate</div>'+
+        '<div class="met-figure">'+pct(winByCount)+'</div>'+
+        '<div class="met-sub">by count · '+pct(winBySize)+' by size, on '+closedN+' closed</div></div>'+
+      '<div class="met expandable" tabindex="0" onclick="openModal(\'funded\')">'+
+        '<div class="met-label">Funded YTD</div>'+
+        '<div class="met-figure">'+money(wonYTDValue)+'</div>'+
+        '<div class="met-sub">'+wonYTD.length+' deal'+(wonYTD.length===1?'':'s')+' funded this year</div></div>'+
     '</div>'+
 
-    '<div class="panel">'+
+    '<div class="panel expandable" onclick="openModal(\'coverage\')">'+
       '<div class="panel-header"><div class="panel-header-text">'+
-        '<div class="panel-title">Funded trend</div>'+
-        '<div class="panel-scope">My closed-won volume by month · rolling 12 months</div>'+
-      '</div></div>'+
-      '<div class="panel-body">'+fundedBarsHtml(trend)+'</div>'+
+        '<div class="panel-title">Pipeline coverage</div>'+
+        '<div class="panel-scope">Weighted pipeline against what\'s left of the '+
+          moneyShort(cov.quota)+' annual target</div>'+
+      '</div><span class="expand-hint">Expand &rsaquo;</span></div>'+
+      '<div class="panel-body">'+coveragePanelHtml(cov)+'</div>'+
     '</div>'+
 
-    '<div class="two-col">'+
-      '<div>'+
+    '<div class="home-grid">'+
         '<div class="panel">'+
           '<div class="panel-header"><div class="panel-header-text">'+
             '<div class="panel-title">Today</div>'+
@@ -45874,9 +46420,7 @@ function renderHome(){
             ).join('') : '<div class="empty">No signals right now — book is quiet.</div>')+
           '</div>'+
         '</div>'+
-      '</div>'+
 
-      '<div>'+
         '<div class="panel">'+
           '<div class="panel-header"><div class="panel-header-text">'+
             '<div class="panel-title">Today\'s agenda</div>'+
@@ -45886,7 +46430,7 @@ function renderHome(){
             agenda.map(r=>
               '<div class="agenda-row'+(r.past?' past':'')+(r.next?' next':'')+'"'+
                 (r.oppId?(' onclick="location.hash=\'#/opp/'+r.oppId+'\'"'):'')+'>'+
-                '<div class="agenda-time">'+r.time+'</div>'+
+                '<div class="agenda-time">'+hhmm12(r.time)+'</div>'+
                 '<div class="agenda-main">'+
                   '<div class="agenda-title">'+esc(r.title)+'</div>'+
                   '<div class="agenda-sub">'+esc(r.sub)+'</div>'+
@@ -45898,15 +46442,15 @@ function renderHome(){
 
         partnersPanelHtml(partners)+
 
-        '<div class="panel">'+
+        '<div class="panel expandable" onclick="openModal(\'stages\')">'+
           '<div class="panel-header"><div class="panel-header-text">'+
             '<div class="panel-title">Open pipeline</div>'+
             '<div class="panel-scope">'+myOpen.length+' open deals · '+moneyShort(pipelineValue)+' total</div>'+
-          '</div></div>'+
+          '</div><span class="expand-hint">Expand &rsaquo;</span></div>'+
           '<div class="panel-body">'+stageFunnelHtml(byStage, Math.max(1,pipelineValue))+'</div>'+
         '</div>'+
 
-        losingPanelHtml(CURRENT_BDO_ID)+
+        lossPanelHtml(CURRENT_BDO_ID)+
 
         '<div class="panel">'+
           '<div class="panel-header"><div class="panel-header-text">'+
@@ -45925,8 +46469,9 @@ function renderHome(){
             }).join('') : '<div class="empty">No activity logged yet.</div>')+
           '</div>'+
         '</div>'+
-      '</div>'+
     '</div>';
+
+  packHomeGrid();
 }
 
 function renderExecHomeStub(){

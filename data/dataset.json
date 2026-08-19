@@ -13,7 +13,8 @@
       "title": "Business Development Officer",
       "hireDate": "2022-10-08",
       "email": "kavya.nakamura@ridgemarkcapital.com",
-      "capacityWeight": 0.92
+      "capacityWeight": 0.92,
+      "annualQuota": 45500000
     },
     {
       "id": "bdo_02",
@@ -21,7 +22,8 @@
       "title": "Business Development Officer",
       "hireDate": "2024-08-20",
       "email": "grant.whitcombe@ridgemarkcapital.com",
-      "capacityWeight": 0.95
+      "capacityWeight": 0.95,
+      "annualQuota": 32000000
     },
     {
       "id": "bdo_03",
@@ -29,7 +31,8 @@
       "title": "Business Development Officer",
       "hireDate": "2023-05-21",
       "email": "emma.ashworth@ridgemarkcapital.com",
-      "capacityWeight": 1.07
+      "capacityWeight": 1.07,
+      "annualQuota": 45500000
     },
     {
       "id": "bdo_04",
@@ -37,7 +40,8 @@
       "title": "Business Development Officer",
       "hireDate": "2024-12-19",
       "email": "wei.ashworth@ridgemarkcapital.com",
-      "capacityWeight": 1.04
+      "capacityWeight": 1.04,
+      "annualQuota": 51500000
     },
     {
       "id": "bdo_05",
@@ -45,7 +49,8 @@
       "title": "Business Development Officer",
       "hireDate": "2024-05-24",
       "email": "priscilla.whitfield@ridgemarkcapital.com",
-      "capacityWeight": 0.83
+      "capacityWeight": 0.83,
+      "annualQuota": 50500000
     },
     {
       "id": "bdo_06",
@@ -53,7 +58,8 @@
       "title": "Business Development Officer",
       "hireDate": "2024-02-15",
       "email": "noah.okafor@ridgemarkcapital.com",
-      "capacityWeight": 1.23
+      "capacityWeight": 1.23,
+      "annualQuota": 75000000
     },
     {
       "id": "bdo_07",
@@ -61,7 +67,8 @@
       "title": "Business Development Officer",
       "hireDate": "2024-08-17",
       "email": "boris.corrigan@ridgemarkcapital.com",
-      "capacityWeight": 1.14
+      "capacityWeight": 1.14,
+      "annualQuota": 75500000
     },
     {
       "id": "bdo_08",
@@ -69,7 +76,8 @@
       "title": "Business Development Officer",
       "hireDate": "2026-03-26",
       "email": "jonas.fontaine@ridgemarkcapital.com",
-      "capacityWeight": 0.5
+      "capacityWeight": 0.5,
+      "annualQuota": 43000000
     }
   ],
   "partners": [
@@ -1829,8 +1837,8 @@
       "industryCode": "2131",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "Community bank line",
-        "National ABL lender"
+        "Bank of America Business Capital",
+        "JPMorgan Chase"
       ],
       "outcome": "lost",
       "lostAtStage": "Underwriting",
@@ -1866,8 +1874,8 @@
       "industryCode": "2131",
       "useOfProceeds": "Seasonal inventory build",
       "competitors": [
-        "Regional factoring company",
-        "Incumbent relationship bank"
+        "PNC Business Credit",
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -1898,11 +1906,11 @@
       "industryCode": "2131",
       "useOfProceeds": "Recapitalization",
       "competitors": [
-        "Community bank line",
-        "Competing direct lender"
+        "Bank of America Business Capital",
+        "Ares Capital"
       ],
       "outcome": "open",
-      "stage": "Analysis",
+      "stage": "Underwriting",
       "createdDate": "2026-07-15",
       "expectedCloseDate": "2026-12-05",
       "fundedDate": null,
@@ -1965,7 +1973,7 @@
       "industryCode": "4244",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Regional factoring company"
+        "PNC Business Credit"
       ],
       "outcome": "lost",
       "lostAtStage": "Proposal",
@@ -1986,7 +1994,7 @@
         "securedStatus": "Secured",
         "callProtection": "1% Yr1 stepdown"
       },
-      "lostToCompetitor": "Regional factoring company",
+      "lostToCompetitor": "PNC Business Credit",
       "lostToCompetitorEvidence": "UCC filing"
     },
     {
@@ -2097,10 +2105,10 @@
       "industryCode": "4841",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Regional factoring company"
+        "PNC Business Credit"
       ],
       "outcome": "open",
-      "stage": "Proposal",
+      "stage": "Underwriting",
       "createdDate": "2026-07-23",
       "expectedCloseDate": "2026-10-01",
       "fundedDate": null,
@@ -2131,8 +2139,8 @@
       "industryCode": "3231",
       "useOfProceeds": "Equipment purchase",
       "competitors": [
-        "Mezzanine fund",
-        "Regional factoring company"
+        "Golub Capital",
+        "PNC Business Credit"
       ],
       "outcome": "lost",
       "lostAtStage": "Analysis",
@@ -2168,10 +2176,10 @@
       "industryCode": "3113",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "National ABL lender"
+        "JPMorgan Chase"
       ],
       "outcome": "open",
-      "stage": "Analysis",
+      "stage": "Underwriting",
       "createdDate": "2026-07-18",
       "expectedCloseDate": "2026-09-26",
       "fundedDate": null,
@@ -2202,7 +2210,7 @@
       "industryCode": "2361",
       "useOfProceeds": "Acquisition financing",
       "competitors": [
-        "Another private credit firm"
+        "White Oak Commercial Finance"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -2238,7 +2246,7 @@
       "useOfProceeds": "Recapitalization",
       "competitors": [],
       "outcome": "open",
-      "stage": "Analysis",
+      "stage": "Underwriting",
       "createdDate": "2026-07-09",
       "expectedCloseDate": "2026-11-12",
       "fundedDate": null,
@@ -2269,8 +2277,8 @@
       "industryCode": "2361",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "Mezzanine fund",
-        "Incumbent relationship bank"
+        "Golub Capital",
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -2368,7 +2376,7 @@
       "industryCode": "2361",
       "useOfProceeds": "Acquisition financing",
       "competitors": [
-        "Another private credit firm"
+        "White Oak Commercial Finance"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -2430,7 +2438,7 @@
       "industryCode": "4238",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "Another private credit firm"
+        "White Oak Commercial Finance"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -2464,7 +2472,7 @@
       "industryCode": "4238",
       "useOfProceeds": "Debt consolidation",
       "competitors": [
-        "Competing direct lender"
+        "Ares Capital"
       ],
       "outcome": "open",
       "stage": "Qualification",
@@ -2557,7 +2565,7 @@
       "industryCode": "3231",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Regional factoring company"
+        "PNC Business Credit"
       ],
       "outcome": "open",
       "stage": "Analysis",
@@ -2591,7 +2599,7 @@
       "industryCode": "3231",
       "useOfProceeds": "Recapitalization",
       "competitors": [
-        "Another private credit firm"
+        "White Oak Commercial Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Proposal",
@@ -2612,7 +2620,7 @@
         "fieldExamStatus": "Complete",
         "primaryCovenant": "FCCR >= 1.1x"
       },
-      "lostToCompetitor": "Another private credit firm",
+      "lostToCompetitor": "White Oak Commercial Finance",
       "lostToCompetitorEvidence": "UCC filing"
     },
     {
@@ -2627,8 +2635,8 @@
       "industryCode": "3231",
       "useOfProceeds": "Seasonal inventory build",
       "competitors": [
-        "Mezzanine fund",
-        "Incumbent relationship bank"
+        "Golub Capital",
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "open",
       "stage": "Underwriting",
@@ -2662,8 +2670,8 @@
       "industryCode": "3231",
       "useOfProceeds": "Recapitalization",
       "competitors": [
-        "Competing direct lender",
-        "Incumbent relationship bank"
+        "Ares Capital",
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Qualification",
@@ -2696,11 +2704,11 @@
       "industryCode": "3231",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Mezzanine fund",
-        "National ABL lender"
+        "Golub Capital",
+        "JPMorgan Chase"
       ],
       "outcome": "open",
-      "stage": "Proposal",
+      "stage": "Underwriting",
       "createdDate": "2026-07-12",
       "expectedCloseDate": "2026-10-25",
       "fundedDate": null,
@@ -2765,7 +2773,7 @@
       "industryCode": "3327",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Community bank line"
+        "Bank of America Business Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -2796,8 +2804,8 @@
       "industryCode": "3327",
       "useOfProceeds": "Equipment purchase",
       "competitors": [
-        "Regional factoring company",
-        "Another private credit firm"
+        "PNC Business Credit",
+        "White Oak Commercial Finance"
       ],
       "outcome": "open",
       "stage": "Proposal",
@@ -2832,8 +2840,8 @@
       "industryCode": "3327",
       "useOfProceeds": "Acquisition financing",
       "competitors": [
-        "Community bank line",
-        "Incumbent relationship bank"
+        "Bank of America Business Capital",
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Proposal",
@@ -2851,7 +2859,7 @@
         "estMonthlyARVolume": 1487000,
         "debtorConcentrationPct": 38
       },
-      "lostToCompetitor": "Community bank line",
+      "lostToCompetitor": "Bank of America Business Capital",
       "lostToCompetitorEvidence": "UCC filing"
     },
     {
@@ -2898,7 +2906,7 @@
       "industryCode": "3113",
       "useOfProceeds": "Recapitalization",
       "competitors": [
-        "Another private credit firm"
+        "White Oak Commercial Finance"
       ],
       "outcome": "open",
       "stage": "Underwriting",
@@ -2961,8 +2969,8 @@
       "industryCode": "3231",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "Incumbent relationship bank",
-        "Regional factoring company"
+        "Wells Fargo Capital Finance",
+        "PNC Business Credit"
       ],
       "outcome": "open",
       "stage": "Qualification",
@@ -2997,8 +3005,8 @@
       "industryCode": "6216",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Community bank line",
-        "Another private credit firm"
+        "Bank of America Business Capital",
+        "White Oak Commercial Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Analysis",
@@ -3034,10 +3042,10 @@
       "industryCode": "3399",
       "useOfProceeds": "Debt consolidation",
       "competitors": [
-        "National ABL lender"
+        "JPMorgan Chase"
       ],
       "outcome": "open",
-      "stage": "Analysis",
+      "stage": "Underwriting",
       "createdDate": "2026-07-09",
       "expectedCloseDate": "2026-10-12",
       "fundedDate": null,
@@ -3097,8 +3105,8 @@
       "industryCode": "6216",
       "useOfProceeds": "Recapitalization",
       "competitors": [
-        "Community bank line",
-        "Another private credit firm"
+        "Bank of America Business Capital",
+        "White Oak Commercial Finance"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -3161,7 +3169,7 @@
       "industryCode": "6216",
       "useOfProceeds": "Debt consolidation",
       "competitors": [
-        "Another private credit firm"
+        "White Oak Commercial Finance"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -3228,8 +3236,8 @@
       "industryCode": "6216",
       "useOfProceeds": "Seasonal inventory build",
       "competitors": [
-        "Another private credit firm",
-        "Competing direct lender"
+        "White Oak Commercial Finance",
+        "Ares Capital"
       ],
       "outcome": "open",
       "stage": "Underwriting",
@@ -3327,8 +3335,8 @@
       "industryCode": "3327",
       "useOfProceeds": "Debt consolidation",
       "competitors": [
-        "Community bank line",
-        "Incumbent relationship bank"
+        "Bank of America Business Capital",
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Qualification",
@@ -3361,8 +3369,8 @@
       "industryCode": "3231",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Incumbent relationship bank",
-        "Mezzanine fund"
+        "Wells Fargo Capital Finance",
+        "Golub Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -3397,10 +3405,10 @@
       "industryCode": "1119",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Incumbent relationship bank"
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "open",
-      "stage": "Proposal",
+      "stage": "Underwriting",
       "createdDate": "2026-07-17",
       "expectedCloseDate": "2026-11-25",
       "fundedDate": null,
@@ -3428,7 +3436,7 @@
       "industryCode": "1119",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "National ABL lender"
+        "JPMorgan Chase"
       ],
       "outcome": "lost",
       "lostAtStage": "Qualification",
@@ -3464,7 +3472,7 @@
       "industryCode": "1119",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "Mezzanine fund"
+        "Golub Capital"
       ],
       "outcome": "open",
       "stage": "Qualification",
@@ -3495,8 +3503,8 @@
       "industryCode": "1119",
       "useOfProceeds": "Equipment purchase",
       "competitors": [
-        "Regional factoring company",
-        "Incumbent relationship bank"
+        "PNC Business Credit",
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Underwriting",
@@ -3532,7 +3540,7 @@
       "industryCode": "1119",
       "useOfProceeds": "Equipment purchase",
       "competitors": [
-        "Regional factoring company"
+        "PNC Business Credit"
       ],
       "outcome": "open",
       "stage": "Analysis",
@@ -3595,8 +3603,8 @@
       "industryCode": "3159",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "National ABL lender",
-        "Competing direct lender"
+        "JPMorgan Chase",
+        "Ares Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -3630,8 +3638,8 @@
       "industryCode": "3159",
       "useOfProceeds": "Recapitalization",
       "competitors": [
-        "Another private credit firm",
-        "Mezzanine fund"
+        "White Oak Commercial Finance",
+        "Golub Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Underwriting",
@@ -3686,7 +3694,7 @@
         "securedStatus": "Secured",
         "callProtection": "None"
       },
-      "lostToCompetitor": "Community bank line",
+      "lostToCompetitor": "Bank of America Business Capital",
       "lostToCompetitorEvidence": "UCC filing"
     },
     {
@@ -3730,7 +3738,7 @@
       "industryCode": "3399",
       "useOfProceeds": "Acquisition financing",
       "competitors": [
-        "Incumbent relationship bank"
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "open",
       "stage": "Underwriting",
@@ -3764,7 +3772,7 @@
       "industryCode": "5613",
       "useOfProceeds": "Acquisition financing",
       "competitors": [
-        "National ABL lender"
+        "JPMorgan Chase"
       ],
       "outcome": "open",
       "stage": "Analysis",
@@ -3832,8 +3840,8 @@
       "industryCode": "2131",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Regional factoring company",
-        "Mezzanine fund"
+        "PNC Business Credit",
+        "Golub Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Qualification",
@@ -3866,7 +3874,7 @@
       "industryCode": "3273",
       "useOfProceeds": "Seasonal inventory build",
       "competitors": [
-        "Another private credit firm"
+        "White Oak Commercial Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Proposal",
@@ -3887,7 +3895,7 @@
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.12x"
       },
-      "lostToCompetitor": "Another private credit firm",
+      "lostToCompetitor": "White Oak Commercial Finance",
       "lostToCompetitorEvidence": "Reported by borrower"
     },
     {
@@ -3902,7 +3910,7 @@
       "industryCode": "3273",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "Community bank line"
+        "Bank of America Business Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -3936,7 +3944,7 @@
       "industryCode": "3273",
       "useOfProceeds": "Recapitalization",
       "competitors": [
-        "Another private credit firm"
+        "White Oak Commercial Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Underwriting",
@@ -4003,7 +4011,7 @@
       "industryCode": "3273",
       "useOfProceeds": "Recapitalization",
       "competitors": [
-        "National ABL lender"
+        "JPMorgan Chase"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -4034,7 +4042,7 @@
       "industryCode": "3273",
       "useOfProceeds": "Recapitalization",
       "competitors": [
-        "Mezzanine fund"
+        "Golub Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -4068,8 +4076,8 @@
       "industryCode": "3327",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Another private credit firm",
-        "Incumbent relationship bank"
+        "White Oak Commercial Finance",
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -4134,8 +4142,8 @@
       "industryCode": "3273",
       "useOfProceeds": "Equipment purchase",
       "competitors": [
-        "Regional factoring company",
-        "Incumbent relationship bank"
+        "PNC Business Credit",
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -4169,10 +4177,10 @@
       "industryCode": "3273",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "National ABL lender"
+        "JPMorgan Chase"
       ],
       "outcome": "open",
-      "stage": "Proposal",
+      "stage": "Underwriting",
       "createdDate": "2026-07-21",
       "expectedCloseDate": "2026-12-13",
       "fundedDate": null,
@@ -4204,8 +4212,8 @@
       "industryCode": "3273",
       "useOfProceeds": "Seasonal inventory build",
       "competitors": [
-        "National ABL lender",
-        "Competing direct lender"
+        "JPMorgan Chase",
+        "Ares Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Proposal",
@@ -4238,7 +4246,7 @@
       "industryCode": "3273",
       "useOfProceeds": "Debt consolidation",
       "competitors": [
-        "Another private credit firm"
+        "White Oak Commercial Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Proposal",
@@ -4260,7 +4268,7 @@
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.14x"
       },
-      "lostToCompetitor": "Another private credit firm",
+      "lostToCompetitor": "White Oak Commercial Finance",
       "lostToCompetitorEvidence": "UCC filing"
     },
     {
@@ -4275,8 +4283,8 @@
       "industryCode": "3273",
       "useOfProceeds": "Acquisition financing",
       "competitors": [
-        "Competing direct lender",
-        "Mezzanine fund"
+        "Ares Capital",
+        "Golub Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -4310,8 +4318,8 @@
       "industryCode": "3113",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "Competing direct lender",
-        "Regional factoring company"
+        "Ares Capital",
+        "PNC Business Credit"
       ],
       "outcome": "lost",
       "lostAtStage": "Proposal",
@@ -4400,8 +4408,8 @@
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
       },
-      "lostToCompetitor": "Incumbent relationship bank",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitor": "Wells Fargo Capital Finance",
+      "lostToCompetitorEvidence": "Reported by borrower"
     },
     {
       "id": "opp_0078",
@@ -4415,8 +4423,8 @@
       "industryCode": "5613",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "Competing direct lender",
-        "Regional factoring company"
+        "Ares Capital",
+        "PNC Business Credit"
       ],
       "outcome": "open",
       "stage": "Qualification",
@@ -4447,8 +4455,8 @@
       "industryCode": "3327",
       "useOfProceeds": "Acquisition financing",
       "competitors": [
-        "Another private credit firm",
-        "Mezzanine fund"
+        "White Oak Commercial Finance",
+        "Golub Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Analysis",
@@ -4470,7 +4478,7 @@
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.12x"
       },
-      "lostToCompetitor": "Incumbent relationship bank",
+      "lostToCompetitor": "Bank of America Business Capital",
       "lostToCompetitorEvidence": "UCC filing"
     },
     {
@@ -4485,7 +4493,7 @@
       "industryCode": "3327",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "Another private credit firm"
+        "White Oak Commercial Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Analysis",
@@ -4503,7 +4511,7 @@
         "estMonthlyARVolume": 2647000,
         "debtorConcentrationPct": 41
       },
-      "lostToCompetitor": "Incumbent relationship bank",
+      "lostToCompetitor": "JPMorgan Chase",
       "lostToCompetitorEvidence": "Reported by borrower"
     },
     {
@@ -4646,7 +4654,7 @@
       "industryCode": "3159",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "Community bank line"
+        "Bank of America Business Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Proposal",
@@ -4667,8 +4675,8 @@
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
       },
-      "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitor": "Bank of America Business Capital",
+      "lostToCompetitorEvidence": "UCC filing"
     },
     {
       "id": "opp_0086",
@@ -4682,8 +4690,8 @@
       "industryCode": "3159",
       "useOfProceeds": "Acquisition financing",
       "competitors": [
-        "Another private credit firm",
-        "Incumbent relationship bank"
+        "White Oak Commercial Finance",
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "open",
       "stage": "Proposal",
@@ -4746,7 +4754,7 @@
       "industryCode": "3159",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "Community bank line"
+        "Bank of America Business Capital"
       ],
       "outcome": "open",
       "stage": "Qualification",
@@ -4777,8 +4785,8 @@
       "industryCode": "3159",
       "useOfProceeds": "Debt consolidation",
       "competitors": [
-        "National ABL lender",
-        "Community bank line"
+        "JPMorgan Chase",
+        "Bank of America Business Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Underwriting",
@@ -4814,8 +4822,8 @@
       "industryCode": "3159",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Regional factoring company",
-        "Community bank line"
+        "PNC Business Credit",
+        "Bank of America Business Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Analysis",
@@ -4836,8 +4844,8 @@
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
       },
-      "lostToCompetitor": "Incumbent relationship bank",
-      "lostToCompetitorEvidence": "Reported by borrower"
+      "lostToCompetitor": "PNC Business Credit",
+      "lostToCompetitorEvidence": "UCC filing"
     },
     {
       "id": "opp_0091",
@@ -4934,8 +4942,8 @@
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
       },
-      "lostToCompetitor": "Another private credit firm",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0094",
@@ -4949,8 +4957,8 @@
       "industryCode": "2361",
       "useOfProceeds": "Equipment purchase",
       "competitors": [
-        "Incumbent relationship bank",
-        "Community bank line"
+        "Wells Fargo Capital Finance",
+        "Bank of America Business Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -4981,8 +4989,8 @@
       "industryCode": "2361",
       "useOfProceeds": "Seasonal inventory build",
       "competitors": [
-        "Regional factoring company",
-        "Competing direct lender"
+        "PNC Business Credit",
+        "Ares Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Proposal",
@@ -5003,8 +5011,8 @@
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.1x"
       },
-      "lostToCompetitor": "Regional factoring company",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0096",
@@ -5050,7 +5058,7 @@
       "industryCode": "4238",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Competing direct lender"
+        "Ares Capital"
       ],
       "outcome": "open",
       "stage": "Analysis",
@@ -5081,8 +5089,8 @@
       "industryCode": "3327",
       "useOfProceeds": "Debt consolidation",
       "competitors": [
-        "Competing direct lender",
-        "Mezzanine fund"
+        "Ares Capital",
+        "Golub Capital"
       ],
       "outcome": "open",
       "stage": "Analysis",
@@ -5149,8 +5157,8 @@
       "industryCode": "3327",
       "useOfProceeds": "Acquisition financing",
       "competitors": [
-        "National ABL lender",
-        "Mezzanine fund"
+        "JPMorgan Chase",
+        "Golub Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Proposal",
@@ -5168,8 +5176,8 @@
         "estMonthlyARVolume": 3706000,
         "debtorConcentrationPct": 43
       },
-      "lostToCompetitor": "National ABL lender",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitor": "JPMorgan Chase",
+      "lostToCompetitorEvidence": "Reported by borrower"
     },
     {
       "id": "opp_0101",
@@ -5217,8 +5225,8 @@
       "industryCode": "2131",
       "useOfProceeds": "Acquisition financing",
       "competitors": [
-        "National ABL lender",
-        "Another private credit firm"
+        "JPMorgan Chase",
+        "White Oak Commercial Finance"
       ],
       "outcome": "open",
       "stage": "Qualification",
@@ -5252,11 +5260,11 @@
       "industryCode": "2361",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "Mezzanine fund",
-        "Incumbent relationship bank"
+        "Golub Capital",
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "open",
-      "stage": "Proposal",
+      "stage": "Underwriting",
       "createdDate": "2026-07-06",
       "expectedCloseDate": "2026-10-06",
       "fundedDate": null,
@@ -5284,8 +5292,8 @@
       "industryCode": "4244",
       "useOfProceeds": "Equipment purchase",
       "competitors": [
-        "Competing direct lender",
-        "Mezzanine fund"
+        "Ares Capital",
+        "Golub Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Underwriting",
@@ -5321,8 +5329,8 @@
       "industryCode": "2361",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "Another private credit firm",
-        "Regional factoring company"
+        "White Oak Commercial Finance",
+        "PNC Business Credit"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -5389,7 +5397,7 @@
       "industryCode": "3399",
       "useOfProceeds": "Recapitalization",
       "competitors": [
-        "Community bank line"
+        "Bank of America Business Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -5420,8 +5428,8 @@
       "industryCode": "3113",
       "useOfProceeds": "Debt consolidation",
       "competitors": [
-        "Mezzanine fund",
-        "Another private credit firm"
+        "Golub Capital",
+        "White Oak Commercial Finance"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -5455,10 +5463,10 @@
       "industryCode": "2131",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "Incumbent relationship bank"
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "open",
-      "stage": "Proposal",
+      "stage": "Underwriting",
       "createdDate": "2026-06-18",
       "expectedCloseDate": "2026-08-26",
       "fundedDate": null,
@@ -5486,7 +5494,7 @@
       "industryCode": "2131",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "Community bank line"
+        "Bank of America Business Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -5552,8 +5560,8 @@
       "industryCode": "3113",
       "useOfProceeds": "Equipment purchase",
       "competitors": [
-        "Mezzanine fund",
-        "National ABL lender"
+        "Golub Capital",
+        "JPMorgan Chase"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -5587,8 +5595,8 @@
       "industryCode": "3113",
       "useOfProceeds": "Seasonal inventory build",
       "competitors": [
-        "Regional factoring company",
-        "Competing direct lender"
+        "PNC Business Credit",
+        "Ares Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -5653,7 +5661,7 @@
       "industryCode": "6216",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "Mezzanine fund"
+        "Golub Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Underwriting",
@@ -5710,8 +5718,8 @@
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.24x"
       },
-      "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitor": "Bank of America Business Capital",
+      "lostToCompetitorEvidence": "Reported by borrower"
     },
     {
       "id": "opp_0117",
@@ -5725,8 +5733,8 @@
       "industryCode": "3327",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Community bank line",
-        "Regional factoring company"
+        "Bank of America Business Capital",
+        "PNC Business Credit"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -5789,8 +5797,8 @@
       "industryCode": "3327",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "Another private credit firm",
-        "Competing direct lender"
+        "White Oak Commercial Finance",
+        "Ares Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -5857,11 +5865,11 @@
       "industryCode": "3327",
       "useOfProceeds": "Recapitalization",
       "competitors": [
-        "Incumbent relationship bank",
-        "Regional factoring company"
+        "Wells Fargo Capital Finance",
+        "PNC Business Credit"
       ],
       "outcome": "open",
-      "stage": "Analysis",
+      "stage": "Underwriting",
       "createdDate": "2026-07-21",
       "expectedCloseDate": "2026-11-14",
       "fundedDate": null,
@@ -5892,8 +5900,8 @@
       "industryCode": "3327",
       "useOfProceeds": "Equipment purchase",
       "competitors": [
-        "Community bank line",
-        "Competing direct lender"
+        "Bank of America Business Capital",
+        "Ares Capital"
       ],
       "outcome": "open",
       "stage": "Proposal",
@@ -5959,8 +5967,8 @@
       "industryCode": "3327",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Another private credit firm",
-        "Mezzanine fund"
+        "White Oak Commercial Finance",
+        "Golub Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Underwriting",
@@ -5993,7 +6001,7 @@
       "industryCode": "3327",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Competing direct lender"
+        "Ares Capital"
       ],
       "outcome": "open",
       "stage": "Proposal",
@@ -6024,8 +6032,8 @@
       "industryCode": "3327",
       "useOfProceeds": "Acquisition financing",
       "competitors": [
-        "Mezzanine fund",
-        "Competing direct lender"
+        "Golub Capital",
+        "Ares Capital"
       ],
       "outcome": "open",
       "stage": "Proposal",
@@ -6059,7 +6067,7 @@
       "industryCode": "3113",
       "useOfProceeds": "Acquisition financing",
       "competitors": [
-        "Mezzanine fund"
+        "Golub Capital"
       ],
       "outcome": "open",
       "stage": "Qualification",
@@ -6090,8 +6098,8 @@
       "industryCode": "3113",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "Incumbent relationship bank",
-        "Mezzanine fund"
+        "Wells Fargo Capital Finance",
+        "Golub Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Analysis",
@@ -6178,7 +6186,7 @@
         "estMonthlyARVolume": 4725000,
         "debtorConcentrationPct": 57
       },
-      "lostToCompetitor": "Incumbent relationship bank",
+      "lostToCompetitor": "JPMorgan Chase",
       "lostToCompetitorEvidence": "UCC filing"
     },
     {
@@ -6212,8 +6220,8 @@
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.06x"
       },
-      "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitor": "Wells Fargo Capital Finance",
+      "lostToCompetitorEvidence": "Reported by borrower"
     },
     {
       "id": "opp_0132",
@@ -6227,7 +6235,7 @@
       "industryCode": "5613",
       "useOfProceeds": "Acquisition financing",
       "competitors": [
-        "Incumbent relationship bank"
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Analysis",
@@ -6248,7 +6256,7 @@
         "securedStatus": "Secured",
         "callProtection": "None"
       },
-      "lostToCompetitor": "Incumbent relationship bank",
+      "lostToCompetitor": "Wells Fargo Capital Finance",
       "lostToCompetitorEvidence": "UCC filing"
     },
     {
@@ -6263,7 +6271,7 @@
       "industryCode": "4244",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "Regional factoring company"
+        "PNC Business Credit"
       ],
       "outcome": "open",
       "stage": "Qualification",
@@ -6297,7 +6305,7 @@
       "industryCode": "3159",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "Community bank line"
+        "Bank of America Business Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Qualification",
@@ -6396,7 +6404,7 @@
       "industryCode": "5613",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "Regional factoring company"
+        "PNC Business Credit"
       ],
       "outcome": "lost",
       "lostAtStage": "Underwriting",
@@ -6429,8 +6437,8 @@
       "industryCode": "3113",
       "useOfProceeds": "Recapitalization",
       "competitors": [
-        "National ABL lender",
-        "Mezzanine fund"
+        "JPMorgan Chase",
+        "Golub Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -6465,8 +6473,8 @@
       "industryCode": "3113",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "Community bank line",
-        "National ABL lender"
+        "Bank of America Business Capital",
+        "JPMorgan Chase"
       ],
       "outcome": "lost",
       "lostAtStage": "Qualification",
@@ -6502,8 +6510,8 @@
       "industryCode": "3113",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Competing direct lender",
-        "Another private credit firm"
+        "Ares Capital",
+        "White Oak Commercial Finance"
       ],
       "outcome": "open",
       "stage": "Analysis",
@@ -6566,7 +6574,7 @@
       "industryCode": "3113",
       "useOfProceeds": "Debt consolidation",
       "competitors": [
-        "Incumbent relationship bank"
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "open",
       "stage": "Proposal",
@@ -6600,7 +6608,7 @@
       "industryCode": "3231",
       "useOfProceeds": "Acquisition financing",
       "competitors": [
-        "Another private credit firm"
+        "White Oak Commercial Finance"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -6631,10 +6639,10 @@
       "industryCode": "3231",
       "useOfProceeds": "Acquisition financing",
       "competitors": [
-        "Competing direct lender"
+        "Ares Capital"
       ],
       "outcome": "open",
-      "stage": "Analysis",
+      "stage": "Underwriting",
       "createdDate": "2026-07-23",
       "expectedCloseDate": "2026-12-16",
       "fundedDate": null,
@@ -6666,8 +6674,8 @@
       "industryCode": "3231",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "National ABL lender",
-        "Incumbent relationship bank"
+        "JPMorgan Chase",
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "open",
       "stage": "Qualification",
@@ -6698,8 +6706,8 @@
       "industryCode": "1119",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "Regional factoring company",
-        "Another private credit firm"
+        "PNC Business Credit",
+        "White Oak Commercial Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Qualification",
@@ -6800,7 +6808,7 @@
       "industryCode": "6216",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Another private credit firm"
+        "White Oak Commercial Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Proposal",
@@ -6871,8 +6879,8 @@
       "industryCode": "6216",
       "useOfProceeds": "Seasonal inventory build",
       "competitors": [
-        "National ABL lender",
-        "Regional factoring company"
+        "JPMorgan Chase",
+        "PNC Business Credit"
       ],
       "outcome": "open",
       "stage": "Qualification",
@@ -6903,7 +6911,7 @@
       "industryCode": "3327",
       "useOfProceeds": "Recapitalization",
       "competitors": [
-        "Another private credit firm"
+        "White Oak Commercial Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Proposal",
@@ -7035,8 +7043,8 @@
       "industryCode": "1119",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "Incumbent relationship bank",
-        "Mezzanine fund"
+        "Wells Fargo Capital Finance",
+        "Golub Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -7067,8 +7075,8 @@
       "industryCode": "1119",
       "useOfProceeds": "Equipment purchase",
       "competitors": [
-        "Incumbent relationship bank",
-        "Competing direct lender"
+        "Wells Fargo Capital Finance",
+        "Ares Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -7102,8 +7110,8 @@
       "industryCode": "1119",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "Mezzanine fund",
-        "Community bank line"
+        "Golub Capital",
+        "Bank of America Business Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Analysis",
@@ -7239,8 +7247,8 @@
       "industryCode": "3231",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "Another private credit firm",
-        "Community bank line"
+        "White Oak Commercial Finance",
+        "Bank of America Business Capital"
       ],
       "outcome": "open",
       "stage": "Analysis",
@@ -7274,8 +7282,8 @@
       "industryCode": "3231",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "Incumbent relationship bank",
-        "Another private credit firm"
+        "Wells Fargo Capital Finance",
+        "White Oak Commercial Finance"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -7306,8 +7314,8 @@
       "industryCode": "3231",
       "useOfProceeds": "Seasonal inventory build",
       "competitors": [
-        "Mezzanine fund",
-        "Regional factoring company"
+        "Golub Capital",
+        "PNC Business Credit"
       ],
       "outcome": "open",
       "stage": "Qualification",
@@ -7341,7 +7349,7 @@
       "industryCode": "3231",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "Another private credit firm"
+        "White Oak Commercial Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Qualification",
@@ -7409,7 +7417,7 @@
       "industryCode": "3113",
       "useOfProceeds": "Seasonal inventory build",
       "competitors": [
-        "Mezzanine fund"
+        "Golub Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -7474,8 +7482,8 @@
       "industryCode": "4244",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Regional factoring company",
-        "Community bank line"
+        "PNC Business Credit",
+        "Bank of America Business Capital"
       ],
       "outcome": "open",
       "stage": "Proposal",
@@ -7510,8 +7518,8 @@
       "industryCode": "2131",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "Regional factoring company",
-        "Incumbent relationship bank"
+        "PNC Business Credit",
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -7545,7 +7553,7 @@
       "industryCode": "2131",
       "useOfProceeds": "Equipment purchase",
       "competitors": [
-        "Incumbent relationship bank"
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Qualification",
@@ -7581,7 +7589,7 @@
       "industryCode": "2131",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "National ABL lender"
+        "JPMorgan Chase"
       ],
       "outcome": "open",
       "stage": "Qualification",
@@ -7612,7 +7620,7 @@
       "industryCode": "4238",
       "useOfProceeds": "Acquisition financing",
       "competitors": [
-        "Another private credit firm"
+        "White Oak Commercial Finance"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -7647,7 +7655,7 @@
       "industryCode": "3399",
       "useOfProceeds": "Recapitalization",
       "competitors": [
-        "Competing direct lender"
+        "Ares Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Analysis",
@@ -7703,8 +7711,8 @@
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
       },
-      "lostToCompetitor": "Incumbent relationship bank",
-      "lostToCompetitorEvidence": "Reported by borrower"
+      "lostToCompetitor": null,
+      "lostToCompetitorEvidence": null
     },
     {
       "id": "opp_0176",
@@ -7718,7 +7726,7 @@
       "industryCode": "3113",
       "useOfProceeds": "Recapitalization",
       "competitors": [
-        "Another private credit firm"
+        "White Oak Commercial Finance"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -7753,8 +7761,8 @@
       "industryCode": "3113",
       "useOfProceeds": "Equipment purchase",
       "competitors": [
-        "National ABL lender",
-        "Incumbent relationship bank"
+        "JPMorgan Chase",
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "open",
       "stage": "Qualification",
@@ -7785,8 +7793,8 @@
       "industryCode": "3113",
       "useOfProceeds": "Acquisition financing",
       "competitors": [
-        "Regional factoring company",
-        "National ABL lender"
+        "PNC Business Credit",
+        "JPMorgan Chase"
       ],
       "outcome": "open",
       "stage": "Proposal",
@@ -7912,8 +7920,8 @@
       "industryCode": "3231",
       "useOfProceeds": "Seasonal inventory build",
       "competitors": [
-        "Another private credit firm",
-        "Mezzanine fund"
+        "White Oak Commercial Finance",
+        "Golub Capital"
       ],
       "outcome": "open",
       "stage": "Qualification",
@@ -7947,8 +7955,8 @@
       "industryCode": "3159",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Another private credit firm",
-        "Competing direct lender"
+        "White Oak Commercial Finance",
+        "Ares Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Analysis",
@@ -7984,8 +7992,8 @@
       "industryCode": "3159",
       "useOfProceeds": "Equipment purchase",
       "competitors": [
-        "Competing direct lender",
-        "Another private credit firm"
+        "Ares Capital",
+        "White Oak Commercial Finance"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -8049,8 +8057,8 @@
       "industryCode": "3159",
       "useOfProceeds": "Debt consolidation",
       "competitors": [
-        "Community bank line",
-        "Another private credit firm"
+        "Bank of America Business Capital",
+        "White Oak Commercial Finance"
       ],
       "outcome": "open",
       "stage": "Proposal",
@@ -8116,7 +8124,7 @@
       "industryCode": "3231",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "Community bank line"
+        "Bank of America Business Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -8150,7 +8158,7 @@
       "industryCode": "3231",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "Incumbent relationship bank"
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "open",
       "stage": "Qualification",
@@ -8233,8 +8241,8 @@
         "securedStatus": "Secured",
         "callProtection": "None"
       },
-      "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitor": "PNC Business Credit",
+      "lostToCompetitorEvidence": "Reported by borrower"
     },
     {
       "id": "opp_0192",
@@ -8248,8 +8256,8 @@
       "industryCode": "3159",
       "useOfProceeds": "Equipment purchase",
       "competitors": [
-        "Regional factoring company",
-        "Another private credit firm"
+        "PNC Business Credit",
+        "White Oak Commercial Finance"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -8280,7 +8288,7 @@
       "industryCode": "3231",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Incumbent relationship bank"
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Proposal",
@@ -8316,8 +8324,8 @@
       "industryCode": "3231",
       "useOfProceeds": "Recapitalization",
       "competitors": [
-        "Regional factoring company",
-        "Mezzanine fund"
+        "PNC Business Credit",
+        "Golub Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -8348,7 +8356,7 @@
       "industryCode": "3231",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "Mezzanine fund"
+        "Golub Capital"
       ],
       "outcome": "open",
       "stage": "Analysis",
@@ -8401,8 +8409,8 @@
         "securedStatus": "Secured",
         "callProtection": "None"
       },
-      "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitor": "Wells Fargo Capital Finance",
+      "lostToCompetitorEvidence": "UCC filing"
     },
     {
       "id": "opp_0197",
@@ -8416,7 +8424,7 @@
       "industryCode": "3113",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "Another private credit firm"
+        "White Oak Commercial Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Proposal",
@@ -8518,8 +8526,8 @@
       "industryCode": "5613",
       "useOfProceeds": "Debt consolidation",
       "competitors": [
-        "National ABL lender",
-        "Competing direct lender"
+        "JPMorgan Chase",
+        "Ares Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -8588,8 +8596,8 @@
       "industryCode": "5613",
       "useOfProceeds": "Seasonal inventory build",
       "competitors": [
-        "Community bank line",
-        "National ABL lender"
+        "Bank of America Business Capital",
+        "JPMorgan Chase"
       ],
       "outcome": "open",
       "stage": "Analysis",
@@ -8620,8 +8628,8 @@
       "industryCode": "5613",
       "useOfProceeds": "Seasonal inventory build",
       "competitors": [
-        "Community bank line",
-        "Competing direct lender"
+        "Bank of America Business Capital",
+        "Ares Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Proposal",
@@ -8639,8 +8647,8 @@
         "estMonthlyARVolume": 767000,
         "debtorConcentrationPct": 22
       },
-      "lostToCompetitor": "Community bank line",
-      "lostToCompetitorEvidence": "Reported by borrower"
+      "lostToCompetitor": "Ares Capital",
+      "lostToCompetitorEvidence": "UCC filing"
     },
     {
       "id": "opp_0204",
@@ -8654,7 +8662,7 @@
       "industryCode": "5613",
       "useOfProceeds": "Acquisition financing",
       "competitors": [
-        "Mezzanine fund"
+        "Golub Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -8688,8 +8696,8 @@
       "industryCode": "3113",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Another private credit firm",
-        "National ABL lender"
+        "White Oak Commercial Finance",
+        "JPMorgan Chase"
       ],
       "outcome": "lost",
       "lostAtStage": "Proposal",
@@ -8722,7 +8730,7 @@
       "industryCode": "3399",
       "useOfProceeds": "Equipment purchase",
       "competitors": [
-        "Another private credit firm"
+        "White Oak Commercial Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Analysis",
@@ -8743,7 +8751,7 @@
         "securedStatus": "Unsecured",
         "callProtection": "1% Yr1 stepdown"
       },
-      "lostToCompetitor": "Incumbent relationship bank",
+      "lostToCompetitor": "JPMorgan Chase",
       "lostToCompetitorEvidence": "UCC filing"
     },
     {
@@ -8852,8 +8860,8 @@
       "industryCode": "1119",
       "useOfProceeds": "Equipment purchase",
       "competitors": [
-        "Mezzanine fund",
-        "Incumbent relationship bank"
+        "Golub Capital",
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -8945,7 +8953,7 @@
       "industryCode": "1119",
       "useOfProceeds": "Acquisition financing",
       "competitors": [
-        "Regional factoring company"
+        "PNC Business Credit"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -8979,8 +8987,8 @@
       "industryCode": "1119",
       "useOfProceeds": "Seasonal inventory build",
       "competitors": [
-        "Another private credit firm",
-        "National ABL lender"
+        "White Oak Commercial Finance",
+        "JPMorgan Chase"
       ],
       "outcome": "open",
       "stage": "Proposal",
@@ -9011,8 +9019,8 @@
       "industryCode": "3399",
       "useOfProceeds": "Debt consolidation",
       "competitors": [
-        "National ABL lender",
-        "Regional factoring company"
+        "JPMorgan Chase",
+        "PNC Business Credit"
       ],
       "outcome": "lost",
       "lostAtStage": "Underwriting",
@@ -9067,7 +9075,7 @@
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.22x"
       },
-      "lostToCompetitor": "Incumbent relationship bank",
+      "lostToCompetitor": "Bank of America Business Capital",
       "lostToCompetitorEvidence": "UCC filing"
     },
     {
@@ -9082,7 +9090,7 @@
       "industryCode": "3399",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "Community bank line"
+        "Bank of America Business Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -9113,8 +9121,8 @@
       "industryCode": "3399",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Community bank line",
-        "Competing direct lender"
+        "Bank of America Business Capital",
+        "Ares Capital"
       ],
       "outcome": "open",
       "stage": "Qualification",
@@ -9148,7 +9156,7 @@
       "industryCode": "3399",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "Competing direct lender"
+        "Ares Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Analysis",
@@ -9246,8 +9254,8 @@
       "industryCode": "1119",
       "useOfProceeds": "Debt consolidation",
       "competitors": [
-        "Mezzanine fund",
-        "Another private credit firm"
+        "Golub Capital",
+        "White Oak Commercial Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Proposal",
@@ -9283,7 +9291,7 @@
       "industryCode": "1119",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "Competing direct lender"
+        "Ares Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -9317,11 +9325,11 @@
       "industryCode": "2131",
       "useOfProceeds": "Debt consolidation",
       "competitors": [
-        "National ABL lender",
-        "Incumbent relationship bank"
+        "JPMorgan Chase",
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "open",
-      "stage": "Analysis",
+      "stage": "Underwriting",
       "createdDate": "2026-07-06",
       "expectedCloseDate": "2026-09-19",
       "fundedDate": null,
@@ -9349,7 +9357,7 @@
       "industryCode": "4244",
       "useOfProceeds": "Recapitalization",
       "competitors": [
-        "Incumbent relationship bank"
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Proposal",
@@ -9414,8 +9422,8 @@
       "industryCode": "4841",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "Regional factoring company",
-        "Another private credit firm"
+        "PNC Business Credit",
+        "White Oak Commercial Finance"
       ],
       "outcome": "open",
       "stage": "Qualification",
@@ -9449,8 +9457,8 @@
       "industryCode": "4841",
       "useOfProceeds": "Debt consolidation",
       "competitors": [
-        "Another private credit firm",
-        "Mezzanine fund"
+        "White Oak Commercial Finance",
+        "Golub Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Analysis",
@@ -9486,7 +9494,7 @@
       "industryCode": "4841",
       "useOfProceeds": "Debt consolidation",
       "competitors": [
-        "Another private credit firm"
+        "White Oak Commercial Finance"
       ],
       "outcome": "open",
       "stage": "Proposal",
@@ -9517,7 +9525,7 @@
       "industryCode": "4841",
       "useOfProceeds": "Debt consolidation",
       "competitors": [
-        "Competing direct lender"
+        "Ares Capital"
       ],
       "outcome": "open",
       "stage": "Analysis",
@@ -9552,7 +9560,7 @@
       "industryCode": "4841",
       "useOfProceeds": "Acquisition financing",
       "competitors": [
-        "Community bank line"
+        "Bank of America Business Capital"
       ],
       "outcome": "open",
       "stage": "Underwriting",
@@ -9586,7 +9594,7 @@
       "industryCode": "4841",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "National ABL lender"
+        "JPMorgan Chase"
       ],
       "outcome": "open",
       "stage": "Proposal",
@@ -9617,8 +9625,8 @@
       "industryCode": "4841",
       "useOfProceeds": "Seasonal inventory build",
       "competitors": [
-        "Competing direct lender",
-        "Another private credit firm"
+        "Ares Capital",
+        "White Oak Commercial Finance"
       ],
       "outcome": "open",
       "stage": "Qualification",
@@ -9652,8 +9660,8 @@
       "industryCode": "3399",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Community bank line",
-        "Another private credit firm"
+        "Bank of America Business Capital",
+        "White Oak Commercial Finance"
       ],
       "outcome": "lost",
       "lostAtStage": "Qualification",
@@ -9689,8 +9697,8 @@
       "industryCode": "4841",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Another private credit firm",
-        "Regional factoring company"
+        "White Oak Commercial Finance",
+        "PNC Business Credit"
       ],
       "outcome": "lost",
       "lostAtStage": "Qualification",
@@ -9726,8 +9734,8 @@
       "industryCode": "2131",
       "useOfProceeds": "Seasonal inventory build",
       "competitors": [
-        "Community bank line",
-        "National ABL lender"
+        "Bank of America Business Capital",
+        "JPMorgan Chase"
       ],
       "outcome": "open",
       "stage": "Qualification",
@@ -9758,7 +9766,7 @@
       "industryCode": "2361",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Community bank line"
+        "Bank of America Business Capital"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -9792,7 +9800,7 @@
       "industryCode": "3231",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "Incumbent relationship bank"
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "open",
       "stage": "Qualification",
@@ -9852,8 +9860,8 @@
       "industryCode": "3231",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "Another private credit firm",
-        "Community bank line"
+        "White Oak Commercial Finance",
+        "Bank of America Business Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Analysis",
@@ -9875,7 +9883,7 @@
         "fieldExamStatus": "Complete",
         "primaryCovenant": "FCCR >= 1.16x"
       },
-      "lostToCompetitor": "Incumbent relationship bank",
+      "lostToCompetitor": "Bank of America Business Capital",
       "lostToCompetitorEvidence": "UCC filing"
     },
     {
@@ -9890,8 +9898,8 @@
       "industryCode": "5613",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "Community bank line",
-        "Incumbent relationship bank"
+        "Bank of America Business Capital",
+        "Wells Fargo Capital Finance"
       ],
       "outcome": "open",
       "stage": "Analysis",
@@ -9954,7 +9962,7 @@
       "industryCode": "3231",
       "useOfProceeds": "Equipment purchase",
       "competitors": [
-        "Community bank line"
+        "Bank of America Business Capital"
       ],
       "outcome": "lost",
       "lostAtStage": "Proposal",
@@ -9976,8 +9984,8 @@
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.07x"
       },
-      "lostToCompetitor": "Community bank line",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitor": "Bank of America Business Capital",
+      "lostToCompetitorEvidence": "Reported by borrower"
     },
     {
       "id": "opp_0244",
@@ -10020,7 +10028,7 @@
       "industryCode": "4841",
       "useOfProceeds": "Refinance existing debt",
       "competitors": [
-        "Another private credit firm"
+        "White Oak Commercial Finance"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -10051,7 +10059,7 @@
       "industryCode": "4841",
       "useOfProceeds": "Working capital",
       "competitors": [
-        "Mezzanine fund"
+        "Golub Capital"
       ],
       "outcome": "open",
       "stage": "Analysis",
@@ -10117,8 +10125,8 @@
       "industryCode": "3273",
       "useOfProceeds": "Growth capital",
       "competitors": [
-        "Another private credit firm",
-        "National ABL lender"
+        "White Oak Commercial Finance",
+        "JPMorgan Chase"
       ],
       "outcome": "won",
       "stage": "ClosedWon",
@@ -10203,8 +10211,8 @@
         "securedStatus": "Secured",
         "callProtection": "1% Yr1 stepdown"
       },
-      "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitor": "Golub Capital",
+      "lostToCompetitorEvidence": "UCC filing"
     }
   ],
   "stageHistory": {
@@ -10278,18 +10286,30 @@
       {
         "stage": "Qualification",
         "enteredDate": "2026-07-15",
-        "exitedDate": "2026-07-27",
-        "durationDays": 12
+        "exitedDate": "2026-07-16",
+        "durationDays": 1
       },
       {
         "stage": "Analysis",
-        "enteredDate": "2026-07-27",
+        "enteredDate": "2026-07-16",
+        "exitedDate": "2026-07-18",
+        "durationDays": 2
+      },
+      {
+        "stage": "Proposal",
+        "enteredDate": "2026-07-18",
+        "exitedDate": "2026-07-19",
+        "durationDays": 1
+      },
+      {
+        "stage": "Underwriting",
+        "enteredDate": "2026-07-19",
         "exitedDate": null,
         "durationDays": null
       },
       {
-        "stage": "Analysis",
-        "enteredDate": "2026-07-27",
+        "stage": "Underwriting",
+        "enteredDate": "2026-07-19",
         "exitedDate": null,
         "durationDays": null,
         "terminal": false
@@ -10434,24 +10454,30 @@
       {
         "stage": "Qualification",
         "enteredDate": "2026-07-23",
-        "exitedDate": "2026-07-29",
-        "durationDays": 6
+        "exitedDate": "2026-07-24",
+        "durationDays": 1
       },
       {
         "stage": "Analysis",
-        "enteredDate": "2026-07-29",
-        "exitedDate": "2026-08-15",
-        "durationDays": 17
+        "enteredDate": "2026-07-24",
+        "exitedDate": "2026-07-25",
+        "durationDays": 1
       },
       {
         "stage": "Proposal",
-        "enteredDate": "2026-08-15",
+        "enteredDate": "2026-07-25",
+        "exitedDate": "2026-07-26",
+        "durationDays": 1
+      },
+      {
+        "stage": "Underwriting",
+        "enteredDate": "2026-07-26",
         "exitedDate": null,
         "durationDays": null
       },
       {
-        "stage": "Proposal",
-        "enteredDate": "2026-08-15",
+        "stage": "Underwriting",
+        "enteredDate": "2026-07-26",
         "exitedDate": null,
         "durationDays": null,
         "terminal": false
@@ -10482,18 +10508,30 @@
       {
         "stage": "Qualification",
         "enteredDate": "2026-07-18",
-        "exitedDate": "2026-07-26",
-        "durationDays": 8
+        "exitedDate": "2026-07-22",
+        "durationDays": 4
       },
       {
         "stage": "Analysis",
-        "enteredDate": "2026-07-26",
+        "enteredDate": "2026-07-22",
+        "exitedDate": "2026-07-28",
+        "durationDays": 6
+      },
+      {
+        "stage": "Proposal",
+        "enteredDate": "2026-07-28",
+        "exitedDate": "2026-08-01",
+        "durationDays": 4
+      },
+      {
+        "stage": "Underwriting",
+        "enteredDate": "2026-08-01",
         "exitedDate": null,
         "durationDays": null
       },
       {
-        "stage": "Analysis",
-        "enteredDate": "2026-07-26",
+        "stage": "Underwriting",
+        "enteredDate": "2026-08-01",
         "exitedDate": null,
         "durationDays": null,
         "terminal": false
@@ -10536,18 +10574,30 @@
       {
         "stage": "Qualification",
         "enteredDate": "2026-07-09",
-        "exitedDate": "2026-07-22",
-        "durationDays": 13
+        "exitedDate": "2026-07-13",
+        "durationDays": 4
       },
       {
         "stage": "Analysis",
-        "enteredDate": "2026-07-22",
+        "enteredDate": "2026-07-13",
+        "exitedDate": "2026-07-20",
+        "durationDays": 7
+      },
+      {
+        "stage": "Proposal",
+        "enteredDate": "2026-07-20",
+        "exitedDate": "2026-07-25",
+        "durationDays": 5
+      },
+      {
+        "stage": "Underwriting",
+        "enteredDate": "2026-07-25",
         "exitedDate": null,
         "durationDays": null
       },
       {
-        "stage": "Analysis",
-        "enteredDate": "2026-07-22",
+        "stage": "Underwriting",
+        "enteredDate": "2026-07-25",
         "exitedDate": null,
         "durationDays": null,
         "terminal": false
@@ -10890,24 +10940,30 @@
       {
         "stage": "Qualification",
         "enteredDate": "2026-07-12",
-        "exitedDate": "2026-07-19",
-        "durationDays": 7
+        "exitedDate": "2026-07-14",
+        "durationDays": 2
       },
       {
         "stage": "Analysis",
-        "enteredDate": "2026-07-19",
-        "exitedDate": "2026-08-14",
-        "durationDays": 26
+        "enteredDate": "2026-07-14",
+        "exitedDate": "2026-07-17",
+        "durationDays": 3
       },
       {
         "stage": "Proposal",
-        "enteredDate": "2026-08-14",
+        "enteredDate": "2026-07-17",
+        "exitedDate": "2026-07-18",
+        "durationDays": 1
+      },
+      {
+        "stage": "Underwriting",
+        "enteredDate": "2026-07-18",
         "exitedDate": null,
         "durationDays": null
       },
       {
-        "stage": "Proposal",
-        "enteredDate": "2026-08-14",
+        "stage": "Underwriting",
+        "enteredDate": "2026-07-18",
         "exitedDate": null,
         "durationDays": null,
         "terminal": false
@@ -11118,18 +11174,30 @@
       {
         "stage": "Qualification",
         "enteredDate": "2026-07-09",
-        "exitedDate": "2026-07-24",
-        "durationDays": 15
+        "exitedDate": "2026-07-15",
+        "durationDays": 6
       },
       {
         "stage": "Analysis",
-        "enteredDate": "2026-07-24",
+        "enteredDate": "2026-07-15",
+        "exitedDate": "2026-07-25",
+        "durationDays": 10
+      },
+      {
+        "stage": "Proposal",
+        "enteredDate": "2026-07-25",
+        "exitedDate": "2026-08-02",
+        "durationDays": 8
+      },
+      {
+        "stage": "Underwriting",
+        "enteredDate": "2026-08-02",
         "exitedDate": null,
         "durationDays": null
       },
       {
-        "stage": "Analysis",
-        "enteredDate": "2026-07-24",
+        "stage": "Underwriting",
+        "enteredDate": "2026-08-02",
         "exitedDate": null,
         "durationDays": null,
         "terminal": false
@@ -11427,24 +11495,30 @@
       {
         "stage": "Qualification",
         "enteredDate": "2026-07-17",
-        "exitedDate": "2026-07-30",
-        "durationDays": 13
+        "exitedDate": "2026-07-18",
+        "durationDays": 1
       },
       {
         "stage": "Analysis",
-        "enteredDate": "2026-07-30",
-        "exitedDate": "2026-08-13",
-        "durationDays": 14
+        "enteredDate": "2026-07-18",
+        "exitedDate": "2026-07-19",
+        "durationDays": 1
       },
       {
         "stage": "Proposal",
-        "enteredDate": "2026-08-13",
+        "enteredDate": "2026-07-19",
+        "exitedDate": "2026-07-20",
+        "durationDays": 1
+      },
+      {
+        "stage": "Underwriting",
+        "enteredDate": "2026-07-20",
         "exitedDate": null,
         "durationDays": null
       },
       {
-        "stage": "Proposal",
-        "enteredDate": "2026-08-13",
+        "stage": "Underwriting",
+        "enteredDate": "2026-07-20",
         "exitedDate": null,
         "durationDays": null,
         "terminal": false
@@ -12060,24 +12134,30 @@
       {
         "stage": "Qualification",
         "enteredDate": "2026-07-21",
-        "exitedDate": "2026-07-26",
-        "durationDays": 5
+        "exitedDate": "2026-07-22",
+        "durationDays": 1
       },
       {
         "stage": "Analysis",
-        "enteredDate": "2026-07-26",
-        "exitedDate": "2026-08-14",
-        "durationDays": 19
+        "enteredDate": "2026-07-22",
+        "exitedDate": "2026-07-23",
+        "durationDays": 1
       },
       {
         "stage": "Proposal",
-        "enteredDate": "2026-08-14",
+        "enteredDate": "2026-07-23",
+        "exitedDate": "2026-07-24",
+        "durationDays": 1
+      },
+      {
+        "stage": "Underwriting",
+        "enteredDate": "2026-07-24",
         "exitedDate": null,
         "durationDays": null
       },
       {
-        "stage": "Proposal",
-        "enteredDate": "2026-08-14",
+        "stage": "Underwriting",
+        "enteredDate": "2026-07-24",
         "exitedDate": null,
         "durationDays": null,
         "terminal": false
@@ -12822,24 +12902,30 @@
       {
         "stage": "Qualification",
         "enteredDate": "2026-07-06",
-        "exitedDate": "2026-07-12",
-        "durationDays": 6
+        "exitedDate": "2026-07-09",
+        "durationDays": 3
       },
       {
         "stage": "Analysis",
-        "enteredDate": "2026-07-12",
-        "exitedDate": "2026-08-07",
-        "durationDays": 26
+        "enteredDate": "2026-07-09",
+        "exitedDate": "2026-07-14",
+        "durationDays": 5
       },
       {
         "stage": "Proposal",
-        "enteredDate": "2026-08-07",
+        "enteredDate": "2026-07-14",
+        "exitedDate": "2026-07-17",
+        "durationDays": 3
+      },
+      {
+        "stage": "Underwriting",
+        "enteredDate": "2026-07-17",
         "exitedDate": null,
         "durationDays": null
       },
       {
-        "stage": "Proposal",
-        "enteredDate": "2026-08-07",
+        "stage": "Underwriting",
+        "enteredDate": "2026-07-17",
         "exitedDate": null,
         "durationDays": null,
         "terminal": false
@@ -12996,24 +13082,30 @@
       {
         "stage": "Qualification",
         "enteredDate": "2026-06-18",
-        "exitedDate": "2026-07-08",
-        "durationDays": 20
+        "exitedDate": "2026-06-30",
+        "durationDays": 12
       },
       {
         "stage": "Analysis",
-        "enteredDate": "2026-07-08",
-        "exitedDate": "2026-07-30",
-        "durationDays": 22
+        "enteredDate": "2026-06-30",
+        "exitedDate": "2026-07-19",
+        "durationDays": 19
       },
       {
         "stage": "Proposal",
-        "enteredDate": "2026-07-30",
+        "enteredDate": "2026-07-19",
+        "exitedDate": "2026-08-02",
+        "durationDays": 14
+      },
+      {
+        "stage": "Underwriting",
+        "enteredDate": "2026-08-02",
         "exitedDate": null,
         "durationDays": null
       },
       {
-        "stage": "Proposal",
-        "enteredDate": "2026-07-30",
+        "stage": "Underwriting",
+        "enteredDate": "2026-08-02",
         "exitedDate": null,
         "durationDays": null,
         "terminal": false
@@ -13350,18 +13442,30 @@
       {
         "stage": "Qualification",
         "enteredDate": "2026-07-21",
-        "exitedDate": "2026-08-03",
-        "durationDays": 13
+        "exitedDate": "2026-07-22",
+        "durationDays": 1
       },
       {
         "stage": "Analysis",
-        "enteredDate": "2026-08-03",
+        "enteredDate": "2026-07-22",
+        "exitedDate": "2026-07-23",
+        "durationDays": 1
+      },
+      {
+        "stage": "Proposal",
+        "enteredDate": "2026-07-23",
+        "exitedDate": "2026-07-24",
+        "durationDays": 1
+      },
+      {
+        "stage": "Underwriting",
+        "enteredDate": "2026-07-24",
         "exitedDate": null,
         "durationDays": null
       },
       {
-        "stage": "Analysis",
-        "enteredDate": "2026-08-03",
+        "stage": "Underwriting",
+        "enteredDate": "2026-07-24",
         "exitedDate": null,
         "durationDays": null,
         "terminal": false
@@ -13881,17 +13985,29 @@
       {
         "stage": "Qualification",
         "enteredDate": "2026-07-23",
-        "exitedDate": "2026-08-02",
-        "durationDays": 10
+        "exitedDate": "2026-07-26",
+        "durationDays": 3
       },
       {
         "stage": "Analysis",
+        "enteredDate": "2026-07-26",
+        "exitedDate": "2026-07-30",
+        "durationDays": 4
+      },
+      {
+        "stage": "Proposal",
+        "enteredDate": "2026-07-30",
+        "exitedDate": "2026-08-02",
+        "durationDays": 3
+      },
+      {
+        "stage": "Underwriting",
         "enteredDate": "2026-08-02",
         "exitedDate": null,
         "durationDays": null
       },
       {
-        "stage": "Analysis",
+        "stage": "Underwriting",
         "enteredDate": "2026-08-02",
         "exitedDate": null,
         "durationDays": null,
@@ -15897,18 +16013,30 @@
       {
         "stage": "Qualification",
         "enteredDate": "2026-07-06",
-        "exitedDate": "2026-07-22",
-        "durationDays": 16
+        "exitedDate": "2026-07-14",
+        "durationDays": 8
       },
       {
         "stage": "Analysis",
-        "enteredDate": "2026-07-22",
+        "enteredDate": "2026-07-14",
+        "exitedDate": "2026-07-26",
+        "durationDays": 12
+      },
+      {
+        "stage": "Proposal",
+        "enteredDate": "2026-07-26",
+        "exitedDate": "2026-08-04",
+        "durationDays": 9
+      },
+      {
+        "stage": "Underwriting",
+        "enteredDate": "2026-08-04",
         "exitedDate": null,
         "durationDays": null
       },
       {
-        "stage": "Analysis",
-        "enteredDate": "2026-07-22",
+        "stage": "Underwriting",
+        "enteredDate": "2026-08-04",
         "exitedDate": null,
         "durationDays": null,
         "terminal": false
@@ -16565,7 +16693,7 @@
       "accountId": "acct_c_0002",
       "filingNumber": "UCC-2023-254029",
       "filingDate": "2025-08-15",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 2,
       "subordinated": false
@@ -16585,7 +16713,7 @@
       "accountId": "acct_c_0003",
       "filingNumber": "UCC-2023-054853",
       "filingDate": "2024-11-21",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": false
@@ -16595,7 +16723,7 @@
       "accountId": "acct_c_0003",
       "filingNumber": "UCC-2023-819402",
       "filingDate": "2025-02-26",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 3,
       "subordinated": false
@@ -16605,7 +16733,7 @@
       "accountId": "acct_c_0003",
       "filingNumber": "UCC-2024-508342",
       "filingDate": "2025-02-15",
-      "securedParty": "National ABL lender",
+      "securedParty": "JPMorgan Chase",
       "collateralDescription": "Inventory",
       "priorityRank": 4,
       "subordinated": false
@@ -16625,7 +16753,7 @@
       "accountId": "acct_c_0004",
       "filingNumber": "UCC-2025-851077",
       "filingDate": "2025-10-01",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 2,
       "subordinated": true
@@ -16635,7 +16763,7 @@
       "accountId": "acct_c_0004",
       "filingNumber": "UCC-2026-714275",
       "filingDate": "2026-02-17",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 3,
       "subordinated": true
@@ -16645,7 +16773,7 @@
       "accountId": "acct_c_0004",
       "filingNumber": "UCC-2025-077020",
       "filingDate": "2025-07-26",
-      "securedParty": "National ABL lender",
+      "securedParty": "JPMorgan Chase",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 4,
       "subordinated": false
@@ -16665,7 +16793,7 @@
       "accountId": "acct_c_0005",
       "filingNumber": "UCC-2025-963855",
       "filingDate": "2025-06-16",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 2,
       "subordinated": false
@@ -16675,7 +16803,7 @@
       "accountId": "acct_c_0005",
       "filingNumber": "UCC-2023-316444",
       "filingDate": "2024-11-09",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Inventory",
       "priorityRank": 3,
       "subordinated": true
@@ -16685,7 +16813,7 @@
       "accountId": "acct_c_0005",
       "filingNumber": "UCC-2025-304385",
       "filingDate": "2025-06-18",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "All assets",
       "priorityRank": 4,
       "subordinated": true
@@ -16715,7 +16843,7 @@
       "accountId": "acct_c_0007",
       "filingNumber": "UCC-2025-286500",
       "filingDate": "2024-11-04",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 2,
       "subordinated": false
@@ -16725,7 +16853,7 @@
       "accountId": "acct_c_0007",
       "filingNumber": "UCC-2025-753688",
       "filingDate": "2025-11-09",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "All assets",
       "priorityRank": 3,
       "subordinated": false
@@ -16745,7 +16873,7 @@
       "accountId": "acct_c_0008",
       "filingNumber": "UCC-2026-661686",
       "filingDate": "2025-01-06",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 2,
       "subordinated": true
@@ -16755,7 +16883,7 @@
       "accountId": "acct_c_0008",
       "filingNumber": "UCC-2025-598488",
       "filingDate": "2024-11-26",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 3,
       "subordinated": true
@@ -16775,7 +16903,7 @@
       "accountId": "acct_c_0009",
       "filingNumber": "UCC-2024-167634",
       "filingDate": "2025-03-27",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -16785,7 +16913,7 @@
       "accountId": "acct_c_0009",
       "filingNumber": "UCC-2023-142465",
       "filingDate": "2025-07-01",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 3,
       "subordinated": false
@@ -16805,7 +16933,7 @@
       "accountId": "acct_c_0010",
       "filingNumber": "UCC-2025-721732",
       "filingDate": "2024-12-11",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 2,
       "subordinated": false
@@ -16825,7 +16953,7 @@
       "accountId": "acct_c_0011",
       "filingNumber": "UCC-2026-830091",
       "filingDate": "2024-10-18",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -16835,7 +16963,7 @@
       "accountId": "acct_c_0011",
       "filingNumber": "UCC-2023-386746",
       "filingDate": "2024-11-16",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 3,
       "subordinated": true
@@ -16855,7 +16983,7 @@
       "accountId": "acct_c_0012",
       "filingNumber": "UCC-2026-125173",
       "filingDate": "2024-12-20",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 2,
       "subordinated": false
@@ -16865,7 +16993,7 @@
       "accountId": "acct_c_0012",
       "filingNumber": "UCC-2026-863978",
       "filingDate": "2025-05-11",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 3,
       "subordinated": false
@@ -16885,7 +17013,7 @@
       "accountId": "acct_c_0013",
       "filingNumber": "UCC-2023-400692",
       "filingDate": "2025-07-29",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": false
@@ -16895,7 +17023,7 @@
       "accountId": "acct_c_0013",
       "filingNumber": "UCC-2024-553896",
       "filingDate": "2025-03-10",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "All assets",
       "priorityRank": 3,
       "subordinated": false
@@ -16915,7 +17043,7 @@
       "accountId": "acct_c_0014",
       "filingNumber": "UCC-2024-502429",
       "filingDate": "2025-02-12",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "All assets",
       "priorityRank": 2,
       "subordinated": false
@@ -16925,7 +17053,7 @@
       "accountId": "acct_c_0014",
       "filingNumber": "UCC-2023-195937",
       "filingDate": "2024-12-23",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 3,
       "subordinated": true
@@ -16945,7 +17073,7 @@
       "accountId": "acct_c_0016",
       "filingNumber": "UCC-2023-186944",
       "filingDate": "2025-08-31",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 2,
       "subordinated": true
@@ -16955,7 +17083,7 @@
       "accountId": "acct_c_0016",
       "filingNumber": "UCC-2023-771326",
       "filingDate": "2025-06-17",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 3,
       "subordinated": false
@@ -16975,7 +17103,7 @@
       "accountId": "acct_c_0017",
       "filingNumber": "UCC-2025-599784",
       "filingDate": "2025-01-23",
-      "securedParty": "National ABL lender",
+      "securedParty": "JPMorgan Chase",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -16985,7 +17113,7 @@
       "accountId": "acct_c_0017",
       "filingNumber": "UCC-2023-497238",
       "filingDate": "2024-10-02",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 3,
       "subordinated": true
@@ -17005,7 +17133,7 @@
       "accountId": "acct_c_0018",
       "filingNumber": "UCC-2024-729956",
       "filingDate": "2025-09-01",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": false
@@ -17035,7 +17163,7 @@
       "accountId": "acct_c_0020",
       "filingNumber": "UCC-2024-466838",
       "filingDate": "2025-10-04",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 2,
       "subordinated": false
@@ -17065,7 +17193,7 @@
       "accountId": "acct_c_0022",
       "filingNumber": "UCC-2025-183812",
       "filingDate": "2025-05-26",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": false
@@ -17095,7 +17223,7 @@
       "accountId": "acct_c_0024",
       "filingNumber": "UCC-2023-257820",
       "filingDate": "2025-11-04",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 2,
       "subordinated": false
@@ -17115,7 +17243,7 @@
       "accountId": "acct_c_0025",
       "filingNumber": "UCC-2023-755156",
       "filingDate": "2025-02-01",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "All assets",
       "priorityRank": 2,
       "subordinated": true
@@ -17135,7 +17263,7 @@
       "accountId": "acct_c_0026",
       "filingNumber": "UCC-2024-465788",
       "filingDate": "2026-02-06",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "All assets",
       "priorityRank": 2,
       "subordinated": false
@@ -17145,7 +17273,7 @@
       "accountId": "acct_c_0026",
       "filingNumber": "UCC-2024-988490",
       "filingDate": "2025-08-23",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "All assets",
       "priorityRank": 3,
       "subordinated": false
@@ -17165,7 +17293,7 @@
       "accountId": "acct_c_0027",
       "filingNumber": "UCC-2025-209000",
       "filingDate": "2024-07-12",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -17175,7 +17303,7 @@
       "accountId": "acct_c_0027",
       "filingNumber": "UCC-2024-952132",
       "filingDate": "2025-03-04",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 3,
       "subordinated": false
@@ -17185,7 +17313,7 @@
       "accountId": "acct_c_0027",
       "filingNumber": "UCC-2024-216033",
       "filingDate": "2025-02-15",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "Inventory",
       "priorityRank": 4,
       "subordinated": true
@@ -17205,7 +17333,7 @@
       "accountId": "acct_c_0028",
       "filingNumber": "UCC-2024-677200",
       "filingDate": "2025-12-28",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 2,
       "subordinated": true
@@ -17215,7 +17343,7 @@
       "accountId": "acct_c_0028",
       "filingNumber": "UCC-2025-925632",
       "filingDate": "2024-12-18",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 3,
       "subordinated": false
@@ -17225,7 +17353,7 @@
       "accountId": "acct_c_0028",
       "filingNumber": "UCC-2025-088994",
       "filingDate": "2024-10-28",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 4,
       "subordinated": true
@@ -17255,7 +17383,7 @@
       "accountId": "acct_c_0030",
       "filingNumber": "UCC-2026-595116",
       "filingDate": "2025-10-30",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -17265,7 +17393,7 @@
       "accountId": "acct_c_0030",
       "filingNumber": "UCC-2026-301259",
       "filingDate": "2024-09-09",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Inventory",
       "priorityRank": 3,
       "subordinated": false
@@ -17285,7 +17413,7 @@
       "accountId": "acct_c_0031",
       "filingNumber": "UCC-2023-666386",
       "filingDate": "2026-03-15",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -17345,7 +17473,7 @@
       "accountId": "acct_c_0036",
       "filingNumber": "UCC-2025-340241",
       "filingDate": "2024-11-12",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -17365,7 +17493,7 @@
       "accountId": "acct_c_0037",
       "filingNumber": "UCC-2025-374013",
       "filingDate": "2025-07-17",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -17375,7 +17503,7 @@
       "accountId": "acct_c_0037",
       "filingNumber": "UCC-2026-589807",
       "filingDate": "2025-05-26",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "All assets",
       "priorityRank": 3,
       "subordinated": true
@@ -17385,7 +17513,7 @@
       "accountId": "acct_c_0037",
       "filingNumber": "UCC-2025-899362",
       "filingDate": "2024-10-18",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 4,
       "subordinated": true
@@ -17405,7 +17533,7 @@
       "accountId": "acct_c_0038",
       "filingNumber": "UCC-2025-743949",
       "filingDate": "2024-10-27",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "All assets",
       "priorityRank": 2,
       "subordinated": false
@@ -17415,7 +17543,7 @@
       "accountId": "acct_c_0038",
       "filingNumber": "UCC-2026-320732",
       "filingDate": "2024-11-26",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 3,
       "subordinated": true
@@ -17445,7 +17573,7 @@
       "accountId": "acct_c_0040",
       "filingNumber": "UCC-2023-680588",
       "filingDate": "2024-07-17",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 2,
       "subordinated": false
@@ -17455,7 +17583,7 @@
       "accountId": "acct_c_0040",
       "filingNumber": "UCC-2023-978049",
       "filingDate": "2025-04-28",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 3,
       "subordinated": true
@@ -17465,7 +17593,7 @@
       "accountId": "acct_c_0040",
       "filingNumber": "UCC-2026-655553",
       "filingDate": "2025-02-06",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 4,
       "subordinated": false
@@ -17485,7 +17613,7 @@
       "accountId": "acct_c_0041",
       "filingNumber": "UCC-2023-043423",
       "filingDate": "2025-10-17",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 2,
       "subordinated": true
@@ -17495,7 +17623,7 @@
       "accountId": "acct_c_0041",
       "filingNumber": "UCC-2026-701515",
       "filingDate": "2026-01-12",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 3,
       "subordinated": false
@@ -17515,7 +17643,7 @@
       "accountId": "acct_c_0042",
       "filingNumber": "UCC-2025-424335",
       "filingDate": "2025-11-09",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "All assets",
       "priorityRank": 2,
       "subordinated": true
@@ -17545,7 +17673,7 @@
       "accountId": "acct_c_0044",
       "filingNumber": "UCC-2024-079931",
       "filingDate": "2025-03-21",
-      "securedParty": "National ABL lender",
+      "securedParty": "JPMorgan Chase",
       "collateralDescription": "All assets",
       "priorityRank": 2,
       "subordinated": true
@@ -17555,7 +17683,7 @@
       "accountId": "acct_c_0044",
       "filingNumber": "UCC-2026-218622",
       "filingDate": "2025-07-27",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 3,
       "subordinated": true
@@ -17585,7 +17713,7 @@
       "accountId": "acct_c_0046",
       "filingNumber": "UCC-2023-761352",
       "filingDate": "2025-07-01",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "All assets",
       "priorityRank": 2,
       "subordinated": true
@@ -17605,7 +17733,7 @@
       "accountId": "acct_c_0047",
       "filingNumber": "UCC-2024-590902",
       "filingDate": "2025-11-24",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": false
@@ -17615,7 +17743,7 @@
       "accountId": "acct_c_0047",
       "filingNumber": "UCC-2026-402194",
       "filingDate": "2025-09-13",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 3,
       "subordinated": false
@@ -17625,7 +17753,7 @@
       "accountId": "acct_c_0047",
       "filingNumber": "UCC-2026-814719",
       "filingDate": "2025-06-16",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 4,
       "subordinated": false
@@ -17645,7 +17773,7 @@
       "accountId": "acct_c_0048",
       "filingNumber": "UCC-2023-488496",
       "filingDate": "2025-06-16",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 2,
       "subordinated": true
@@ -17655,7 +17783,7 @@
       "accountId": "acct_c_0048",
       "filingNumber": "UCC-2024-596085",
       "filingDate": "2025-02-20",
-      "securedParty": "National ABL lender",
+      "securedParty": "JPMorgan Chase",
       "collateralDescription": "Inventory",
       "priorityRank": 3,
       "subordinated": false
@@ -17675,7 +17803,7 @@
       "accountId": "acct_c_0049",
       "filingNumber": "UCC-2025-403795",
       "filingDate": "2025-06-26",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 2,
       "subordinated": false
@@ -17685,7 +17813,7 @@
       "accountId": "acct_c_0049",
       "filingNumber": "UCC-2026-249154",
       "filingDate": "2025-04-12",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Inventory",
       "priorityRank": 3,
       "subordinated": true
@@ -17705,7 +17833,7 @@
       "accountId": "acct_c_0050",
       "filingNumber": "UCC-2026-711404",
       "filingDate": "2025-04-03",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -17715,7 +17843,7 @@
       "accountId": "acct_c_0050",
       "filingNumber": "UCC-2024-923164",
       "filingDate": "2026-05-05",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 3,
       "subordinated": true
@@ -17725,7 +17853,7 @@
       "accountId": "acct_c_0050",
       "filingNumber": "UCC-2024-739442",
       "filingDate": "2025-12-18",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 4,
       "subordinated": false
@@ -17755,7 +17883,7 @@
       "accountId": "acct_c_0052",
       "filingNumber": "UCC-2025-960084",
       "filingDate": "2025-04-18",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 2,
       "subordinated": false
@@ -17765,7 +17893,7 @@
       "accountId": "acct_c_0052",
       "filingNumber": "UCC-2025-196270",
       "filingDate": "2025-07-04",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "Inventory",
       "priorityRank": 3,
       "subordinated": true
@@ -17785,7 +17913,7 @@
       "accountId": "acct_c_0053",
       "filingNumber": "UCC-2026-124146",
       "filingDate": "2025-09-04",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "All assets",
       "priorityRank": 2,
       "subordinated": false
@@ -17795,7 +17923,7 @@
       "accountId": "acct_c_0053",
       "filingNumber": "UCC-2024-873604",
       "filingDate": "2025-08-04",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 3,
       "subordinated": false
@@ -17815,7 +17943,7 @@
       "accountId": "acct_c_0054",
       "filingNumber": "UCC-2023-078793",
       "filingDate": "2025-10-16",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -17825,7 +17953,7 @@
       "accountId": "acct_c_0054",
       "filingNumber": "UCC-2024-660942",
       "filingDate": "2025-11-20",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 3,
       "subordinated": true
@@ -17855,7 +17983,7 @@
       "accountId": "acct_c_0056",
       "filingNumber": "UCC-2023-491530",
       "filingDate": "2025-07-04",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": false
@@ -17865,7 +17993,7 @@
       "accountId": "acct_c_0056",
       "filingNumber": "UCC-2024-358072",
       "filingDate": "2025-10-12",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 3,
       "subordinated": true
@@ -17875,7 +18003,7 @@
       "accountId": "acct_c_0056",
       "filingNumber": "UCC-2026-364019",
       "filingDate": "2026-08-07",
-      "securedParty": "National ABL lender",
+      "securedParty": "JPMorgan Chase",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 4,
       "subordinated": false
@@ -17905,7 +18033,7 @@
       "accountId": "acct_c_0058",
       "filingNumber": "UCC-2025-700795",
       "filingDate": "2025-06-14",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": false
@@ -17915,7 +18043,7 @@
       "accountId": "acct_c_0058",
       "filingNumber": "UCC-2026-513650",
       "filingDate": "2024-11-08",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "All assets",
       "priorityRank": 3,
       "subordinated": true
@@ -17925,7 +18053,7 @@
       "accountId": "acct_c_0058",
       "filingNumber": "UCC-2023-262225",
       "filingDate": "2025-04-19",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 4,
       "subordinated": true
@@ -17945,7 +18073,7 @@
       "accountId": "acct_c_0059",
       "filingNumber": "UCC-2024-282122",
       "filingDate": "2025-05-26",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -17955,7 +18083,7 @@
       "accountId": "acct_c_0059",
       "filingNumber": "UCC-2024-431127",
       "filingDate": "2025-02-13",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 3,
       "subordinated": true
@@ -17965,7 +18093,7 @@
       "accountId": "acct_c_0059",
       "filingNumber": "UCC-2026-385484",
       "filingDate": "2025-03-24",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 4,
       "subordinated": true
@@ -17985,7 +18113,7 @@
       "accountId": "acct_c_0060",
       "filingNumber": "UCC-2026-347501",
       "filingDate": "2024-10-04",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": false
@@ -18015,7 +18143,7 @@
       "accountId": "acct_c_0062",
       "filingNumber": "UCC-2024-785587",
       "filingDate": "2024-11-03",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 2,
       "subordinated": false
@@ -18025,7 +18153,7 @@
       "accountId": "acct_c_0062",
       "filingNumber": "UCC-2026-447107",
       "filingDate": "2025-10-08",
-      "securedParty": "National ABL lender",
+      "securedParty": "JPMorgan Chase",
       "collateralDescription": "Inventory",
       "priorityRank": 3,
       "subordinated": false
@@ -18035,7 +18163,7 @@
       "accountId": "acct_c_0062",
       "filingNumber": "UCC-2024-798748",
       "filingDate": "2025-07-31",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "All assets",
       "priorityRank": 4,
       "subordinated": false
@@ -18075,7 +18203,7 @@
       "accountId": "acct_c_0065",
       "filingNumber": "UCC-2026-330323",
       "filingDate": "2025-11-17",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -18085,7 +18213,7 @@
       "accountId": "acct_c_0065",
       "filingNumber": "UCC-2024-051767",
       "filingDate": "2025-10-01",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 3,
       "subordinated": true
@@ -18105,7 +18233,7 @@
       "accountId": "acct_c_0066",
       "filingNumber": "UCC-2024-195609",
       "filingDate": "2025-08-19",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 2,
       "subordinated": true
@@ -18125,7 +18253,7 @@
       "accountId": "acct_c_0067",
       "filingNumber": "UCC-2024-192242",
       "filingDate": "2025-06-09",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -18155,7 +18283,7 @@
       "accountId": "acct_c_0069",
       "filingNumber": "UCC-2025-041246",
       "filingDate": "2025-06-15",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 2,
       "subordinated": false
@@ -18185,7 +18313,7 @@
       "accountId": "acct_c_0071",
       "filingNumber": "UCC-2025-793923",
       "filingDate": "2025-02-21",
-      "securedParty": "National ABL lender",
+      "securedParty": "JPMorgan Chase",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": false
@@ -18195,7 +18323,7 @@
       "accountId": "acct_c_0071",
       "filingNumber": "UCC-2026-154371",
       "filingDate": "2025-06-03",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 3,
       "subordinated": true
@@ -18205,7 +18333,7 @@
       "accountId": "acct_c_0071",
       "filingNumber": "UCC-2025-325864",
       "filingDate": "2025-09-18",
-      "securedParty": "National ABL lender",
+      "securedParty": "JPMorgan Chase",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 4,
       "subordinated": true
@@ -18225,7 +18353,7 @@
       "accountId": "acct_c_0072",
       "filingNumber": "UCC-2025-299656",
       "filingDate": "2026-03-18",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -18235,7 +18363,7 @@
       "accountId": "acct_c_0072",
       "filingNumber": "UCC-2024-750164",
       "filingDate": "2026-01-16",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 3,
       "subordinated": true
@@ -18255,7 +18383,7 @@
       "accountId": "acct_c_0073",
       "filingNumber": "UCC-2026-850392",
       "filingDate": "2024-10-25",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "All assets",
       "priorityRank": 2,
       "subordinated": true
@@ -18295,7 +18423,7 @@
       "accountId": "acct_c_0076",
       "filingNumber": "UCC-2025-523709",
       "filingDate": "2025-09-24",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "All assets",
       "priorityRank": 2,
       "subordinated": false
@@ -18325,7 +18453,7 @@
       "accountId": "acct_c_0078",
       "filingNumber": "UCC-2025-846034",
       "filingDate": "2025-04-06",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -18335,7 +18463,7 @@
       "accountId": "acct_c_0078",
       "filingNumber": "UCC-2024-193009",
       "filingDate": "2024-12-29",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 3,
       "subordinated": true
@@ -18345,7 +18473,7 @@
       "accountId": "acct_c_0078",
       "filingNumber": "UCC-2024-862337",
       "filingDate": "2024-08-17",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 4,
       "subordinated": true
@@ -18365,7 +18493,7 @@
       "accountId": "acct_c_0079",
       "filingNumber": "UCC-2026-194988",
       "filingDate": "2024-11-27",
-      "securedParty": "National ABL lender",
+      "securedParty": "JPMorgan Chase",
       "collateralDescription": "All assets",
       "priorityRank": 2,
       "subordinated": false
@@ -18385,7 +18513,7 @@
       "accountId": "acct_c_0080",
       "filingNumber": "UCC-2023-259580",
       "filingDate": "2024-11-11",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 2,
       "subordinated": true
@@ -18395,7 +18523,7 @@
       "accountId": "acct_c_0080",
       "filingNumber": "UCC-2025-259959",
       "filingDate": "2025-05-23",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 3,
       "subordinated": false
@@ -18415,7 +18543,7 @@
       "accountId": "acct_c_0081",
       "filingNumber": "UCC-2026-609667",
       "filingDate": "2025-08-05",
-      "securedParty": "National ABL lender",
+      "securedParty": "JPMorgan Chase",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": false
@@ -18425,7 +18553,7 @@
       "accountId": "acct_c_0081",
       "filingNumber": "UCC-2023-611334",
       "filingDate": "2025-10-05",
-      "securedParty": "National ABL lender",
+      "securedParty": "JPMorgan Chase",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 3,
       "subordinated": false
@@ -18435,7 +18563,7 @@
       "accountId": "acct_c_0081",
       "filingNumber": "UCC-2023-242909",
       "filingDate": "2025-10-21",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 4,
       "subordinated": false
@@ -18455,7 +18583,7 @@
       "accountId": "acct_c_0082",
       "filingNumber": "UCC-2025-061721",
       "filingDate": "2025-10-25",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -18465,7 +18593,7 @@
       "accountId": "acct_c_0082",
       "filingNumber": "UCC-2023-757691",
       "filingDate": "2025-05-24",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 3,
       "subordinated": true
@@ -18495,7 +18623,7 @@
       "accountId": "acct_c_0084",
       "filingNumber": "UCC-2024-027362",
       "filingDate": "2025-07-10",
-      "securedParty": "National ABL lender",
+      "securedParty": "JPMorgan Chase",
       "collateralDescription": "All assets",
       "priorityRank": 2,
       "subordinated": false
@@ -18505,7 +18633,7 @@
       "accountId": "acct_c_0084",
       "filingNumber": "UCC-2024-261791",
       "filingDate": "2025-09-03",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "Inventory",
       "priorityRank": 3,
       "subordinated": true
@@ -18515,7 +18643,7 @@
       "accountId": "acct_c_0084",
       "filingNumber": "UCC-2025-437512",
       "filingDate": "2025-08-24",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 4,
       "subordinated": true
@@ -18535,7 +18663,7 @@
       "accountId": "acct_c_0086",
       "filingNumber": "UCC-2026-398544",
       "filingDate": "2025-02-11",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 2,
       "subordinated": false
@@ -18565,7 +18693,7 @@
       "accountId": "acct_c_0088",
       "filingNumber": "UCC-2023-326417",
       "filingDate": "2025-09-30",
-      "securedParty": "National ABL lender",
+      "securedParty": "JPMorgan Chase",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -18575,7 +18703,7 @@
       "accountId": "acct_c_0088",
       "filingNumber": "UCC-2024-099973",
       "filingDate": "2024-12-09",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 3,
       "subordinated": true
@@ -18585,7 +18713,7 @@
       "accountId": "acct_c_0088",
       "filingNumber": "UCC-2023-885710",
       "filingDate": "2025-11-24",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "All assets",
       "priorityRank": 4,
       "subordinated": false
@@ -18615,7 +18743,7 @@
       "accountId": "acct_c_0090",
       "filingNumber": "UCC-2023-557885",
       "filingDate": "2025-09-25",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 2,
       "subordinated": false
@@ -18625,7 +18753,7 @@
       "accountId": "acct_c_0090",
       "filingNumber": "UCC-2024-845438",
       "filingDate": "2025-01-23",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 3,
       "subordinated": false
@@ -18645,7 +18773,7 @@
       "accountId": "acct_c_0091",
       "filingNumber": "UCC-2023-757898",
       "filingDate": "2024-08-05",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -18665,7 +18793,7 @@
       "accountId": "acct_c_0092",
       "filingNumber": "UCC-2026-344490",
       "filingDate": "2025-07-17",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 2,
       "subordinated": false
@@ -18685,7 +18813,7 @@
       "accountId": "acct_c_0093",
       "filingNumber": "UCC-2026-280277",
       "filingDate": "2026-01-16",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -18695,7 +18823,7 @@
       "accountId": "acct_c_0093",
       "filingNumber": "UCC-2024-807034",
       "filingDate": "2025-03-27",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 3,
       "subordinated": true
@@ -18715,7 +18843,7 @@
       "accountId": "acct_c_0094",
       "filingNumber": "UCC-2026-612407",
       "filingDate": "2024-12-10",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -18735,7 +18863,7 @@
       "accountId": "acct_c_0095",
       "filingNumber": "UCC-2026-026733",
       "filingDate": "2026-03-24",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 2,
       "subordinated": true
@@ -18745,7 +18873,7 @@
       "accountId": "acct_c_0095",
       "filingNumber": "UCC-2023-447393",
       "filingDate": "2025-05-03",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 3,
       "subordinated": true
@@ -18755,7 +18883,7 @@
       "accountId": "acct_c_0095",
       "filingNumber": "UCC-2023-621460",
       "filingDate": "2025-03-13",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "All assets",
       "priorityRank": 4,
       "subordinated": true
@@ -18785,7 +18913,7 @@
       "accountId": "acct_c_0098",
       "filingNumber": "UCC-2025-021492",
       "filingDate": "2026-07-12",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -18795,7 +18923,7 @@
       "accountId": "acct_c_0098",
       "filingNumber": "UCC-2023-863175",
       "filingDate": "2026-07-30",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 3,
       "subordinated": true
@@ -18815,7 +18943,7 @@
       "accountId": "acct_c_0099",
       "filingNumber": "UCC-2023-037440",
       "filingDate": "2026-01-15",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 2,
       "subordinated": true
@@ -18825,7 +18953,7 @@
       "accountId": "acct_c_0099",
       "filingNumber": "UCC-2024-252152",
       "filingDate": "2026-02-18",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Inventory",
       "priorityRank": 3,
       "subordinated": true
@@ -18845,7 +18973,7 @@
       "accountId": "acct_c_0100",
       "filingNumber": "UCC-2024-848878",
       "filingDate": "2026-01-14",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 2,
       "subordinated": true
@@ -18855,7 +18983,7 @@
       "accountId": "acct_c_0100",
       "filingNumber": "UCC-2025-790677",
       "filingDate": "2025-05-25",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 3,
       "subordinated": true
@@ -18875,7 +19003,7 @@
       "accountId": "acct_c_0101",
       "filingNumber": "UCC-2023-980825",
       "filingDate": "2025-01-09",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": false
@@ -18885,7 +19013,7 @@
       "accountId": "acct_c_0101",
       "filingNumber": "UCC-2023-825721",
       "filingDate": "2024-11-08",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 3,
       "subordinated": true
@@ -18905,7 +19033,7 @@
       "accountId": "acct_c_0103",
       "filingNumber": "UCC-2026-751842",
       "filingDate": "2025-12-13",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 2,
       "subordinated": true
@@ -18915,7 +19043,7 @@
       "accountId": "acct_c_0103",
       "filingNumber": "UCC-2025-520656",
       "filingDate": "2025-10-17",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Inventory",
       "priorityRank": 3,
       "subordinated": false
@@ -18925,7 +19053,7 @@
       "accountId": "acct_c_0103",
       "filingNumber": "UCC-2024-446338",
       "filingDate": "2025-06-20",
-      "securedParty": "National ABL lender",
+      "securedParty": "JPMorgan Chase",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 4,
       "subordinated": false
@@ -18945,7 +19073,7 @@
       "accountId": "acct_c_0105",
       "filingNumber": "UCC-2026-595382",
       "filingDate": "2025-03-24",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": false
@@ -18965,7 +19093,7 @@
       "accountId": "acct_c_0106",
       "filingNumber": "UCC-2026-409455",
       "filingDate": "2025-04-14",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -18975,7 +19103,7 @@
       "accountId": "acct_c_0106",
       "filingNumber": "UCC-2026-328451",
       "filingDate": "2025-08-14",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 3,
       "subordinated": false
@@ -18995,7 +19123,7 @@
       "accountId": "acct_c_0107",
       "filingNumber": "UCC-2023-161582",
       "filingDate": "2025-01-23",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -19005,7 +19133,7 @@
       "accountId": "acct_c_0107",
       "filingNumber": "UCC-2025-544229",
       "filingDate": "2025-05-07",
-      "securedParty": "National ABL lender",
+      "securedParty": "JPMorgan Chase",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 3,
       "subordinated": true
@@ -19015,7 +19143,7 @@
       "accountId": "acct_c_0107",
       "filingNumber": "UCC-2026-383139",
       "filingDate": "2025-08-09",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 4,
       "subordinated": false
@@ -19035,7 +19163,7 @@
       "accountId": "acct_c_0109",
       "filingNumber": "UCC-2023-905545",
       "filingDate": "2025-09-17",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -19045,7 +19173,7 @@
       "accountId": "acct_c_0109",
       "filingNumber": "UCC-2024-050593",
       "filingDate": "2025-04-21",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 3,
       "subordinated": true
@@ -19075,7 +19203,7 @@
       "accountId": "acct_c_0111",
       "filingNumber": "UCC-2024-068428",
       "filingDate": "2026-07-14",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 2,
       "subordinated": false
@@ -19095,7 +19223,7 @@
       "accountId": "acct_c_0112",
       "filingNumber": "UCC-2025-102076",
       "filingDate": "2025-03-03",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": false
@@ -19105,7 +19233,7 @@
       "accountId": "acct_c_0112",
       "filingNumber": "UCC-2026-615818",
       "filingDate": "2025-10-03",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 3,
       "subordinated": false
@@ -19115,7 +19243,7 @@
       "accountId": "acct_c_0112",
       "filingNumber": "UCC-2023-657314",
       "filingDate": "2026-05-21",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 4,
       "subordinated": true
@@ -19135,7 +19263,7 @@
       "accountId": "acct_c_0114",
       "filingNumber": "UCC-2026-026756",
       "filingDate": "2025-01-13",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 2,
       "subordinated": false
@@ -19145,7 +19273,7 @@
       "accountId": "acct_c_0114",
       "filingNumber": "UCC-2023-692198",
       "filingDate": "2025-08-01",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 3,
       "subordinated": true
@@ -19155,7 +19283,7 @@
       "accountId": "acct_c_0114",
       "filingNumber": "UCC-2024-909234",
       "filingDate": "2025-05-06",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Equipment & fixtures",
       "priorityRank": 4,
       "subordinated": true
@@ -19175,7 +19303,7 @@
       "accountId": "acct_c_0116",
       "filingNumber": "UCC-2026-552559",
       "filingDate": "2025-08-08",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 2,
       "subordinated": false
@@ -19185,7 +19313,7 @@
       "accountId": "acct_c_0116",
       "filingNumber": "UCC-2025-398015",
       "filingDate": "2025-11-25",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 3,
       "subordinated": false
@@ -19195,7 +19323,7 @@
       "accountId": "acct_c_0116",
       "filingNumber": "UCC-2024-795563",
       "filingDate": "2024-09-28",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 4,
       "subordinated": false
@@ -19215,7 +19343,7 @@
       "accountId": "acct_c_0117",
       "filingNumber": "UCC-2023-582124",
       "filingDate": "2026-01-15",
-      "securedParty": "Competing direct lender",
+      "securedParty": "Ares Capital",
       "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -19235,7 +19363,7 @@
       "accountId": "acct_c_0118",
       "filingNumber": "UCC-2024-231212",
       "filingDate": "2025-12-12",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Wells Fargo Capital Finance",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 2,
       "subordinated": false
@@ -19255,7 +19383,7 @@
       "accountId": "acct_c_0119",
       "filingNumber": "UCC-2023-361638",
       "filingDate": "2025-10-23",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": false
@@ -19265,7 +19393,7 @@
       "accountId": "acct_c_0119",
       "filingNumber": "UCC-2023-590802",
       "filingDate": "2024-12-30",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 3,
       "subordinated": true
@@ -19285,7 +19413,7 @@
       "accountId": "acct_c_0120",
       "filingNumber": "UCC-2024-395036",
       "filingDate": "2026-03-05",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Inventory",
       "priorityRank": 2,
       "subordinated": true
@@ -19295,7 +19423,7 @@
       "accountId": "acct_c_0120",
       "filingNumber": "UCC-2023-622169",
       "filingDate": "2024-11-16",
-      "securedParty": "Mezzanine fund",
+      "securedParty": "Golub Capital",
       "collateralDescription": "All assets",
       "priorityRank": 3,
       "subordinated": false
@@ -19305,7 +19433,7 @@
       "accountId": "acct_c_0120",
       "filingNumber": "UCC-2025-990336",
       "filingDate": "2026-02-10",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 4,
       "subordinated": true
@@ -19315,7 +19443,7 @@
       "accountId": "acct_c_0002",
       "filingNumber": "UCC-2026-295904",
       "filingDate": "2026-06-17",
-      "securedParty": "Regional factoring company",
+      "securedParty": "PNC Business Credit",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 1,
       "subordinated": false,
@@ -19326,7 +19454,7 @@
       "accountId": "acct_c_0008",
       "filingNumber": "UCC-2026-819022",
       "filingDate": "2026-08-05",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 1,
       "subordinated": false,
@@ -19337,7 +19465,7 @@
       "accountId": "acct_c_0010",
       "filingNumber": "UCC-2026-695917",
       "filingDate": "2026-02-21",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Inventory",
       "priorityRank": 1,
       "subordinated": false,
@@ -19348,7 +19476,7 @@
       "accountId": "acct_c_0023",
       "filingNumber": "UCC-2026-968155",
       "filingDate": "2026-07-17",
-      "securedParty": "Community bank line",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Inventory",
       "priorityRank": 1,
       "subordinated": false,
@@ -19359,7 +19487,7 @@
       "accountId": "acct_c_0031",
       "filingNumber": "UCC-2026-898491",
       "filingDate": "2026-01-09",
-      "securedParty": "Another private credit firm",
+      "securedParty": "White Oak Commercial Finance",
       "collateralDescription": "All assets",
       "priorityRank": 1,
       "subordinated": false,
@@ -19367,87 +19495,87 @@
     },
     {
       "id": "lien_0283",
-      "accountId": "acct_c_0034",
-      "filingNumber": "UCC-2025-813135",
-      "filingDate": "2025-09-10",
-      "securedParty": "Incumbent relationship bank",
-      "collateralDescription": "Accounts receivable",
-      "priorityRank": 1,
-      "subordinated": false,
-      "wonDealWeLost": "opp_0077"
-    },
-    {
-      "id": "lien_0284",
       "accountId": "acct_c_0036",
       "filingNumber": "UCC-2026-505276",
       "filingDate": "2026-06-03",
-      "securedParty": "Incumbent relationship bank",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "Accounts receivable",
       "priorityRank": 1,
       "subordinated": false,
       "wonDealWeLost": "opp_0079"
     },
     {
-      "id": "lien_0285",
-      "accountId": "acct_c_0041",
-      "filingNumber": "UCC-2026-355831",
-      "filingDate": "2026-06-20",
-      "securedParty": "Another private credit firm",
+      "id": "lien_0284",
+      "accountId": "acct_c_0040",
+      "filingNumber": "UCC-2026-890597",
+      "filingDate": "2026-01-11",
+      "securedParty": "Bank of America Business Capital",
       "collateralDescription": "All assets",
       "priorityRank": 1,
       "subordinated": false,
-      "wonDealWeLost": "opp_0093"
+      "wonDealWeLost": "opp_0085"
+    },
+    {
+      "id": "lien_0285",
+      "accountId": "acct_c_0040",
+      "filingNumber": "UCC-2026-415576",
+      "filingDate": "2026-01-18",
+      "securedParty": "PNC Business Credit",
+      "collateralDescription": "Inventory",
+      "priorityRank": 1,
+      "subordinated": false,
+      "wonDealWeLost": "opp_0090"
     },
     {
       "id": "lien_0286",
-      "accountId": "acct_c_0042",
-      "filingNumber": "UCC-2026-665930",
-      "filingDate": "2026-04-22",
-      "securedParty": "Regional factoring company",
-      "collateralDescription": "Accounts receivable",
-      "priorityRank": 1,
-      "subordinated": false,
-      "wonDealWeLost": "opp_0095"
-    },
-    {
-      "id": "lien_0287",
-      "accountId": "acct_c_0044",
-      "filingNumber": "UCC-2025-863054",
-      "filingDate": "2025-12-24",
-      "securedParty": "National ABL lender",
-      "collateralDescription": "Accounts receivable and inventory",
-      "priorityRank": 1,
-      "subordinated": false,
-      "wonDealWeLost": "opp_0100"
-    },
-    {
-      "id": "lien_0288",
       "accountId": "acct_c_0058",
-      "filingNumber": "UCC-2025-083168",
-      "filingDate": "2025-10-05",
-      "securedParty": "Incumbent relationship bank",
+      "filingNumber": "UCC-2025-737398",
+      "filingDate": "2025-09-25",
+      "securedParty": "JPMorgan Chase",
       "collateralDescription": "Inventory",
       "priorityRank": 1,
       "subordinated": false,
       "wonDealWeLost": "opp_0130"
     },
     {
-      "id": "lien_0289",
+      "id": "lien_0287",
       "accountId": "acct_c_0058",
-      "filingNumber": "UCC-2026-909060",
-      "filingDate": "2026-02-13",
-      "securedParty": "Incumbent relationship bank",
-      "collateralDescription": "Accounts receivable",
+      "filingNumber": "UCC-2026-920319",
+      "filingDate": "2026-02-12",
+      "securedParty": "Wells Fargo Capital Finance",
+      "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 1,
       "subordinated": false,
       "wonDealWeLost": "opp_0132"
     },
     {
+      "id": "lien_0288",
+      "accountId": "acct_c_0087",
+      "filingNumber": "UCC-2025-038139",
+      "filingDate": "2025-11-15",
+      "securedParty": "Wells Fargo Capital Finance",
+      "collateralDescription": "All assets",
+      "priorityRank": 1,
+      "subordinated": false,
+      "wonDealWeLost": "opp_0196"
+    },
+    {
+      "id": "lien_0289",
+      "accountId": "acct_c_0090",
+      "filingNumber": "UCC-2026-365642",
+      "filingDate": "2026-08-17",
+      "securedParty": "Ares Capital",
+      "collateralDescription": "All assets",
+      "priorityRank": 1,
+      "subordinated": false,
+      "wonDealWeLost": "opp_0203"
+    },
+    {
       "id": "lien_0290",
       "accountId": "acct_c_0093",
-      "filingNumber": "UCC-2025-493686",
-      "filingDate": "2025-11-16",
-      "securedParty": "Incumbent relationship bank",
+      "filingNumber": "UCC-2025-657126",
+      "filingDate": "2025-12-04",
+      "securedParty": "JPMorgan Chase",
       "collateralDescription": "All assets",
       "priorityRank": 1,
       "subordinated": false,
@@ -19456,10 +19584,10 @@
     {
       "id": "lien_0291",
       "accountId": "acct_c_0099",
-      "filingNumber": "UCC-2026-697533",
-      "filingDate": "2026-05-27",
-      "securedParty": "Incumbent relationship bank",
-      "collateralDescription": "Accounts receivable and inventory",
+      "filingNumber": "UCC-2026-526502",
+      "filingDate": "2026-05-29",
+      "securedParty": "Bank of America Business Capital",
+      "collateralDescription": "Accounts receivable",
       "priorityRank": 1,
       "subordinated": false,
       "wonDealWeLost": "opp_0216"
@@ -19467,24 +19595,24 @@
     {
       "id": "lien_0292",
       "accountId": "acct_c_0111",
-      "filingNumber": "UCC-2026-641397",
-      "filingDate": "2026-05-20",
-      "securedParty": "Incumbent relationship bank",
-      "collateralDescription": "Inventory",
+      "filingNumber": "UCC-2026-744877",
+      "filingDate": "2026-05-17",
+      "securedParty": "Bank of America Business Capital",
+      "collateralDescription": "Accounts receivable and inventory",
       "priorityRank": 1,
       "subordinated": false,
       "wonDealWeLost": "opp_0240"
     },
     {
       "id": "lien_0293",
-      "accountId": "acct_c_0114",
-      "filingNumber": "UCC-2026-085784",
-      "filingDate": "2026-08-17",
-      "securedParty": "Community bank line",
-      "collateralDescription": "Accounts receivable and inventory",
+      "accountId": "acct_c_0120",
+      "filingNumber": "UCC-2026-775663",
+      "filingDate": "2026-07-03",
+      "securedParty": "Golub Capital",
+      "collateralDescription": "Inventory",
       "priorityRank": 1,
       "subordinated": false,
-      "wonDealWeLost": "opp_0243"
+      "wonDealWeLost": "opp_0250"
     }
   ],
   "networkEdges": [
