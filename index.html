@@ -281,24 +281,27 @@ h1,h2,h3,p,dl,dd{margin:0}
 .modal-fig{font-family:var(--display);font-size:22px;font-weight:500;letter-spacing:-.03em;color:var(--ink)}
 .modal-lab{font-size:11px;font-weight:500;color:var(--ink-3)}
 
-/* ---------- pipeline coverage ---------- */
-.cov-bar{position:relative;height:var(--s5);background:var(--sunken);border-radius:var(--r-s);
+/* ---------- segmented bar (generic — stacked proportional segments, tint ramp by depth) ----------
+   Was "pipeline coverage"-specific (.cov-*); coverage itself moved off BDO Home (it's a manager
+   metric, belongs on Exec Home when that screen is built — see PROJECT_STATE §13k). Renamed and
+   trimmed to the shape alone so it's reusable wherever a stacked-by-category bar is needed next,
+   starting with BDO Home's pipeline-by-stage bar below. */
+.segbar{position:relative;height:var(--s5);background:var(--sunken);border-radius:var(--r-s);
   overflow:hidden;display:flex}
-.cov-seg{height:100%;background:var(--brand-a30)}
-.cov-seg.t2{background:var(--brand-a65)}
-.cov-seg.t3{background:var(--brand-a80)}
-.cov-seg.t4{background:var(--brand)}
-.cov-mark{position:absolute;top:0;bottom:0;width:0;border-left:1px dashed var(--ink-2)}
-.cov-marklab{font-size:11px;color:var(--ink-2);margin-top:var(--s2);display:flex;
-  justify-content:space-between;gap:var(--s3)}
-.cov-head{display:flex;align-items:baseline;gap:var(--s3);margin-bottom:var(--s3);flex-wrap:wrap}
-.cov-ratio{font-family:var(--display);font-size:29px;font-weight:500;letter-spacing:-.03em;color:var(--ink)}
-.cov-ratio.short{color:var(--warn-ink)}
-.cov-ratio.met{color:var(--pos-ink)}
-.cov-verdict{font-size:11px;font-weight:500;padding:0 var(--s2);height:20px;display:inline-flex;
-  align-items:center;border-radius:var(--r-s)}
-.cov-verdict.ok{background:var(--pos-soft);color:var(--pos-ink)}
-.cov-verdict.warn{background:var(--warn-soft);color:var(--warn-ink)}
+.segbar-seg{height:100%;background:var(--brand-a30)}
+.segbar-seg.t2{background:var(--brand-a65)}
+.segbar-seg.t3{background:var(--brand-a80)}
+.segbar-seg.t4{background:var(--brand)}
+
+/* ---------- pipeline-by-stage bar (BDO Home) ---------- */
+.stagebar-legend{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--s4);margin-top:var(--s3)}
+@media (max-width:1140px){.stagebar-legend{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.stagebar-item .k{font-size:11px;color:var(--ink-2);display:block}
+.stagebar-item .v{font-family:var(--mono);font-size:11px;color:var(--ink);margin-top:var(--s1);display:block}
+
+/* ---------- today/now pair row (agenda + pipeline snapshot, side by side) ---------- */
+.pair-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--s5)}
+@media (max-width:1140px){.pair-row{grid-template-columns:minmax(0,1fr)}}
 
 /* ---------- compact label/value rows (no hard-right islands with an empty middle) ---------- */
 .kv-line{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--s3);align-items:baseline;
@@ -449,13 +452,42 @@ table.tbl{width:100%;border-collapse:collapse}
 .dropzone-sub{font-size:12px;color:var(--ink-3);margin-top:var(--s2)}
 .dropzone input[type=file]{display:none}
 
-.extract-row{display:flex;align-items:center;gap:var(--s3);padding:var(--s2) 0}
-.extract-check{width:20px;height:20px;border-radius:var(--r-s);background:var(--sunken);display:flex;
-  align-items:center;justify-content:center;font-size:11px;color:var(--ink-3);flex:0 0 20px}
-.extract-check.done{background:var(--pos-soft);color:var(--pos-ink)}
-.extract-name{font-size:12.5px;color:var(--ink)}
+/* ---------- extraction processing state ----------
+   Replaces a per-file checkmark list (absurd at 100 docs, reads as a literal upload log) with a
+   central pulse, a running count, and a single narration line that cycles — see drawIntake().
+   Pulse, never a spinner: no rotation, just a brand-tint wave. prefers-reduced-motion already
+   collapses all animation-duration app-wide (see the global media query near the top), so no
+   per-component override is needed here. */
+.process-stage{text-align:center;padding:var(--s6) var(--s4) var(--s4)}
+.pulse-wave{display:flex;align-items:center;justify-content:center;gap:var(--s2);height:32px}
+.pulse-bar{width:5px;height:24px;border-radius:var(--r-s);background:var(--brand);
+  animation:pulseWave 1.1s ease-in-out infinite}
+.pulse-bar:nth-child(1){animation-delay:0s}
+.pulse-bar:nth-child(2){animation-delay:.11s}
+.pulse-bar:nth-child(3){animation-delay:.22s}
+.pulse-bar:nth-child(4){animation-delay:.33s}
+.pulse-bar:nth-child(5){animation-delay:.44s}
+@keyframes pulseWave{0%,100%{transform:scaleY(.45);opacity:.55}50%{transform:scaleY(1);opacity:1}}
+.process-count{font-size:11px;font-weight:500;color:var(--ink-3);margin-top:var(--s4)}
+.process-phrase{font-family:var(--display);font-size:16px;color:var(--ink);margin-top:var(--s1)}
 .progressbar{height:6px;background:var(--sunken);border-radius:var(--r-s);overflow:hidden;margin:var(--s4) 0}
 .progressbar-fill{height:100%;background:var(--brand);transition:width .3s var(--ease);width:0%}
+
+/* ---------- intelligence run (round 3b) ----------
+   Visually distinct from extraction: a sequential source checklist, each source pulsing while
+   working then resolving to a done state with a one-line, dataset-real result. */
+.intel-panel{background:var(--brand-soft)}
+.intel-row{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) 0;box-shadow:inset 0 1px 0 var(--row-sep)}
+.intel-row:first-child{box-shadow:none}
+.step-check{width:22px;height:22px;border-radius:var(--r-s);background:var(--paper);display:flex;
+  align-items:center;justify-content:center;font-size:11px;color:var(--ink-3);flex:0 0 22px;
+  transition:background .15s var(--ease),color .15s var(--ease)}
+.step-check.working{animation:stepPulse 1s ease-in-out infinite}
+.step-check.done{background:var(--pos-soft);color:var(--pos-ink);animation:none}
+@keyframes stepPulse{0%,100%{opacity:.4}50%{opacity:1}}
+.intel-main{flex:1;min-width:0}
+.intel-source{font-size:12.5px;font-weight:500;color:var(--brand-ink)}
+.intel-detail{font-size:12px;color:var(--ink-2);margin-top:var(--s1)}
 
 .match-banner{background:var(--brand-soft);border-radius:var(--r-m);padding:var(--s4);margin-bottom:var(--s4)}
 .match-banner-title{font-size:12.5px;font-weight:500;color:var(--brand-ink)}
@@ -45894,69 +45926,44 @@ window.closeModal = function(){
 };
 window.addEventListener('hashchange', closeModal);
 
-/* ---------- pipeline coverage ----------
-   Replaces the funded-trend slot. Funded trend is a rearview mirror; coverage answers the only
-   question a BDO asks at a glance — "do I have enough in flight to hit my number?" It is
-   weighted pipeline (each open deal discounted by its stage's historical conversion) against
-   what is still LEFT of the annual target, not against the whole target: comparing a
-   point-in-time pipeline to a full-year number is apples to oranges and would read under 1x for
-   everyone forever. The shape — which stages carry the weight — is the insight, so it's a chart. */
-const STAGE_WEIGHTS = {Qualification:0.10, Analysis:0.25, Proposal:0.50, Underwriting:0.80};
-const COVERAGE_TARGET = 1.0;
-
-function coverageStats(bdoId){
+/* ---------- quota progress ----------
+   Trimmed from the former "pipeline coverage" card's stats function — that card (weighted
+   pipeline vs. remaining annual target) is a manager metric and moved off BDO Home entirely
+   (see PROJECT_STATE §13k; it belongs on Exec Home when that screen is built). Only the piece
+   the Funded YTD modal still genuinely needs — quota and what's left of it — survives here. */
+function quotaStats(bdoId){
   const bdo = BDOS[bdoId];
   const mine = Object.values(OPPS).filter(o=>o.bdoId===bdoId);
-  const open = mine.filter(o=>o.outcome==='open');
   const fundedYTD = mine.filter(o=>o.outcome==='won' && (o.fundedDate||'').slice(0,4)===TODAY.slice(0,4))
     .reduce((s,o)=>s+o.facilitySize,0);
   const quota = bdo.annualQuota || 0;
   const remaining = Math.max(0, quota - fundedYTD);
-  const byStage = TRACK_STAGES.map(s=>{
-    const g = open.filter(o=>o.stage===s);
-    const raw = g.reduce((t,o)=>t+o.facilitySize,0);
-    return {stage:s, count:g.length, raw, weighted: raw*STAGE_WEIGHTS[s]};
-  });
-  const weighted = byStage.reduce((s,b)=>s+b.weighted,0);
-  return {bdo, quota, fundedYTD, remaining, weighted, byStage,
-    raw: open.reduce((s,o)=>s+o.facilitySize,0),
-    coverage: remaining>0 ? weighted/remaining : null};
+  return {bdo, quota, fundedYTD, remaining};
 }
 
-function coveragePanelHtml(st){
-  const met = st.remaining<=0;
-  const ratio = met ? null : st.coverage;
-  const short = !met && ratio < COVERAGE_TARGET;
-  /* the bar is scaled so the remaining-target mark sits at a fixed point, letting the weighted
-     stack read directly against it rather than against an invisible maximum */
-  const scale = Math.max(st.weighted, st.remaining) * 1.08 || 1;
-  const markPct = (st.remaining/scale)*100;
-  const segs = st.byStage.filter(b=>b.weighted>0).map((b,i)=>
-    '<div class="'+('cov-seg '+['','t2','t3','t4'][TRACK_STAGES.indexOf(b.stage)]).trim()+
-      '" style="width:'+((b.weighted/scale)*100).toFixed(2)+'%"'+
-      tipAttr(b.stage, moneyShort(b.weighted)+' weighted',
-        b.count+' deal'+(b.count===1?'':'s')+' · '+moneyShort(b.raw)+' raw · '+
-        pct(STAGE_WEIGHTS[b.stage])+' stage conversion')+'></div>').join('');
-
-  return '<div class="cov-head">'+
-      '<span class="'+('cov-ratio '+(met?'met':(short?'short':''))).trim()+'">'+
-        (met ? 'Target met' : ratio.toFixed(2)+'x')+'</span>'+
-      '<span class="'+('cov-verdict '+(met||!short?'ok':'warn')).trim()+'">'+
-        (met ? 'Quota already covered' : short ? 'Below 1.0x coverage' : 'Covered')+'</span>'+
-    '</div>'+
-    '<div class="cov-bar"'+tipAttr('Weighted pipeline', moneyShort(st.weighted),
-        'Open deals discounted by stage conversion')+'>'+segs+
-      (met ? '' : '<div class="cov-mark" style="left:'+markPct.toFixed(2)+'%"></div>')+
-    '</div>'+
-    '<div class="cov-marklab">'+
-      '<span>Weighted pipeline <b>'+moneyShort(st.weighted)+'</b></span>'+
-      '<span>'+(met ? 'Funded YTD '+moneyShort(st.fundedYTD)+' vs '+moneyShort(st.quota)+' target'
-        : 'Still to close <b>'+moneyShort(st.remaining)+'</b>')+'</span>'+
-    '</div>'+
-    '<div class="chart-note">'+(met
-      ? 'Funded YTD is already at or past the annual target.'
-      : 'Weighted pipeline against the '+moneyShort(st.remaining)+' still needed to hit '+
-        moneyShort(st.quota)+' this year. Dashed mark is that remaining target.')+'</div>';
+/* ---------- pipeline-by-stage (BDO Home) ----------
+   Replaces the pipeline-coverage card's slot. A single horizontal stacked bar, one segment per
+   stage sized by $, tint deepening by stage — echoes the segmented-bar language used elsewhere
+   (.segbar) so this and any future stacked-by-category bar read as one system. Each segment and
+   the legend cell beneath it carry a tooltip (standing app-wide rule). */
+function pipelineByStageHtml(myOpen){
+  const byStage = TRACK_STAGES.map(s=>{
+    const g = myOpen.filter(o=>o.stage===s);
+    return {stage:s, count:g.length, value:g.reduce((t,o)=>t+o.facilitySize,0)};
+  });
+  const total = Math.max(1, byStage.reduce((s,b)=>s+b.value,0));
+  const segs = byStage.filter(b=>b.value>0).map(b=>
+    '<div class="'+('segbar-seg '+['','t2','t3','t4'][TRACK_STAGES.indexOf(b.stage)]).trim()+
+      '" style="width:'+((b.value/total)*100).toFixed(2)+'%"'+
+      tipAttr(b.stage, b.count+' deal'+(b.count===1?'':'s')+' · '+moneyShort(b.value),
+        pct(b.value/total)+' of open pipeline')+'></div>').join('');
+  const legend = byStage.map(b=>
+    '<div class="stagebar-item"'+tipAttr(b.stage, b.count+' deal'+(b.count===1?'':'s')+' · '+moneyShort(b.value),
+        pct(b.value/total)+' of open pipeline')+'>'+
+      '<span class="k">'+b.stage+'</span><span class="v">'+b.count+' · '+moneyShort(b.value)+'</span>'+
+    '</div>').join('');
+  return '<div class="segbar">'+segs+'</div>'+
+    '<div class="stagebar-legend">'+legend+'</div>';
 }
 
 /* ---------- partners: one dataset, three views ----------
@@ -46241,7 +46248,7 @@ MODALS.funded = function(){
   const yr = TODAY.slice(0,4);
   const ytd = myOpps().filter(o=>o.outcome==='won' && (o.fundedDate||'').slice(0,4)===yr);
   const total = ytd.reduce((s,o)=>s+o.facilitySize,0);
-  const st = coverageStats(CURRENT_BDO_ID);
+  const st = quotaStats(CURRENT_BDO_ID);
   return {
     title:'Funded year to date',
     scope:ytd.length+' deals funded in '+yr+' · '+moneyPlain(total),
@@ -46250,31 +46257,6 @@ MODALS.funded = function(){
       {label:'Annual target', value:moneyShort(st.quota)},
       {label:'Still to close', value:st.remaining>0?moneyShort(st.remaining):'Target met'},
     ]) + oppRowsTable(ytd, o=>'Funded '+fmtDate(o.fundedDate)),
-  };
-};
-
-MODALS.coverage = function(){
-  const st = coverageStats(CURRENT_BDO_ID);
-  const rows = st.byStage.map(b=>modalRow([
-    {v:b.stage, cls:'name'}, {v:b.count, cls:'num'}, {v:moneyPlain(b.raw), cls:'num'},
-    {v:pct(STAGE_WEIGHTS[b.stage]), cls:'num sec'}, {v:moneyPlain(b.weighted), cls:'num'},
-  ]));
-  return {
-    title:'Pipeline coverage',
-    scope:'Weighted pipeline against the '+moneyShort(st.remaining)+' still needed to hit '+
-      moneyShort(st.quota)+' this year',
-    body: modalStrip([
-      {label:'Weighted pipeline', value:moneyShort(st.weighted)},
-      {label:'Still to close', value:st.remaining>0?moneyShort(st.remaining):'Target met'},
-      {label:'Coverage', value:st.coverage==null?'Met':st.coverage.toFixed(2)+'x'},
-    ]) +
-    '<p class="chart-note mt-3">Each open deal is discounted by its stage\'s historical conversion, '+
-    'so a Qualification deal counts for a tenth of its face value and an Underwriting deal for '+
-    'four fifths. Coverage compares that weighted number to what is still left of the annual '+
-    'target — not to the whole target, which a point-in-time pipeline could never cover.</p>'+
-    modalTable(['Stage', {label:'Deals',num:true}, {label:'Raw',num:true},
-      {label:'Weight',num:true}, {label:'Weighted',num:true}], rows) +
-    '<div class="mt-4">'+oppRowsTable(myOpps().filter(o=>o.outcome==='open'))+'</div>',
   };
 };
 
@@ -46406,7 +46388,6 @@ function renderHome(){
 
   const feed = buildFeed(CURRENT_BDO_ID);
   const agenda = buildAgenda(CURRENT_BDO_ID);
-  const cov = coverageStats(CURRENT_BDO_ID);
 
   const recent = D.activities.filter(a=>a.bdoId===CURRENT_BDO_ID)
     .slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,6);
@@ -46444,13 +46425,48 @@ function renderHome(){
         '<div class="met-sub">'+wonYTD.length+' deal'+(wonYTD.length===1?'':'s')+' funded this year</div></div>'+
     '</div>'+
 
-    '<div class="panel expandable" onclick="openModal(\'coverage\')">'+
+    /* Today/now pair — agenda (your day) and Pipeline Snapshot (your book) — belong together at
+       the top, above the step-back-and-think analytical cards. A fixed two-column row, not the
+       masonry pool below: with exactly two cards the packer would always place them side by side
+       anyway, but a dedicated row makes the pairing explicit and collapses to stacked (agenda
+       then snapshot) under the same 1140px breakpoint the rest of the home body already uses. */
+    '<div class="pair-row">'+
+      '<div class="panel">'+
+        '<div class="panel-header"><div class="panel-header-text">'+
+          '<div class="panel-title">Today\'s agenda</div>'+
+          '<div class="panel-scope">'+agenda.filter(r=>!r.past).length+' left today · demo calendar</div>'+
+        '</div></div>'+
+        '<div class="panel-body flush agenda-scroll">'+
+          agenda.map(r=>
+            '<div class="agenda-row'+(r.past?' past':'')+(r.next?' next':'')+'"'+
+              (r.oppId?(' onclick="location.hash=\'#/opp/'+r.oppId+'\'"'):'')+'>'+
+              '<div class="agenda-time">'+hhmm12(r.time)+'</div>'+
+              '<div class="agenda-main">'+
+                '<div class="agenda-title">'+esc(r.title)+'</div>'+
+                '<div class="agenda-sub">'+esc(r.sub)+'</div>'+
+              '</div>'+
+              (r.next?'<div class="agenda-tag">Next</div>':'')+
+            '</div>').join('')+
+        '</div>'+
+      '</div>'+
+
+      '<div class="panel">'+
+        '<div class="panel-header"><div class="panel-header-text">'+
+          '<div class="panel-title">Pipeline Snapshot</div>'+
+          '<div class="panel-scope">Top 5 by facility size · active opportunities</div>'+
+        '</div><span class="panel-header-count">'+myOpen.length+' total deal'+(myOpen.length===1?'':'s')+'</span></div>'+
+        '<div class="panel-body flush">'+pipelineSnapshotHtml(myOpen)+'</div>'+
+        '<div class="panel-footer"><span>'+stageMixSummary(myOpen)+'</span>'+
+          '<span class="drill" onclick="location.hash=\'#/pipeline\'">Pipeline &rsaquo;</span></div>'+
+      '</div>'+
+    '</div>'+
+
+    '<div class="panel">'+
       '<div class="panel-header"><div class="panel-header-text">'+
-        '<div class="panel-title">Pipeline coverage</div>'+
-        '<div class="panel-scope">Weighted pipeline against what\'s left of the '+
-          moneyShort(cov.quota)+' annual target</div>'+
-      '</div><span class="expand-hint">Expand &rsaquo;</span></div>'+
-      '<div class="panel-body">'+coveragePanelHtml(cov)+'</div>'+
+        '<div class="panel-title">Pipeline by stage</div>'+
+        '<div class="panel-scope">'+myOpen.length+' open deal'+(myOpen.length===1?'':'s')+' · '+moneyShort(pipelineValue)+' total</div>'+
+      '</div></div>'+
+      '<div class="panel-body">'+pipelineByStageHtml(myOpen)+'</div>'+
     '</div>'+
 
     '<div class="home-grid">'+
@@ -46474,36 +46490,7 @@ function renderHome(){
           '</div>'+
         '</div>'+
 
-        '<div class="panel">'+
-          '<div class="panel-header"><div class="panel-header-text">'+
-            '<div class="panel-title">Today\'s agenda</div>'+
-            '<div class="panel-scope">'+agenda.filter(r=>!r.past).length+' left today · demo calendar</div>'+
-          '</div></div>'+
-          '<div class="panel-body flush agenda-scroll">'+
-            agenda.map(r=>
-              '<div class="agenda-row'+(r.past?' past':'')+(r.next?' next':'')+'"'+
-                (r.oppId?(' onclick="location.hash=\'#/opp/'+r.oppId+'\'"'):'')+'>'+
-                '<div class="agenda-time">'+hhmm12(r.time)+'</div>'+
-                '<div class="agenda-main">'+
-                  '<div class="agenda-title">'+esc(r.title)+'</div>'+
-                  '<div class="agenda-sub">'+esc(r.sub)+'</div>'+
-                '</div>'+
-                (r.next?'<div class="agenda-tag">Next</div>':'')+
-              '</div>').join('')+
-          '</div>'+
-        '</div>'+
-
         partnersPanelHtml(partners)+
-
-        '<div class="panel">'+
-          '<div class="panel-header"><div class="panel-header-text">'+
-            '<div class="panel-title">Pipeline Snapshot</div>'+
-            '<div class="panel-scope">Top 5 by facility size · active opportunities</div>'+
-          '</div><span class="panel-header-count">'+myOpen.length+' total deal'+(myOpen.length===1?'':'s')+'</span></div>'+
-          '<div class="panel-body flush">'+pipelineSnapshotHtml(myOpen)+'</div>'+
-          '<div class="panel-footer"><span>'+stageMixSummary(myOpen)+'</span>'+
-            '<span class="drill" onclick="location.hash=\'#/pipeline\'">Pipeline &rsaquo;</span></div>'+
-        '</div>'+
 
         lossPanelHtml(CURRENT_BDO_ID)+
 
@@ -47110,9 +47097,25 @@ const DOC_EXTRA = {
   ABL: ['Borrowing Base Certificate','Field Exam Report'],
   TermLoan: ['Equipment Appraisal','Debt Schedule'],
 };
+/* CLAUDE.md §2b: extraction narration must be driven by the actual uploaded set — never claim to
+   parse a document type that wasn't uploaded. One phrase per known doc type; a doc type not in
+   this map (shouldn't happen — DOC_BASE/DOC_EXTRA are the only types the sim ever "uploads") falls
+   back to a generic, still-truthful "Reading {label}…" rather than a hardcoded guess. */
+const DOC_PHRASES = {
+  'Financial Statements':'Reading financial statements', 'Tax Returns':'Reviewing tax returns',
+  'Bank Statements':'Reading bank statements', 'Formation Docs':'Confirming entity formation',
+  'AP Aging':'Reading AP aging', 'AR Aging':'Reading AR aging',
+  'UCC Lien Search':'Cross-referencing the UCC lien search', 'Term Sheet Draft':'Parsing term sheet draft',
+  'AR Detail Schedule':'Extracting AR detail schedule', 'Debtor Concentration Report':'Calculating debtor concentration',
+  'Borrowing Base Certificate':'Extracting borrowing base', 'Field Exam Report':'Reading field exam report',
+  'Equipment Appraisal':'Reading equipment appraisal', 'Debt Schedule':'Reviewing debt schedule',
+};
+function intakeDocLabels(productType){
+  return DOC_BASE.concat(DOC_EXTRA[productType]||[]);
+}
 function intakeFileNames(acct, productType){
   const base = acct.name.replace(/[^A-Za-z0-9]+/g,'_');
-  return DOC_BASE.concat(DOC_EXTRA[productType]||[]).map(n=>base+'_'+n.replace(/\s+/g,'_')+'.pdf');
+  return intakeDocLabels(productType).map(n=>base+'_'+n.replace(/\s+/g,'_')+'.pdf');
 }
 
 let RUNTIME_COUNTER = 0;
@@ -47174,8 +47177,36 @@ function commitDraftOpportunity(draft){
   return draft;
 }
 
+/* Intelligence run (round 3b): D&B, ZoomInfo, LexisNexis lien search, and network/relationship
+   mapping, in sequence. Every result is computed from this account's real records (CLAUDE.md
+   §2b) — never a fabricated per-run figure, so the same account always reports the same numbers. */
+function intelligenceResults(acct){
+  const contacts = CONTACTS_BY_ACCT[acct.id] || [];
+  const liens = LIENS_BY_ACCT[acct.id] || [];
+  const hasSub = liens.some(l=>l.subordinated);
+  const edges = EDGES_BY_ACCT[acct.id] || [];
+  const wonEdges = edges.filter(e=>{
+    const other = e.fromAccountId===acct.id ? e.toAccountId : e.fromAccountId;
+    return CLOSED_WON_ACCT_IDS.has(other);
+  });
+  return [
+    {source:'D&B', working:'Matching company record…',
+      result:'Matched · '+acct.industryName+' · '+acct.location},
+    {source:'ZoomInfo', working:'Enriching contacts…',
+      result: contacts.length ? contacts.length+' contact'+(contacts.length===1?'':'s')+' found' : 'No additional contacts found'},
+    {source:'LexisNexis lien search', working:'Searching UCC filings…',
+      result: liens.length
+        ? liens.length+' UCC filing'+(liens.length===1?'':'s')+(hasSub?' · subordination present':'')
+        : 'No UCC filings on record'},
+    {source:'Network mapping', working:'Mapping trade relationships…',
+      result: !edges.length ? 'No trade relationships on record'
+        : wonEdges.length ? edges.length+' trade relationship'+(edges.length===1?'':'s')+' · connects to '+wonEdges.length+' Closed-Won account'+(wonEdges.length===1?'':'s')
+        : edges.length+' trade relationship'+(edges.length===1?'':'s')+' · no Closed-Won ties yet'},
+  ];
+}
+
 let INTAKE_MODE = 'hero';   // 'hero' | 'simulated'
-let INTAKE_STATE = 'drop';  // 'drop' | 'extracting' | 'review'
+let INTAKE_STATE = 'drop';  // 'drop' | 'extracting' | 'intelligence' | 'review'
 let INTAKE_CTX = null;      // {account, productType}
 let INTAKE_DRAFT = null;    // editable draft opportunity, set on entering 'review'
 let INTAKE_TIMER = null;
@@ -47189,7 +47220,7 @@ function renderIntake(mode){
 }
 
 function wizardBarHtml(step){
-  const steps=['Drop','Extract','Review','Create'];
+  const steps=['Drop','Extract','Intelligence','Review','Create'];
   return '<div class="wizardbar">'+steps.map((s,i)=>
     '<span class="tag '+(i===step?'brand':'neutral')+'">'+(i+1)+' '+s+'</span>'
   ).join('')+'</div>';
@@ -47243,30 +47274,97 @@ function drawIntake(){
   }
 
   if(INTAKE_STATE==='extracting'){
-    const files = intakeFileNames(INTAKE_CTX.account, INTAKE_CTX.productType);
+    /* Per-file checkmark rows don't scale (absurd at 100 docs) and read as a literal upload
+       list rather than "the system is understanding." A processing state instead: a central
+       pulse (never a spinner), a running N-of-M count, and a single narration line that cycles
+       through phrases tied to the actual uploaded set (CLAUDE.md §2b) — never a doc type that
+       wasn't in this scenario's list. */
+    const labels = intakeDocLabels(INTAKE_CTX.productType);
+    const total = labels.length;
+    const closing = ['Cross-checking figures across documents','Populating deal fields'];
+    const totalSteps = total + closing.length;
     el.innerHTML =
       '<h1 class="page-heading">New Opportunity</h1>'+
-      '<div class="page-sub">Extracting from '+files.length+' documents&hellip;</div>'+
+      '<div class="page-sub">Extracting from '+total+' documents&hellip;</div>'+
       wizardBarHtml(1)+
       demoOnlyBannerHtml()+
       '<div class="panel"><div class="panel-body pad-top">'+
-        files.map((f,i)=>'<div class="extract-row" id="extract-row-'+i+'"><div class="extract-check" id="extract-check-'+i+'">&hellip;</div><div class="extract-name">'+esc(f)+'</div></div>').join('')+
+        '<div class="process-stage">'+
+          '<div class="pulse-wave">'+'<div class="pulse-bar"></div>'.repeat(5)+'</div>'+
+          '<div class="process-count" id="extract-count">Preparing to read '+total+' document'+(total===1?'':'s')+'&hellip;</div>'+
+          '<div class="process-phrase" id="extract-phrase">Opening upload&hellip;</div>'+
+        '</div>'+
         '<div class="progressbar"><div class="progressbar-fill" id="extract-progress"></div></div>'+
       '</div></div>';
     let step=0;
     const advance=()=>{
-      if(step>0){ const prev=document.getElementById('extract-check-'+(step-1)); if(prev){ prev.classList.add('done'); prev.textContent='✓'; } }
       const bar=document.getElementById('extract-progress');
-      if(bar) bar.style.width = Math.round((step/files.length)*100)+'%';
-      if(step>=files.length){
+      const countEl=document.getElementById('extract-count');
+      const phraseEl=document.getElementById('extract-phrase');
+      if(step>=totalSteps){
         if(bar) bar.style.width='100%';
-        INTAKE_TIMER=setTimeout(()=>{ INTAKE_STATE='review'; drawIntake(); }, 500);
+        INTAKE_TIMER=setTimeout(()=>{ INTAKE_STATE='intelligence'; drawIntake(); }, 500);
         return;
       }
+      if(step<total){
+        if(countEl) countEl.textContent='Reading '+(step+1)+' of '+total+' document'+(total===1?'':'s')+'…';
+        if(phraseEl) phraseEl.textContent=(DOC_PHRASES[labels[step]] || ('Reading '+labels[step].toLowerCase()))+'…';
+      } else {
+        if(countEl) countEl.textContent='Reading '+total+' of '+total+' document'+(total===1?'':'s')+'…';
+        if(phraseEl) phraseEl.textContent=closing[step-total]+'…';
+      }
+      if(bar) bar.style.width = Math.round(((step+1)/totalSteps)*100)+'%';
       step++;
       INTAKE_TIMER=setTimeout(advance, 550);
     };
     INTAKE_TIMER=setTimeout(advance, 300);
+    return;
+  }
+
+  if(INTAKE_STATE==='intelligence'){
+    /* Round 3b — a distinct beat from extraction: extraction reads what was handed to you,
+       this pulls in enrichment/intelligence sources. Runs as a continuous sequence after
+       extraction (auto-advances in), but stays visually its own step (own wizard-bar stop,
+       own panel, its own per-source resolve) so the two jobs don't blur together. */
+    const results = intelligenceResults(INTAKE_CTX.account);
+    el.innerHTML =
+      '<h1 class="page-heading">New Opportunity</h1>'+
+      '<div class="page-sub">Running intelligence on '+esc(INTAKE_CTX.account.name)+'&hellip;</div>'+
+      wizardBarHtml(2)+
+      demoOnlyBannerHtml()+
+      '<div class="panel intel-panel">'+
+        '<div class="panel-header"><div class="panel-header-text">'+
+          '<div class="panel-title">Intelligence run</div>'+
+          '<div class="panel-scope">Premium intelligence layer — D&amp;B, ZoomInfo, lien search, network mapping</div>'+
+        '</div></div>'+
+        '<div class="panel-body pad-top">'+
+          results.map((r,i)=>
+            '<div class="intel-row" id="intel-row-'+i+'">'+
+              '<div class="step-check'+(i===0?' working':'')+'" id="intel-status-'+i+'">&hellip;</div>'+
+              '<div class="intel-main">'+
+                '<div class="intel-source">'+esc(r.source)+'</div>'+
+                '<div class="intel-detail" id="intel-detail-'+i+'">'+esc(r.working)+'</div>'+
+              '</div>'+
+            '</div>'
+          ).join('')+
+        '</div>'+
+      '</div>';
+    let step=0;
+    const advance=()=>{
+      if(step>=results.length){
+        INTAKE_TIMER=setTimeout(()=>{ INTAKE_STATE='review'; drawIntake(); }, 500);
+        return;
+      }
+      const statusEl=document.getElementById('intel-status-'+step);
+      const detailEl=document.getElementById('intel-detail-'+step);
+      if(statusEl){ statusEl.classList.remove('working'); statusEl.classList.add('done'); statusEl.innerHTML='&#10003;'; }
+      if(detailEl) detailEl.textContent=results[step].result;
+      const nextStatus=document.getElementById('intel-status-'+(step+1));
+      if(nextStatus) nextStatus.classList.add('working');
+      step++;
+      INTAKE_TIMER=setTimeout(advance, 450);
+    };
+    INTAKE_TIMER=setTimeout(advance, 500);
     return;
   }
 
@@ -47293,7 +47391,7 @@ function drawIntake(){
     el.innerHTML =
       '<h1 class="page-heading">New Opportunity</h1>'+
       '<div class="page-sub">Review the extracted deal — every field below is overridable before you create it</div>'+
-      wizardBarHtml(2)+
+      wizardBarHtml(3)+
       demoOnlyBannerHtml()+
       '<div class="match-banner">'+
         '<div class="match-banner-title">Matched to existing account: '+esc(acct.name)+'</div>'+
