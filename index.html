@@ -240,12 +240,30 @@ h1,h2,h3,p,dl,dd{margin:0}
 .hbar-row:hover .hbar-fill{background:var(--brand-2)}
 .hbar-row:hover .hbar-fill.warn{background:var(--warn-ink)}
 
+/* ---------- toggle-card stable height (standing rule — CLAUDE.md §4) ----------
+   A card with an internal view-toggle must not change its own height when the view switches —
+   the Partners card (Dormancy/Volume/Quality) and the loss-analysis card (by stage/by reason/
+   lost-to) both swap their row COUNT by view (4 rows for by-stage vs. up to 6 for the others),
+   and swapPanel() deliberately does not re-pack the masonry grid on a view toggle — so a height
+   change here reflows every card below it. Reserve the tallest view's height up front: measured
+   at 6 * the shared .hbar-row height (57.390625px), so 344px (6*57.39, on the 4pt scale). A view
+   with fewer rows leaves minor slack at the bottom of this box — sanctioned, not a bug — rather
+   than the card resizing and shoving its neighbors. */
+.toggle-rows{min-height:344px}
+/* Reserves layout space for a conditionally-shown element (e.g. the loss card's "Lost to"-only
+   attribution footer) without painting it — visibility:hidden, not omitting the element, so a
+   view without that content doesn't lose its height too. General-purpose, not loss-card-specific. */
+.invisible{visibility:hidden}
+
 /* ---------- segmented control (reuses the .viewtoggle idiom, full-width in a rail) ---------- */
 .viewtoggle.seg{width:100%}
 .viewtoggle.seg button{flex:1;padding:0 var(--s2);font-size:11px}
 
-/* ---------- agenda: fixed height, scrolls internally like a real calendar pane ---------- */
-.agenda-scroll{max-height:calc(var(--s7) * 5);overflow-y:auto}
+/* ---------- calendar: fills the pair-row's stretched height, scrolls only past that ----------
+   No fixed max-height any more — .pair-row > .panel > .panel-body already supplies flex:1, so
+   this panel-body's real height is whatever the row's tallest sibling (Snapshot) sets. overflow
+   only engages if the calendar's real entries still run longer than that. */
+.agenda-scroll{overflow-y:auto}
 
 /* ---------- home body: multi-column packing ----------
    Replaces the rigid 2fr/1fr split. That split stacked every rail card in one tall column, so
@@ -310,13 +328,20 @@ h1,h2,h3,p,dl,dd{margin:0}
   font-size:11px;font-weight:500;cursor:pointer;padding:0}
 .stage-filter-clear:hover{color:var(--brand-ink)}
 
-/* ---------- today/now pair row (agenda + pipeline snapshot, side by side) ----------
-   align-items:start, not the grid default (stretch): stretch was forcing the shorter card (the
-   agenda, which frequently has fewer rows than the Snapshot's fixed top-5) to inflate to match
-   its taller sibling, leaving dead whitespace at the bottom of its panel. Each card now sizes to
-   its own content; only the agenda's own internal scroll (.agenda-scroll) caps its height. */
-.pair-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--s5);align-items:start}
+/* ---------- today/now pair row (calendar + pipeline snapshot, side by side) ----------
+   Grid default stretch (not align-items:start — that was last round's fix and undoes cleanly by
+   omission) so both cards share the row's tallest height, normally Pipeline Snapshot's fixed
+   top-5-plus-footer. Each panel becomes a flex column so its own body FLEXES to fill that
+   stretched height with real rows — more of Calendar's already-real agenda entries become
+   visible — instead of stretch just leaving blank space below a fixed-height inner block, which
+   is what happened when this was tried the first time (see the superseded comment this replaces,
+   still visible in git history / PROJECT_STATE §13k). Equal height, earned by content, not padding. */
+.pair-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--s5)}
 @media (max-width:1140px){.pair-row{grid-template-columns:minmax(0,1fr)}}
+.pair-row > .panel{display:flex;flex-direction:column}
+.pair-row > .panel > .panel-header{flex:0 0 auto}
+.pair-row > .panel > .panel-body{flex:1 1 auto;min-height:0}
+.pair-row > .panel > .panel-footer{flex:0 0 auto}
 
 /* ---------- compact label/value rows (no hard-right islands with an empty middle) ---------- */
 .kv-line{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--s3);align-items:baseline;
@@ -505,12 +530,13 @@ table.tbl{width:100%;border-collapse:collapse}
 .intel-detail{font-size:12px;color:var(--ink-2);margin-top:var(--s1)}
 
 /* ---------- intelligence gate ----------
-   The "extraction is done, intelligence hasn't run yet" step. The explicit click that follows is
-   the premium tier made visible (D39/§2a) — intelligence is a distinct action, not a free step
-   that just happens after extraction. */
-.intel-gate{display:flex;align-items:center;justify-content:space-between;gap:var(--s5);flex-wrap:wrap}
-.intel-gate-title{font-size:14px;font-weight:500;color:var(--ink)}
-.intel-gate-sub{font-size:12px;color:var(--ink-3);margin-top:var(--s1);max-width:520px}
+   The "extraction is done, intelligence hasn't run yet" step: a value-framed choice (what each
+   source does, previewed as inert .intel-row/.step-check pairs — same component the real run
+   uses once started, just at rest) with two equally-weighted actions in the footer. Reuses
+   .intel-panel's brand-soft tint so the preview reads as the same premium surface the real run
+   lands in, and .panel-footer for the action bar rather than inventing a new footer pattern. */
+.intel-gate-footer{flex-wrap:wrap}
+.intel-gate-buttons{display:flex;gap:var(--s3);margin-left:auto;flex:0 0 auto}
 
 .match-banner{background:var(--brand-soft);border-radius:var(--r-m);padding:var(--s4);margin-bottom:var(--s4)}
 .match-banner-title{font-size:12.5px;font-weight:500;color:var(--brand-ink)}
@@ -46111,7 +46137,7 @@ function partnersPanelHtml(stats){
         '<button class="'+(view===v.key?'active':'')+'" onclick="setPartnerView(\''+v.key+'\')">'+
         v.label+'</button>').join('')+'</div>'+
     '</div>'+
-    '<div class="panel-body flush mt-3">'+
+    '<div class="panel-body flush mt-3 toggle-rows">'+
       (rows.length ? body : '<div class="empty">No partner-sourced deals yet.</div>')+
     '</div>'+
   '</div>';
@@ -46213,13 +46239,19 @@ function lossPanelHtml(bdoId){
         '<button class="'+(LOSS_VIEW===v.key?'active':'')+'" onclick="setLossView(\''+v.key+'\')">'+
         v.label+'</button>').join('')+'</div>'+
     '</div>'+
-    '<div class="panel-body flush mt-3">'+
+    '<div class="panel-body flush mt-3 toggle-rows">'+
       (d.rows.length ? body : '<div class="empty">Nothing lost yet.</div>')+
     '</div>'+
-    (LOSS_VIEW==='competitor'
-      ? '<div class="panel-footer">Attribution comes from the borrower or a competitor&#39;s UCC '+
-        'filing after the loss — not every loss reveals a winner.</div>'
-      : '')+
+    /* The attribution footer only means something in the "Lost to" view, but it must still
+       occupy its layout space in the other two — a footer that appears/disappears by view is
+       exactly the height instability the toggle-rows fix above exists to prevent. Always render
+       the SAME real text (it wraps to two lines at this width) and only toggle visibility — a
+       placeholder like "&nbsp;" wraps to one line and reserves the wrong height, which is exactly
+       what happened on the first pass at this fix (still short by about a line). visibility:
+       hidden, not omitting the element, keeps the box's height without painting anything. */
+    '<div class="panel-footer'+(LOSS_VIEW==='competitor'?'':' invisible')+'">'+
+      'Attribution comes from the borrower or a competitor&#39;s UCC filing after the loss — not every loss reveals a winner.'+
+    '</div>'+
   '</div>';
 }
 
@@ -46484,7 +46516,7 @@ function renderHome(){
     '<div class="pair-row">'+
       '<div class="panel">'+
         '<div class="panel-header"><div class="panel-header-text">'+
-          '<div class="panel-title">Today\'s agenda</div>'+
+          '<div class="panel-title">Calendar</div>'+
           '<div class="panel-scope">'+agenda.filter(r=>!r.past).length+' left today · demo calendar</div>'+
         '</div></div>'+
         '<div class="panel-body flush agenda-scroll">'+
@@ -47373,13 +47405,21 @@ function drawIntake(){
   }
 
   if(INTAKE_STATE==='ready'){
-    /* Extraction is done; intelligence does NOT auto-run. The explicit click IS the premium
-       tier made visible (D39/§2a) — it demonstrates intelligence as a distinct, gated capability
-       rather than a step that just happens for free. Wizard bar stays on "Extract": Intelligence
-       only becomes the active step once the user actually starts it. */
+    /* Extraction is done; intelligence does NOT auto-run. The explicit choice IS the premium
+       tier made visible (D39/§2a) — a value-framed decision (what intelligence does, then two
+       real actions), not a bare button in a void. Skip is a first-class, equally-weighted path:
+       the plain-CRM tier must be able to create a deal without ever touching intelligence.
+       Wizard bar stays on "Extract": Intelligence only becomes the active step once actually
+       started, and never becomes active at all if the user skips it. */
+    const gateSources = [
+      {source:'D&B', blurb:'Match company & firmographic data'},
+      {source:'ZoomInfo', blurb:'Enrich decision-maker contacts'},
+      {source:'LexisNexis lien search', blurb:'Search UCC filings & subordination'},
+      {source:'Network mapping', blurb:'Map trade relationships & warm intros'},
+    ];
     el.innerHTML =
       '<h1 class="page-heading">New Opportunity</h1>'+
-      '<div class="page-sub">Extraction complete — review, then run intelligence when ready</div>'+
+      '<div class="page-sub">Extraction complete for '+esc(INTAKE_CTX.account.name)+'</div>'+
       wizardBarHtml(1)+
       demoOnlyBannerHtml()+
       '<div class="panel">'+
@@ -47387,12 +47427,29 @@ function drawIntake(){
           '<div class="panel-title">Extraction complete</div>'+
           '<div class="panel-scope">'+intakeDocLabels(INTAKE_CTX.productType).length+' documents read for '+esc(INTAKE_CTX.account.name)+'</div>'+
         '</div></div>'+
-        '<div class="panel-body pad-top intel-gate">'+
-          '<div class="intel-gate-copy">'+
-            '<div class="intel-gate-title">Run intelligence on this account?</div>'+
-            '<div class="intel-gate-sub">Premium intelligence layer — D&amp;B, ZoomInfo, LexisNexis lien search, and network mapping. Part of your plan\'s intelligence tier, not bundled into the base CRM.</div>'+
+      '</div>'+
+      '<div class="panel intel-panel">'+
+        '<div class="panel-header"><div class="panel-header-text">'+
+          '<div class="panel-title">Run intelligence on this account?</div>'+
+          '<div class="panel-scope">Enrich with D&amp;B &amp; ZoomInfo &middot; run lien/UCC search &middot; map network relationships</div>'+
+        '</div></div>'+
+        '<div class="panel-body pad-top">'+
+          gateSources.map(s=>
+            '<div class="intel-row">'+
+              '<div class="step-check">&#9675;</div>'+
+              '<div class="intel-main">'+
+                '<div class="intel-source">'+esc(s.source)+'</div>'+
+                '<div class="intel-detail">'+esc(s.blurb)+'</div>'+
+              '</div>'+
+            '</div>'
+          ).join('')+
+        '</div>'+
+        '<div class="panel-footer intel-gate-footer">'+
+          '<span>Premium intelligence layer &mdash; part of your plan\'s intelligence tier, not bundled into the base CRM.</span>'+
+          '<div class="intel-gate-buttons">'+
+            '<button class="btn" onclick="skipIntelligence()">Skip &mdash; create without intelligence</button>'+
+            '<button class="btn primary" onclick="runIntelligence()">Run Intelligence</button>'+
           '</div>'+
-          '<button class="btn primary" onclick="runIntelligence()">Run Intelligence</button>'+
         '</div>'+
       '</div>';
     return;
@@ -47500,6 +47557,12 @@ window.startScenario = function(i){
 };
 window.runIntelligence = function(){
   INTAKE_STATE='intelligence';
+  drawIntake();
+};
+/* Skip is a first-class path, not a hidden escape hatch — the plain-CRM tier (D39) must be able
+   to create a deal without ever touching intelligence. Jumps straight to review. */
+window.skipIntelligence = function(){
+  INTAKE_STATE='review';
   drawIntake();
 };
 window.startOverIntake = function(){
