@@ -183,7 +183,10 @@ h1,h2,h3,p,dl,dd{margin:0}
 .dayline-sum{font-size:12px;color:var(--ink-2)}
 .dayline-sum b{font-weight:500;color:var(--ink)}
 
-/* ---------- today's agenda (POC-faked; shaped like a real calendar feed) ---------- */
+/* ---------- calendar (POC-faked; a real day-view, not just a list of the fake events) ----------
+   Spans the full 7:00-19:00 working day (see buildAgenda()'s filler slots), so the card's
+   internal scroll is structural — always there, at any scroll position — rather than depending
+   on whether today's demo data happens to be tall enough to overflow. */
 .agenda-row{display:flex;align-items:flex-start;gap:var(--s3);padding:var(--s3) var(--s5);
   box-shadow:inset 0 1px 0 var(--row-sep)}
 .agenda-row:first-child{box-shadow:none}
@@ -192,6 +195,8 @@ h1,h2,h3,p,dl,dd{margin:0}
 .agenda-row.past{opacity:.55}
 .agenda-row.next{background:var(--brand-a05)}
 .agenda-row.next .agenda-time{color:var(--brand-ink)}
+.agenda-row.empty{padding:var(--s1) var(--s5);opacity:.4}
+.agenda-row.empty .agenda-time{padding-top:0}
 .agenda-main{flex:1;min-width:0}
 .agenda-title{font-size:12px;font-weight:500;color:var(--ink)}
 .agenda-sub{font-size:11px;color:var(--ink-3);margin-top:var(--s1)}
@@ -329,16 +334,21 @@ h1,h2,h3,p,dl,dd{margin:0}
 .stage-filter-clear:hover{color:var(--brand-ink)}
 
 /* ---------- today/now pair row (calendar + pipeline snapshot, side by side) ----------
-   Grid default stretch (not align-items:start — that was last round's fix and undoes cleanly by
-   omission) so both cards share the row's tallest height, normally Pipeline Snapshot's fixed
-   top-5-plus-footer. Each panel becomes a flex column so its own body FLEXES to fill that
-   stretched height with real rows — more of Calendar's already-real agenda entries become
-   visible — instead of stretch just leaving blank space below a fixed-height inner block, which
-   is what happened when this was tried the first time (see the superseded comment this replaces,
-   still visible in git history / PROJECT_STATE §13k). Equal height, earned by content, not padding. */
+   An EXPLICIT fixed height on both panels, not grid stretch-to-tallest-sibling. Stretch-to-
+   tallest was last round's mechanism and it broke the moment Calendar's own content grew to a
+   full 7am-7pm day (§13n): Calendar's un-capped natural content height (~920px+) became the
+   tallest thing in the row, so grid stretch pulled the whole row — including Snapshot — up to
+   match it, and Snapshot's fixed top-5-plus-footer had nothing to fill that extra space with,
+   reintroducing the exact dead-void bug this pairing already went through twice, just relocated
+   to the other card. A calendar is SUPPOSED to have more content than fits — that's the point of
+   giving it real internal scroll — so its natural size can no longer be allowed to drive the
+   row's height. A fixed height breaks the circularity: both panels are this height regardless of
+   either one's content, Calendar's real day genuinely overflows it (scrolls), and Snapshot's
+   fixed top-5 fits inside it with at most the same "minor slack, no bug" already sanctioned for
+   toggle-cards. Value matches Snapshot's own measured natural height (5 rows + footer). */
 .pair-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--s5)}
 @media (max-width:1140px){.pair-row{grid-template-columns:minmax(0,1fr)}}
-.pair-row > .panel{display:flex;flex-direction:column}
+.pair-row > .panel{display:flex;flex-direction:column;height:562px}
 .pair-row > .panel > .panel-header{flex:0 0 auto}
 .pair-row > .panel > .panel-body{flex:1 1 auto;min-height:0}
 .pair-row > .panel > .panel-footer{flex:0 0 auto}
@@ -492,26 +502,32 @@ table.tbl{width:100%;border-collapse:collapse}
 .dropzone-sub{font-size:12px;color:var(--ink-3);margin-top:var(--s2)}
 .dropzone input[type=file]{display:none}
 
-/* ---------- extraction processing state ----------
-   Replaces a per-file checkmark list (absurd at 100 docs, reads as a literal upload log) with a
-   central pulse, a running count, and a single narration line that cycles — see drawIntake().
-   Pulse, never a spinner: no rotation, just a brand-tint wave. prefers-reduced-motion already
-   collapses all animation-duration app-wide (see the global media query near the top), so no
-   per-component override is needed here. */
-.process-stage{text-align:center;padding:var(--s6) var(--s4) var(--s4)}
-.pulse-wave{display:flex;align-items:center;justify-content:center;gap:var(--s2);height:32px}
-.pulse-bar{width:5px;height:24px;border-radius:var(--r-s);background:var(--brand);
-  animation:pulseWave 1.1s ease-in-out infinite}
-.pulse-bar:nth-child(1){animation-delay:0s}
-.pulse-bar:nth-child(2){animation-delay:.11s}
-.pulse-bar:nth-child(3){animation-delay:.22s}
-.pulse-bar:nth-child(4){animation-delay:.33s}
-.pulse-bar:nth-child(5){animation-delay:.44s}
-@keyframes pulseWave{0%,100%{transform:scaleY(.45);opacity:.55}50%{transform:scaleY(1);opacity:1}}
-.process-count{font-size:11px;font-weight:500;color:var(--ink-3);margin-top:var(--s4)}
-.process-phrase{font-family:var(--display);font-size:16px;color:var(--ink);margin-top:var(--s1)}
-.progressbar{height:6px;background:var(--sunken);border-radius:var(--r-s);overflow:hidden;margin:var(--s4) 0}
-.progressbar-fill{height:100%;background:var(--brand);transition:width .3s var(--ease);width:0%}
+/* ---------- processing ring (reusable "working" component — Option A) ----------
+   Drives both the extraction beat and the intelligence beat (and any future "working" state):
+   processRingHtml(prefix, caption) renders the markup, startPhraseCycle(id, phrases, ms) drives
+   the center text. A calm rotating arc, not a spinner — slow (2s/revolution), brand teal only,
+   a faint full-circle track beneath a partial arc. Rotating the whole <svg> (track included) is
+   deliberate, not an oversight: the track is a uniform circle, so rotating it is visually a
+   no-op, and it avoids transform-origin quirks that isolating just the arc circle would invite.
+   The center text cycles on its own fixed timer, independent of real progress — see
+   startPhraseCycle() and its call sites for why. prefers-reduced-motion: the global media query
+   (near the top of the stylesheet) already collapses the CSS rotation to a single static frame;
+   startPhraseCycle() separately checks the same media query and skips its JS interval entirely,
+   holding one phrase rather than cycling — CSS alone can't stop a JS timer. */
+.proc-ring-block{text-align:center;padding:var(--s6) var(--s4) var(--s5)}
+.proc-ring{position:relative;width:152px;height:152px;margin:0 auto}
+.proc-ring-svg{width:100%;height:100%;transform-origin:50% 50%;
+  animation:procRingSpin 2s linear infinite}
+@keyframes procRingSpin{from{transform:rotate(-90deg)}to{transform:rotate(270deg)}}
+.proc-ring-track{fill:none;stroke:var(--brand-a15);stroke-width:4}
+.proc-ring-arc{fill:none;stroke:var(--brand);stroke-width:4;stroke-linecap:round;
+  stroke-dasharray:70 207}
+.proc-ring-center{position:absolute;inset:18px;display:flex;align-items:center;justify-content:center}
+.proc-ring-center-text{font-size:11px;font-weight:500;color:var(--ink);line-height:1.4;
+  opacity:0;transition:opacity .35s var(--ease)}
+.proc-count{font-family:var(--display);font-size:20px;font-weight:500;color:var(--ink);
+  margin-top:var(--s5)}
+.proc-caption{font-size:12px;color:var(--ink-3);margin-top:var(--s1)}
 
 /* ---------- intelligence run (round 3b) ----------
    Visually distinct from extraction: a sequential source checklist, each source pulsing while
@@ -45783,6 +45799,13 @@ function hhmm12(t){
   const h12 = h%12 === 0 ? 12 : h%12;
   return h12+':'+String(m).padStart(2,'0')+' '+ap;
 }
+/* The calendar spans a full working day (7:00–19:00), not just the hours that happen to have a
+   fake event on them — a card whose scrollable range depends on how much demo data exists isn't
+   a real day-view, it's a list that occasionally scrolls. Half-hour slots not covered by a real
+   AGENDA_SLOTS entry render as quiet, compact "nothing scheduled" ticks so the timeline reads as
+   continuous, and the card's internal scroll is guaranteed structurally — always there, at any
+   scroll position, regardless of the demo data. */
+const AGENDA_DAY_START_H = 7, AGENDA_DAY_END_H = 19;
 function buildAgenda(bdoId){
   const open = Object.values(OPPS).filter(o=>o.bdoId===bdoId && o.outcome==='open')
     .slice().sort((a,b)=>b.facilitySize-a.facilitySize);
@@ -45794,7 +45817,16 @@ function buildAgenda(bdoId){
     return {time:s.time, title:s.kind+' — '+getAccount(o.accountId).name,
       sub:s.title+' · '+o.stage+' · '+moneyShort(o.facilitySize), oppId:o.id, tag:s.kind};
   });
-  const nextIdx = rows.findIndex(r=>r.time>NOW_HHMM);
+  const covered = new Set(rows.map(r=>r.time));
+  for(let h=AGENDA_DAY_START_H; h<=AGENDA_DAY_END_H; h++){
+    for(const m of [0,30]){
+      if(h===AGENDA_DAY_END_H && m===30) continue;
+      const t = String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
+      if(!covered.has(t)) rows.push({time:t, empty:true});
+    }
+  }
+  rows.sort((a,b)=>a.time.localeCompare(b.time));
+  const nextIdx = rows.findIndex(r=>!r.empty && r.time>NOW_HHMM);
   rows.forEach((r,i)=>{ r.past = r.time<=NOW_HHMM; r.next = i===nextIdx; });
   return rows;
 }
@@ -46517,19 +46549,21 @@ function renderHome(){
       '<div class="panel">'+
         '<div class="panel-header"><div class="panel-header-text">'+
           '<div class="panel-title">Calendar</div>'+
-          '<div class="panel-scope">'+agenda.filter(r=>!r.past).length+' left today · demo calendar</div>'+
+          '<div class="panel-scope">'+agenda.filter(r=>!r.past && !r.empty).length+' left today · demo calendar</div>'+
         '</div></div>'+
-        '<div class="panel-body flush agenda-scroll">'+
+        '<div class="panel-body flush agenda-scroll" id="calendar-scroll">'+
           agenda.map(r=>
-            '<div class="agenda-row'+(r.past?' past':'')+(r.next?' next':'')+'"'+
-              (r.oppId?(' onclick="location.hash=\'#/opp/'+r.oppId+'\'"'):'')+'>'+
-              '<div class="agenda-time">'+hhmm12(r.time)+'</div>'+
-              '<div class="agenda-main">'+
-                '<div class="agenda-title">'+esc(r.title)+'</div>'+
-                '<div class="agenda-sub">'+esc(r.sub)+'</div>'+
-              '</div>'+
-              (r.next?'<div class="agenda-tag">Next</div>':'')+
-            '</div>').join('')+
+            r.empty
+              ? '<div class="agenda-row empty"><div class="agenda-time">'+hhmm12(r.time)+'</div></div>'
+              : '<div class="agenda-row'+(r.past?' past':'')+(r.next?' next':'')+'"'+
+                (r.oppId?(' onclick="location.hash=\'#/opp/'+r.oppId+'\'"'):'')+'>'+
+                '<div class="agenda-time">'+hhmm12(r.time)+'</div>'+
+                '<div class="agenda-main">'+
+                  '<div class="agenda-title">'+esc(r.title)+'</div>'+
+                  '<div class="agenda-sub">'+esc(r.sub)+'</div>'+
+                '</div>'+
+                (r.next?'<div class="agenda-tag">Next</div>':'')+
+              '</div>').join('')+
         '</div>'+
       '</div>'+
 
@@ -46589,6 +46623,25 @@ function renderHome(){
     '</div>';
 
   packHomeGrid();
+  /* Default scroll window: near working hours / the next thing on the clock, not the very top
+     of the 7am day-start. Mirrors how a real calendar app opens — scrolled to "now," with a
+     little past context still visible above, not to the literal beginning of the day.
+     getBoundingClientRect() math, not .offsetTop: #calendar-scroll has no positioned ancestor of
+     its own, so raw .offsetTop resolves against whatever positioned ancestor is further up the
+     tree — not this container — and silently gives the wrong number. Deferred to document.fonts.
+     ready: setting scrollTop one requestAnimationFrame after mount raced the web fonts (Newsreader/
+     Inter Tight/JetBrains Mono) still loading, so the position was computed against a shorter,
+     pre-font-swap layout and never corrected once the real fonts came in and rows grew taller. */
+  const positionCalendarScroll = () => {
+    const cal = document.getElementById('calendar-scroll');
+    if(!cal) return;
+    const anchor = cal.querySelector('.agenda-row.next') || cal.querySelector('.agenda-row:not(.past):not(.empty)');
+    if(!anchor) return;
+    const offset = anchor.getBoundingClientRect().top - cal.getBoundingClientRect().top + cal.scrollTop;
+    cal.scrollTop = Math.max(0, offset - 80);
+  };
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(positionCalendarScroll);
+  else requestAnimationFrame(positionCalendarScroll);
 }
 
 function renderExecHomeStub(){
@@ -47316,6 +47369,70 @@ function demoOnlyBannerHtml(){
   '</div>';
 }
 
+/* ================================================================
+   PROCESSING RING — reusable "working" component (Option A).
+   Drives extraction and the intelligence run (and any future "system is working" beat). Markup
+   from processRingHtml(); the center text is driven separately by startPhraseCycle() so callers
+   can mount the ring once and update its count/caption with plain DOM writes as real progress
+   comes in, same as the rest of drawIntake() already does.
+   ================================================================ */
+function processRingHtml(prefix, caption){
+  return '<div class="proc-ring-block">'+
+    '<div class="proc-ring">'+
+      '<svg class="proc-ring-svg" viewBox="0 0 100 100" aria-hidden="true">'+
+        '<circle class="proc-ring-track" cx="50" cy="50" r="44"></circle>'+
+        '<circle class="proc-ring-arc" cx="50" cy="50" r="44"></circle>'+
+      '</svg>'+
+      '<div class="proc-ring-center"><span class="proc-ring-center-text" id="'+prefix+'-center"></span></div>'+
+    '</div>'+
+    '<div class="proc-count" id="'+prefix+'-count">&nbsp;</div>'+
+    '<div class="proc-caption">'+esc(caption)+'</div>'+
+  '</div>';
+}
+/* Cycles `phrases` in the element `centerId`, one at a time, fading between them, on a fixed
+   timer that is DELIBERATELY independent of real progress (extraction/intelligence's actual N-of-M
+   count is driven separately by the caller — see drawIntake()). With 4-6 phrases and hundreds of
+   real items, showing one phrase per item would take minutes; the phrases are representative
+   narration of the kind of work happening, not a 1:1 ticker. Self-cleaning: once the mounting
+   element is gone (the caller moved on to another intake state), the next tick clears its own
+   interval rather than requiring every state transition to remember to cancel it. Respects
+   prefers-reduced-motion by never starting the interval — CSS alone can silence the ring's own
+   rotation (the global reduced-motion media query already does), but a JS setInterval keeps
+   running regardless of CSS, so it has to be skipped here explicitly. */
+function startPhraseCycle(centerId, phrases, intervalMs){
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let idx = 0;
+  function showNext(){
+    const el = document.getElementById(centerId);
+    if(!el){ if(timer) clearInterval(timer); return; }
+    const fadeDelay = idx===0 ? 0 : 350;
+    if(idx>0) el.style.opacity = '0';
+    setTimeout(function(){
+      const el2 = document.getElementById(centerId);
+      if(!el2) return;
+      el2.textContent = phrases[idx % phrases.length];
+      el2.style.opacity = '1';
+      idx++;
+    }, fadeDelay);
+  }
+  let timer = null;
+  showNext();
+  if(!reduced) timer = setInterval(showNext, intervalMs || 2200);
+}
+/* Picks up to `count` phrases spread evenly across `labels` (not just the first N — a straight
+   slice would always land on the same base document types and never surface a scenario's
+   product-specific docs) and maps each to its real narration phrase via DOC_PHRASES. Every phrase
+   traces back to a document type actually in `labels` (CLAUDE.md §2b) — this only changes HOW MANY
+   of the real set get cycled, never fabricates one that wasn't there. */
+function pickCyclePhrases(labels, count){
+  count = Math.max(1, Math.min(count || 5, labels.length));
+  const picked = [];
+  for(let i=0;i<count;i++){
+    picked.push(labels[Math.floor(i*labels.length/count)]);
+  }
+  return picked.map(l => (DOC_PHRASES[l] || ('Reading '+l.toLowerCase()))+'…');
+}
+
 function drawIntake(){
   const el = document.getElementById('view-intake');
 
@@ -47357,50 +47474,36 @@ function drawIntake(){
   }
 
   if(INTAKE_STATE==='extracting'){
-    /* Per-file checkmark rows don't scale (absurd at 100 docs) and read as a literal upload
-       list rather than "the system is understanding." A processing state instead: a central
-       pulse (never a spinner), a running N-of-M count, and a single narration line that cycles
-       through phrases tied to the actual uploaded set (CLAUDE.md §2b) — never a doc type that
-       wasn't in this scenario's list. */
+    /* The processing ring (Option A) — see processRingHtml()/startPhraseCycle() above. Center
+       text cycles a small representative set of phrases on its own fixed timer, decoupled from
+       the real document count: with 100 docs, showing one phrase per document would take
+       minutes, so the ring narrates the KIND of work happening while the count below it ticks
+       the real N-of-M truthfully and separately. Every cycled phrase still traces back to a
+       document type actually in this scenario's uploaded set (CLAUDE.md §2b). Total wall-clock
+       time is held roughly constant regardless of document count — the count's own pace is what
+       scales, not the ring's — so a small demo scenario and a hypothetical much larger one both
+       read as the same calm, fixed-length beat rather than one that balloons with volume. */
     const labels = intakeDocLabels(INTAKE_CTX.productType);
     const total = labels.length;
-    const closing = ['Cross-checking figures across documents','Populating deal fields'];
-    const totalSteps = total + closing.length;
+    const phrases = pickCyclePhrases(labels, 5).concat(['Cross-checking totals…']);
     el.innerHTML =
       '<h1 class="page-heading">New Opportunity</h1>'+
       '<div class="page-sub">Extracting from '+total+' documents&hellip;</div>'+
       wizardBarHtml(1)+
       demoOnlyBannerHtml()+
-      '<div class="panel"><div class="panel-body pad-top">'+
-        '<div class="process-stage">'+
-          '<div class="pulse-wave">'+'<div class="pulse-bar"></div>'.repeat(5)+'</div>'+
-          '<div class="process-count" id="extract-count">Preparing to read '+total+' document'+(total===1?'':'s')+'&hellip;</div>'+
-          '<div class="process-phrase" id="extract-phrase">Opening upload&hellip;</div>'+
-        '</div>'+
-        '<div class="progressbar"><div class="progressbar-fill" id="extract-progress"></div></div>'+
-      '</div></div>';
-    let step=0;
-    const advance=()=>{
-      const bar=document.getElementById('extract-progress');
-      const countEl=document.getElementById('extract-count');
-      const phraseEl=document.getElementById('extract-phrase');
-      if(step>=totalSteps){
-        if(bar) bar.style.width='100%';
-        INTAKE_TIMER=setTimeout(()=>{ INTAKE_STATE='ready'; drawIntake(); }, 500);
-        return;
-      }
-      if(step<total){
-        if(countEl) countEl.textContent='Reading '+(step+1)+' of '+total+' document'+(total===1?'':'s')+'…';
-        if(phraseEl) phraseEl.textContent=(DOC_PHRASES[labels[step]] || ('Reading '+labels[step].toLowerCase()))+'…';
-      } else {
-        if(countEl) countEl.textContent='Reading '+total+' of '+total+' document'+(total===1?'':'s')+'…';
-        if(phraseEl) phraseEl.textContent=closing[step-total]+'…';
-      }
-      if(bar) bar.style.width = Math.round(((step+1)/totalSteps)*100)+'%';
-      step++;
-      INTAKE_TIMER=setTimeout(advance, 550);
-    };
-    INTAKE_TIMER=setTimeout(advance, 300);
+      '<div class="panel">'+processRingHtml('extract', 'Reading your documents')+'</div>';
+    startPhraseCycle('extract-center', phrases, 2200);
+    const COUNT_TICK_MS = 220, MIN_TOTAL_MS = 5200;
+    let n = 0;
+    const countTimer = setInterval(function(){
+      const ce = document.getElementById('extract-count');
+      if(!ce){ clearInterval(countTimer); return; }
+      n++;
+      ce.textContent = n+' of '+total+' document'+(total===1?'':'s');
+      if(n>=total) clearInterval(countTimer);
+    }, COUNT_TICK_MS);
+    INTAKE_TIMER = setTimeout(function(){ INTAKE_STATE='ready'; drawIntake(); },
+      Math.max(MIN_TOTAL_MS, total*COUNT_TICK_MS) + 500);
     return;
   }
 
@@ -47456,11 +47559,17 @@ function drawIntake(){
   }
 
   if(INTAKE_STATE==='intelligence'){
-    /* Round 3b — a distinct beat from extraction: extraction reads what was handed to you,
-       this pulls in enrichment/intelligence sources. Deliberately NOT auto-run — see the
-       'ready' gate above — but stays visually its own step (own wizard-bar stop, own panel,
-       its own per-source resolve) once started, so the two jobs don't blur together. */
+    /* Round 3b — a distinct beat from extraction: extraction reads what was handed to you, this
+       pulls in enrichment/intelligence sources. Deliberately NOT auto-run — see the 'ready' gate
+       above — but stays visually its own step once started. Reuses the SAME processing-ring
+       component extraction uses (Option A): the ring's center cycles through the sources BEING
+       queried on its own independent timer, while the count below it ticks the real "N of 4
+       sources" truthfully in step with the checklist. The per-source checklist below the ring is
+       unchanged in mechanism — each source still resolves individually to a green check and a
+       dataset-real result — just slowed roughly 3x (was 500ms/450ms, now 1500ms/1350ms) so each
+       step reads as real work rather than flashing past. */
     const results = intelligenceResults(INTAKE_CTX.account);
+    const phrases = ['Querying Dun & Bradstreet','Searching ZoomInfo','Running lien/UCC search','Mapping network relationships'];
     el.innerHTML =
       '<h1 class="page-heading">New Opportunity</h1>'+
       '<div class="page-sub">Running intelligence on '+esc(INTAKE_CTX.account.name)+'&hellip;</div>'+
@@ -47471,6 +47580,7 @@ function drawIntake(){
           '<div class="panel-title">Intelligence run</div>'+
           '<div class="panel-scope">Premium intelligence layer — D&amp;B, ZoomInfo, lien search, network mapping</div>'+
         '</div></div>'+
+        processRingHtml('intel', 'Running intelligence')+
         '<div class="panel-body pad-top">'+
           results.map((r,i)=>
             '<div class="intel-row" id="intel-row-'+i+'">'+
@@ -47483,6 +47593,9 @@ function drawIntake(){
           ).join('')+
         '</div>'+
       '</div>';
+    startPhraseCycle('intel-center', phrases, 2200);
+    const intelCount0 = document.getElementById('intel-count');
+    if(intelCount0) intelCount0.textContent = '0 of '+results.length+' sources';
     let step=0;
     const advance=()=>{
       if(step>=results.length){
@@ -47496,9 +47609,11 @@ function drawIntake(){
       const nextStatus=document.getElementById('intel-status-'+(step+1));
       if(nextStatus) nextStatus.classList.add('working');
       step++;
-      INTAKE_TIMER=setTimeout(advance, 450);
+      const countEl=document.getElementById('intel-count');
+      if(countEl) countEl.textContent = step+' of '+results.length+' sources';
+      INTAKE_TIMER=setTimeout(advance, 1350);
     };
-    INTAKE_TIMER=setTimeout(advance, 500);
+    INTAKE_TIMER=setTimeout(advance, 1500);
     return;
   }
 
