@@ -47318,7 +47318,9 @@ function commitDraftOpportunity(draft){
 
 /* Intelligence run (round 3b): D&B, ZoomInfo, LexisNexis lien search, and network/relationship
    mapping, in sequence. Every result is computed from this account's real records (CLAUDE.md
-   §2b) — never a fabricated per-run figure, so the same account always reports the same numbers. */
+   §2b) — never a fabricated per-run figure, so the same account always reports the same numbers.
+   `warn` marks a genuine verdict (a subordinated lien is decaying/actionable, CLAUDE.md D51's
+   --warn semantics) — never set on a plain count like a contact total, which isn't a conclusion. */
 function intelligenceResults(acct){
   const contacts = CONTACTS_BY_ACCT[acct.id] || [];
   const liens = LIENS_BY_ACCT[acct.id] || [];
@@ -47336,7 +47338,8 @@ function intelligenceResults(acct){
     {source:'LexisNexis lien search', working:'Searching UCC filings…',
       result: liens.length
         ? liens.length+' UCC filing'+(liens.length===1?'':'s')+(hasSub?' · subordination present':'')
-        : 'No UCC filings on record'},
+        : 'No UCC filings on record',
+      warn: hasSub},
     {source:'Network mapping', working:'Mapping trade relationships…',
       result: !edges.length ? 'No trade relationships on record'
         : wonEdges.length ? edges.length+' trade relationship'+(edges.length===1?'':'s')+' · connects to '+wonEdges.length+' Closed-Won account'+(wonEdges.length===1?'':'s')
@@ -47344,10 +47347,46 @@ function intelligenceResults(acct){
   ];
 }
 
+/* Renders the intelligence run's results ON THE REVIEW STEP — previously computed in the
+   'intelligence' state (see below) then thrown away the instant INTAKE_STATE moved to 'review';
+   nothing of the run survived to the moment that actually decides what gets created. Only called
+   when INTAKE_INTEL is set (the Run-Intelligence path); Skip leaves it null and this panel simply
+   isn't rendered — no empty state, no "you skipped this" placeholder penalizing that choice.
+   Every line is READ-ONLY: a lien, a trade edge, a contact count, or a match confirmation is a
+   derived fact about the account, not a field the run wrote onto the draft (nothing here does —
+   Industry/NAICS is already editable via the core fields panel above, sourced from extraction,
+   not from this run), so nothing is wrapped in efSpan. The absence of the hover/pencil affordance
+   IS the "read-only" signal, the same convention the review's own Account/Stage rows already use
+   for their non-editable fields. Reuses .intel-panel/.intel-row/.step-check.done exactly as the
+   gate and run beats render them, so gate preview, run animation, and review persistence all read
+   as the same component at three different moments — no new CSS. */
+function intelResultsPanelHtml(results){
+  return '<div class="panel intel-panel">'+
+    '<div class="panel-header"><div class="panel-header-text">'+
+      '<div class="panel-title">Intelligence</div>'+
+      '<div class="panel-scope">Premium intelligence layer — D&amp;B, ZoomInfo, lien search, network mapping</div>'+
+    '</div></div>'+
+    '<div class="panel-body pad-top">'+
+      results.map(r=>
+        '<div class="intel-row">'+
+          '<div class="step-check done">&#10003;</div>'+
+          '<div class="intel-main">'+
+            '<div class="intel-source">'+esc(r.source)+'</div>'+
+            '<div class="intel-detail">'+esc(r.result)+'</div>'+
+          '</div>'+
+          (r.warn ? '<span class="tag warn">Subordinated</span>' : '')+
+        '</div>'
+      ).join('')+
+    '</div>'+
+  '</div>';
+}
+
 let INTAKE_MODE = 'hero';   // 'hero' | 'simulated'
 let INTAKE_STATE = 'drop';  // 'drop' | 'extracting' | 'ready' | 'intelligence' | 'review'
 let INTAKE_CTX = null;      // {account, productType}
 let INTAKE_DRAFT = null;    // editable draft opportunity, set on entering 'review'
+let INTAKE_INTEL = null;    // intelligenceResults() output, set on entering 'intelligence'; stays
+                             // null on Skip — its presence is what gates the review-step panel
 let INTAKE_TIMER = null;
 
 function renderIntake(mode){
@@ -47355,6 +47394,7 @@ function renderIntake(mode){
   INTAKE_STATE = 'drop';
   INTAKE_CTX = null;
   INTAKE_DRAFT = null;
+  INTAKE_INTEL = null;
   drawIntake();
 }
 
@@ -47579,6 +47619,9 @@ function drawIntake(){
        dataset-real result — just slowed roughly 3x (was 500ms/450ms, now 1500ms/1350ms) so each
        step reads as real work rather than flashing past. */
     const results = intelligenceResults(INTAKE_CTX.account);
+    INTAKE_INTEL = results; // lift into intake state — deterministic, so persisting it here
+                             // (rather than only when the animation finishes) reports nothing
+                             // the run hasn't already actually computed
     const phrases = ['Querying Dun & Bradstreet','Searching ZoomInfo','Running lien/UCC search','Mapping network relationships'];
     el.innerHTML =
       '<h1 class="page-heading">New Opportunity</h1>'+
@@ -47660,6 +47703,7 @@ function drawIntake(){
       '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
         '<div class="panel-title">'+product+' terms</div><div class="panel-scope">Product-conditional fields — this is what changes by product type</div>'+
       '</div></div><div class="panel-body">'+productFieldsHtml(recId)+'</div></div>'+
+      (INTAKE_INTEL ? intelResultsPanelHtml(INTAKE_INTEL) : '')+
       '<div class="actions-end">'+
         '<button class="btn" onclick="startOverIntake()">Start over</button>'+
         '<button class="btn primary" onclick="completeIntake()">Create Opportunity</button>'+
@@ -47690,6 +47734,7 @@ window.skipIntelligence = function(){
 };
 window.startOverIntake = function(){
   INTAKE_DRAFT=null;
+  INTAKE_INTEL=null;
   INTAKE_STATE='drop';
   drawIntake();
 };
