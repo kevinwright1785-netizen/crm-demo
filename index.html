@@ -45988,6 +45988,14 @@ function stageMixSummary(myOpen){
 const MODALS = {};
 let MODAL_RETURN_FOCUS = null;
 let MODAL_OPEN_KEY = null;
+/* A card with its own internal view toggle (Partners, "Where we're losing") must open its modal
+   scoped to whichever view was active on the card, per-key, and let the modal's toggle switch
+   views independently afterward without touching the card. Keyed by modal key so this is one
+   generalized store rather than a pair of near-identical globals per toggle card — a third
+   toggle card (D81's divergence/stage-time card) reuses it for free. Plain JS state, not
+   anything written onto a DOM node, so swapPanel()'s wholesale node replacement (D80) never
+   touches it — confirmed, not assumed: nothing here is read from or written to a card element. */
+const MODAL_VIEW = {};
 
 /* Background scroll lock. position:fixed on the body is used rather than overflow:hidden
    because overflow:hidden still lets the page scroll under a fixed overlay in several browsers.
@@ -46043,12 +46051,16 @@ function oppRowsTable(opps, extra){
     '</tr></thead><tbody>'+rows.join('')+'</tbody></table></div>';
 }
 
-window.openModal = function(key){
+window.openModal = function(key, view){
   const def = MODALS[key];
   if(!def) return;
   closeModal();
   MODAL_RETURN_FOCUS = document.activeElement;
   MODAL_OPEN_KEY = key;
+  /* Only toggle-card callers pass `view` (the card's own current PARTNER_VIEW/LOSS_VIEW/etc.,
+     the single source of truth — never a second one introduced here); a plain metric-tile modal
+     passes nothing and MODALS[key] ignores MODAL_VIEW entirely. */
+  if(view !== undefined) MODAL_VIEW[key] = view;
   const d = def();
   const scrim = document.createElement('div');
   scrim.className = 'scrim';
@@ -46103,8 +46115,16 @@ function refreshModalIfOpen(key){
   const scrim = document.getElementById('modal-scrim');
   const def = MODALS[key];
   if(!scrim || !def) return;
+  const d = def();
   const body = scrim.querySelector('.modal-body');
-  if(body) body.innerHTML = def().body;
+  if(body) body.innerHTML = d.body;
+  /* A toggle card's modal scope line is view-specific (D81) — an edit-replay refresh (this
+     function's original caller) never changes the view, so this used to only ever need to
+     refresh the body. Switching the view INSIDE the modal now also changes what the scope line
+     should say, so it has to be kept in sync here too or the header goes stale against the body
+     it's describing. */
+  const scope = scrim.querySelector('.modal-scope');
+  if(scope) scope.innerHTML = d.scope;
 }
 
 /* ---------- quota progress ----------
@@ -46149,6 +46169,17 @@ function pipelineByStageHtml(myOpen){
     '</div>').join('');
   return '<div class="segbar">'+segs+'</div>'+
     '<div class="stagebar-legend">'+legend+'</div>';
+}
+
+/* ---------- shared toggle-card segmented control ----------
+   Every toggle card (Partners, "Where we're losing", the divergence/stage-time card) renders
+   this exact same control twice — once on the card, once inside its modal (per the modal-scoping
+   fix, CLAUDE.md's editability/consistency spirit) — wired to a different setter each time so
+   switching the modal's view never touches the card's. One markup source, not one per caller. */
+function viewToggleHtml(views, current, setterName){
+  return '<div class="viewtoggle seg" onclick="event.stopPropagation()">'+views.map(v=>
+    '<button class="'+(current===v.key?'active':'')+'" onclick="'+setterName+'(\''+v.key+'\')">'+
+    v.label+'</button>').join('')+'</div>';
 }
 
 /* ---------- partners: one dataset, three views ----------
@@ -46208,24 +46239,29 @@ function partnerStats(bdoId){
   });
 }
 
+/* Filter/sort/scope shared between the card (top 6) and the modal (the full list) — one
+   source for "what does this view mean," not a card copy and a separately-drifting modal copy. */
+function partnerViewRows(stats, view){
+  if(view==='volume'){
+    return { rows: stats.slice().sort((a,b)=>b.mine-a.mine || a.p.name.localeCompare(b.p.name)),
+      scope: 'Referrals sent to you · ranked' };
+  }
+  if(view==='quality'){
+    return { rows: stats.filter(r=>r.winRate!=null)
+      .sort((a,b)=>b.winRate-a.winRate || a.p.name.localeCompare(b.p.name)),
+      scope: 'Closed-won rate on all their referrals, firm-wide' };
+  }
+  return { rows: stats.filter(r=>r.days!=null)
+    .sort((a,b)=>b.days-a.days || a.p.name.localeCompare(b.p.name)),
+    scope: 'Days since their last referral · longest first' };
+}
+
 function partnersPanelHtml(stats){
   const view = PARTNER_VIEW;
-  let rows, scope, max;
-  if(view==='volume'){
-    rows = stats.slice().sort((a,b)=>b.mine-a.mine || a.p.name.localeCompare(b.p.name)).slice(0,6);
-    max = Math.max(1,...rows.map(r=>r.mine));
-    scope = 'Referrals sent to you · ranked';
-  } else if(view==='quality'){
-    rows = stats.filter(r=>r.winRate!=null)
-      .sort((a,b)=>b.winRate-a.winRate || a.p.name.localeCompare(b.p.name)).slice(0,6);
-    max = 1;
-    scope = 'Closed-won rate on all their referrals, firm-wide';
-  } else {
-    rows = stats.filter(r=>r.days!=null)
-      .sort((a,b)=>b.days-a.days || a.p.name.localeCompare(b.p.name)).slice(0,6);
-    max = Math.max(1,...rows.map(r=>r.days));
-    scope = 'Days since their last referral · longest first';
-  }
+  const vd = partnerViewRows(stats, view);
+  const scope = vd.scope;
+  const rows = vd.rows.slice(0,6);
+  const max = view==='quality' ? 1 : Math.max(1,...rows.map(r=>view==='volume'?r.mine:r.days));
 
   const body = rows.map(r=>{
     let width, val, cls='', rowCls='', tip;
@@ -46254,15 +46290,13 @@ function partnersPanelHtml(stats){
     '</div>';
   }).join('');
 
-  return '<div class="panel expandable" id="panel-partners" onclick="openModal(\'partners\')">'+
+  return '<div class="panel expandable" id="panel-partners" onclick="openModal(\'partners\', \''+view+'\')">'+
     '<div class="panel-header"><div class="panel-header-text">'+
       '<div class="panel-title">Partners</div>'+
       '<div class="panel-scope">'+scope+'</div>'+
     '</div><span class="expand-hint">Expand &rsaquo;</span></div>'+
     '<div class="panel-body pad-top">'+
-      '<div class="viewtoggle seg" onclick="event.stopPropagation()">'+PARTNER_VIEWS.map(v=>
-        '<button class="'+(view===v.key?'active':'')+'" onclick="setPartnerView(\''+v.key+'\')">'+
-        v.label+'</button>').join('')+'</div>'+
+      viewToggleHtml(PARTNER_VIEWS, view, 'setPartnerView')+
     '</div>'+
     '<div class="panel-body flush mt-3 toggle-rows">'+
       (rows.length ? body : '<div class="empty">No partner-sourced deals yet.</div>')+
@@ -46304,11 +46338,15 @@ function lossTally(opps, keyFn){
   return t;
 }
 
-function lossViewData(bdoId){
+/* `view` and `limit` are parameters, not the LOSS_VIEW global, so the exact same function serves
+   the card (view=LOSS_VIEW, limit=6) and the modal (any view the modal toggle is on, unlimited —
+   the modal's whole reason for existing is the depth a 6-row card can't show). */
+function lossViewData(bdoId, view, limit){
+  limit = limit==null ? Infinity : limit;
   const myLost = Object.values(OPPS).filter(o=>o.bdoId===bdoId && o.outcome==='lost');
   const firmLost = Object.values(OPPS).filter(o=>o.outcome==='lost');
 
-  if(LOSS_VIEW==='stage'){
+  if(view==='stage'){
     // stage always uses the personal book: four fixed buckets carry a shape even at n=7
     const rows = TRACK_STAGES.map(st=>{
       const g = myLost.filter(o=>o.lostAtStage===st);
@@ -46318,11 +46356,11 @@ function lossViewData(bdoId){
       total:myLost.length, tone:'', firm:false};
   }
 
-  if(LOSS_VIEW==='reason'){
+  if(view==='reason'){
     const usingFirm = myLost.length < LOSS_MIN_SAMPLE * 2;
     const pool = usingFirm ? firmLost : myLost;
     const t = lossTally(pool, o=>o.closedLostReason);
-    const rows = Object.entries(t).sort((a,b)=>b[1].n-a[1].n).slice(0,6)
+    const rows = Object.entries(t).sort((a,b)=>b[1].n-a[1].n).slice(0,limit)
       .map(([k,v])=>({label:k, n:v.n, val:v.val}));
     return {rows, total:pool.length, tone:'', firm:usingFirm,
       scope:(usingFirm?'Firm-wide':'Your book')+' · '+pool.length+
@@ -46333,7 +46371,7 @@ function lossViewData(bdoId){
   const usingFirm = mineAttr.length < LOSS_MIN_SAMPLE;
   const pool = usingFirm ? firmLost.filter(o=>o.lostToCompetitor) : mineAttr;
   const t = lossTally(pool, o=>o.lostToCompetitor);
-  const rows = Object.entries(t).sort((a,b)=>b[1].n-a[1].n).slice(0,6)
+  const rows = Object.entries(t).sort((a,b)=>b[1].n-a[1].n).slice(0,limit)
     .map(([k,v])=>({label:k, n:v.n, val:v.val, ucc:v.ucc}));
   return {rows, total:pool.length, tone:'warn', firm:usingFirm,
     scope:(usingFirm?'Firm-wide':'Your book')+' · '+pool.length+
@@ -46341,10 +46379,11 @@ function lossViewData(bdoId){
 }
 
 function lossPanelHtml(bdoId){
-  const d = lossViewData(bdoId);
+  const view = LOSS_VIEW;
+  const d = lossViewData(bdoId, view, 6);
   const max = Math.max(1, ...d.rows.map(r=>r.n));
   const body = d.rows.map(r=>{
-    const sub = LOSS_VIEW==='competitor'
+    const sub = view==='competitor'
       ? (r.ucc ? r.ucc+' confirmed by a UCC filing' : 'Reported by the borrower')
       : (r.n ? pct(r.n/Math.max(1,d.total))+' of these losses · '+moneyShort(r.val) : 'No losses here');
     const isMax = r.n===max && r.n>0;
@@ -46357,15 +46396,13 @@ function lossPanelHtml(bdoId){
     '</div>';
   }).join('');
 
-  return '<div class="panel expandable" id="panel-loss" onclick="openModal(\'loss\')">'+
+  return '<div class="panel expandable" id="panel-loss" onclick="openModal(\'loss\', \''+view+'\')">'+
     '<div class="panel-header"><div class="panel-header-text">'+
       '<div class="panel-title">Where we\'re losing</div>'+
       '<div class="panel-scope">'+d.scope+'</div>'+
     '</div><span class="expand-hint">Expand &rsaquo;</span></div>'+
     '<div class="panel-body pad-top">'+
-      '<div class="viewtoggle seg" onclick="event.stopPropagation()">'+LOSS_VIEWS.map(v=>
-        '<button class="'+(LOSS_VIEW===v.key?'active':'')+'" onclick="setLossView(\''+v.key+'\')">'+
-        v.label+'</button>').join('')+'</div>'+
+      viewToggleHtml(LOSS_VIEWS, view, 'setLossView')+
     '</div>'+
     '<div class="panel-body flush mt-3 toggle-rows">'+
       (d.rows.length ? body : '<div class="empty">Nothing lost yet.</div>')+
@@ -46377,7 +46414,7 @@ function lossPanelHtml(bdoId){
        placeholder like "&nbsp;" wraps to one line and reserves the wrong height, which is exactly
        what happened on the first pass at this fix (still short by about a line). visibility:
        hidden, not omitting the element, keeps the box's height without painting anything. */
-    '<div class="panel-footer'+(LOSS_VIEW==='competitor'?'':' invisible')+'">'+
+    '<div class="panel-footer'+(view==='competitor'?'':' invisible')+'">'+
       'Attribution comes from the borrower or a competitor&#39;s UCC filing after the loss — not every loss reveals a winner.'+
     '</div>'+
   '</div>';
@@ -46460,21 +46497,28 @@ MODALS.funded = function(){
   };
 };
 
+/* Both partners/loss modals below are scoped to whichever view was active when the card was
+   clicked (MODAL_VIEW[key], set by openModal's `view` arg) — never a fixed dump of every view
+   stacked together. setModalPartnerView/setModalLossView switch only the modal's own state and
+   refresh the modal body in place; they never call swapPanel or applyGridAlignment, so the card
+   and the Home grid are untouched by a view change made inside the modal. */
 MODALS.partners = function(){
-  const stats = partnerStats(CURRENT_BDO_ID)
-    .sort((a,b)=>(b.days||0)-(a.days||0));
-  const rows = stats.map(r=>modalRow([
+  const view = MODAL_VIEW.partners || PARTNER_VIEW;
+  const stats = partnerStats(CURRENT_BDO_ID);
+  const vd = partnerViewRows(stats, view);
+  const rows = vd.rows.map(r=>modalRow([
     {v:esc(r.p.name), cls:'name'}, {v:esc(r.p.partnerType), cls:'sec'},
     {v:r.mine, cls:'num'}, {v:r.firmTotal, cls:'num'},
     {v:r.winRate!=null?pct(r.winRate):'—', cls:'num'},
     {v:r.days!=null?r.days+'d':'—', cls:'num'},
-    {v:r.p.isDormant?'Dormant':'Active', cls:r.p.isDormant?'sec':'sec'},
-  ], r.p.isDormant?'':''));
+    {v:r.p.isDormant?'Dormant':'Active', cls:'sec'},
+  ]));
   const dormant = stats.filter(r=>r.p.isDormant).length;
   return {
     title:'Partners',
-    scope:stats.length+' referral sources on your book · '+dormant+' gone quiet',
-    body: modalStrip([
+    scope: vd.scope,
+    body: viewToggleHtml(PARTNER_VIEWS, view, 'setModalPartnerView')+
+    modalStrip([
       {label:'Referral sources', value:stats.length},
       {label:'Gone quiet', value:dormant},
       {label:'Referrals to you', value:stats.reduce((s,r)=>s+r.mine,0)},
@@ -46485,43 +46529,42 @@ MODALS.partners = function(){
       {label:'Win rate',num:true},{label:'Last referral',num:true},'Status'], rows),
   };
 };
+window.setModalPartnerView = function(v){ MODAL_VIEW.partners = v; refreshModalIfOpen('partners'); };
 
+function lossModalTable(view, rows){
+  if(view==='competitor'){
+    return modalTable(['Lender',{label:'Deals',num:true},{label:'Facility',num:true},{label:'Evidence',num:true}],
+      rows.map(r=>modalRow([{v:esc(r.label), cls:'name'}, {v:r.n, cls:'num'}, {v:moneyPlain(r.val), cls:'num'},
+        {v:r.ucc+' UCC', cls:'num sec'}])));
+  }
+  const header = view==='reason' ? 'Closed lost reason' : 'Stage';
+  return modalTable([header,{label:'Lost',num:true},{label:'Facility',num:true}],
+    rows.map(r=>modalRow([{v:esc(r.label), cls:'name'}, {v:r.n, cls:'num'}, {v:moneyPlain(r.val), cls:'num'}])));
+}
 MODALS.loss = function(){
-  const mineLost = myOpps().filter(o=>o.outcome==='lost');
+  const view = MODAL_VIEW.loss || LOSS_VIEW;
+  const d = lossViewData(CURRENT_BDO_ID, view);
   const firmLost = Object.values(OPPS).filter(o=>o.outcome==='lost');
   const attributed = firmLost.filter(o=>o.lostToCompetitor);
-  const stageRows = TRACK_STAGES.map(st=>{
-    const g = mineLost.filter(o=>o.lostAtStage===st);
-    return modalRow([{v:st, cls:'name'}, {v:g.length, cls:'num'},
-      {v:moneyPlain(g.reduce((t,o)=>t+o.facilitySize,0)), cls:'num'}]);
-  });
-  const reasonT = lossTally(firmLost, o=>o.closedLostReason);
-  const reasonRows = Object.entries(reasonT).sort((a,b)=>b[1].n-a[1].n).map(([k,v])=>
-    modalRow([{v:esc(k), cls:'name'}, {v:v.n, cls:'num'}, {v:moneyPlain(v.val), cls:'num'}]));
-  const compT = lossTally(attributed, o=>o.lostToCompetitor);
-  const compRows = Object.entries(compT).sort((a,b)=>b[1].n-a[1].n).map(([k,v])=>
-    modalRow([{v:esc(k), cls:'name'}, {v:v.n, cls:'num'}, {v:moneyPlain(v.val), cls:'num'},
-      {v:v.ucc+' UCC', cls:'num sec'}]));
   return {
     title:'Where we\'re losing',
-    scope:'Three views of the same losses — where they die, why, and who takes them',
-    body: modalStrip([
-      {label:'Your losses', value:mineLost.length},
-      {label:'Firm losses', value:firmLost.length},
-      {label:'Winner identified', value:attributed.length+' of '+firmLost.length},
+    scope: d.scope,
+    body: viewToggleHtml(LOSS_VIEWS, view, 'setModalLossView')+
+    modalStrip([
+      {label:(d.firm?'Firm losses':'Your losses'), value:d.total},
+      {label:'Distinct '+(view==='competitor'?'lenders':view==='reason'?'reasons':'stages'),
+        value:d.rows.filter(r=>r.n>0).length},
+      {label:'Largest single-bucket loss', value: d.rows.length?moneyShort(Math.max(...d.rows.map(r=>r.val))):'—'},
     ]) +
-    '<div class="panel-title mt-4">By stage — your book</div>'+
-    modalTable(['Stage',{label:'Lost',num:true},{label:'Facility',num:true}], stageRows)+
-    '<div class="panel-title mt-5">By reason — firm-wide</div>'+
-    modalTable(['Closed lost reason',{label:'Lost',num:true},{label:'Facility',num:true}], reasonRows)+
-    '<div class="panel-title mt-5">Lost to — firm-wide</div>'+
-    modalTable(['Lender',{label:'Deals',num:true},{label:'Facility',num:true},
-      {label:'Evidence',num:true}], compRows)+
-    '<p class="chart-note mt-3">Attribution comes from the borrower or from a competitor\'s UCC '+
-    'filing after the loss. '+attributed.length+' of '+firmLost.length+' losses named a winner — '+
-    'the rest never revealed one.</p>',
+    (view==='competitor'
+      ? '<p class="chart-note mt-3">Attribution comes from the borrower or from a competitor\'s UCC '+
+        'filing after the loss. '+attributed.length+' of '+firmLost.length+' losses named a winner — '+
+        'the rest never revealed one.</p>'
+      : '')+
+    lossModalTable(view, d.rows),
   };
 };
+window.setModalLossView = function(v){ MODAL_VIEW.loss = v; refreshModalIfOpen('loss'); };
 
 /* True shortest-column packing (D34), generalized (D73) so a second consumer — the Opportunity
    record's Details grid — reuses this exact algorithm instead of a second packer. CSS multi-column
