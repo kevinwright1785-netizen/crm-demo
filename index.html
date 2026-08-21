@@ -477,14 +477,13 @@ table.tbl{width:100%;border-collapse:collapse}
    inventing record-page-specific components, so it stops reading as a different app glued onto
    Home. min-width:0 on .record-main stops wide content (tables) from blowing past the viewport. */
 .record-main{min-width:0}
-/* Details tab: two columns of unequal weight, not equal height boxes — the varying heights in the
-   narrow column are deliberate (D71). align-items:start keeps each column sized to its own
-   content instead of stretching to match the other. A plain grid, not the masonry packer: the
-   card set is fixed, not variable-count, same reasoning as the BDO Home pair-row (PROJECT_STATE
-   §13, "masonry packing is reserved for the variable-count analytical grid only"). */
-.opp-details-grid{display:grid;grid-template-columns:2fr 1fr;gap:var(--s5);align-items:start}
-@media (max-width:900px){.opp-details-grid{grid-template-columns:1fr}}
-.opp-col{min-width:0}
+/* Details tab (D73): a real packed grid, reusing Home's own packHomeGrid()/.home-col — not a
+   hand-assigned two-column split (that read as a fixed layout, not a pack, and is why the left
+   column used to run dry while the right kept going). Same shape as .home-grid deliberately, so
+   this reads as the same component, not a lookalike: equal-width flex columns, cards placed at
+   runtime by measured shortest-column packing, Next Best Action anchored to column one exactly
+   like the action feed anchors Home's. */
+.opp-details-grid{display:flex;gap:var(--s5);align-items:flex-start}
 /* Compact single-line rows, reused by the Signals card. A small colored glyph (no icon box, no
    radius) plus text — deliberately not .feedrow/.feed-icon, whose zero-padding "static" variant
    combined with a "flush" panel body caused the icon-overlaps-the-edge bug (D69/D71); these rows
@@ -46514,20 +46513,25 @@ MODALS.loss = function(){
   };
 };
 
-/* True shortest-column packing. CSS multi-column balances by content flow, which with
-   unbreakable cards left a 464px dead column under the shorter side — the exact void this
-   replaces. Here each card is placed into whichever column is currently shortest, measured
-   live, so the columns finish within a card's height of each other no matter what the feed
-   length is. The action feed is pinned to column one first because it is the hero; everything
-   after it packs. */
+/* True shortest-column packing (D34), generalized (D73) so a second consumer — the Opportunity
+   record's Details grid — reuses this exact algorithm instead of a second packer. CSS multi-column
+   balances by content flow, which with unbreakable cards left a 464px dead column under the
+   shorter side — the exact void this replaces. Each card is placed into whichever column is
+   currently shortest, measured live, so the columns finish within a card's height of each other
+   no matter what the card set is. The first card is pinned to column one because it's the anchor
+   (Home's action feed; the Opportunity record's Next Best Action) — everything after it packs.
+   `after`, if given, runs once packing has genuinely completed (not on a discarded 0-height retry
+   frame) — the Opportunity record uses it to run the bottom-alignment flex pass (D73) only after
+   real column heights exist to measure. */
 const HOME_BREAKPOINT = 1140;
-function packHomeGrid(){
-  const grid = document.querySelector('.home-grid');
+const PACK_RETRY = {};
+function packGrid(selector, breakpoint, after){
+  const grid = document.querySelector(selector);
   if(!grid) return;
   const cards = Array.from(grid.querySelectorAll(':scope > .home-col > *, :scope > *'))
     .filter(el => !el.classList.contains('home-col'));
   if(!cards.length) return;
-  const colCount = window.innerWidth <= HOME_BREAKPOINT ? 1 : 2;
+  const colCount = window.innerWidth <= breakpoint ? 1 : 2;
   grid.innerHTML = '';
   const cols = [];
   for(let i=0;i<colCount;i++){
@@ -46545,16 +46549,22 @@ function packHomeGrid(){
   // If we were measured inside a hidden container every height read as 0 and everything piled
   // into column one. Detect that and re-pack once the view is actually laid out.
   if(colCount > 1 && cols[1].children.length === 0 && cards.length > 2 &&
-     typeof requestAnimationFrame === 'function' && !packHomeGrid._retry){
-    packHomeGrid._retry = true;
-    requestAnimationFrame(()=>{ packHomeGrid._retry = false; packHomeGrid(); });
+     typeof requestAnimationFrame === 'function' && !PACK_RETRY[selector]){
+    PACK_RETRY[selector] = true;
+    requestAnimationFrame(()=>{ PACK_RETRY[selector] = false; packGrid(selector, breakpoint, after); });
+    return;
   }
+  if(after) after();
 }
+function packHomeGrid(){ packGrid('.home-grid', HOME_BREAKPOINT); }
 let HOME_RESIZE_TIMER = null;
 window.addEventListener('resize', function(){
-  if(!document.querySelector('.home-grid')) return;
+  if(!document.querySelector('.home-grid') && !document.querySelector('.opp-details-grid')) return;
   clearTimeout(HOME_RESIZE_TIMER);
-  HOME_RESIZE_TIMER = setTimeout(packHomeGrid, 120);
+  HOME_RESIZE_TIMER = setTimeout(function(){
+    if(document.querySelector('.home-grid')) packHomeGrid();
+    if(document.querySelector('.opp-details-grid')) packOppGrid();
+  }, 120);
 });
 
 function renderHome(){
@@ -47144,7 +47154,7 @@ function sectionNextBestActionCardHtml(o, recId){
     ? '<div class="band-line">'+efSpan(recId,DEF_INDEX['core.nextBestAction'])+'</div>'+
       '<div class="band-meta">'+esc(nextBestActionMeta(o))+'</div>'
     : '<div class="band-line">'+efSpan(recId,DEF_INDEX['core.nextBestAction'])+'</div>';
-  return '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
+  return '<div class="panel" data-card="nba"><div class="panel-header"><div class="panel-header-text">'+
       '<div class="panel-title">Next best action</div>'+
       '<div class="panel-scope">Rep or underwriter status, read in pipeline meetings</div>'+
     '</div></div><div class="panel-body">'+body+'</div></div>';
@@ -47179,7 +47189,7 @@ function sectionSignalsCardHtml(o){
   else if(rows.length<=MAX) body = rows.join('');
   else body = rows.slice(0,MAX).join('')+'<div class="band-more">+'+(rows.length-MAX)+' more</div>';
 
-  return '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
+  return '<div class="panel" data-card="signals"><div class="panel-header"><div class="panel-header-text">'+
       '<div class="panel-title">Signals</div>'+
       '<div class="panel-scope">Computed from liens, network, and stage history</div>'+
     '</div></div><div class="panel-body">'+body+'</div>'+
@@ -47234,6 +47244,18 @@ const OPP_SECTIONS = [
 ];
 let OPP_SECTION = 'details';
 let OPP_SECTION_FOR = null;
+/* Packed-grid state (D73), remembered per record so an edit-triggered re-render — renderOpp() runs
+   on every inline save via EF_RERENDER, not just on navigation — REPLAYS the last real packing
+   decision instead of re-measuring. Re-measuring on every render would call packGrid()'s
+   grid.innerHTML='' on every save, reintroducing the D34/D35 scroll-jump via a different trigger
+   than the one D35 already fixed. All reset together on a genuinely different record (renderOpp);
+   OPP_GRID_COLUMNS/CARD_KEY_SET also reset whenever the set of rendered cards itself changes (e.g.
+   Outcome appearing the moment a deal closes while its record is already open) — that's a
+   structural change, not routine editing, and earns a fresh pack (sectionDetailsHtml detects it). */
+let OPP_GRID_COLUMNS = null;       // [[cardKey,...], [cardKey,...]] from the last real pack
+let OPP_GRID_CARD_KEY_SET = null;  // card keys present at that pack, to detect the set changing
+let OPP_GRID_NEEDS_PACK = false;   // set by sectionDetailsHtml(), read by renderOpp() right after
+let OPP_DEAL_EXTRA_COUNT = 0;      // fields flexDealCard() last revealed beyond the 6-field face
 window.setOppSection = function(key){
   OPP_SECTION = key;
   if(OPP_SECTION_FOR) renderOpp(OPP_SECTION_FOR);
@@ -47262,13 +47284,16 @@ function dealFieldRowsHtml(recId, keys){
     return '<div><dt>'+def.label+'</dt><dd>'+efSpan(recId,def)+'</dd></div>';
   }).join('');
 }
-function sectionDealCardHtml(recId){
-  return '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
+function sectionDealCardHtml(recId, extraCount){
+  extraCount = extraCount || 0;
+  const keys = DEAL_FACE_KEYS.concat(DEAL_MODAL_EXTRA_KEYS.slice(0, extraCount));
+  const stillHidden = DEAL_MODAL_EXTRA_KEYS.length - extraCount;
+  return '<div class="panel" data-card="deal" data-rec="'+esc(recId)+'"><div class="panel-header"><div class="panel-header-text">'+
       '<div class="panel-title">Deal</div><div class="panel-scope">Opportunity-owned fields</div>'+
     '</div></div><div class="panel-body"><dl class="kv kv-2col">'+
-      dealFieldRowsHtml(recId, DEAL_FACE_KEYS)+
+      dealFieldRowsHtml(recId, keys)+
     '</dl></div>'+
-    '<button type="button" class="card-expand" title="Show all deal fields" onclick="openModal(\'oppDeal\')">&#8599;</button>'+
+    (stillHidden>0 ? '<button type="button" class="card-expand" title="Show all deal fields" onclick="openModal(\'oppDeal\')">&#8599;</button>' : '')+
   '</div>';
 }
 MODALS.oppDeal = function(){
@@ -47287,7 +47312,7 @@ MODALS.oppDeal = function(){
 function sectionBorrowerDetailsHtml(o, acct){
   const openOpps = D.opportunities.filter(x=>x.accountId===o.accountId && x.outcome==='open');
   const openTotal = openOpps.reduce((s,x)=>s+x.facilitySize,0);
-  return '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
+  return '<div class="panel" data-card="borrower"><div class="panel-header"><div class="panel-header-text">'+
       '<div class="panel-title">Borrower details</div><div class="panel-scope">From Account</div>'+
     '</div></div><div class="panel-body"><dl class="kv">'+
       '<div><dt>Legal Company Name</dt><dd>'+esc(acct.name)+'</dd></div>'+
@@ -47303,7 +47328,7 @@ function sectionBorrowerDetailsHtml(o, acct){
 
 function sectionUnderwritingCardHtml(recId){
   const obj = EF_STORE[recId].obj;
-  return '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
+  return '<div class="panel" data-card="underwriting"><div class="panel-header"><div class="panel-header-text">'+
       '<div class="panel-title">Underwriting</div><div class="panel-scope">Credit team fields</div>'+
     '</div></div><div class="panel-body"><dl class="kv">'+
       '<div><dt>Underwriter</dt><dd>'+efSpan(recId,DEF_INDEX['core.underwriterId'])+'</dd></div>'+
@@ -47324,29 +47349,107 @@ function sectionOutcomeCardHtml(o, recId){
   } else {
     rows += '<div><dt>Funded Date</dt><dd>'+efSpan(recId,DEF_INDEX['core.fundedDate'])+'</dd></div>';
   }
-  return '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
+  return '<div class="panel" data-card="outcome"><div class="panel-header"><div class="panel-header-text">'+
       '<div class="panel-title">Outcome</div><div class="panel-scope">Renders only when the deal is closed</div>'+
     '</div></div><div class="panel-body"><dl class="kv">'+rows+'</dl></div></div>';
 }
 
-/* Packed grid (D71), not a stack of equal height boxes: a wide left column (Next Best Action,
-   Deal) and a narrow right column of cards left deliberately varying height (Signals, product
-   terms, Borrower details, Underwriting, Outcome). Equal height boxes read as generated; letting
-   each card be as tall as its own content is what reads as designed. */
-function sectionDetailsHtml(o, recId, acct){
-  const wide = sectionNextBestActionCardHtml(o, recId)+
-    sectionDealCardHtml(recId);
-  const narrow = sectionSignalsCardHtml(o)+
-    '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
+function sectionProductTermsCardHtml(o, recId){
+  return '<div class="panel" data-card="terms"><div class="panel-header"><div class="panel-header-text">'+
       '<div class="panel-title">'+o.productType+' terms</div><div class="panel-scope">Product-specific commercial terms</div>'+
-    '</div></div><div class="panel-body">'+productFieldsHtml(recId)+'</div></div>'+
-    sectionBorrowerDetailsHtml(o, acct)+
-    sectionUnderwritingCardHtml(recId)+
-    sectionOutcomeCardHtml(o, recId);
-  return '<div class="opp-details-grid">'+
-    '<div class="opp-col">'+wide+'</div>'+
-    '<div class="opp-col">'+narrow+'</div>'+
-  '</div>';
+    '</div></div><div class="panel-body">'+productFieldsHtml(recId)+'</div></div>';
+}
+
+const DETAILS_CARD_ORDER = ['nba','deal','signals','terms','borrower','underwriting','outcome'];
+/* Packed grid (D73), reusing packGrid() — not a hand-assigned two-column split. On a record's
+   first arrival at Details, or whenever the set of rendered cards changes (Outcome appearing the
+   moment a deal closes while its record is already open), this emits a FLAT card list — Next Best
+   Action first, so it anchors column one exactly like Home's action feed anchors its column one —
+   and sets OPP_GRID_NEEDS_PACK so renderOpp() calls packOppGrid() once the DOM exists to measure.
+   On every other render (an edit, re-rendering via EF_RERENDER) this REPLAYS the last real packing
+   decision instead of re-measuring — see the OPP_GRID_* state comment above for why re-measuring
+   here would reintroduce the D34/D35 scroll-jump. */
+function sectionDetailsHtml(o, recId, acct){
+  const cards = {
+    nba: sectionNextBestActionCardHtml(o, recId),
+    deal: sectionDealCardHtml(recId, OPP_DEAL_EXTRA_COUNT),
+    signals: sectionSignalsCardHtml(o),
+    terms: sectionProductTermsCardHtml(o, recId),
+    borrower: sectionBorrowerDetailsHtml(o, acct),
+    underwriting: sectionUnderwritingCardHtml(recId),
+    outcome: sectionOutcomeCardHtml(o, recId),
+  };
+  const presentKeys = DETAILS_CARD_ORDER.filter(k=>cards[k]);
+  const sameCardSet = OPP_GRID_COLUMNS && OPP_GRID_CARD_KEY_SET &&
+    presentKeys.length===OPP_GRID_CARD_KEY_SET.length &&
+    presentKeys.every(k=>OPP_GRID_CARD_KEY_SET.includes(k));
+  OPP_GRID_NEEDS_PACK = !sameCardSet;
+  if(sameCardSet){
+    return '<div class="opp-details-grid">'+
+      OPP_GRID_COLUMNS.map(colKeys=>'<div class="home-col">'+colKeys.map(k=>cards[k]).join('')+'</div>').join('')+
+    '</div>';
+  }
+  return '<div class="opp-details-grid">'+presentKeys.map(k=>cards[k]).join('')+'</div>';
+}
+function captureOppGridColumns(){
+  const grid = document.querySelector('.opp-details-grid');
+  if(!grid) return;
+  OPP_GRID_COLUMNS = Array.from(grid.children).map(col=>
+    Array.from(col.children).filter(c=>c.classList && c.classList.contains('panel')).map(c=>c.dataset.card));
+  OPP_GRID_CARD_KEY_SET = [].concat(...OPP_GRID_COLUMNS);
+}
+function packOppGrid(){
+  packGrid('.opp-details-grid', HOME_BREAKPOINT, function(){ flexDealCard(); captureOppGridColumns(); });
+}
+
+/* Bottom-alignment flex pass (D73). Packing balances columns, it doesn't align their bottoms —
+   even Home's own packer leaves real imbalance, since fixed-content cards rarely sum equal. Deal
+   is the one valid flex candidate on this grid: it already holds 9 real fields back for the modal
+   (D71), so it can genuinely reveal more rows rather than growing with padding, which would just
+   relocate the whitespace inside the card instead of removing it. Every other card on this grid
+   already shows 100% of its available content (Signals caps at 3 possible signals, all shown when
+   present; product terms/Borrower details/Underwriting/Outcome have small fixed field sets with
+   nothing held back) — none of them pass the "can it show more real content" test, so there is no
+   second flex candidate today. That's reported here, not papered over with a stretched card.
+   Always recomputed from the 6-field baseline (never incremental) so shrinking the viewport back
+   can't strand fields revealed that are no longer needed, and the corner control is added back or
+   removed to match — its presence must keep meaning "there is more behind this," honestly.
+   OPP_DEAL_EXTRA_COUNT is updated here so a later replayed render (an edit, not a real pack) keeps
+   showing however many fields were last revealed instead of snapping back to the 6-field face. */
+function flexDealCard(){
+  const grid = document.querySelector('.opp-details-grid');
+  if(!grid) return;
+  const dealCard = grid.querySelector('[data-card="deal"]');
+  if(!dealCard) return;
+  const recId = dealCard.dataset.rec;
+  const body = dealCard.querySelector('.panel-body');
+  const col = dealCard.parentElement;
+  const other = Array.from(grid.children).find(c=>c!==col);
+
+  body.innerHTML = '<dl class="kv kv-2col">'+dealFieldRowsHtml(recId, DEAL_FACE_KEYS)+'</dl>';
+  let extraFieldsNeeded = 0;
+  if(other){
+    const deficit = other.offsetHeight - col.offsetHeight;
+    if(deficit > 0){
+      const rowEl = dealCard.querySelector('.kv-2col > div');
+      const s4 = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--s4')) || 16;
+      const rowHeight = (rowEl ? rowEl.offsetHeight : 40) + s4;
+      extraFieldsNeeded = Math.min(DEAL_MODAL_EXTRA_KEYS.length, Math.ceil(deficit / rowHeight) * 2);
+    }
+  }
+  OPP_DEAL_EXTRA_COUNT = extraFieldsNeeded;
+  if(extraFieldsNeeded > 0){
+    const revealedKeys = DEAL_FACE_KEYS.concat(DEAL_MODAL_EXTRA_KEYS.slice(0, extraFieldsNeeded));
+    body.innerHTML = '<dl class="kv kv-2col">'+dealFieldRowsHtml(recId, revealedKeys)+'</dl>';
+  }
+
+  const stillHidden = DEAL_MODAL_EXTRA_KEYS.length - extraFieldsNeeded;
+  const btn = dealCard.querySelector('.card-expand');
+  if(stillHidden<=0 && btn){ btn.remove(); }
+  else if(stillHidden>0 && !btn){
+    dealCard.insertAdjacentHTML('beforeend',
+      '<button type="button" class="card-expand" title="Show all deal fields" onclick="openModal(\'oppDeal\')">&#8599;</button>');
+  }
 }
 function sectionNetworkHtml(o){
   return networkPanelHtml(o)+
@@ -47401,7 +47504,13 @@ function renderOpp(id){
   // Section resets to Details on a *different* record (you land on the overview, not
   // wherever a previous unrelated deal happened to leave off) but persists across
   // re-renders of the *same* record (e.g. an edit-triggered refresh while on Audit).
-  if(OPP_SECTION_FOR !== id) OPP_SECTION = 'details';
+  const freshRecord = OPP_SECTION_FOR !== id;
+  if(freshRecord){
+    OPP_SECTION = 'details';
+    OPP_GRID_COLUMNS = null;
+    OPP_GRID_CARD_KEY_SET = null;
+    OPP_DEAL_EXTRA_COUNT = 0;
+  }
   OPP_SECTION_FOR = id;
 
   let sectionBody;
@@ -47433,6 +47542,14 @@ function renderOpp(id){
 
     oppMetricStripHtml(o, acct)+
     '<div class="record-main">'+navHtml+sectionBody+'</div>';
+
+  /* Pack (and flex) only when sectionDetailsHtml() actually emitted a flat, unpacked grid — a
+     record's first arrival at Details, or the rendered card set changing (Outcome appearing) —
+     never on a routine edit-triggered re-render, which replays the remembered layout instead
+     (OPP_GRID_NEEDS_PACK, set above). Repacking on every edit would reintroduce the D34/D35
+     scroll-jump (grid.innerHTML='' collapses the container for a frame) via a different trigger
+     than the one D35 already fixed. Resize is the only other trigger, wired separately below. */
+  if(OPP_SECTION==='details' && OPP_GRID_NEEDS_PACK) packOppGrid();
 }
 
 /* ================================================================
