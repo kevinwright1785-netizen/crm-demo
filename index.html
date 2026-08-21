@@ -1,3 +1,4 @@
+<meta charset="utf-8">
 <title>Keystone — Ridgemark Capital</title>
 <style>
 :root{
@@ -46166,7 +46167,14 @@ let PARTNER_VIEW = 'dormancy';
    emptied the grid container to re-pack it, which collapsed the document height for a frame and
    made the browser clamp scroll toward the top — the visible jump. Replacing just this card's
    node leaves every other node, and the scroll position, untouched. Deliberately does NOT
-   re-pack the grid: re-packing moves cards between columns, which is itself a scroll jump. */
+   re-pack the grid: re-packing moves cards between columns, which is itself a scroll jump.
+   IMPORTANT (D79): this replaces the card's node WHOLESALE (`replaceWith`), so any inline style
+   another mechanism wrote onto the old node — specifically alignGridColumns()'s explicit
+   `style.height` on a column's last card — is discarded, not carried over to the fresh node. Any
+   caller that swaps a card which might be an aligned column's last child MUST reapply alignment
+   afterward (applyGridAlignment(), a cheap reapply, not a remeasure); swapPanel() itself doesn't,
+   because it has no way to know which grid it's swapping inside. This generalizes beyond
+   alignment: anything that writes state onto a card node has the same obligation after a swap. */
 function swapPanel(id, html){
   const el = document.getElementById(id);
   if(!el) return false;
@@ -46179,7 +46187,8 @@ function swapPanel(id, html){
 }
 window.setPartnerView = function(v){
   PARTNER_VIEW = v;
-  if(!swapPanel('panel-partners', partnersPanelHtml(partnerStats(CURRENT_BDO_ID)))) renderHome();
+  if(swapPanel('panel-partners', partnersPanelHtml(partnerStats(CURRENT_BDO_ID)))) applyGridAlignment('.home-grid');
+  else renderHome();
 };
 
 function partnerStats(bdoId){
@@ -46278,7 +46287,8 @@ const LOSS_VIEWS = [
 let LOSS_VIEW = 'stage';
 window.setLossView = function(v){
   LOSS_VIEW = v;
-  if(!swapPanel('panel-loss', lossPanelHtml(CURRENT_BDO_ID))) renderHome();
+  if(swapPanel('panel-loss', lossPanelHtml(CURRENT_BDO_ID))) applyGridAlignment('.home-grid');
+  else renderHome();
 };
 const LOSS_MIN_SAMPLE = 5;
 
@@ -46524,7 +46534,8 @@ MODALS.loss = function(){
    frame) — the Opportunity record uses it to run the bottom-alignment flex pass (D73) only after
    real column heights exist to measure. */
 const HOME_BREAKPOINT = 1140;
-const PACK_RETRY = {};
+const PACK_RETRY = {}; // selector -> consecutive failed attempts so far this packing sequence
+const PACK_RETRY_MAX = 3;
 function packGrid(selector, breakpoint, after){
   const grid = document.querySelector(selector);
   if(!grid) return;
@@ -46547,16 +46558,23 @@ function packGrid(selector, breakpoint, after){
     target.appendChild(card);
   });
   // If we were measured inside a hidden container every height read as 0 and everything piled
-  // into column one. Detect that and re-pack once the view is actually laid out.
-  if(colCount > 1 && cols[1].children.length === 0 && cards.length > 2 &&
-     typeof requestAnimationFrame === 'function' && !PACK_RETRY[selector]){
-    PACK_RETRY[selector] = true;
-    requestAnimationFrame(()=>{ PACK_RETRY[selector] = false; packGrid(selector, breakpoint, after); });
+  // into column one. Detect that and re-pack once the view is actually laid out — but only while
+  // BOTH an attempt budget remains AND this attempt is still degenerate (i.e. the previous retry,
+  // if there was one, did not change the outcome). A condition that's still degenerate after
+  // PACK_RETRY_MAX attempts is persistent, not the one-frame hidden-container artifact this retry
+  // was built for, and retrying forever would itself freeze the page regardless of what's causing
+  // the condition (D77) — so it stops here and renders the degenerate-but-stable result instead.
+  const degenerate = colCount > 1 && cols[1].children.length === 0 && cards.length > 2;
+  const attemptsSoFar = PACK_RETRY[selector] || 0;
+  if(degenerate && attemptsSoFar < PACK_RETRY_MAX && typeof requestAnimationFrame === 'function'){
+    PACK_RETRY[selector] = attemptsSoFar + 1;
+    requestAnimationFrame(()=>{ packGrid(selector, breakpoint, after); });
     return;
   }
+  PACK_RETRY[selector] = 0;
   if(after) after();
 }
-function packHomeGrid(){ packGrid('.home-grid', HOME_BREAKPOINT); }
+function packHomeGrid(){ packGrid('.home-grid', HOME_BREAKPOINT, function(){ alignGridColumns('.home-grid'); }); }
 let HOME_RESIZE_TIMER = null;
 window.addEventListener('resize', function(){
   if(!document.querySelector('.home-grid') && !document.querySelector('.opp-details-grid')) return;
@@ -47255,7 +47273,6 @@ let OPP_SECTION_FOR = null;
 let OPP_GRID_COLUMNS = null;       // [[cardKey,...], [cardKey,...]] from the last real pack
 let OPP_GRID_CARD_KEY_SET = null;  // card keys present at that pack, to detect the set changing
 let OPP_GRID_NEEDS_PACK = false;   // set by sectionDetailsHtml(), read by renderOpp() right after
-let OPP_DEAL_EXTRA_COUNT = 0;      // fields flexDealCard() last revealed beyond the 6-field face
 window.setOppSection = function(key){
   OPP_SECTION = key;
   if(OPP_SECTION_FOR) renderOpp(OPP_SECTION_FOR);
@@ -47284,16 +47301,13 @@ function dealFieldRowsHtml(recId, keys){
     return '<div><dt>'+def.label+'</dt><dd>'+efSpan(recId,def)+'</dd></div>';
   }).join('');
 }
-function sectionDealCardHtml(recId, extraCount){
-  extraCount = extraCount || 0;
-  const keys = DEAL_FACE_KEYS.concat(DEAL_MODAL_EXTRA_KEYS.slice(0, extraCount));
-  const stillHidden = DEAL_MODAL_EXTRA_KEYS.length - extraCount;
+function sectionDealCardHtml(recId){
   return '<div class="panel" data-card="deal" data-rec="'+esc(recId)+'"><div class="panel-header"><div class="panel-header-text">'+
       '<div class="panel-title">Deal</div><div class="panel-scope">Opportunity-owned fields</div>'+
     '</div></div><div class="panel-body"><dl class="kv kv-2col">'+
-      dealFieldRowsHtml(recId, keys)+
+      dealFieldRowsHtml(recId, DEAL_FACE_KEYS)+
     '</dl></div>'+
-    (stillHidden>0 ? '<button type="button" class="card-expand" title="Show all deal fields" onclick="openModal(\'oppDeal\')">&#8599;</button>' : '')+
+    '<button type="button" class="card-expand" title="Show all deal fields" onclick="openModal(\'oppDeal\')">&#8599;</button>'+
   '</div>';
 }
 MODALS.oppDeal = function(){
@@ -47372,7 +47386,7 @@ const DETAILS_CARD_ORDER = ['nba','deal','signals','terms','borrower','underwrit
 function sectionDetailsHtml(o, recId, acct){
   const cards = {
     nba: sectionNextBestActionCardHtml(o, recId),
-    deal: sectionDealCardHtml(recId, OPP_DEAL_EXTRA_COUNT),
+    deal: sectionDealCardHtml(recId),
     signals: sectionSignalsCardHtml(o),
     terms: sectionProductTermsCardHtml(o, recId),
     borrower: sectionBorrowerDetailsHtml(o, acct),
@@ -47399,57 +47413,54 @@ function captureOppGridColumns(){
   OPP_GRID_CARD_KEY_SET = [].concat(...OPP_GRID_COLUMNS);
 }
 function packOppGrid(){
-  packGrid('.opp-details-grid', HOME_BREAKPOINT, function(){ flexDealCard(); captureOppGridColumns(); });
+  packGrid('.opp-details-grid', HOME_BREAKPOINT, function(){ captureOppGridColumns(); alignGridColumns('.opp-details-grid'); });
 }
 
-/* Bottom-alignment flex pass (D73). Packing balances columns, it doesn't align their bottoms —
-   even Home's own packer leaves real imbalance, since fixed-content cards rarely sum equal. Deal
-   is the one valid flex candidate on this grid: it already holds 9 real fields back for the modal
-   (D71), so it can genuinely reveal more rows rather than growing with padding, which would just
-   relocate the whitespace inside the card instead of removing it. Every other card on this grid
-   already shows 100% of its available content (Signals caps at 3 possible signals, all shown when
-   present; product terms/Borrower details/Underwriting/Outcome have small fixed field sets with
-   nothing held back) — none of them pass the "can it show more real content" test, so there is no
-   second flex candidate today. That's reported here, not papered over with a stretched card.
-   Always recomputed from the 6-field baseline (never incremental) so shrinking the viewport back
-   can't strand fields revealed that are no longer needed, and the corner control is added back or
-   removed to match — its presence must keep meaning "there is more behind this," honestly.
-   OPP_DEAL_EXTRA_COUNT is updated here so a later replayed render (an edit, not a real pack) keeps
-   showing however many fields were last revealed instead of snapping back to the 6-field face. */
-function flexDealCard(){
-  const grid = document.querySelector('.opp-details-grid');
+/* Bottom alignment (D78, generalized to both grids D79) — computed ONCE per real pack, not a live
+   CSS relationship. D75 and D76 both froze the page using align-items:stretch + a :last-child
+   selector that grows whichever card is currently last while packGrid() is still appending more —
+   since "last child" changes with every appendChild, and stretch makes a column's height depend
+   on the OTHER column's, the quantity packGrid()'s own placement loop measures (offsetHeight, to
+   decide the next card's column) was being fed by a rule reacting to a DOM structure that hadn't
+   finished changing yet. That circular read is what D77 traces as the likely route to the exact
+   degenerate outcome packGrid()'s hidden-container retry exists to catch — see D77/D78 for the
+   full finding. This avoids it structurally: no CSS rule targets anything during placement,
+   nothing for an incremental offsetHeight read to depend on. `alignGridColumns(selector)` runs
+   only from a grid's own `packGrid()` `after` callback — after packing has fully finished
+   appending every card — takes ONE measurement of each column's finished height, and writes ONE
+   explicit pixel height to each shorter column's last card. No listener, no observer, nothing
+   left watching for the next reflow. Content renders at natural size at the top; the extra height
+   is blank space at the card's own bottom, inside its border — expected, per the brief, and not
+   filled with anything (D73's content-reveal approach was rejected on review and stays removed,
+   see D76/D78). Generalized the same way packGrid() itself was (D73): one shared pair of
+   functions, keyed by selector, rather than a second copy for Home (D79). */
+const GRID_LAST_CARD_EXTRA = {}; // selector -> [px to add to each column's last card], from that
+  // grid's last real pack — reapplied on every render that doesn't repack, including a replayed
+  // Opportunity edit and a Home toggle-card swap, so alignment survives without recomputing.
+function alignGridColumns(selector){
+  const grid = document.querySelector(selector);
   if(!grid) return;
-  const dealCard = grid.querySelector('[data-card="deal"]');
-  if(!dealCard) return;
-  const recId = dealCard.dataset.rec;
-  const body = dealCard.querySelector('.panel-body');
-  const col = dealCard.parentElement;
-  const other = Array.from(grid.children).find(c=>c!==col);
-
-  body.innerHTML = '<dl class="kv kv-2col">'+dealFieldRowsHtml(recId, DEAL_FACE_KEYS)+'</dl>';
-  let extraFieldsNeeded = 0;
-  if(other){
-    const deficit = other.offsetHeight - col.offsetHeight;
-    if(deficit > 0){
-      const rowEl = dealCard.querySelector('.kv-2col > div');
-      const s4 = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--s4')) || 16;
-      const rowHeight = (rowEl ? rowEl.offsetHeight : 40) + s4;
-      extraFieldsNeeded = Math.min(DEAL_MODAL_EXTRA_KEYS.length, Math.ceil(deficit / rowHeight) * 2);
-    }
-  }
-  OPP_DEAL_EXTRA_COUNT = extraFieldsNeeded;
-  if(extraFieldsNeeded > 0){
-    const revealedKeys = DEAL_FACE_KEYS.concat(DEAL_MODAL_EXTRA_KEYS.slice(0, extraFieldsNeeded));
-    body.innerHTML = '<dl class="kv kv-2col">'+dealFieldRowsHtml(recId, revealedKeys)+'</dl>';
-  }
-
-  const stillHidden = DEAL_MODAL_EXTRA_KEYS.length - extraFieldsNeeded;
-  const btn = dealCard.querySelector('.card-expand');
-  if(stillHidden<=0 && btn){ btn.remove(); }
-  else if(stillHidden>0 && !btn){
-    dealCard.insertAdjacentHTML('beforeend',
-      '<button type="button" class="card-expand" title="Show all deal fields" onclick="openModal(\'oppDeal\')">&#8599;</button>');
-  }
+  const cols = Array.from(grid.querySelectorAll(':scope > .home-col'));
+  // Clear any previous pass's explicit height before remeasuring, so a stale inflated height
+  // from an earlier resize/pack can't corrupt this pass's "natural height" reading.
+  cols.forEach(col=>{ const c = col.lastElementChild; if(c) c.style.height = ''; });
+  if(cols.length < 2){ GRID_LAST_CARD_EXTRA[selector] = null; return; } // single column — nothing to align
+  const heights = cols.map(c=>c.offsetHeight);
+  const maxHeight = Math.max.apply(null, heights);
+  GRID_LAST_CARD_EXTRA[selector] = heights.map(h=>Math.max(0, maxHeight - h));
+  applyGridAlignment(selector);
+}
+function applyGridAlignment(selector){
+  const grid = document.querySelector(selector);
+  const extras = GRID_LAST_CARD_EXTRA[selector];
+  if(!grid || !extras) return;
+  const cols = Array.from(grid.querySelectorAll(':scope > .home-col'));
+  cols.forEach((col, i)=>{
+    const lastCard = col.lastElementChild;
+    if(!lastCard) return;
+    const extra = extras[i] || 0;
+    lastCard.style.height = extra > 0 ? (lastCard.offsetHeight + extra) + 'px' : '';
+  });
 }
 function sectionNetworkHtml(o){
   return networkPanelHtml(o)+
@@ -47509,7 +47520,7 @@ function renderOpp(id){
     OPP_SECTION = 'details';
     OPP_GRID_COLUMNS = null;
     OPP_GRID_CARD_KEY_SET = null;
-    OPP_DEAL_EXTRA_COUNT = 0;
+    GRID_LAST_CARD_EXTRA['.opp-details-grid'] = null;
   }
   OPP_SECTION_FOR = id;
 
@@ -47543,13 +47554,18 @@ function renderOpp(id){
     oppMetricStripHtml(o, acct)+
     '<div class="record-main">'+navHtml+sectionBody+'</div>';
 
-  /* Pack (and flex) only when sectionDetailsHtml() actually emitted a flat, unpacked grid — a
+  /* Pack (and align) only when sectionDetailsHtml() actually emitted a flat, unpacked grid — a
      record's first arrival at Details, or the rendered card set changing (Outcome appearing) —
      never on a routine edit-triggered re-render, which replays the remembered layout instead
      (OPP_GRID_NEEDS_PACK, set above). Repacking on every edit would reintroduce the D34/D35
      scroll-jump (grid.innerHTML='' collapses the container for a frame) via a different trigger
-     than the one D35 already fixed. Resize is the only other trigger, wired separately below. */
-  if(OPP_SECTION==='details' && OPP_GRID_NEEDS_PACK) packOppGrid();
+     than the one D35 already fixed. Resize is the only other trigger, wired separately below.
+     On the replay path, applyGridAlignment() still runs — it's a cheap reapply of an already
+     -computed number (D78), not a remeasure, so alignment survives an edit without recomputing. */
+  if(OPP_SECTION==='details'){
+    if(OPP_GRID_NEEDS_PACK) packOppGrid();
+    else applyGridAlignment('.opp-details-grid');
+  }
 }
 
 /* ================================================================
