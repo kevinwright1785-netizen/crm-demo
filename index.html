@@ -488,6 +488,7 @@ table.tbl{width:100%;border-collapse:collapse}
 .kv{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:var(--s4) var(--s5)}
 .kv dt{font-size:11px;font-weight:500;color:var(--ink-3)}
 .kv dd{font-size:13px;color:var(--ink);margin-top:var(--s1);font-weight:400}
+.kv dd.muted{color:var(--ink-3)}
 
 .chips-inline{display:flex;flex-wrap:wrap;gap:var(--s2)}
 
@@ -45336,6 +45337,21 @@ const CLOSED_LOST_REASONS = {
   Proposal: ['Lost to competitor on terms', 'Pricing — too expensive', 'Structure rejected'],
   Underwriting: ['Declined in credit committee', 'Failed field exam / appraisal', 'Died in legal / documentation', 'Borrower withdrew'],
 };
+// Mirrors data/generate.js's COMPETITOR_ARCHETYPES exactly (display/edit options only here — the
+// template does no PRNG generation, so unlike the generator's copy this one carries no length
+// constraint). Keep the values in sync by hand if the generator's list ever changes.
+const COMPETITOR_ARCHETYPES = ['Wells Fargo Capital Finance','PNC Business Credit','JPMorgan Chase',
+  'Ares Capital','Golub Capital','Bank of America Business Capital','White Oak Commercial Finance'];
+
+/* New governed vocabularies introduced with the rail/Details rebuild (round 4, D65). None of these
+   exist in data/generate.js — Priority, Risk Rating, Decline Reason, and Underwriter are runtime
+   fields a rep or underwriter fills in as they work the deal, same edit-persists-in-session-only
+   pattern as every other inline-editable field. They start unset on all 250 existing opportunities. */
+const PRIORITIES = ['Low','Medium','High'];
+const RISK_RATINGS = ['Pass','Watch','Special Mention','Substandard','Doubtful']; // regulatory credit-classification categories, not invented tiers
+const DECLINE_REASONS = ['Insufficient collateral coverage','Leverage exceeds policy',
+  'Cash flow coverage insufficient','Concentration risk','Adverse credit history',
+  'Incomplete financial disclosure','Other'];
 
 /* ================================================================
    GENERIC EDITABLE-FIELD ENGINE
@@ -45380,11 +45396,28 @@ const CORE_DEFS = [
       if(match){ if(acct) acct.industryCode=match.code; o.industryCode=match.code; }
     }}),
   cdef('useOfProceeds','Use of Proceeds','select', USE_OF_PROCEEDS),
+  cdef('competitors','Competitor(s)','multiselect', COMPETITOR_ARCHETYPES),
+  cdef('nextStep','Next Step','text'),
+  cdef('nextStepDate','Next Step Date','date',null,{set:(o,v)=>{o.nextStepDate=v||null;}}),
+  cdef('priority','Priority','select', PRIORITIES),
+  cdef('notes','Notes','text'),
+  cdef('nextBestAction','Next Best Action','text',null,{emptyLabel:'Add next best action'}),
+  cdef('underwriterId','Underwriter',
+    'select',[{value:'',label:'Unassigned'}].concat(D.bdos.map(b=>({value:b.id,label:b.name}))),
+    {set:(o,v)=>{o.underwriterId=v||null;}}),
+  cdef('riskRating','Risk Rating','select', RISK_RATINGS),
+  cdef('stipulations','Stipulations','text'),
+  cdef('declineReason','Decline Reason','select', DECLINE_REASONS),
+  cdef('declineReasonDetail','Decline Explanation','text'),
+  cdef('closedLostReasonDetail','Closed Lost Explanation','text'),
 ];
 
-/* Product Type is editable only pre-commit (the intake review draft) — changing it on a live
-   record would invalidate stage history/audit assumptions, out of scope here. Kept out of
-   DEF_INDEX so nothing else picks it up; resolved explicitly by findDef() below. */
+/* Product Type is now live-record editable as well as pre-commit (D65 closes a §2a gap — it was
+   editable only during intake review before this round). Regenerating productFields on a live
+   record is safe: stage history and audit are tracked independently of product type, so nothing
+   downstream breaks. Registered into DEF_INDEX below so efSpan can find it from either context;
+   findDef() still special-cases the key as a fallback for the pre-commit draft, which is never in
+   DEF_INDEX's own record store. */
 const REVIEW_PRODUCT_TYPE_DEF = cdef('productType','Product Type','select',['Factoring','ABL','TermLoan'],{
   set:(o,v)=>{ if(o.productType!==v){ o.productType=v; o.productFields=randomProductFields(v,o.facilitySize); } }
 });
@@ -45415,17 +45448,18 @@ const PDEF = {
 const DEF_INDEX = {};
 CORE_DEFS.forEach(d=>DEF_INDEX[d.key]=d);
 Object.values(PDEF).forEach(d=>DEF_INDEX[d.key]=d);
+DEF_INDEX['core.productType'] = REVIEW_PRODUCT_TYPE_DEF;
 function closedLostReasonDef(lostAtStage){
   return cdef('closedLostReason','Closed Lost Reason','select', CLOSED_LOST_REASONS[lostAtStage]||[]);
 }
 
 function displayValue(def, val, plain){
   if(def.format && !plain) return def.format(val);
-  if(val==null || val==='') return '—';
+  if(val==null || val===''){ return (!plain && def.emptyLabel) || '–'; }
   if(def.type==='money') return moneyPlain(val);
   if(def.type==='percent') return val+'%';
   if(def.type==='date') return fmtDate(val);
-  if(def.type==='multiselect') return (val&&val.length) ? val.join(', ') : '—';
+  if(def.type==='multiselect') return (val&&val.length) ? val.join(', ') : '–';
   if(def.type==='select'){
     const hit=(def.options||[]).find(o=>String(o.value)===String(val));
     return hit ? esc(hit.label) : esc(String(val));
@@ -46299,7 +46333,7 @@ MODALS.pipeline = function(){
   const total = open.reduce((s,o)=>s+o.facilitySize,0);
   return {
     title:'Active pipeline',
-    scope:open.length+' open deals · '+moneyPlain(total)+' in facility commitments',
+    scope:open.length+' open deals · '+moneyPlain(total)+' in facility size',
     body: modalStrip([
       {label:'Open deals', value:open.length},
       {label:'Total facility', value:moneyShort(total)},
@@ -47001,6 +47035,62 @@ function lienPanelHtml(o){
   '</div>';
 }
 
+/* ================================================================
+   RAIL (D64): "the rail carries what the system computed, the main panel
+   carries what the record holds." Three computed reads, never a field dump.
+   ================================================================ */
+function railSignalsHtml(o){
+  const liens = LIENS_BY_ACCT[o.accountId] || [];
+  const hasSub = liens.some(l=>l.subordinated);
+  const edges = EDGES_BY_ACCT[o.accountId] || [];
+  const wonEdges = edges.filter(e=>{
+    const other = e.fromAccountId===o.accountId ? e.toAccountId : e.fromAccountId;
+    return CLOSED_WON_ACCT_IDS.has(other);
+  });
+  const days = o.outcome==='open' ? currentDaysInStage(o) : null;
+  const stale = days!=null && days >= (STAGE_P75[o.stage]||Infinity);
+
+  const rows = [];
+  if(hasSub) rows.push(
+    '<div class="feedrow static"><div class="feed-icon warn">&#9878;</div>'+
+    '<div class="feed-main"><div class="feed-title">Subordinated lien on file</div></div>'+
+    '<div class="tagrow"><span class="tag warn">Subordinated</span></div></div>'
+  );
+  if(wonEdges.length) rows.push(
+    '<div class="feedrow static"><div class="feed-icon">&#8644;</div>'+
+    '<div class="feed-main"><div class="feed-title">Trade ties to '+wonEdges.length+' Closed-Won account'+(wonEdges.length===1?'':'s')+'</div></div>'+
+    '<div class="tagrow"><span class="tag pos">Closed-Won</span></div></div>'
+  );
+  if(stale) rows.push(
+    '<div class="feedrow static"><div class="feed-icon warn">&#9888;</div>'+
+    '<div class="feed-main"><div class="feed-title">Longer in '+o.stage+' than most open deals</div></div>'+
+    '<div class="tagrow">'+
+      '<span class="tag fig warn"'+tipAttr(o.stage, days+' day'+(days===1?'':'s')+' in stage',
+        'Beyond the '+Math.max(STAGE_P75[o.stage]||0,1)+'d typical for '+o.stage)+'>'+days+'d</span>'+
+    '</div></div>'
+  );
+
+  return '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
+      '<div class="panel-title">Signals</div>'+
+      '<div class="panel-scope">Computed from liens, network, and stage history</div>'+
+    '</div></div>'+
+    '<div class="panel-body'+(rows.length?' flush':'')+'">'+
+      (rows.length ? rows.join('') : '<div class="empty">No signals on this deal right now.</div>')+
+    '</div></div>';
+}
+function railBorrowerContextHtml(o, acct){
+  const openOpps = D.opportunities.filter(x=>x.accountId===o.accountId && x.outcome==='open');
+  const openTotal = openOpps.reduce((s,x)=>s+x.facilitySize,0);
+  return '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
+      '<div class="panel-title">Borrower context</div>'+
+      '<div class="panel-scope">From Account</div>'+
+    '</div></div>'+
+    '<div class="panel-body"><dl class="kv">'+
+      '<div><dt>Open Opportunities</dt><dd>'+openOpps.length+' · '+moneyPlain(openTotal)+'</dd></div>'+
+      '<div><dt>Client Since</dt><dd>'+fmtDate(acct.createdDate)+'</dd></div>'+
+    '</dl></div></div>';
+}
+
 function auditPanelHtml(o){
   /* Drop only the open-deal terminal marker (terminal:false), which duplicates the row for the
      stage it marks. terminal:true is NOT a duplicate — it's the distinct ClosedWon/ClosedLost
@@ -47053,21 +47143,88 @@ window.setOppSection = function(key){
   if(OPP_SECTION_FOR) renderOpp(OPP_SECTION_FOR);
 };
 
-function sectionDetailsHtml(o, recId){
-  const competitorsHtml = (o.competitors&&o.competitors.length)
-    ? '<div class="chips-inline">'+o.competitors.map(c=>'<span class="tag neutral">'+esc(c)+'</span>').join('')+'</div>'
-    : '<div class="empty">No competitors identified on this deal.</div>';
-  return (
+/* D61 pattern, built once and reused twice (Decline Reason below, Closed Lost Reason in
+   sectionOutcomeHtml): a governed picklist paired with a free-text explanation that's required
+   when the picklist is set. The `--warn` "Required" tag is the visible tax on the escape hatch —
+   it never blocks the save, since this app has no hard form-validation layer, but it makes the
+   gap visible until filled. */
+function governedExplanationRow(recId, label, reasonSet, def){
+  const missing = reasonSet && !def.get(EF_STORE[recId].obj);
+  return '<div><dt>'+label+(missing?' <span class="tag warn">Required</span>':'')+'</dt><dd>'+efSpan(recId,def)+'</dd></div>';
+}
+
+function sectionDealCardHtml(o, recId){
+  return '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
+      '<div class="panel-title">Deal</div><div class="panel-scope">Opportunity-owned fields</div>'+
+    '</div></div><div class="panel-body"><dl class="kv">'+
+      '<div><dt>Opportunity Name</dt><dd>'+efSpan(recId,DEF_INDEX['core.name'])+'</dd></div>'+
+      '<div><dt>Owner</dt><dd>'+efSpan(recId,DEF_INDEX['core.bdoId'])+'</dd></div>'+
+      '<div><dt>Product Type</dt><dd>'+efSpan(recId,DEF_INDEX['core.productType'])+'</dd></div>'+
+      '<div><dt>Stage</dt><dd>'+stageStatusText(o)+'</dd></div>'+
+      '<div><dt>Facility Size</dt><dd>'+efSpan(recId,DEF_INDEX['core.facilitySize'])+'</dd></div>'+
+      '<div><dt>Expected Close Date</dt><dd>'+efSpan(recId,DEF_INDEX['core.expectedCloseDate'])+'</dd></div>'+
+      '<div><dt>Funded Date</dt><dd>'+efSpan(recId,DEF_INDEX['core.fundedDate'])+'</dd></div>'+
+      '<div><dt>Channel</dt><dd>'+efSpan(recId,DEF_INDEX['core.channel'])+'</dd></div>'+
+      '<div><dt>Referral Partner</dt><dd>'+efSpan(recId,DEF_INDEX['core.referralPartnerId'])+'</dd></div>'+
+      '<div><dt>Referral Date</dt><dd>'+efSpan(recId,DEF_INDEX['core.referralDate'])+'</dd></div>'+
+      '<div><dt>Use of Proceeds</dt><dd>'+efSpan(recId,DEF_INDEX['core.useOfProceeds'])+'</dd></div>'+
+      '<div><dt>Competitor(s)</dt><dd>'+efSpan(recId,DEF_INDEX['core.competitors'])+'</dd></div>'+
+      '<div><dt>Next Step</dt><dd>'+efSpan(recId,DEF_INDEX['core.nextStep'])+'</dd></div>'+
+      '<div><dt>Next Step Date</dt><dd>'+efSpan(recId,DEF_INDEX['core.nextStepDate'])+'</dd></div>'+
+      '<div><dt>Priority</dt><dd>'+efSpan(recId,DEF_INDEX['core.priority'])+'</dd></div>'+
+      '<div><dt>Notes</dt><dd>'+efSpan(recId,DEF_INDEX['core.notes'])+'</dd></div>'+
+    '</dl></div></div>';
+}
+
+function sectionBorrowerDetailsHtml(acct){
+  return '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
+      '<div class="panel-title">Borrower details</div><div class="panel-scope">From Account</div>'+
+    '</div></div><div class="panel-body"><dl class="kv">'+
+      '<div><dt>Legal Company Name</dt><dd>'+esc(acct.name)+'</dd></div>'+
+      '<div><dt>DBA</dt><dd class="muted">Not on file</dd></div>'+
+      '<div><dt>Business Address</dt><dd>'+esc(acct.location)+'</dd></div>'+
+      '<div><dt>Industry</dt><dd>'+esc(acct.industryName)+'</dd></div>'+
+      '<div><dt>Years in Business</dt><dd class="muted">Not on file</dd></div>'+
+      '<div><dt>Annual Revenue</dt><dd>'+moneyPlain(acct.annualRevenue)+'</dd></div>'+
+    '</dl></div></div>';
+}
+
+function sectionUnderwritingCardHtml(recId){
+  const obj = EF_STORE[recId].obj;
+  return '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
+      '<div class="panel-title">Underwriting</div><div class="panel-scope">Credit team fields</div>'+
+    '</div></div><div class="panel-body"><dl class="kv">'+
+      '<div><dt>Underwriter</dt><dd>'+efSpan(recId,DEF_INDEX['core.underwriterId'])+'</dd></div>'+
+      '<div><dt>Risk Rating</dt><dd>'+efSpan(recId,DEF_INDEX['core.riskRating'])+'</dd></div>'+
+      '<div><dt>Stipulations</dt><dd>'+efSpan(recId,DEF_INDEX['core.stipulations'])+'</dd></div>'+
+      '<div><dt>Decline Reason</dt><dd>'+efSpan(recId,DEF_INDEX['core.declineReason'])+'</dd></div>'+
+      governedExplanationRow(recId,'Decline Explanation',!!obj.declineReason,DEF_INDEX['core.declineReasonDetail'])+
+    '</dl></div></div>';
+}
+
+function sectionOutcomeCardHtml(o, recId){
+  if(o.outcome!=='won' && o.outcome!=='lost') return '';
+  let rows = '<div><dt>Closed Reason</dt><dd>'+(o.outcome==='won'?'Won':'Lost')+'</dd></div>';
+  if(o.outcome==='lost'){
+    rows += '<div><dt>Closed Lost Reason</dt><dd>'+efSpan(recId,closedLostReasonDef(o.lostAtStage))+'</dd></div>';
+    rows += governedExplanationRow(recId,'Closed Lost Explanation',true,DEF_INDEX['core.closedLostReasonDetail']);
+    rows += '<div><dt>Died At Stage</dt><dd>'+o.lostAtStage+'</dd></div>';
+  } else {
+    rows += '<div><dt>Funded Date</dt><dd>'+efSpan(recId,DEF_INDEX['core.fundedDate'])+'</dd></div>';
+  }
+  return '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
+      '<div class="panel-title">Outcome</div><div class="panel-scope">Renders only when the deal is closed</div>'+
+    '</div></div><div class="panel-body"><dl class="kv">'+rows+'</dl></div></div>';
+}
+
+function sectionDetailsHtml(o, recId, acct){
+  return sectionDealCardHtml(o, recId)+
+    sectionBorrowerDetailsHtml(acct)+
     '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
       '<div class="panel-title">'+o.productType+' terms</div><div class="panel-scope">Product-specific commercial terms</div>'+
     '</div></div><div class="panel-body">'+productFieldsHtml(recId)+'</div></div>'+
-    '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
-      '<div class="panel-title">Competitors</div><div class="panel-scope">Other capital providers on this deal</div>'+
-    '</div></div><div class="panel-body">'+competitorsHtml+'</div></div>'+
-    '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
-      '<div class="panel-title">Approvals</div><div class="panel-scope">Credit committee</div>'+
-    '</div></div><div class="panel-body"><div class="empty">Approvals object not yet modeled in this dataset — planned for a later pass.</div></div></div>'
-  );
+    sectionUnderwritingCardHtml(recId)+
+    sectionOutcomeCardHtml(o, recId);
 }
 function sectionNetworkHtml(o){
   return networkPanelHtml(o)+
@@ -47122,20 +47279,18 @@ function renderOpp(id){
   if(OPP_SECTION_FOR !== id) OPP_SECTION = 'details';
   OPP_SECTION_FOR = id;
 
-  const coreKv = '<dl class="kv">'+
-    '<div><dt>Account</dt><dd>'+esc(acct.name)+'</dd></div>'+
-    '<div><dt>Owner</dt><dd>'+efSpan(recId,DEF_INDEX['core.bdoId'])+'</dd></div>'+
-    '<div><dt>Product Type</dt><dd>'+o.productType+'</dd></div>'+
-    '<div><dt>Stage</dt><dd>'+(o.outcome==='open'?o.stage:(o.outcome==='won'?'Closed · Won':'Closed · Lost'))+'</dd></div>'+
-    '<div><dt>Expected Close</dt><dd>'+efSpan(recId,DEF_INDEX['core.expectedCloseDate'])+'</dd></div>'+
-    '<div><dt>Funded Date</dt><dd>'+efSpan(recId,DEF_INDEX['core.fundedDate'])+'</dd></div>'+
-    '<div><dt>Referral Partner</dt><dd>'+efSpan(recId,DEF_INDEX['core.referralPartnerId'])+'</dd></div>'+
-    '<div><dt>Referral Date</dt><dd>'+efSpan(recId,DEF_INDEX['core.referralDate'])+'</dd></div>'+
-    '<div><dt>Channel</dt><dd>'+efSpan(recId,DEF_INDEX['core.channel'])+'</dd></div>'+
-    '<div><dt>Industry</dt><dd>'+efSpan(recId,DEF_INDEX['core.industryCode'])+'</dd></div>'+
-    '<div><dt>Use of Proceeds</dt><dd>'+efSpan(recId,DEF_INDEX['core.useOfProceeds'])+'</dd></div>'+
-    (o.outcome==='lost' ? '<div><dt>Closed Lost Reason</dt><dd>'+efSpan(recId,closedLostReasonDef(o.lostAtStage))+'</dd></div><div><dt>Died At Stage</dt><dd>'+o.lostAtStage+'</dd></div>' : '')+
-    '</dl>';
+  /* Rail (D64): Next Best Action leads only when populated (a full panel, top of the rail); empty,
+     it drops to a single quiet kv row below Signals and Borrower context instead of an empty hero
+     in the best position on screen. */
+  const nbaSet = !!o.nextBestAction;
+  const nbaPanel = nbaSet
+    ? '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
+        '<div class="panel-title">Next Best Action</div>'+
+        '<div class="panel-scope">Rep or underwriter status, read in pipeline meetings</div>'+
+      '</div></div><div class="panel-body">'+efSpan(recId,DEF_INDEX['core.nextBestAction'])+'</div></div>'
+    : '';
+  const nbaQuietRow = nbaSet ? '' :
+    '<dl class="kv"><div><dt>Next Best Action</dt><dd class="muted">'+efSpan(recId,DEF_INDEX['core.nextBestAction'])+'</dd></div></dl>';
 
   let sectionBody;
   if(OPP_SECTION==='network') sectionBody = sectionNetworkHtml(o);
@@ -47144,7 +47299,7 @@ function renderOpp(id){
   else if(OPP_SECTION==='activity') sectionBody = sectionActivityHtml(acts);
   else if(OPP_SECTION==='documents') sectionBody = sectionDocumentsHtml(docs);
   else if(OPP_SECTION==='audit') sectionBody = auditPanelHtml(o);
-  else sectionBody = sectionDetailsHtml(o, recId);
+  else sectionBody = sectionDetailsHtml(o, recId, acct);
 
   const navHtml = '<div class="section-nav">'+OPP_SECTIONS.map(s=>
     '<div class="section-nav-item'+(OPP_SECTION===s.key?' active':'')+'" onclick="setOppSection(\''+s.key+'\')">'+s.label+'</div>'
@@ -47166,9 +47321,10 @@ function renderOpp(id){
 
     '<div class="record-layout">'+
       '<div class="record-rail">'+
-        '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
-          '<div class="panel-title">Deal core</div><div class="panel-scope">Commercial terms and routing — always visible</div>'+
-        '</div></div><div class="panel-body">'+coreKv+'</div></div>'+
+        nbaPanel+
+        railSignalsHtml(o)+
+        railBorrowerContextHtml(o, acct)+
+        nbaQuietRow+
       '</div>'+
       '<div class="record-main">'+navHtml+sectionBody+'</div>'+
     '</div>';
