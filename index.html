@@ -482,18 +482,8 @@ table.tbl{width:100%;border-collapse:collapse}
    column used to run dry while the right kept going). Same shape as .home-grid deliberately, so
    this reads as the same component, not a lookalike: equal-width flex columns, cards placed at
    runtime by measured shortest-column packing, Next Best Action anchored to column one exactly
-   like the action feed anchors Home's.
-   align-items:stretch (D76) makes both .home-col children match the taller one's height — this is
-   scoped to .opp-details-grid specifically, NOT applied to .home-grid, and the rule below is
-   scoped the same way (.opp-details-grid > .home-col > *:last-child), even though .home-col is a
-   shared structural class. D75 tried this on both grids via a bare .home-col > *:last-child
-   selector and broke scrolling, most likely by colliding with BDO Home's toggle cards (Partners,
-   Where we're losing), which already own their height via CLAUDE.md's toggle-card stable-height
-   rule — a second, independent height mechanism landing on the same card. The Opportunity record
-   has no toggle cards (confirmed before writing this), so this scoping keeps the fix here and
-   leaves Home's grid exactly as it was, pending its own decision. */
-.opp-details-grid{display:flex;gap:var(--s5);align-items:stretch}
-.opp-details-grid > .home-col > *:last-child{flex:1 1 auto}
+   like the action feed anchors Home's. */
+.opp-details-grid{display:flex;gap:var(--s5);align-items:flex-start}
 /* Compact single-line rows, reused by the Signals card. A small colored glyph (no icon box, no
    radius) plus text — deliberately not .feedrow/.feed-icon, whose zero-padding "static" variant
    combined with a "flush" panel body caused the icon-overlaps-the-edge bug (D69/D71); these rows
@@ -47265,6 +47255,7 @@ let OPP_SECTION_FOR = null;
 let OPP_GRID_COLUMNS = null;       // [[cardKey,...], [cardKey,...]] from the last real pack
 let OPP_GRID_CARD_KEY_SET = null;  // card keys present at that pack, to detect the set changing
 let OPP_GRID_NEEDS_PACK = false;   // set by sectionDetailsHtml(), read by renderOpp() right after
+let OPP_DEAL_EXTRA_COUNT = 0;      // fields flexDealCard() last revealed beyond the 6-field face
 window.setOppSection = function(key){
   OPP_SECTION = key;
   if(OPP_SECTION_FOR) renderOpp(OPP_SECTION_FOR);
@@ -47293,13 +47284,16 @@ function dealFieldRowsHtml(recId, keys){
     return '<div><dt>'+def.label+'</dt><dd>'+efSpan(recId,def)+'</dd></div>';
   }).join('');
 }
-function sectionDealCardHtml(recId){
+function sectionDealCardHtml(recId, extraCount){
+  extraCount = extraCount || 0;
+  const keys = DEAL_FACE_KEYS.concat(DEAL_MODAL_EXTRA_KEYS.slice(0, extraCount));
+  const stillHidden = DEAL_MODAL_EXTRA_KEYS.length - extraCount;
   return '<div class="panel" data-card="deal" data-rec="'+esc(recId)+'"><div class="panel-header"><div class="panel-header-text">'+
       '<div class="panel-title">Deal</div><div class="panel-scope">Opportunity-owned fields</div>'+
     '</div></div><div class="panel-body"><dl class="kv kv-2col">'+
-      dealFieldRowsHtml(recId, DEAL_FACE_KEYS)+
+      dealFieldRowsHtml(recId, keys)+
     '</dl></div>'+
-    '<button type="button" class="card-expand" title="Show all deal fields" onclick="openModal(\'oppDeal\')">&#8599;</button>'+
+    (stillHidden>0 ? '<button type="button" class="card-expand" title="Show all deal fields" onclick="openModal(\'oppDeal\')">&#8599;</button>' : '')+
   '</div>';
 }
 MODALS.oppDeal = function(){
@@ -47378,7 +47372,7 @@ const DETAILS_CARD_ORDER = ['nba','deal','signals','terms','borrower','underwrit
 function sectionDetailsHtml(o, recId, acct){
   const cards = {
     nba: sectionNextBestActionCardHtml(o, recId),
-    deal: sectionDealCardHtml(recId),
+    deal: sectionDealCardHtml(recId, OPP_DEAL_EXTRA_COUNT),
     signals: sectionSignalsCardHtml(o),
     terms: sectionProductTermsCardHtml(o, recId),
     borrower: sectionBorrowerDetailsHtml(o, acct),
@@ -47405,7 +47399,57 @@ function captureOppGridColumns(){
   OPP_GRID_CARD_KEY_SET = [].concat(...OPP_GRID_COLUMNS);
 }
 function packOppGrid(){
-  packGrid('.opp-details-grid', HOME_BREAKPOINT, captureOppGridColumns);
+  packGrid('.opp-details-grid', HOME_BREAKPOINT, function(){ flexDealCard(); captureOppGridColumns(); });
+}
+
+/* Bottom-alignment flex pass (D73). Packing balances columns, it doesn't align their bottoms —
+   even Home's own packer leaves real imbalance, since fixed-content cards rarely sum equal. Deal
+   is the one valid flex candidate on this grid: it already holds 9 real fields back for the modal
+   (D71), so it can genuinely reveal more rows rather than growing with padding, which would just
+   relocate the whitespace inside the card instead of removing it. Every other card on this grid
+   already shows 100% of its available content (Signals caps at 3 possible signals, all shown when
+   present; product terms/Borrower details/Underwriting/Outcome have small fixed field sets with
+   nothing held back) — none of them pass the "can it show more real content" test, so there is no
+   second flex candidate today. That's reported here, not papered over with a stretched card.
+   Always recomputed from the 6-field baseline (never incremental) so shrinking the viewport back
+   can't strand fields revealed that are no longer needed, and the corner control is added back or
+   removed to match — its presence must keep meaning "there is more behind this," honestly.
+   OPP_DEAL_EXTRA_COUNT is updated here so a later replayed render (an edit, not a real pack) keeps
+   showing however many fields were last revealed instead of snapping back to the 6-field face. */
+function flexDealCard(){
+  const grid = document.querySelector('.opp-details-grid');
+  if(!grid) return;
+  const dealCard = grid.querySelector('[data-card="deal"]');
+  if(!dealCard) return;
+  const recId = dealCard.dataset.rec;
+  const body = dealCard.querySelector('.panel-body');
+  const col = dealCard.parentElement;
+  const other = Array.from(grid.children).find(c=>c!==col);
+
+  body.innerHTML = '<dl class="kv kv-2col">'+dealFieldRowsHtml(recId, DEAL_FACE_KEYS)+'</dl>';
+  let extraFieldsNeeded = 0;
+  if(other){
+    const deficit = other.offsetHeight - col.offsetHeight;
+    if(deficit > 0){
+      const rowEl = dealCard.querySelector('.kv-2col > div');
+      const s4 = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--s4')) || 16;
+      const rowHeight = (rowEl ? rowEl.offsetHeight : 40) + s4;
+      extraFieldsNeeded = Math.min(DEAL_MODAL_EXTRA_KEYS.length, Math.ceil(deficit / rowHeight) * 2);
+    }
+  }
+  OPP_DEAL_EXTRA_COUNT = extraFieldsNeeded;
+  if(extraFieldsNeeded > 0){
+    const revealedKeys = DEAL_FACE_KEYS.concat(DEAL_MODAL_EXTRA_KEYS.slice(0, extraFieldsNeeded));
+    body.innerHTML = '<dl class="kv kv-2col">'+dealFieldRowsHtml(recId, revealedKeys)+'</dl>';
+  }
+
+  const stillHidden = DEAL_MODAL_EXTRA_KEYS.length - extraFieldsNeeded;
+  const btn = dealCard.querySelector('.card-expand');
+  if(stillHidden<=0 && btn){ btn.remove(); }
+  else if(stillHidden>0 && !btn){
+    dealCard.insertAdjacentHTML('beforeend',
+      '<button type="button" class="card-expand" title="Show all deal fields" onclick="openModal(\'oppDeal\')">&#8599;</button>');
+  }
 }
 function sectionNetworkHtml(o){
   return networkPanelHtml(o)+
@@ -47465,6 +47509,7 @@ function renderOpp(id){
     OPP_SECTION = 'details';
     OPP_GRID_COLUMNS = null;
     OPP_GRID_CARD_KEY_SET = null;
+    OPP_DEAL_EXTRA_COUNT = 0;
   }
   OPP_SECTION_FOR = id;
 
