@@ -45439,6 +45439,40 @@ function fmtDate(s){
   if(!s) return '—';
   return toDateObj(s).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',timeZone:'UTC'});
 }
+
+/* ---------- period-scope helpers (D100) ----------
+   Shared across both persona pages so "year to date" and "trailing 12 months" mean exactly one
+   thing everywhere, not a per-card reimplementation. Every business-performance metric on both
+   Home pages computes over one of these two windows and says which — see PROJECT_STATE D100 for
+   the standing decision this codifies (no "all-time" anywhere; a page's stated period must be true
+   of every figure beneath it). */
+const YTD_YEAR = TODAY.slice(0,4);
+const TRAILING_12_START = (function(){
+  const d = toDateObj(TODAY);
+  return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth()-11, 1)).toISOString().slice(0,10);
+})();
+function inYTD(dateStr){ return !!dateStr && dateStr.slice(0,4)===YTD_YEAR; }
+function inTrailing12(dateStr){ return !!dateStr && dateStr>=TRAILING_12_START; }
+/* Lost opportunities carry no closedDate of their own — the terminal ClosedLost entry in
+   stageHistory's own enteredDate IS that date, read once here rather than re-derived per caller. */
+function lostDateOf(o){
+  const hist = STAGEHIST[o.id] || [];
+  const cl = hist.find(e=>e.stage==='ClosedLost');
+  return cl ? cl.enteredDate : null;
+}
+/* A rate computed on a handful of deals is statistically unreliable — commercial lending reps and
+   partners close few, large deals, not hundreds of small ones, so a thin sample is the normal
+   state of this business, not a data-quality problem (PROJECT_STATE D100). A single deal moves a
+   rate by 1/n of its total; MIN_RATE_SAMPLE=10 is reasoned from that, not picked by feel: below
+   10, one deal can swing the printed number by MORE than ten percentage points (a 25% rate on 4
+   deals is one deal from 50%, a 25-point swing). Below the threshold, show the real counts
+   (always reliable, never suppressed) and say the sample is too small to rate, instead of
+   printing a percentage the reader has no way to know is noise — the same class of error
+   CLAUDE.md §2b already forbids for fabricated narration, applied to a computed number instead of
+   invented text. */
+const MIN_RATE_SAMPLE = 10;
+function rateReliable(n){ return n >= MIN_RATE_SAMPLE; }
+
 function money(n,decimals){
   if(n==null) return '—';
   decimals = decimals==null?1:decimals;
@@ -45961,7 +45995,7 @@ function buildFeed(bdoId){
       icon:'warn', glyph:'○', action:'Re-engage',
       title:esc(p.name)+' has gone quiet',
       sub:(days!=null?'No referral in '+days+' days':'No referral on record')+
-          ' · '+p.referralCount+' sent all-time · last was '+esc(getAccount(o.accountId).name)
+          ' · '+p.referralCount+' over the full relationship · last was '+esc(getAccount(o.accountId).name)
     });
   });
 
@@ -46450,17 +46484,23 @@ window.setPartnerView = function(v){
 };
 
 function partnerStats(bdoId){
-  const mine = Object.values(OPPS).filter(o=>o.bdoId===bdoId);
-  const ids = [...new Set(mine.map(o=>o.referralPartnerId).filter(id=>id && PARTNERS[id]))];
+  /* D100: partner MEMBERSHIP on this list (which partners appear at all) stays lifetime — a
+     referral relationship existing isn't a performance metric with a period, and a dormant
+     partner (the whole point of the Dormancy view) may have zero referrals in any recent window
+     by definition. The metrics computed PER partner (volume, win rate) each get their own correct
+     window below. */
+  const mineAll = Object.values(OPPS).filter(o=>o.bdoId===bdoId);
+  const ids = [...new Set(mineAll.map(o=>o.referralPartnerId).filter(id=>id && PARTNERS[id]))];
   return ids.map(id=>{
     const p = PARTNERS[id];
-    const all = Object.values(OPPS).filter(o=>o.referralPartnerId===id);
-    const won = all.filter(o=>o.outcome==='won').length;
-    const lost = all.filter(o=>o.outcome==='lost').length;
+    const allFirm = Object.values(OPPS).filter(o=>o.referralPartnerId===id);
+    const wonT12 = allFirm.filter(o=>o.outcome==='won' && inTrailing12(o.fundedDate));
+    const lostT12 = allFirm.filter(o=>o.outcome==='lost' && inTrailing12(lostDateOf(o)));
+    const closedN = wonT12.length+lostT12.length;
     return {
-      p, mine: mine.filter(o=>o.referralPartnerId===id).length,
-      firmTotal: all.length, won, lost,
-      winRate: (won+lost) ? won/(won+lost) : null,
+      p, mine: mineAll.filter(o=>o.referralPartnerId===id && inYTD(o.createdDate)).length,
+      firmTotal: allFirm.length, won: wonT12.length, lost: lostT12.length, closedN,
+      winRate: closedN ? wonT12.length/closedN : null,
       days: p.lastReferralDate ? daysBetween(p.lastReferralDate,TODAY) : null,
     };
   });
@@ -46471,16 +46511,22 @@ function partnerStats(bdoId){
 function partnerViewRows(stats, view){
   if(view==='volume'){
     return { rows: stats.slice().sort((a,b)=>b.mine-a.mine || a.p.name.localeCompare(b.p.name)),
-      scope: 'Referrals sent to you · ranked' };
+      scope: 'Referrals sent to you, year to date, ranked' };
   }
   if(view==='quality'){
+    /* D100: sorted by win rate best-effort even where thin (still the best guess ordering), but
+       the display gates on rateReliable(closedN) per row — a partner with 3 closed referrals
+       shows its counts, not a percentage that looks exactly as confident as one built on 30. Given
+       the real per-partner sample sizes in this business (2-6 closed referrals is normal, not a
+       data problem — PROJECT_STATE D100), MOST rows in this view will show counts, not a rate.
+       That is the correct, honest state of this view, not a bug to work around. */
     return { rows: stats.filter(r=>r.winRate!=null)
       .sort((a,b)=>b.winRate-a.winRate || a.p.name.localeCompare(b.p.name)),
-      scope: 'Closed-won rate on all their referrals, firm-wide' };
+      scope: 'Closed-won rate on all their referrals, trailing 12 months' };
   }
   return { rows: stats.filter(r=>r.days!=null)
     .sort((a,b)=>b.days-a.days || a.p.name.localeCompare(b.p.name)),
-    scope: 'Days since their last referral · longest first' };
+    scope: 'Days since their last referral, longest first' };
 }
 
 function partnersPanelHtml(stats){
@@ -46494,20 +46540,30 @@ function partnersPanelHtml(stats){
     let width, val, cls='', rowCls='', tip;
     if(view==='volume'){
       width = (r.mine/max)*100; val = r.mine+'';
-      tip = tipAttr(r.p.name, r.mine+' referral'+(r.mine===1?'':'s')+' to you',
-        r.firmTotal+' firm-wide · '+r.p.partnerType);
+      tip = tipAttr(r.p.name, r.mine+' referral'+(r.mine===1?'':'s')+' to you, year to date',
+        r.firmTotal+' over the full relationship · '+r.p.partnerType);
     } else if(view==='quality'){
-      width = r.winRate*100; val = pct(r.winRate);
-      cls = r.winRate>=0.5 ? '' : 'muted';
-      tip = tipAttr(r.p.name, pct(r.winRate)+' closed-won',
-        r.won+' won / '+r.lost+' lost of '+r.firmTotal+' referred');
+      /* D100: display gates on rateReliable(r.closedN), not on winRate itself — a partner's raw
+         count of referred deals is always safe to show; the derived percentage is not, once the
+         count that produced it is this small (2-6 closed referrals is the normal range for this
+         business, per PROJECT_STATE D100, not a thin-data problem to paper over). */
+      if(rateReliable(r.closedN)){
+        width = r.winRate*100; val = pct(r.winRate);
+        cls = r.winRate>=0.5 ? '' : 'muted';
+        tip = tipAttr(r.p.name, pct(r.winRate)+' closed-won, trailing 12 months',
+          r.won+' won / '+r.lost+' lost of '+r.firmTotal+' referred over the full relationship');
+      } else {
+        width = 0; val = r.won+'W / '+r.lost+'L'; cls = 'muted';
+        tip = tipAttr(r.p.name, 'Too few closed deals to rate',
+          r.won+' won / '+r.lost+' lost, trailing 12 months, of '+r.firmTotal+' referred over the full relationship');
+      }
     } else {
       width = (r.days/max)*100; val = r.days+'d';
       cls = r.p.isDormant ? 'warn' : '';
       rowCls = r.p.isDormant ? ' warnrow' : '';
       tip = tipAttr(r.p.name, r.days+' days since last referral',
-        (r.p.isDormant?'Dormant — no referral in 90+ days · ':'Active · ')+
-        r.p.referralCount+' sent all-time');
+        (r.p.isDormant?'Dormant, no referral in 90+ days · ':'Active · ')+
+        r.p.referralCount+' referred over the full relationship');
     }
     return '<div class="hbar-row'+rowCls+'"'+tip+'>'+
       '<div class="hbar-name">'+esc(r.p.name)+'</div>'+
@@ -46570,16 +46626,21 @@ function lossTally(opps, keyFn){
    the modal's whole reason for existing is the depth a 6-row card can't show). */
 function lossViewData(bdoId, view, limit){
   limit = limit==null ? Infinity : limit;
-  const myLost = Object.values(OPPS).filter(o=>o.bdoId===bdoId && o.outcome==='lost');
-  const firmLost = Object.values(OPPS).filter(o=>o.outcome==='lost');
+  const myLost = Object.values(OPPS).filter(o=>o.bdoId===bdoId && o.outcome==='lost' && inTrailing12(lostDateOf(o)));
+  const firmLost = Object.values(OPPS).filter(o=>o.outcome==='lost' && inTrailing12(lostDateOf(o)));
 
   if(view==='stage'){
-    // stage always uses the personal book: four fixed buckets carry a shape even at n=7
+    /* D100: stage always uses the personal book, still — no firm-wide fallback added here. If a
+       rep's own book is thin at this window, that IS the true state of their book; the honest
+       answer is to say so on the card (Kevin's instruction), not to quietly swap in a bigger
+       population to make the bar look more confident than the data supports. */
     const rows = TRACK_STAGES.map(st=>{
       const g = myLost.filter(o=>o.lostAtStage===st);
       return {label:st, n:g.length, val:g.reduce((t,o)=>t+o.facilitySize,0)};
     });
-    return {rows, scope:'Your book · '+myLost.length+' closed-lost deals · where in the funnel they died',
+    const thin = !rateReliable(myLost.length);
+    return {rows, scope:'Your book, '+myLost.length+' closed-lost deals, trailing 12 months'+
+        (thin ? '. Small sample, read the shape loosely' : '')+', where in the funnel they died',
       total:myLost.length, tone:'', firm:false};
   }
 
@@ -46590,8 +46651,8 @@ function lossViewData(bdoId, view, limit){
     const rows = Object.entries(t).sort((a,b)=>b[1].n-a[1].n).slice(0,limit)
       .map(([k,v])=>({label:k, n:v.n, val:v.val}));
     return {rows, total:pool.length, tone:'', firm:usingFirm,
-      scope:(usingFirm?'Firm-wide':'Your book')+' · '+pool.length+
-        ' losses by controlled reason'+(usingFirm?' — your own book is too small to read':'')};
+      scope:(usingFirm?'Firm-wide':'Your book')+', '+pool.length+
+        ' losses by controlled reason, trailing 12 months'+(usingFirm?'. Your own book is too small to read':'')};
   }
 
   const mineAttr = myLost.filter(o=>o.lostToCompetitor);
@@ -46601,8 +46662,8 @@ function lossViewData(bdoId, view, limit){
   const rows = Object.entries(t).sort((a,b)=>b[1].n-a[1].n).slice(0,limit)
     .map(([k,v])=>({label:k, n:v.n, val:v.val, ucc:v.ucc}));
   return {rows, total:pool.length, tone:'warn', firm:usingFirm,
-    scope:(usingFirm?'Firm-wide':'Your book')+' · '+pool.length+
-      ' losses where the winner was identified'};
+    scope:(usingFirm?'Firm-wide':'Your book')+', '+pool.length+
+      ' losses where the winner was identified, trailing 12 months'};
 }
 
 function lossPanelHtml(bdoId){
@@ -46682,28 +46743,36 @@ MODALS.underwriting = function(){
 
 MODALS.winrate = function(){
   const mine = myOpps();
-  const won = mine.filter(o=>o.outcome==='won'), lost = mine.filter(o=>o.outcome==='lost');
+  const won = mine.filter(o=>o.outcome==='won' && inTrailing12(o.fundedDate));
+  const lost = mine.filter(o=>o.outcome==='lost' && inTrailing12(lostDateOf(o)));
   const wS = won.reduce((s,o)=>s+o.facilitySize,0), lS = lost.reduce((s,o)=>s+o.facilitySize,0);
+  const closedN = won.length+lost.length;
+  const reliable = rateReliable(closedN);
   const rows = ['Factoring','ABL','TermLoan'].map(pt=>{
     const w = won.filter(o=>o.productType===pt), l = lost.filter(o=>o.productType===pt);
     const n = w.length+l.length;
     const ws = w.reduce((s,o)=>s+o.facilitySize,0), ls = l.reduce((s,o)=>s+o.facilitySize,0);
     return modalRow([
       {v:pt, cls:'name'}, {v:w.length, cls:'num', sort:w.length}, {v:l.length, cls:'num', sort:l.length},
-      {v:n?pct(w.length/n):'—', cls:'num', sort:n?w.length/n:null},
-      {v:(ws+ls)?pct(ws/(ws+ls)):'—', cls:'num', sort:(ws+ls)?ws/(ws+ls):null},
+      {v:rateReliable(n)?pct(w.length/n):'—', cls:'num', sort:rateReliable(n)?w.length/n:null},
+      {v:rateReliable(n)?pct(ws/(ws+ls)):'—', cls:'num', sort:rateReliable(n)?ws/(ws+ls):null},
     ]);
   });
   return {
     title:'Win rate',
-    scope:'By count and by size, on '+(won.length+lost.length)+' closed deals — the divergence is the signal',
+    scope: closedN+' closed deals, trailing 12 months'+(reliable?'. The count-and-size divergence is the signal':', too few to rate reliably'),
     body: modalStrip([
-      {label:'By count', value:pct(won.length/Math.max(1,won.length+lost.length))},
-      {label:'By size', value:pct(wS/Math.max(1,wS+lS))},
       {label:'Won / lost', value:won.length+' / '+lost.length},
+      {label:'By count', value: reliable ? pct(won.length/Math.max(1,closedN)) : '—'},
+      {label:'By size', value: reliable ? pct(wS/Math.max(1,wS+lS)) : '—'},
     ]) +
-    '<p class="chart-note mt-3">Winning more deals than dollars means the losses are landing on '+
-    'the bigger tickets — the count-and-size divergence this product surfaces by default.</p>'+
+    (reliable
+      ? '<p class="chart-note mt-3">Winning more deals than dollars means the losses are landing on '+
+        'the bigger tickets, the count-and-size divergence this product surfaces by default.</p>'
+      : '<p class="chart-note mt-3">Fewer than '+MIN_RATE_SAMPLE+' closed deals in the trailing 12 '+
+        'months, so a percentage here would move by double digits on a single deal. Counts are shown '+
+        'instead of a rate. This is a normal sample size for one rep\'s book in commercial lending, '+
+        'not a data problem.</p>')+
     modalTable([{label:'Product',type:'text'}, {label:'Won',num:true,type:'number'}, {label:'Lost',num:true,type:'number'},
       {label:'Win % count',num:true,type:'number'}, {label:'Win % size',num:true,type:'number'}], rows),
   };
@@ -46737,7 +46806,7 @@ MODALS.partners = function(){
   const rows = vd.rows.map(r=>modalRow([
     {v:esc(r.p.name), cls:'name'}, {v:esc(r.p.partnerType), cls:'sec'},
     {v:r.mine, cls:'num', sort:r.mine}, {v:r.firmTotal, cls:'num', sort:r.firmTotal},
-    {v:r.winRate!=null?pct(r.winRate):'—', cls:'num', sort:r.winRate},
+    {v:rateReliable(r.closedN)?pct(r.winRate):'—', cls:'num', sort:rateReliable(r.closedN)?r.winRate:null},
     {v:r.days!=null?r.days+'d':'—', cls:'num', sort:r.days},
     {v:r.p.isDormant?'Dormant':'Active', cls:'sec'},
   ]));
@@ -46749,12 +46818,14 @@ MODALS.partners = function(){
     modalStrip([
       {label:'Referral sources', value:stats.length},
       {label:'Gone quiet', value:dormant},
-      {label:'Referrals to you', value:stats.reduce((s,r)=>s+r.mine,0)},
+      {label:'Referrals to you, YTD', value:stats.reduce((s,r)=>s+r.mine,0)},
     ]) +
-    '<p class="chart-note mt-3">Volume counts referrals sent to you. Win rate is each partner\'s '+
-    'full firm-wide record, because a rate over one or two of your own deals is noise.</p>'+
+    '<p class="chart-note mt-3">Volume counts referrals sent to you, year to date. Win rate is '+
+    'each partner\'s trailing-12-month record, firm-wide (a rate over one or two of your own deals '+
+    'is noise). Below '+MIN_RATE_SAMPLE+' closed referrals in that window, the count is shown '+
+    'instead of a rate. This is normal for a referral relationship in this business, not missing data.</p>'+
     modalTable([{label:'Partner',type:'text'},{label:'Type',type:'text'},
-      {label:'To you',num:true,type:'number'},{label:'Firm-wide',num:true,type:'number'},
+      {label:'To you (YTD)',num:true,type:'number'},{label:'Lifetime',num:true,type:'number'},
       {label:'Win rate',num:true,type:'number'},{label:'Last referral',num:true,type:'number'},
       {label:'Status',type:'text'}], rows),
   };
@@ -46777,7 +46848,7 @@ function lossModalTable(view, rows){
 MODALS.loss = function(){
   const view = MODAL_VIEW.loss || LOSS_VIEW;
   const d = lossViewData(CURRENT_BDO_ID, view);
-  const firmLost = Object.values(OPPS).filter(o=>o.outcome==='lost');
+  const firmLost = Object.values(OPPS).filter(o=>o.outcome==='lost' && inTrailing12(lostDateOf(o)));
   const attributed = firmLost.filter(o=>o.lostToCompetitor);
   return {
     title:'Where we\'re losing',
@@ -46791,7 +46862,7 @@ MODALS.loss = function(){
     ]) +
     (view==='competitor'
       ? '<p class="chart-note mt-3">Attribution comes from the borrower or from a competitor\'s UCC '+
-        'filing after the loss. '+attributed.length+' of '+firmLost.length+' losses named a winner — '+
+        'filing after the loss. '+attributed.length+' of '+firmLost.length+' losses named a winner, '+
         'the rest never revealed one.</p>'
       : '')+
     lossModalTable(view, d.rows),
@@ -46876,12 +46947,19 @@ function renderHome(){
   const myLost = myOpps.filter(o=>o.outcome==='lost');
 
   const pipelineValue = myOpen.reduce((s,o)=>s+o.facilitySize,0);
-  const wonYTD = myWon.filter(o=>(o.fundedDate||'').slice(0,4)===TODAY.slice(0,4));
+  const wonYTD = myWon.filter(o=>inYTD(o.fundedDate));
   const wonYTDValue = wonYTD.reduce((s,o)=>s+o.facilitySize,0);
-  const closedN = myWon.length+myLost.length;
-  const wonSize = myWon.reduce((s,o)=>s+o.facilitySize,0);
-  const lostSize = myLost.reduce((s,o)=>s+o.facilitySize,0);
-  const winByCount = closedN ? myWon.length/closedN : 0;
+  /* D100: Win Rate is a performance measure, not a snapshot — it must obey the period-scope rule
+     (trailing 12 months, since a single rep's YTD closed count runs too thin some months of the
+     year) and the small-sample rule (MIN_RATE_SAMPLE): below 10 closed deals, show the counts,
+     not a percentage that looks exactly as confident on 4 deals as on 40. */
+  const myWonT12 = myWon.filter(o=>inTrailing12(o.fundedDate));
+  const myLostT12 = myLost.filter(o=>inTrailing12(lostDateOf(o)));
+  const closedN = myWonT12.length+myLostT12.length;
+  const winRateReliable = rateReliable(closedN);
+  const wonSize = myWonT12.reduce((s,o)=>s+o.facilitySize,0);
+  const lostSize = myLostT12.reduce((s,o)=>s+o.facilitySize,0);
+  const winByCount = closedN ? myWonT12.length/closedN : 0;
   const winBySize = (wonSize+lostSize) ? wonSize/(wonSize+lostSize) : 0;
   const inUW = myOpen.filter(o=>o.stage==='Underwriting');
   const inUWValue = inUW.reduce((s,o)=>s+o.facilitySize,0);
@@ -46901,6 +46979,7 @@ function renderHome(){
     '<h1 class="page-heading">Good morning, '+esc(bdo.name.split(' ')[0])+'</h1>'+
     '<div class="dayline">'+
       '<span class="dayline-date">'+todayLabel+'</span>'+
+      '<span class="dayline-sum">Year to date · your book</span>'+
       '<span class="dayline-sum"><b>'+feed.length+'</b> item'+(feed.length===1?'':'s')+
         ' need you today · <b>'+moneyShort(pipelineValue)+'</b> active pipeline</span>'+
     '</div>'+
@@ -46917,8 +46996,12 @@ function renderHome(){
         '<div class="met-sub">'+moneyShort(inUWValue)+' at the credit gate</div></div>'+
       '<div class="met expandable" tabindex="0" onclick="openModal(\'winrate\')">'+
         '<div class="met-label">Win Rate</div>'+
-        '<div class="met-figure">'+pct(winByCount)+'</div>'+
-        '<div class="met-sub">by count · '+pct(winBySize)+' by size, on '+closedN+' closed</div></div>'+
+        (winRateReliable
+          ? '<div class="met-figure">'+pct(winByCount)+'</div>'+
+            '<div class="met-sub">by count · '+pct(winBySize)+' by size, on '+closedN+' closed, trailing 12mo</div>'
+          : '<div class="met-figure">'+myWonT12.length+'W &middot; '+myLostT12.length+'L</div>'+
+            '<div class="met-sub">Too few closed deals to rate, trailing 12mo</div>'
+        )+'</div>'+
       '<div class="met expandable" tabindex="0" onclick="openModal(\'funded\')">'+
         '<div class="met-label">Funded YTD</div>'+
         '<div class="met-figure">'+money(wonYTDValue)+'</div>'+
@@ -47116,7 +47199,9 @@ function execStalledDeals(){
    counted (its own delta, not the cumulative slide) — the question is "how much did the CURRENT
    date move," not a lifetime total. */
 function execSlippage(){
-  const pushes = D.auditEvents.filter(a=>a.field==='expectedCloseDate' && a.newValue>a.oldValue);
+  /* D100: year to date, by changedAt (was all-time, unlabeled) — healthy sample either way (37 of
+     58 pushes fall in YTD), no reliability concern here. */
+  const pushes = D.auditEvents.filter(a=>a.field==='expectedCloseDate' && a.newValue>a.oldValue && inYTD(a.changedAt));
   const latestByOpp = {};
   pushes.forEach(a=>{
     const cur = latestByOpp[a.opportunityId];
@@ -47130,12 +47215,14 @@ function execSlippage(){
   return {deals, count:deals.length, value, avgDays};
 }
 
-/* ---------- diagnostics: stage conversion — entered vs. advanced vs. died, all-time ----------
-   Full history, not YTD: a partial year doesn't have the sample size to read a conversion rate
-   from. Filters the open-deal terminal:false duplicate marker first (same convention
-   auditPanelHtml already uses) — counting it as a second "entered" event for the current stage
-   was an early-draft bug (a 250-deal book was reading as 281 Qualification entries before this
-   filter; caught before writing this into the shipped version). */
+/* ---------- diagnostics: stage conversion — entered vs. advanced vs. died, trailing 12 months ----------
+   D100: was "full history, all-time" — a partial year (YTD) doesn't have the sample size to read
+   a conversion rate from (Underwriting drops to 49 entries at YTD vs. 71 at trailing 12 months),
+   so this is exactly the case the period-scope rule's own stated fallback exists for: trailing 12
+   months, not YTD, and never all-time. Filters the open-deal terminal:false duplicate marker first
+   (same convention auditPanelHtml already uses) — counting it as a second "entered" event for the
+   current stage was an early-draft bug (a 250-deal book was reading as 281 Qualification entries
+   before this filter; caught before writing this into the shipped version). */
 function execStageConversion(){
   const counts = {};
   TRACK_STAGES.forEach(s=>counts[s]={stage:s, entered:0, advanced:0, diedHere:0, stillHere:0});
@@ -47143,6 +47230,7 @@ function execStageConversion(){
     const hist = fullHist.filter(e=>e.terminal!==false);
     hist.forEach((e,i)=>{
       if(!TRACK_STAGES.includes(e.stage)) return;
+      if(!inTrailing12(e.enteredDate)) return;
       counts[e.stage].entered++;
       const next = hist[i+1];
       if(!next){ counts[e.stage].stillHere++; return; }
@@ -47159,23 +47247,27 @@ function execWorstJamStage(){
     .map(c=>({...c, deathRate:c.diedHere/c.entered})).sort((a,b)=>b.deathRate-a.deathRate)[0];
 }
 
-/* ---------- diagnostics: cycle time, application to funding — all won deals, with spread ---------- */
+/* ---------- diagnostics: cycle time, application to funding, trailing 12 months ----------
+   D100: was all-time, same "needs real sample size" reasoning as stage conversion above — moved
+   to the same window (trailing 12 months) for the same reason, not decided independently. */
 function execCycleTime(){
-  const days = execFirmWon().filter(o=>o.fundedDate)
+  const days = execFirmWon().filter(o=>o.fundedDate && inTrailing12(o.fundedDate))
     .map(o=>daysBetween(o.createdDate,o.fundedDate)).sort((a,b)=>a-b);
   return {days, count:days.length};
 }
 
 /* ---------- diagnostics: Underwriting THROUGHPUT ONLY (PROJECT_STATE D86) ----------
-   Count and age of deals currently in the queue, and average turnaround for completed stints.
-   Deliberately does not compute or expose approval rate, decline rate, or any per-underwriter
-   measure — a governance boundary, not a design preference. See the D86 log entry for why. */
+   Count and age of deals currently in the queue (a snapshot, not a period — exempt from the
+   period-scope rule) and average turnaround for stints completed year to date (D100: was
+   all-time, unlabeled). Deliberately does not compute or expose approval rate, decline rate, or
+   any per-underwriter measure — a governance boundary, not a design preference. See the D86 log
+   entry for why. */
 function execUnderwritingThroughput(){
   const inQueue = execFirmOpen().filter(o=>o.stage==='Underwriting');
   const ages = inQueue.map(o=>currentDaysInStage(o)).sort((a,b)=>a-b);
   const turnarounds = [];
   Object.values(STAGEHIST).forEach(hist=>{
-    hist.forEach(e=>{ if(e.stage==='Underwriting' && e.durationDays!=null) turnarounds.push(e.durationDays); });
+    hist.forEach(e=>{ if(e.stage==='Underwriting' && e.durationDays!=null && inYTD(e.exitedDate)) turnarounds.push(e.durationDays); });
   });
   turnarounds.sort((a,b)=>a-b);
   const avgTurnaround = turnarounds.length ? Math.round(turnarounds.reduce((a,b)=>a+b,0)/turnarounds.length) : 0;
@@ -47227,10 +47319,12 @@ function execMonthlySeries(dateField, pool){
   }));
 }
 
-/* ---------- production: sourcing — channel mix + top referral partners, merged (same question) ---------- */
+/* ---------- production: sourcing — channel mix + top referral partners, merged (same question) ----------
+   D100: both were all-time, unlabeled — now year to date, by createdDate (the date the deal, and
+   so the referral/channel, actually happened). Healthy YTD sample for both (153 of 250 opps). */
 function execChannelMix(){
   const byChannel = {};
-  D.opportunities.forEach(o=>{
+  D.opportunities.filter(o=>inYTD(o.createdDate)).forEach(o=>{
     const e = byChannel[o.channel] = byChannel[o.channel] || {n:0,val:0};
     e.n++; e.val+=o.facilitySize;
   });
@@ -47239,7 +47333,7 @@ function execChannelMix(){
 }
 function execTopReferralPartners(limit){
   const byPartner = {};
-  D.opportunities.filter(o=>o.referralPartnerId).forEach(o=>{
+  D.opportunities.filter(o=>o.referralPartnerId && inYTD(o.createdDate)).forEach(o=>{
     const e = byPartner[o.referralPartnerId] = byPartner[o.referralPartnerId] || {n:0,val:0};
     e.n++; e.val+=o.facilitySize;
   });
@@ -47247,9 +47341,9 @@ function execTopReferralPartners(limit){
     .sort((a,b)=>b.count-a.count).slice(0, limit==null?Infinity:limit);
 }
 
-/* ---------- production: closed-won by product ---------- */
+/* ---------- production: closed-won by product, year to date (D100: was all-time, unlabeled) ---------- */
 function execClosedWonByProduct(){
-  const won = execFirmWon();
+  const won = execFirmWon().filter(o=>inYTD(o.fundedDate));
   return ['Factoring','ABL','TermLoan'].map(pt=>{
     const g = won.filter(o=>o.productType===pt);
     return {label:pt, count:g.length, value:g.reduce((s,o)=>s+o.facilitySize,0)};
@@ -47270,7 +47364,10 @@ const EXEC_LOST_WITHDREW_REASONS = ['Borrower withdrew','Timing — not ready','
    subset — the Proposal-jam diagnostic modal (D91) passes only deals lost specifically at
    Proposal, reusing this exact bucketing rather than a second copy scoped to one stage. */
 function execClosedLostBuckets(pool){
-  pool = pool || execFirmLost();
+  /* D100: default pool is year to date (was all-time, unlabeled) — healthy sample (46 of 88,
+     smallest of the 4 buckets is 8). Callers that need a different window (the Proposal-jam modal
+     wants trailing 12 months, matching execStageConversion's own window) pass their own pool. */
+  pool = pool || execFirmLost().filter(o=>inYTD(lostDateOf(o)));
   const buckets = {credit:[], competitor:[], withdrew:[], other:[]};
   pool.forEach(o=>{
     if(o.lostToCompetitor) buckets.competitor.push(o);
@@ -47559,7 +47656,7 @@ function execBuildFeed(){
     cand.push({type:'jam', score:60, icon:'neg', glyph:'&#9888;',
       title: worstStage.stage+' is where deals die most often',
       sub: pct(worstStage.deathRate)+' of deals that reach '+worstStage.stage+' end there ('+
-        worstStage.diedHere+' of '+worstStage.entered+'), the highest rate of any stage',
+        worstStage.diedHere+' of '+worstStage.entered+', trailing 12 months), the highest rate of any stage',
       modalKey:'execStageJam'});
   }
 
@@ -47571,19 +47668,25 @@ function execBuildFeed(){
   // loss card's own fallback logic already guards against. A breakdown here would show noise, not
   // insight, so none is built — same discipline that correctly killed the win-rate-shift item
   // and the fabricated coverage alert (D86).
+  /* D100: trailing 12 months for BOTH volume and win rate (was all-time, unlabeled) — sharing one
+     window means "most volume" and "below-average win rate" are talking about the same period,
+     not silently mixing an all-time count with a period-bound rate. Pool membership requires
+     rateReliable(closedN), not the old ad hoc closedN>=8: a rep whose own win rate can't be
+     stated reliably can't be named as having a below-average one, either. */
   const byBdo = D.bdos.map(b=>{
-    const opps = Object.values(OPPS).filter(o=>o.bdoId===b.id);
-    const closed = opps.filter(o=>o.outcome!=='open');
-    const won = closed.filter(o=>o.outcome==='won').length;
-    return {b, n:opps.length, winRate: closed.length?won/closed.length:null, closedN:closed.length};
-  }).filter(x=>x.closedN>=8);
+    const opps = Object.values(OPPS).filter(o=>o.bdoId===b.id && inTrailing12(o.createdDate));
+    const won = Object.values(OPPS).filter(o=>o.bdoId===b.id && o.outcome==='won' && inTrailing12(o.fundedDate));
+    const lost = Object.values(OPPS).filter(o=>o.bdoId===b.id && o.outcome==='lost' && inTrailing12(lostDateOf(o)));
+    const closedN = won.length+lost.length;
+    return {b, n:opps.length, winRate: closedN?won.length/closedN:null, closedN};
+  }).filter(x=>rateReliable(x.closedN));
   const avgWinRate = byBdo.length ? byBdo.reduce((s,x)=>s+(x.winRate||0),0)/byBdo.length : 0;
   const highestVolume = byBdo.slice().sort((a,b)=>b.n-a.n)[0];
   if(highestVolume && highestVolume.winRate!=null && highestVolume.winRate<avgWinRate){
     cand.push({type:'tension', score:55, icon:'warn', glyph:'&#9651;',
       title: esc(highestVolume.b.name)+' has the most volume, a below-average win rate',
-      sub: highestVolume.n+' deals firm-wide (the most of any rep) at '+pct(highestVolume.winRate)+
-        ' win rate, vs. '+pct(avgWinRate)+' average', hash:null});
+      sub: highestVolume.n+' deals firm-wide (the most of any rep), trailing 12 months, at '+
+        pct(highestVolume.winRate)+' win rate, vs. '+pct(avgWinRate)+' average', hash:null});
   }
 
   // stalled-deal concentration — the stage carrying the largest share; exec-scoped as a pattern
@@ -47681,7 +47784,7 @@ function execStageConversionPanelHtml(){
   return '<div class="panel" id="panel-exec-conversion">'+
     '<div class="panel-header"><div class="panel-header-text">'+
       '<div class="panel-title">Stage conversion</div>'+
-      '<div class="panel-scope">Where deals advance vs. where they die, all-time</div>'+
+      '<div class="panel-scope">Where deals advance vs. where they die, trailing 12 months</div>'+
     '</div></div>'+
     '<div class="panel-body">'+stageConversionHtml(conv)+
       '<div class="convrow-legend">'+
@@ -47698,7 +47801,7 @@ function execCycleTimePanelHtml(){
   return '<div class="panel" id="panel-exec-cycle">'+
     '<div class="panel-header"><div class="panel-header-text">'+
       '<div class="panel-title">Cycle time</div>'+
-      '<div class="panel-scope">Application to funding, '+c.count+' closed-won deals, all-time</div>'+
+      '<div class="panel-scope">Application to funding, '+c.count+' closed-won deals, trailing 12 months</div>'+
     '</div></div>'+
     '<div class="panel-body">'+
       '<div class="exec-ratio">'+median+'<span class="un">d median</span></div>'+
@@ -47711,7 +47814,7 @@ function execUnderwritingPanelHtml(){
   return '<div class="panel expandable" id="panel-exec-uw" onclick="openModal(\'execUnderwriting\')">'+
     '<div class="panel-header"><div class="panel-header-text">'+
       '<div class="panel-title">Underwriting throughput</div>'+
-      '<div class="panel-scope">Queue depth and turnaround, throughput only, not decision quality</div>'+
+      '<div class="panel-scope">Queue depth now; turnaround year to date. Throughput only, not decision quality</div>'+
     '</div><span class="expand-hint">Expand &rsaquo;</span></div>'+
     '<div class="panel-body">'+
       '<div class="modal-strip">'+
@@ -47858,7 +47961,7 @@ function execSourcingRows(view, limit, measure){
 }
 function execSourcingPanelHtml(){
   const view = EXEC_SOURCING_VIEW, measure = EXEC_SOURCING_MEASURE;
-  const scope = view==='partners' ? 'Top referral partners by volume, firm-wide' : 'Deal channel mix, firm-wide';
+  const scope = view==='partners' ? 'Top referral partners by volume, year to date' : 'Deal channel mix, year to date';
   /* "By partner" is a ranking (stays a horizontal-bar list, §4's "a genuine list stays a list");
      "By channel" is a part-to-whole mix question, so it gets the single stacked bar (D93) instead
      of a second ranked-bar list — same card, two different questions, two different forms.
@@ -47904,7 +48007,7 @@ function execClosedWonProductPanelHtml(){
   return '<div class="panel" id="panel-exec-wonproduct">'+
     '<div class="panel-header"><div class="panel-header-text">'+
       '<div class="panel-title">Closed-won by product</div>'+
-      '<div class="panel-scope">'+totalCount+' deal'+(totalCount===1?'':'s')+' funded, all-time, by product type</div>'+
+      '<div class="panel-scope">'+totalCount+' deal'+(totalCount===1?'':'s')+' funded, year to date, by product type</div>'+
     '</div></div>'+
     '<div class="panel-body pad-top">'+viewToggleHtml(EXEC_MEASURE_VIEWS, measure, 'setExecWonProductMeasure')+'</div>'+
     '<div class="panel-body">'+stackedBarHtml(rows, {narrow:true})+'</div>'+
@@ -47926,7 +48029,7 @@ function execClosedLostPanelHtml(){
   return '<div class="panel" id="panel-exec-lostintel">'+
     '<div class="panel-header"><div class="panel-header-text">'+
       '<div class="panel-title">Closed-lost intelligence</div>'+
-      '<div class="panel-scope">'+totalCount+' lost deal'+(totalCount===1?'':'s')+', all-time, by failure mode</div>'+
+      '<div class="panel-scope">'+totalCount+' lost deal'+(totalCount===1?'':'s')+', year to date, by failure mode</div>'+
     '</div></div>'+
     '<div class="panel-body pad-top">'+viewToggleHtml(EXEC_MEASURE_VIEWS, measure, 'setExecLostIntelMeasure')+'</div>'+
     '<div class="panel-body">'+stackedBarHtml(rows, {narrow:true})+
@@ -47957,7 +48060,10 @@ window.setExecLostIntelMeasure = function(v){
 MODALS.execStageJam = function(){
   const worst = execWorstJamStage();
   if(!worst) return {title:'Stage conversion', scope:'Not enough data yet', body:'<div class="empty">No stage has enough history to compare.</div>'};
-  const stageLost = execFirmLost().filter(o=>o.lostAtStage===worst.stage);
+  /* D100: trailing 12 months, matching execStageConversion()'s own window — worst.stage was
+     identified from that window, so the deals explaining WHY must be drawn from the same one,
+     not a mismatched all-time pool. */
+  const stageLost = execFirmLost().filter(o=>o.lostAtStage===worst.stage && inTrailing12(lostDateOf(o)));
   const buckets = execClosedLostBuckets(stageLost);
   const bucketRows = stackedBarHtml(buckets.map(b=>({label:esc(b.label), value:b.count,
     display:b.count+' · '+moneyShort(b.value), cls:b.label==='Other'?'muted':null})));
@@ -47987,7 +48093,7 @@ MODALS.execStageJam = function(){
   const conv = execStageConversion();
   return {
     title: worst.stage+': why deals die here',
-    scope: stageLost.length+' deals lost at '+worst.stage+', all-time. '+pct(worst.deathRate)+
+    scope: stageLost.length+' deals lost at '+worst.stage+', trailing 12 months. '+pct(worst.deathRate)+
       ' of everything that reaches this stage, the highest rate of any stage',
     body: modalStrip([
       {label:'Lost at '+worst.stage, value:stageLost.length},
@@ -48034,7 +48140,7 @@ MODALS.execDormantPartner = function(){
     scope: top.deals.length+' referred deal'+(top.deals.length===1?'':'s')+' · '+moneyShort(top.value)+' · '+
       (days!=null ? 'no referral in '+days+' days' : 'no referral on record'),
     body: modalStrip([
-      {label:'Referrals (all-time)', value:top.p.referralCount},
+      {label:'Referrals (full relationship)', value:top.p.referralCount},
       {label:'Total referred value', value:moneyShort(top.value)},
       {label:'Last referral', value:top.p.lastReferralDate?fmtDate(top.p.lastReferralDate):'—'},
     ]) +
@@ -48091,7 +48197,7 @@ MODALS.execUnderwriting = function(){
     body: modalStrip([
       {label:'In queue', value:uw.deals.length},
       {label:'Oldest', value:(uw.ages.length?uw.ages[uw.ages.length-1]:0)+'d'},
-      {label:'Avg turnaround', value:uw.avgTurnaround+'d'},
+      {label:'Avg turnaround (YTD)', value:uw.avgTurnaround+'d'},
     ]) + oppRowsTable(uw.deals, o=>currentDaysInStage(o)+'d in queue', 'number', o=>currentDaysInStage(o)),
   };
 };
@@ -48126,7 +48232,7 @@ MODALS.execSourcing = function(){
     : '';
   return {
     title:'Sourcing',
-    scope: view==='partners' ? 'Every referral partner by volume, firm-wide' : 'Deal channel mix, firm-wide',
+    scope: view==='partners' ? 'Every referral partner by volume, year to date' : 'Deal channel mix, year to date',
     body: viewToggleHtml(EXEC_SOURCING_VIEWS, view, 'setModalExecSourcingView')+
       viewToggleHtml(EXEC_MEASURE_VIEWS, measure, 'setModalExecSourcingMeasure')+
       chart+
