@@ -407,6 +407,29 @@ table.tbl{width:100%;border-collapse:collapse}
 .tbl.clickable tbody tr{cursor:pointer;transition:background .12s var(--ease)}
 .tbl.clickable tbody tr:hover td{background:var(--hover)}
 
+/* ---------- sortable table headers (D85, ratified DESIGN_STANDARDS.md §7b) ----------
+   At rest: a plain sentence-case header, no persistent marker — same "clean until touched"
+   principle as the inline-edit affordance (.ef, CLAUDE.md §2a) applied to a second control.
+   The button fills the whole header cell (the click/tap target is the entire header, not just
+   the label text) and is reset to look like plain text via all:unset. Hover reveals the header's
+   --hover fill (scoped to sortable headers only via :has(), so the one opted-out table — stage
+   history — never implies an interaction it doesn't have) plus a neutral glyph pinned to the
+   cell's right edge, mirroring the inline-edit glyph's own position. Active sort darkens the
+   header to full --ink and swaps the glyph for a persistent directional one; no background fill
+   marks the active state, since a fill there would collide with the hover fill's own meaning on
+   the same cell. */
+.tbl th:has(.th-sort):hover{background:var(--hover)}
+.th-sort{all:unset;position:relative;display:block;width:100%;box-sizing:border-box;
+  cursor:pointer;padding-right:var(--s4)}
+.th-sort::after{content:'\21D5';position:absolute;right:0;top:50%;transform:translateY(-50%);
+  font-size:10px;color:var(--ink-3);opacity:0;transition:opacity var(--t-fast) var(--ease)}
+.tbl th:hover .th-sort::after{opacity:1}
+.th-sort:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
+.tbl th[aria-sort]{color:var(--ink)}
+.tbl th[aria-sort] .th-sort::after{opacity:1;color:var(--ink)}
+.tbl th[aria-sort="ascending"] .th-sort::after{content:'\2191'}
+.tbl th[aria-sort="descending"] .th-sort::after{content:'\2193'}
+
 /* ---------- stage node track ----------
    Equal-width columns so every label sits below its own node at full column width and can
    never collide with its neighbour. Line segments are absolutely positioned half-widths that
@@ -46022,14 +46045,34 @@ function unlockScroll(){
   window.scrollTo(0, y);
 }
 
+/* Sortable header cell (D85, DESIGN_STANDARDS.md §7b) — every table opts in through this one
+   builder rather than reimplementing the affordance per table. `opts.type` is 'text' (default),
+   'number', 'currency', or 'date' — the delegated sort listener below reads it to compare by
+   underlying value, never by rendered string. Pass `opts.noSort` for the one deliberate
+   exception (stage history, PROJECT_STATE D84) — that call site skips this builder entirely and
+   writes a plain `<th>`, so "opted out" is visible at the table's own definition, not a flag
+   buried in here. */
+function sortableTh(label, opts){
+  opts = opts || {};
+  const cls = opts.num ? ' class="num"' : '';
+  return '<th'+cls+' data-sort-type="'+(opts.type||'text')+'">'+
+    '<button type="button" class="th-sort">'+label+'</button></th>';
+}
 function modalRow(cells, cls){
-  return '<tr'+(cls?' class="'+cls+'"':'')+'>'+cells.map(c=>
-    typeof c==='object' ? '<td class="'+(c.cls||'')+'">'+c.v+'</td>' : '<td>'+c+'</td>').join('')+'</tr>';
+  return '<tr'+(cls?' class="'+cls+'"':'')+'>'+cells.map(c=>{
+    if(typeof c!=='object') return '<td>'+c+'</td>';
+    const sortAttr = c.sort!=null ? ' data-sort="'+esc(String(c.sort))+'"' : '';
+    return '<td class="'+(c.cls||'')+'"'+sortAttr+'>'+c.v+'</td>';
+  }).join('')+'</tr>';
 }
 function modalTable(headers, rows){
   if(!rows.length) return '<div class="empty">Nothing to show here.</div>';
   return '<div class="tbl-wrap"><table class="tbl"><thead><tr>'+
-    headers.map(h=>'<th'+(h.num?' class="num"':'')+'>'+(h.label!=null?h.label:h)+'</th>').join('')+
+    headers.map(h=>{
+      const opts = (h!=null && typeof h==='object') ? h : {};
+      const label = (h!=null && typeof h==='object') ? (h.label!=null?h.label:'') : h;
+      return sortableTh(label, opts);
+    }).join('')+
     '</tr></thead><tbody>'+rows.join('')+'</tbody></table></div>';
 }
 function modalStrip(items){
@@ -46037,19 +46080,92 @@ function modalStrip(items){
     '<div><div class="modal-lab">'+esc(i.label)+'</div><div class="modal-fig">'+i.value+'</div></div>'
   ).join('')+'</div>';
 }
-function oppRowsTable(opps, extra){
-  const rows = opps.slice().sort((a,b)=>b.facilitySize-a.facilitySize).map(o=>
-    '<tr onclick="closeModal();location.hash=\'#/opp/'+o.id+'\'">'+
+/* `extraSortType`/`extraSortValue` type the Detail column correctly per caller (MODALS.underwriting
+   passes a day count as 'number'; MODALS.funded passes fundedDate as 'date'); omitted, Detail
+   sorts as text, same as the plain Stage case when there's no `extra` at all. */
+function oppRowsTable(opps, extra, extraSortType, extraSortValue){
+  const rows = opps.slice().sort((a,b)=>b.facilitySize-a.facilitySize).map(o=>{
+    const detailSort = extraSortValue ? ' data-sort="'+esc(String(extraSortValue(o)))+'"' : '';
+    return '<tr onclick="closeModal();location.hash=\'#/opp/'+o.id+'\'">'+
       '<td class="name">'+esc(getAccount(o.accountId).name)+'</td>'+
       '<td class="sec">'+o.productType+'</td>'+
-      '<td class="sec">'+(extra?extra(o):o.stage)+'</td>'+
-      '<td class="num">'+moneyPlain(o.facilitySize)+'</td>'+
-    '</tr>');
+      '<td class="sec"'+detailSort+'>'+(extra?extra(o):o.stage)+'</td>'+
+      '<td class="num" data-sort="'+o.facilitySize+'">'+moneyPlain(o.facilitySize)+'</td>'+
+    '</tr>';
+  });
   if(!rows.length) return '<div class="empty">No deals in this set.</div>';
   return '<div class="tbl-wrap"><table class="tbl clickable"><thead><tr>'+
-    '<th>Account</th><th>Product</th><th>'+(extra?'Detail':'Stage')+'</th><th class="num">Facility</th>'+
+    sortableTh('Account',{type:'text'})+sortableTh('Product',{type:'text'})+
+    sortableTh(extra?'Detail':'Stage',{type: extra ? (extraSortType||'text') : 'text'})+
+    sortableTh('Facility',{num:true,type:'currency'})+
     '</tr></thead><tbody>'+rows.join('')+'</tbody></table></div>';
 }
+
+/* ================================================================
+   SORTABLE TABLES (D85, ratified DESIGN_STANDARDS.md §7b) — one delegated listener for every
+   table in the app, not a per-table implementation. A table opts in purely through markup
+   (sortableTh() on its headers, a data-sort attribute on numeric/date/currency cells); a future
+   table gets sorting by using that same markup, never by wiring up its own click handler.
+
+   Sort state lives ONLY in the DOM (aria-sort + row order) — deliberately, not because tracking
+   it in JS was overlooked. A table is always rebuilt from scratch on: a toggle-card view switch
+   (setPartnerView/setLossView/setTrendView), a modal reopening (openModal) or an in-modal view
+   switch (refreshModalIfOpen), or a record-page edit-triggered rebuild (renderOpp). Every one of
+   those is a moment the columns or row population may have changed meaning — carrying a
+   column-index sort across that boundary risks silently comparing the wrong thing (Partners'
+   three views share all seven columns, but "sorted by column 4" doesn't mean the same thing once
+   the view itself just changed what question is being asked). Resetting to the table's own
+   default order is the safer, and the DELIBERATE, choice — see PROJECT_STATE D84/D85.
+
+   swapPanel() (D80) is the only other way a table's node could be discarded out from under this
+   state, and it's confirmed, not assumed, to never apply: the only two swapped panels are
+   panel-partners and panel-loss, and neither renders a <table> directly — only their modals do,
+   and modals are never swapped, only rebuilt fresh. So there is nothing for swapPanel() to strand
+   here today; if a future card ever does put a sortable table directly on a swapped panel, this
+   same "rebuild = fresh default order" rule already covers it correctly with no extra code.
+
+   Empty/null convention: a cell with no data-sort (numeric/date/currency) or no text (text) sorts
+   to the END, regardless of direction — an unknown value is never "smallest" or "earliest," and
+   flipping direction shouldn't make missing data jump from last to first. */
+document.addEventListener('click', function(e){
+  const btn = e.target.closest('.th-sort');
+  if(!btn) return;
+  const th = btn.closest('th');
+  const table = btn.closest('table');
+  const theadRow = table && table.querySelector('thead tr');
+  const tbody = table && table.querySelector('tbody');
+  if(!th || !theadRow || !tbody) return;
+
+  const ths = Array.from(theadRow.children);
+  const colIndex = ths.indexOf(th);
+  const type = th.dataset.sortType || 'text';
+  const dir = th.getAttribute('aria-sort')==='ascending' ? 'descending' : 'ascending';
+  ths.forEach(h=>{ if(h!==th) h.removeAttribute('aria-sort'); });
+  th.setAttribute('aria-sort', dir);
+
+  const dirMul = dir==='ascending' ? 1 : -1;
+  const withKeys = Array.from(tbody.querySelectorAll(':scope > tr')).map(tr=>{
+    const td = tr.children[colIndex];
+    if(type==='text'){
+      const t = td ? td.textContent.trim() : '';
+      return {tr, empty: t===''||t==='—', key: t.toLowerCase()};
+    }
+    const raw = td ? td.dataset.sort : undefined;
+    if(raw==null || raw==='') return {tr, empty:true};
+    // 'date' cells carry an ISO date string (e.g. "2026-01-08") — parseFloat on that string
+    // reads only the leading digits (the year), silently collapsing every date in the same
+    // year to one key. Date.parse gives the real timestamp; number/currency stay parseFloat.
+    return {tr, empty:false, key: type==='date' ? Date.parse(raw) : parseFloat(raw)};
+  });
+  withKeys.sort((a,b)=>{
+    if(a.empty && b.empty) return 0;
+    if(a.empty) return 1;    // empties always last, regardless of direction
+    if(b.empty) return -1;
+    if(type==='text') return a.key.localeCompare(b.key) * dirMul;
+    return (a.key - b.key) * dirMul;
+  });
+  withKeys.forEach(w=>tbody.appendChild(w.tr));
+});
 
 window.openModal = function(key, view){
   const def = MODALS[key];
@@ -46449,7 +46565,7 @@ MODALS.underwriting = function(){
       {label:'Facility', value:moneyShort(total)},
       {label:'Avg days in stage', value:(uw.length
         ? Math.round(uw.reduce((s,o)=>s+currentDaysInStage(o),0)/uw.length)+'d' : '—')},
-    ]) + oppRowsTable(uw, o=>currentDaysInStage(o)+' days in Underwriting'),
+    ]) + oppRowsTable(uw, o=>currentDaysInStage(o)+' days in Underwriting', 'number', o=>currentDaysInStage(o)),
   };
 };
 
@@ -46462,8 +46578,9 @@ MODALS.winrate = function(){
     const n = w.length+l.length;
     const ws = w.reduce((s,o)=>s+o.facilitySize,0), ls = l.reduce((s,o)=>s+o.facilitySize,0);
     return modalRow([
-      {v:pt, cls:'name'}, {v:w.length, cls:'num'}, {v:l.length, cls:'num'},
-      {v:n?pct(w.length/n):'—', cls:'num'}, {v:(ws+ls)?pct(ws/(ws+ls)):'—', cls:'num'},
+      {v:pt, cls:'name'}, {v:w.length, cls:'num', sort:w.length}, {v:l.length, cls:'num', sort:l.length},
+      {v:n?pct(w.length/n):'—', cls:'num', sort:n?w.length/n:null},
+      {v:(ws+ls)?pct(ws/(ws+ls)):'—', cls:'num', sort:(ws+ls)?ws/(ws+ls):null},
     ]);
   });
   return {
@@ -46476,8 +46593,8 @@ MODALS.winrate = function(){
     ]) +
     '<p class="chart-note mt-3">Winning more deals than dollars means the losses are landing on '+
     'the bigger tickets — the count-and-size divergence this product surfaces by default.</p>'+
-    modalTable(['Product', {label:'Won',num:true}, {label:'Lost',num:true},
-      {label:'Win % count',num:true}, {label:'Win % size',num:true}], rows),
+    modalTable([{label:'Product',type:'text'}, {label:'Won',num:true,type:'number'}, {label:'Lost',num:true,type:'number'},
+      {label:'Win % count',num:true,type:'number'}, {label:'Win % size',num:true,type:'number'}], rows),
   };
 };
 
@@ -46493,7 +46610,7 @@ MODALS.funded = function(){
       {label:'Funded YTD', value:moneyShort(total)},
       {label:'Annual target', value:moneyShort(st.quota)},
       {label:'Still to close', value:st.remaining>0?moneyShort(st.remaining):'Target met'},
-    ]) + oppRowsTable(ytd, o=>'Funded '+fmtDate(o.fundedDate)),
+    ]) + oppRowsTable(ytd, o=>'Funded '+fmtDate(o.fundedDate), 'date', o=>o.fundedDate),
   };
 };
 
@@ -46508,9 +46625,9 @@ MODALS.partners = function(){
   const vd = partnerViewRows(stats, view);
   const rows = vd.rows.map(r=>modalRow([
     {v:esc(r.p.name), cls:'name'}, {v:esc(r.p.partnerType), cls:'sec'},
-    {v:r.mine, cls:'num'}, {v:r.firmTotal, cls:'num'},
-    {v:r.winRate!=null?pct(r.winRate):'—', cls:'num'},
-    {v:r.days!=null?r.days+'d':'—', cls:'num'},
+    {v:r.mine, cls:'num', sort:r.mine}, {v:r.firmTotal, cls:'num', sort:r.firmTotal},
+    {v:r.winRate!=null?pct(r.winRate):'—', cls:'num', sort:r.winRate},
+    {v:r.days!=null?r.days+'d':'—', cls:'num', sort:r.days},
     {v:r.p.isDormant?'Dormant':'Active', cls:'sec'},
   ]));
   const dormant = stats.filter(r=>r.p.isDormant).length;
@@ -46525,21 +46642,26 @@ MODALS.partners = function(){
     ]) +
     '<p class="chart-note mt-3">Volume counts referrals sent to you. Win rate is each partner\'s '+
     'full firm-wide record, because a rate over one or two of your own deals is noise.</p>'+
-    modalTable(['Partner','Type',{label:'To you',num:true},{label:'Firm-wide',num:true},
-      {label:'Win rate',num:true},{label:'Last referral',num:true},'Status'], rows),
+    modalTable([{label:'Partner',type:'text'},{label:'Type',type:'text'},
+      {label:'To you',num:true,type:'number'},{label:'Firm-wide',num:true,type:'number'},
+      {label:'Win rate',num:true,type:'number'},{label:'Last referral',num:true,type:'number'},
+      {label:'Status',type:'text'}], rows),
   };
 };
 window.setModalPartnerView = function(v){ MODAL_VIEW.partners = v; refreshModalIfOpen('partners'); };
 
 function lossModalTable(view, rows){
   if(view==='competitor'){
-    return modalTable(['Lender',{label:'Deals',num:true},{label:'Facility',num:true},{label:'Evidence',num:true}],
-      rows.map(r=>modalRow([{v:esc(r.label), cls:'name'}, {v:r.n, cls:'num'}, {v:moneyPlain(r.val), cls:'num'},
-        {v:r.ucc+' UCC', cls:'num sec'}])));
+    return modalTable([{label:'Lender',type:'text'},{label:'Deals',num:true,type:'number'},
+      {label:'Facility',num:true,type:'currency'},{label:'Evidence',num:true,type:'number'}],
+      rows.map(r=>modalRow([{v:esc(r.label), cls:'name'}, {v:r.n, cls:'num', sort:r.n},
+        {v:moneyPlain(r.val), cls:'num', sort:r.val}, {v:r.ucc+' UCC', cls:'num sec', sort:r.ucc}])));
   }
   const header = view==='reason' ? 'Closed lost reason' : 'Stage';
-  return modalTable([header,{label:'Lost',num:true},{label:'Facility',num:true}],
-    rows.map(r=>modalRow([{v:esc(r.label), cls:'name'}, {v:r.n, cls:'num'}, {v:moneyPlain(r.val), cls:'num'}])));
+  return modalTable([{label:header,type:'text'},{label:'Lost',num:true,type:'number'},
+    {label:'Facility',num:true,type:'currency'}],
+    rows.map(r=>modalRow([{v:esc(r.label), cls:'name'}, {v:r.n, cls:'num', sort:r.n},
+      {v:moneyPlain(r.val), cls:'num', sort:r.val}])));
 }
 MODALS.loss = function(){
   const view = MODAL_VIEW.loss || LOSS_VIEW;
@@ -46881,22 +47003,25 @@ function renderPipeline(){
 
   const sorted = opps.slice().sort((a,b)=>b.facilitySize-a.facilitySize);
   const listHtml = '<div class="tbl-wrap"><table class="tbl clickable"><thead><tr>'+
-    '<th>Deal</th><th>Account</th><th>Owner</th><th>Product</th><th>Stage</th>'+
-    '<th class="num">Facility Size</th><th>Expected Close</th><th class="num">Days in Stage</th>'+
+    sortableTh('Deal',{type:'text'})+sortableTh('Account',{type:'text'})+sortableTh('Owner',{type:'text'})+
+    sortableTh('Product',{type:'text'})+sortableTh('Stage',{type:'text'})+
+    sortableTh('Facility Size',{num:true,type:'currency'})+sortableTh('Expected Close',{type:'date'})+
+    sortableTh('Days in Stage',{num:true,type:'number'})+
     '</tr></thead><tbody>'+
     sorted.map(o=>{
       const acct=getAccount(o.accountId);
       const owner=BDOS[o.bdoId];
       const stageLabel = o.outcome==='won' ? 'Closed · Won' : o.outcome==='lost' ? 'Closed · Lost' : o.stage;
+      const days = o.outcome==='open' ? currentDaysInStage(o) : null;
       return '<tr onclick="location.hash=\'#/opp/'+o.id+'\'">'+
         '<td class="name">'+esc(o.name)+'</td>'+
         '<td class="sec">'+esc(acct.name)+'</td>'+
         '<td class="sec">'+esc(owner?owner.name:'')+'</td>'+
         '<td class="sec">'+o.productType+'</td>'+
         '<td class="sec">'+stageLabel+'</td>'+
-        '<td class="num">'+moneyPlain(o.facilitySize)+'</td>'+
-        '<td class="sec">'+fmtDate(o.expectedCloseDate)+'</td>'+
-        '<td class="num">'+(o.outcome==='open'?currentDaysInStage(o):'—')+'</td>'+
+        '<td class="num" data-sort="'+o.facilitySize+'">'+moneyPlain(o.facilitySize)+'</td>'+
+        '<td class="sec" data-sort="'+esc(o.expectedCloseDate||'')+'">'+fmtDate(o.expectedCloseDate)+'</td>'+
+        '<td class="num"'+(days!=null?' data-sort="'+days+'"':'')+'>'+(days!=null?days:'—')+'</td>'+
       '</tr>';
     }).join('')+
     '</tbody></table></div>';
@@ -47130,9 +47255,9 @@ function lienPanelHtml(o){
   const liens = LIENS_BY_ACCT[o.accountId] || [];
   const hasSub = liens.some(l=>l.subordinated);
   const rows = liens.map(l=>
-    '<tr><td class="sec">'+fmtDate(l.filingDate)+'</td><td class="name">'+esc(l.filingNumber)+'</td>'+
+    '<tr><td class="sec" data-sort="'+esc(l.filingDate||'')+'">'+fmtDate(l.filingDate)+'</td><td class="name">'+esc(l.filingNumber)+'</td>'+
     '<td class="sec">'+esc(l.securedParty)+'</td><td class="sec">'+esc(l.collateralDescription)+'</td>'+
-    '<td class="num">'+l.priorityRank+'</td>'+
+    '<td class="num" data-sort="'+l.priorityRank+'">'+l.priorityRank+'</td>'+
     '<td>'+(l.subordinated?'<span class="tag warn">Subordinated</span>':'<span class="tag neutral">First lien</span>')+'</td></tr>'
   ).join('');
 
@@ -47149,7 +47274,11 @@ function lienPanelHtml(o){
     '</div></div>'+
     '<div class="panel-body">'+
       (liens.length
-        ? '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Filed</th><th>Filing #</th><th>Secured Party</th><th>Collateral</th><th class="num">Priority</th><th>Status</th></tr></thead><tbody>'+rows+'</tbody></table></div>'
+        ? '<div class="tbl-wrap"><table class="tbl"><thead><tr>'+
+            sortableTh('Filed',{type:'date'})+sortableTh('Filing #',{type:'text'})+
+            sortableTh('Secured Party',{type:'text'})+sortableTh('Collateral',{type:'text'})+
+            sortableTh('Priority',{num:true,type:'number'})+sortableTh('Status',{type:'text'})+
+          '</tr></thead><tbody>'+rows+'</tbody></table></div>'
         : '<div class="empty">No liens on record for this account.</div>')+
       (velocityLine ? '<div class="velocity-note">'+velocityLine+'</div>' : '')+
     '</div>'+
@@ -47270,7 +47399,7 @@ function auditPanelHtml(o){
 
   const edits = AUDIT_BY_OPP[o.id] || [];
   const editRows = edits.map(a=>
-    '<tr><td class="sec">'+fmtDate(a.changedAt)+'</td><td class="name">'+a.field+'</td>'+
+    '<tr><td class="sec" data-sort="'+esc(a.changedAt||'')+'">'+fmtDate(a.changedAt)+'</td><td class="name">'+a.field+'</td>'+
     '<td class="sec">'+esc(String(a.oldValue))+' → '+esc(String(a.newValue))+'</td>'+
     '<td class="sec">'+esc(BDOS[a.changedBy]?BDOS[a.changedBy].name:'')+'</td></tr>'
   ).join('');
@@ -47281,8 +47410,16 @@ function auditPanelHtml(o){
       '<div class="panel-scope">Full unlimited history · '+edits.length+' field edit'+(edits.length===1?'':'s')+' logged</div>'+
     '</div></div>'+
     '<div class="panel-body">'+
+      /* Stage history opts out of sorting (DESIGN_STANDARDS.md §7b, PROJECT_STATE D84): it is a
+         short progression, not a log, and the row sequence itself is the content — no column
+         encodes "what came before what," unlike the edit-history table below, which carries its
+         own Date column and stays sortable for exactly that reason. Plain <th>, no sortableTh(),
+         deliberately. */
       '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Stage</th><th>Entered</th><th>Exited</th><th class="num">Days</th></tr></thead><tbody>'+stageRows+'</tbody></table></div>'+
-      (edits.length ? '<div class="mt-5"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Date</th><th>Field</th><th>Change</th><th>Changed By</th></tr></thead><tbody>'+editRows+'</tbody></table></div></div>' : '')+
+      (edits.length ? '<div class="mt-5"><div class="tbl-wrap"><table class="tbl"><thead><tr>'+
+        sortableTh('Date',{type:'date'})+sortableTh('Field',{type:'text'})+
+        sortableTh('Change',{type:'text'})+sortableTh('Changed By',{type:'text'})+
+        '</tr></thead><tbody>'+editRows+'</tbody></table></div></div>' : '')+
     '</div>'+
   '</div>';
 }
@@ -47511,7 +47648,10 @@ function sectionNetworkHtml(o){
 }
 function sectionContactsHtml(contacts){
   const contactsHtml = contacts.length
-    ? '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Name</th><th>Role</th><th>Email</th><th>Phone</th></tr></thead><tbody>'+
+    ? '<div class="tbl-wrap"><table class="tbl"><thead><tr>'+
+        sortableTh('Name',{type:'text'})+sortableTh('Role',{type:'text'})+
+        sortableTh('Email',{type:'text'})+sortableTh('Phone',{type:'text'})+
+        '</tr></thead><tbody>'+
         contacts.map(c=>'<tr><td class="name">'+esc(c.name)+'</td><td class="sec">'+esc(c.role)+'</td><td class="sec">'+esc(c.email)+'</td><td class="sec">'+esc(c.phone)+'</td></tr>').join('')+
       '</tbody></table></div>'
     : '<div class="empty">No contacts on record.</div>';
@@ -47529,8 +47669,10 @@ function sectionActivityHtml(acts){
 }
 function sectionDocumentsHtml(docs){
   const docsHtml = docs.length
-    ? '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Document</th><th>Uploaded</th><th>By</th></tr></thead><tbody>'+
-        docs.map(d=>'<tr><td class="name">'+esc(d.type)+'</td><td class="sec">'+fmtDate(d.uploadedDate)+'</td><td class="sec">'+esc(BDOS[d.uploadedBy]?BDOS[d.uploadedBy].name:'')+'</td></tr>').join('')+
+    ? '<div class="tbl-wrap"><table class="tbl"><thead><tr>'+
+        sortableTh('Document',{type:'text'})+sortableTh('Uploaded',{type:'date'})+sortableTh('By',{type:'text'})+
+        '</tr></thead><tbody>'+
+        docs.map(d=>'<tr><td class="name">'+esc(d.type)+'</td><td class="sec" data-sort="'+esc(d.uploadedDate||'')+'">'+fmtDate(d.uploadedDate)+'</td><td class="sec">'+esc(BDOS[d.uploadedBy]?BDOS[d.uploadedBy].name:'')+'</td></tr>').join('')+
       '</tbody></table></div>'
     : '<div class="empty">No documents on record.</div>';
   return '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
