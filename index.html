@@ -274,9 +274,27 @@ h1,h2,h3,p,dl,dd{margin:0}
    Replaces the rigid 2fr/1fr split. That split stacked every rail card in one tall column, so
    whenever the action feed was shorter than the rail, everything below the agenda sat beside
    nothing and left a dead void under the feed. Multi-column lets the cards balance across both
-   columns instead, filling the space. break-inside keeps a card whole. */
-.home-grid{display:flex;gap:var(--s5);align-items:flex-start}
+   columns instead, filling the space. break-inside keeps a card whole.
+   align-items:stretch (D75) makes every .home-col match the tallest column's height — this is
+   NOT the D43 anti-pattern (stretch inflating a shorter panel into dead whitespace): D43's grid
+   had nothing to do with the extra space, so it just sat there, inert, between content and the
+   panel's own edge. Here it's paired with :last-child{flex:1} below, which hands that exact space
+   to the bottom-most card, growing THAT card's own box so the column visibly terminates flush
+   with its taller sibling instead of leaving a gap after it. Packing balances column height;
+   this is the separate step that aligns their bottom edge — see the comment above :last-child. */
+.home-grid{display:flex;gap:var(--s5);align-items:stretch}
 .home-col{flex:1;min-width:0;display:flex;flex-direction:column}
+/* Bottom-alignment (D75), shared by both packed grids (Home and the Opportunity record's Details
+   tab — same component, same fix). Packing (packGrid()) balances column height; it doesn't
+   guarantee the columns END at the same line, since fixed-content cards rarely sum equal. This is
+   deliberately NOT a JS height computation: the last card in a column is, by definition, whichever
+   one packing placed there last, so a plain CSS rule keyed off :last-child stays correct through
+   any pack outcome or card-set change with no re-measurement, no re-pack, and no risk of the
+   D34/D35 scroll-jump — it's ordinary layout, recalculated by the browser for free on every
+   reflow. The grown card's own content still renders at its natural size at the top; the extra
+   height becomes blank space at the card's own bottom, inside its border — expected and fine,
+   per the standing rule that a taller card beats two columns ending at different heights. */
+.home-col > *:last-child{flex:1 1 auto}
 
 /* ---------- expandable cards + modal (v7 tier 3: scrim + --lift-hi) ---------- */
 .panel.expandable{cursor:pointer;transition:border-color .12s var(--ease)}
@@ -482,8 +500,10 @@ table.tbl{width:100%;border-collapse:collapse}
    column used to run dry while the right kept going). Same shape as .home-grid deliberately, so
    this reads as the same component, not a lookalike: equal-width flex columns, cards placed at
    runtime by measured shortest-column packing, Next Best Action anchored to column one exactly
-   like the action feed anchors Home's. */
-.opp-details-grid{display:flex;gap:var(--s5);align-items:flex-start}
+   like the action feed anchors Home's. align-items:stretch + .home-col > *:last-child{flex:1}
+   (defined above, shared with Home) is the D75 bottom-alignment fix — the same mechanism, not a
+   second one, since this grid reuses .home-col for its columns too. */
+.opp-details-grid{display:flex;gap:var(--s5);align-items:stretch}
 /* Compact single-line rows, reused by the Signals card. A small colored glyph (no icon box, no
    radius) plus text — deliberately not .feedrow/.feed-icon, whose zero-padding "static" variant
    combined with a "flush" panel body caused the icon-overlaps-the-edge bug (D69/D71); these rows
@@ -47402,15 +47422,17 @@ function packOppGrid(){
   packGrid('.opp-details-grid', HOME_BREAKPOINT, function(){ flexDealCard(); captureOppGridColumns(); });
 }
 
-/* Bottom-alignment flex pass (D73). Packing balances columns, it doesn't align their bottoms —
-   even Home's own packer leaves real imbalance, since fixed-content cards rarely sum equal. Deal
-   is the one valid flex candidate on this grid: it already holds 9 real fields back for the modal
-   (D71), so it can genuinely reveal more rows rather than growing with padding, which would just
-   relocate the whitespace inside the card instead of removing it. Every other card on this grid
+/* Deal content-reveal pass (D73, redefined D75) — NOT the alignment mechanism. Bottom alignment
+   is now guaranteed unconditionally by CSS (align-items:stretch + .home-col > *:last-child{flex:1}
+   above), regardless of which cards are present or whether this function ever runs. What this
+   still does, independent of alignment: if Deal happens to be the last card in its column, D75's
+   CSS grows Deal's own box to fill any column slack, same as it would any other last card — the
+   difference is Deal actually has 9 real fields held back for its modal (D71), so instead of
+   leaving that grown space blank, it can fill it with real content. Every other card on this grid
    already shows 100% of its available content (Signals caps at 3 possible signals, all shown when
    present; product terms/Borrower details/Underwriting/Outcome have small fixed field sets with
-   nothing held back) — none of them pass the "can it show more real content" test, so there is no
-   second flex candidate today. That's reported here, not papered over with a stretched card.
+   nothing held back), so Deal remains the only card capable of this — not a rule about where
+   alignment slack lands, just about which card can do something useful with slack if it gets any.
    Always recomputed from the 6-field baseline (never incremental) so shrinking the viewport back
    can't strand fields revealed that are no longer needed, and the corner control is added back or
    removed to match — its presence must keep meaning "there is more behind this," honestly.
@@ -47424,17 +47446,22 @@ function flexDealCard(){
   const recId = dealCard.dataset.rec;
   const body = dealCard.querySelector('.panel-body');
   const col = dealCard.parentElement;
-  const other = Array.from(grid.children).find(c=>c!==col);
+  const isLastInColumn = !!(col && col.lastElementChild === dealCard);
 
   body.innerHTML = '<dl class="kv kv-2col">'+dealFieldRowsHtml(recId, DEAL_FACE_KEYS)+'</dl>';
   let extraFieldsNeeded = 0;
-  if(other){
-    const deficit = other.offsetHeight - col.offsetHeight;
-    if(deficit > 0){
+  if(isLastInColumn){
+    // Measure the slack CSS already grew into Deal's box at the 6-field baseline: box height
+    // minus what its own header+body content actually needs. Comparing column heights to each
+    // other (the pre-D75 approach) would always read zero now that stretch forces them equal.
+    const header = dealCard.querySelector('.panel-header');
+    const naturalHeight = (header ? header.offsetHeight : 0) + body.offsetHeight;
+    const slack = dealCard.offsetHeight - naturalHeight;
+    if(slack > 0){
       const rowEl = dealCard.querySelector('.kv-2col > div');
       const s4 = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--s4')) || 16;
       const rowHeight = (rowEl ? rowEl.offsetHeight : 40) + s4;
-      extraFieldsNeeded = Math.min(DEAL_MODAL_EXTRA_KEYS.length, Math.ceil(deficit / rowHeight) * 2);
+      extraFieldsNeeded = Math.min(DEAL_MODAL_EXTRA_KEYS.length, Math.ceil(slack / rowHeight) * 2);
     }
   }
   OPP_DEAL_EXTRA_COUNT = extraFieldsNeeded;
