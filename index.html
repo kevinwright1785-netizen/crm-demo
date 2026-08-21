@@ -276,7 +276,7 @@ h1,h2,h3,p,dl,dd{margin:0}
    whenever the action feed was shorter than the rail, everything below the agenda sat beside
    nothing and left a dead void under the feed. Multi-column lets the cards balance across both
    columns instead, filling the space. break-inside keeps a card whole. */
-.home-grid{display:flex;gap:var(--s5);align-items:flex-start}
+.home-grid,.exec-diag-grid,.exec-prod-grid{display:flex;gap:var(--s5);align-items:flex-start}
 .home-col{flex:1;min-width:0;display:flex;flex-direction:column}
 
 /* ---------- expandable cards + modal (v7 tier 3: scrim + --lift-hi) ---------- */
@@ -318,6 +318,8 @@ h1,h2,h3,p,dl,dd{margin:0}
 .segbar-seg.t4{background:var(--brand)}
 .segbar-seg.clickable{cursor:pointer;transition:opacity .12s var(--ease)}
 .segbar-seg.clickable:hover{opacity:.7}
+.segbar-seg.neg{background:var(--neg-a30)}
+.segbar-seg.muted{background:var(--neutral-a15)}
 
 /* ---------- pipeline-by-stage bar (BDO Home) ---------- */
 .stagebar-legend{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--s4);margin-top:var(--s3)}
@@ -328,6 +330,108 @@ h1,h2,h3,p,dl,dd{margin:0}
   margin:calc(var(--s1) * -1) calc(var(--s2) * -1);padding:var(--s1) var(--s2);
   transition:background .12s var(--ease)}
 .stagebar-item.clickable:hover{background:var(--hover)}
+
+/* ---------- single stacked-bar mix legend (D93) — variable item count (3-5), so flex-wrap
+   rather than the fixed 4-column .stagebar-legend grid above ---------- */
+.stackedbar-legend{display:flex;flex-wrap:wrap;gap:var(--s4) var(--s5);margin-top:var(--s3)}
+
+/* D94: a "supporting mix" bar (part-to-whole, 3-5 categories, a secondary read against the
+   diagnostics on the page — Closed-won by product, Closed-lost intelligence, Sourcing's By-
+   channel view) gets BOTH a shorter bar (--s4, lighter than the funnel/Coverage's --s5) AND a
+   capped width, so it stops claiming the same footprint as an 8-row ranked list or a 5-row
+   funnel. 240px comfortably fits 3-5 short category labels' worth of proportional bar without
+   reading as a magic number tied to any one card's content — it's a footprint cap, not a
+   measurement of anything. Genuine top-line diagnostics (the funnel, Coverage's segbar) are
+   deliberately NOT capped — a funnel row's proportions and Coverage's target-line position are
+   both meaningfully read against the full available scale, not just against each other. */
+.segbar.segbar-mix{height:var(--s4)}
+.stackedbar-narrow{max-width:240px}
+
+/* ---------- Exec Home (D86, first pass) ---------- */
+.exec-hero{background:var(--paper);border-radius:var(--r-l);box-shadow:var(--lift);
+  padding:var(--s5) var(--s6);margin-bottom:var(--s5)}
+.exec-hero-label{font-size:12px;color:var(--ink-3)}
+.exec-hero-figure{font-family:var(--display);font-size:48px;font-weight:500;letter-spacing:-.03em;
+  color:var(--ink);margin-top:var(--s1)}
+.exec-hero-sub{font-size:12px;color:var(--ink-2);margin-top:var(--s2)}
+.exec-band-heading{font-family:var(--display);font-size:16px;font-weight:500;color:var(--ink);
+  margin:var(--s6) 0 var(--s3)}
+/* D98: a plain CSS grid row for cards with genuinely comparable natural heights — no JS, no
+   packGrid()/alignGridColumns() involved at all. `align-items:stretch` is Grid's own default
+   (named explicitly here since it IS the mechanism): every card in the row shares the row's own
+   height because they're laid out in the same row, not because one was chosen to absorb a
+   deficit. This is why there is no victim and no cap to satisfy — see PROJECT_STATE D98 for why
+   this exists instead of a fourth packed-grid extraction. Collapses to a single stacked column at
+   the same breakpoint the packed grids use, where natural per-card heights are correct again
+   (nothing to compare against once cards aren't side by side). */
+.exec-mix-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s5);
+  align-items:stretch;margin-bottom:var(--s5)}
+@media (max-width:1140px){.exec-mix-row{grid-template-columns:1fr}}
+/* One hero figure per view (CLAUDE.md §4) — .exec-hero above owns that slot, so per-card figures
+   in the diagnostics band use this smaller, non-emphasis size, never .met-figure.emphasis. */
+.exec-ratio{font-family:var(--display);font-size:22px;font-weight:500;letter-spacing:-.03em;color:var(--ink)}
+.exec-ratio .un{font-size:.6em;font-weight:400;color:var(--ink-2);letter-spacing:0}
+.exec-target-line{position:absolute;top:0;bottom:0;width:0;border-left:1px dashed var(--ink-3);pointer-events:auto}
+.attain-wrap{position:relative}
+.attain-target-line{position:absolute;top:0;bottom:0;width:0;border-left:1px dashed var(--ink-3);pointer-events:auto}
+
+/* stage-conversion funnel rows — one .segbar per stage, entered count right-aligned.
+   D94: bar height raised to --s5 (was --s4) and row padding loosened to --s3 (was --s2) so the
+   funnel — the single most diagnostic element on this page — reads as the DENSEST, heaviest
+   bar-based shape here, not the thinnest one (it was previously thinner than the supporting mix
+   bars below, backwards from what its role warrants). See the chart-weight/width log entry. */
+.convrow{display:grid;grid-template-columns:104px 1fr 44px;gap:var(--s3);align-items:center;padding:var(--s3) 0}
+.convrow-label{font-size:12px;color:var(--ink)}
+.convrow-bar{height:var(--s5)}
+.convrow-val{font-family:var(--mono);font-size:11px;color:var(--ink-2);text-align:right}
+.convrow-legend{display:flex;gap:var(--s5);margin-top:var(--s3);font-size:11px;color:var(--ink-2)}
+.convdot{display:inline-block;width:8px;height:8px;border-radius:var(--r-s);margin-right:var(--s1);background:var(--brand)}
+.convdot.t2{background:var(--brand-a65)}
+.convdot.t3{background:var(--brand-a80)}
+.convdot.t4{background:var(--brand)}
+.convdot.neg{background:var(--neg-a30)}
+.convdot.muted{background:var(--neutral-a15)}
+
+/* range-strip (min/p25-p75/median/max) — cycle time and Underwriting age spread.
+   D90 containment fix: both chart SVGs on this page had an explicit overflow:visible, overriding
+   the safe overflow:hidden every other SVG in the app relies on by default (compare
+   .proc-ring-svg, which sets no overflow property at all and has never had this problem). Marks
+   are already comfortably inset from the viewBox edges (padL/padR margins exceed every mark's own
+   radius), so removing the override costs nothing and adds a real backstop against exactly the
+   overflow Kevin saw. The wrap div gets an explicit overflow:hidden too, defense in depth, so a
+   chart's own box can never bleed into the panel below it even if something inside miscalculates. */
+.rangestrip-svg{width:100%;height:64px;margin-top:var(--s3);overflow:hidden}
+.rangestrip-whisker{stroke:var(--line-2);stroke-width:1.5}
+.rangestrip-box{fill:var(--brand-a30);stroke:var(--brand);stroke-width:1}
+.rangestrip-median{stroke:var(--brand);stroke-width:2}
+.rangestrip-cap{fill:var(--ink-3)}
+.rangestrip-label{font-size:10px;fill:var(--ink-3);font-family:var(--mono)}
+
+/* exec chart infrastructure — shared gridline/axis language used by every exec SVG chart.
+   D92: never give an SVG geometry element (rect/circle/path/line) a class built for a <div>
+   (.segbar-seg, .t2/t3/t4, .convdot) — `background` is inert on SVG shapes (falls back to the
+   spec's default fill, black) and `height`/`width` are real, stylable SVG CSS geometry properties
+   that silently override the element's own attribute of the same name. Every SVG mark in this
+   file gets its own dedicated fill/stroke rule for exactly this reason — see PROJECT_STATE D92
+   for the full mechanism. */
+.execchart-wrap{height:180px;padding:0 var(--s5);overflow:hidden}
+.execchart-svg{width:100%;height:100%;overflow:hidden}
+.execchart-grid{stroke:var(--line);stroke-width:1}
+.execchart-axis{font-size:10px;fill:var(--ink-3);font-family:var(--mono)}
+.execchart-xlabel{font-size:10px;fill:var(--ink-3)}
+
+/* dual-series line chart (D93) — solid brand line + dashed brand-2 line, colour AND dash pattern
+   never colour alone. Hit circles are the actual tooltip/hover target (radius comfortably larger
+   than the visible dot, easier to hover without cluttering the mark itself). */
+.linechart-line-a{fill:none;stroke:var(--brand);stroke-width:2}
+.linechart-line-b{fill:none;stroke:var(--brand-2);stroke-width:2;stroke-dasharray:4 3}
+.linechart-dot-a{fill:var(--brand)}
+.linechart-dot-b{fill:var(--brand-2)}
+.linechart-hit{fill:transparent}
+.linechart-legend{display:flex;gap:var(--s5);padding:0 var(--s5) var(--s5);font-size:11px;color:var(--ink-2)}
+.linechart-legend-item{display:flex;align-items:center;gap:var(--s2)}
+.linechart-swatch{width:14px;height:2px;background:var(--brand);border-radius:1px;flex:0 0 auto}
+.linechart-swatch.b{background:none;border-top:2px dashed var(--brand-2)}
 
 /* ---------- pipeline stage-filter chip (Pipeline view, arrived via a stage-bar click) ---------- */
 .stage-filter-clear{margin-left:var(--s1);background:none;border:none;color:var(--brand);
@@ -45682,13 +45786,20 @@ function route(){
 
   if(view==='home'){ showView('view-home'); renderHome(); }
   else if(view==='pipeline'){
-    /* #/pipeline/stage/X arrives pre-filtered (BDO Home's pipeline-by-stage bar links here) —
-       forces My Open Deals + List so the landing view is exactly "my open X deals," not a kanban
-       board with one populated column. A plain #/pipeline always clears any stale filter, so
-       navigating away and back via the nav rail never leaves a stranded filter behind. */
+    /* #/pipeline/stage/X arrives pre-filtered (BDO Home's pipeline-by-stage bar, and Exec Home's
+       firm-wide coverage/conversion links, both land here) — forces List so the landing view is
+       a filtered list, not a kanban board with one populated column. A plain #/pipeline always
+       clears any stale filter, so navigating away and back via the nav rail never leaves a
+       stranded filter behind.
+       Segment is role-aware, not hardcoded to My Open Deals (D88 bug fix): this route used to
+       force 'myOpen' unconditionally, which was correct for BDO Home's own stage-bar (a personal
+       page, personal scope) but silently wrong for Exec Home's firm-wide feed items — an exec
+       clicking a firm-wide finding ("Proposal is where deals die most often") landed on one demo
+       BDO's own Proposal deals instead of the firm-wide set the item was actually about. There is
+       no "my deals" for the exec persona, so exec always gets the firm-wide segment. */
     if(parts[1]==='stage' && parts[2]){
       PIPE_STAGE_FILTER = parts[2];
-      PIPE_SEGMENT = 'myOpen';
+      PIPE_SEGMENT = ROLE==='exec' ? 'allOpen' : 'myOpen';
       PIPE_VIEW = 'list';
     } else {
       PIPE_STAGE_FILTER = null;
@@ -46741,17 +46852,22 @@ function packGrid(selector, breakpoint, after){
 }
 function packHomeGrid(){ packGrid('.home-grid', HOME_BREAKPOINT, function(){ alignGridColumns('.home-grid'); }); }
 let HOME_RESIZE_TIMER = null;
+function packExecDiagGrid(){ packGrid('.exec-diag-grid', HOME_BREAKPOINT, function(){ alignGridColumns('.exec-diag-grid'); }); }
+function packExecProdGrid(){ packGrid('.exec-prod-grid', HOME_BREAKPOINT, function(){ alignGridColumns('.exec-prod-grid'); }); }
 window.addEventListener('resize', function(){
-  if(!document.querySelector('.home-grid') && !document.querySelector('.opp-details-grid')) return;
+  if(!document.querySelector('.home-grid') && !document.querySelector('.opp-details-grid') &&
+     !document.querySelector('.exec-diag-grid') && !document.querySelector('.exec-prod-grid')) return;
   clearTimeout(HOME_RESIZE_TIMER);
   HOME_RESIZE_TIMER = setTimeout(function(){
     if(document.querySelector('.home-grid')) packHomeGrid();
     if(document.querySelector('.opp-details-grid')) packOppGrid();
+    if(document.querySelector('.exec-diag-grid')) packExecDiagGrid();
+    if(document.querySelector('.exec-prod-grid')) packExecProdGrid();
   }, 120);
 });
 
 function renderHome(){
-  if(ROLE==='exec'){ renderExecHomeStub(); return; }
+  if(ROLE==='exec'){ renderExecHome(); return; }
 
   const bdo = BDOS[CURRENT_BDO_ID];
   const myOpps = Object.values(OPPS).filter(o=>o.bdoId===CURRENT_BDO_ID);
@@ -46924,16 +47040,1174 @@ function renderHome(){
   else requestAnimationFrame(positionCalendarScroll);
 }
 
-function renderExecHomeStub(){
-  document.getElementById('view-home').innerHTML =
-    '<h1 class="page-heading">Exec / Head of Sales</h1>'+
-    '<div class="page-sub">Auto-surfaced insights, count-vs-size, rep and partner performance, velocity</div>'+
-    '<div class="stub-panel">'+
-      '<div class="stub-icon">&#9634;</div>'+
-      '<div class="stub-title">Exec Home is defined, not built in this pass</div>'+
-      '<div class="stub-sub">The IA (PROJECT_STATE.md §12) locks this screen\'s content — count-vs-size panels, rep and partner leaderboards, velocity. '+
-        'This skeleton pass built the BDO Home as the fully-worked reference. Switch back to BDO to see it.</div>'+
+/* ================================================================
+   EXEC HOME (D86, first pass) — firm-wide diagnostics + production, per D53's build order and
+   the Unit 0 data-feasibility audit (PROJECT_STATE). Distinct from BDO Home on purpose: the BDO
+   page exists to make someone act on a specific deal; this page exists to make someone notice a
+   pattern and decide where to intervene. Every data function below reads firm-wide (D.opportunities/
+   OPPS unfiltered by bdoId) — there is no per-rep scoping anywhere on this page. Period is
+   year-to-date for goal/production figures; diagnostics that need real sample size (stage
+   conversion, cycle time) read full history, not a partial year, per the brief.
+   ================================================================ */
+
+const EXEC_STALE_DAYS = 30; /* no-activity threshold for "stalled" — checked against the real
+  dataset before building (PROJECT_STATE D86): yields 8 deals / $60.8M, a real, non-trivial
+  population at this threshold. Not tuned to manufacture a result; this is the number the brief's
+  own suggested example produces against the actual data. */
+
+function execFirmOpen(){ return Object.values(OPPS).filter(o=>o.outcome==='open'); }
+function execFirmWon(){ return Object.values(OPPS).filter(o=>o.outcome==='won'); }
+function execFirmLost(){ return Object.values(OPPS).filter(o=>o.outcome==='lost'); }
+
+/* ---------- hero: percent of firm goal achieved ---------- */
+function execGoalStats(){
+  const yr = TODAY.slice(0,4);
+  const target = D.bdos.reduce((s,b)=>s+b.annualQuota,0);
+  const ytd = execFirmWon().filter(o=>(o.fundedDate||'').slice(0,4)===yr);
+  const fundedYTD = ytd.reduce((s,o)=>s+o.facilitySize,0);
+  return { target, fundedYTD, count: ytd.length, ratio: target?fundedYTD/target:0 };
+}
+
+/* ---------- diagnostics: pipeline coverage, firm-wide ----------
+   Rebuilt from scratch, not reused: coverageStats() and the STAGE_WEIGHTS/COVERAGE_TARGET
+   constants were deleted entirely when coverage moved off BDO Home (D40, BUILD_LOG §13k) — the
+   brief's assumption that they survived was wrong, corrected in the Unit 0 report. The weight
+   VALUES are preserved in that history and reused verbatim; the JS is new, and generalized to
+   firm scope from the start (no per-BDO version exists to generalize from). */
+const EXEC_STAGE_WEIGHTS = {Qualification:0.10, Analysis:0.25, Proposal:0.50, Underwriting:0.80};
+function execCoverageStats(){
+  const open = execFirmOpen();
+  const byStage = TRACK_STAGES.map(s=>{
+    const g = open.filter(o=>o.stage===s);
+    const value = g.reduce((t,o)=>t+o.facilitySize,0);
+    return {stage:s, count:g.length, value, weighted:value*EXEC_STAGE_WEIGHTS[s]};
+  });
+  const weightedPipeline = byStage.reduce((s,b)=>s+b.weighted,0);
+  const goal = execGoalStats();
+  const remaining = Math.max(0, goal.target-goal.fundedYTD);
+  const ratio = remaining>0 ? weightedPipeline/remaining : (weightedPipeline>0?Infinity:0);
+  return {byStage, weightedPipeline, remaining, ratio};
+}
+
+/* ---------- diagnostics: stalled deals — no logged activity in EXEC_STALE_DAYS ---------- */
+function execStalledDeals(){
+  const open = execFirmOpen();
+  const lastAct = {};
+  D.activities.forEach(a=>{
+    const cur = lastAct[a.opportunityId];
+    if(!cur || a.date>cur) lastAct[a.opportunityId] = a.date;
+  });
+  const stale = open.filter(o=>{
+    const last = lastAct[o.id];
+    return !last || daysBetween(last,TODAY) >= EXEC_STALE_DAYS;
+  });
+  const byStage = TRACK_STAGES.map(s=>{
+    const g = stale.filter(o=>o.stage===s);
+    return {stage:s, count:g.length, value:g.reduce((t,o)=>t+o.facilitySize,0)};
+  });
+  return {deals:stale, count:stale.length, value:stale.reduce((s,o)=>s+o.facilitySize,0), byStage};
+}
+
+/* ---------- diagnostics: slippage — recorded expectedCloseDate push-outs ----------
+   Same audit-trail mechanism D85 made sortable (a field-edit log), read for a different purpose
+   here. Every recorded change in the dataset today happens to be a push-out (verified before
+   building, PROJECT_STATE D86) — this reads whichever direction the data actually shows rather
+   than assuming a direction. Where a deal has more than one recorded push, only the latest is
+   counted (its own delta, not the cumulative slide) — the question is "how much did the CURRENT
+   date move," not a lifetime total. */
+function execSlippage(){
+  const pushes = D.auditEvents.filter(a=>a.field==='expectedCloseDate' && a.newValue>a.oldValue);
+  const latestByOpp = {};
+  pushes.forEach(a=>{
+    const cur = latestByOpp[a.opportunityId];
+    if(!cur || a.changedAt>cur.changedAt) latestByOpp[a.opportunityId] = a;
+  });
+  const deals = Object.values(latestByOpp).map(a=>({
+    opp: getOpp(a.opportunityId), days: daysBetween(a.oldValue,a.newValue), changedAt:a.changedAt,
+  })).filter(x=>x.opp);
+  const value = deals.reduce((s,x)=>s+x.opp.facilitySize,0);
+  const avgDays = deals.length ? Math.round(deals.reduce((s,x)=>s+x.days,0)/deals.length) : 0;
+  return {deals, count:deals.length, value, avgDays};
+}
+
+/* ---------- diagnostics: stage conversion — entered vs. advanced vs. died, all-time ----------
+   Full history, not YTD: a partial year doesn't have the sample size to read a conversion rate
+   from. Filters the open-deal terminal:false duplicate marker first (same convention
+   auditPanelHtml already uses) — counting it as a second "entered" event for the current stage
+   was an early-draft bug (a 250-deal book was reading as 281 Qualification entries before this
+   filter; caught before writing this into the shipped version). */
+function execStageConversion(){
+  const counts = {};
+  TRACK_STAGES.forEach(s=>counts[s]={stage:s, entered:0, advanced:0, diedHere:0, stillHere:0});
+  Object.values(STAGEHIST).forEach(fullHist=>{
+    const hist = fullHist.filter(e=>e.terminal!==false);
+    hist.forEach((e,i)=>{
+      if(!TRACK_STAGES.includes(e.stage)) return;
+      counts[e.stage].entered++;
+      const next = hist[i+1];
+      if(!next){ counts[e.stage].stillHere++; return; }
+      if(next.stage==='ClosedLost') counts[e.stage].diedHere++;
+      else counts[e.stage].advanced++;
+    });
+  });
+  return TRACK_STAGES.map(s=>counts[s]);
+}
+/* Shared by the feed item (D86) and its diagnostic modal (D91) so "which stage is worst" is
+   computed once, not once per caller — entered >= 20 so a thin stage can't produce a noisy rate. */
+function execWorstJamStage(){
+  return execStageConversion().filter(c=>c.entered>=20)
+    .map(c=>({...c, deathRate:c.diedHere/c.entered})).sort((a,b)=>b.deathRate-a.deathRate)[0];
+}
+
+/* ---------- diagnostics: cycle time, application to funding — all won deals, with spread ---------- */
+function execCycleTime(){
+  const days = execFirmWon().filter(o=>o.fundedDate)
+    .map(o=>daysBetween(o.createdDate,o.fundedDate)).sort((a,b)=>a-b);
+  return {days, count:days.length};
+}
+
+/* ---------- diagnostics: Underwriting THROUGHPUT ONLY (PROJECT_STATE D86) ----------
+   Count and age of deals currently in the queue, and average turnaround for completed stints.
+   Deliberately does not compute or expose approval rate, decline rate, or any per-underwriter
+   measure — a governance boundary, not a design preference. See the D86 log entry for why. */
+function execUnderwritingThroughput(){
+  const inQueue = execFirmOpen().filter(o=>o.stage==='Underwriting');
+  const ages = inQueue.map(o=>currentDaysInStage(o)).sort((a,b)=>a-b);
+  const turnarounds = [];
+  Object.values(STAGEHIST).forEach(hist=>{
+    hist.forEach(e=>{ if(e.stage==='Underwriting' && e.durationDays!=null) turnarounds.push(e.durationDays); });
+  });
+  turnarounds.sort((a,b)=>a-b);
+  const avgTurnaround = turnarounds.length ? Math.round(turnarounds.reduce((a,b)=>a+b,0)/turnarounds.length) : 0;
+  return {deals:inQueue, ages, avgTurnaround, turnarounds};
+}
+
+/* ---------- production: BDO attainment distribution — spread, not just totals ---------- */
+function execBdoAttainment(){
+  const yr = TODAY.slice(0,4);
+  return D.bdos.map(b=>{
+    const funded = Object.values(OPPS).filter(o=>o.bdoId===b.id && o.outcome==='won' && (o.fundedDate||'').slice(0,4)===yr)
+      .reduce((s,o)=>s+o.facilitySize,0);
+    return {label:b.name, pctOf: b.annualQuota?funded/b.annualQuota*100:0, fundedVal:funded, quotaVal:b.annualQuota};
+  }).sort((a,b)=>b.pctOf-a.pctOf);
+}
+
+/* ---------- production: monthly volume — opportunity creation vs. closed-won, by month ---------- */
+function monthKeyOf(dateStr){ return dateStr.slice(0,7); }
+function monthLabel(key){
+  const p = key.split('-').map(Number);
+  return new Date(Date.UTC(p[0],p[1]-1,1)).toLocaleDateString('en-US',{month:'short',year:'2-digit',timeZone:'UTC'});
+}
+function addMonthsKey(key, delta){
+  const p = key.split('-').map(Number);
+  let y=p[0], m=p[1]+delta;
+  while(m<1){ m+=12; y--; }
+  while(m>12){ m-=12; y++; }
+  return y+'-'+String(m).padStart(2,'0');
+}
+function trailingMonthKeys(startKey, endKey){
+  const out=[startKey]; let k=startKey;
+  while(k!==endKey){ k=addMonthsKey(k,1); out.push(k); }
+  return out;
+}
+const EXEC_MONTHLY_WINDOW = 12;
+function execMonthlySeries(dateField, pool){
+  const endKey = monthKeyOf(TODAY);
+  const startKey = addMonthsKey(endKey, -(EXEC_MONTHLY_WINDOW-1));
+  const byMonth = {};
+  pool.forEach(o=>{
+    const d = o[dateField];
+    if(!d) return;
+    const k = monthKeyOf(d);
+    const e = byMonth[k] = byMonth[k] || {n:0,val:0};
+    e.n++; e.val += o.facilitySize;
+  });
+  return trailingMonthKeys(startKey,endKey).map(k=>({
+    month:k, label:monthLabel(k), count:(byMonth[k]||{n:0}).n, value:(byMonth[k]||{val:0}).val,
+  }));
+}
+
+/* ---------- production: sourcing — channel mix + top referral partners, merged (same question) ---------- */
+function execChannelMix(){
+  const byChannel = {};
+  D.opportunities.forEach(o=>{
+    const e = byChannel[o.channel] = byChannel[o.channel] || {n:0,val:0};
+    e.n++; e.val+=o.facilitySize;
+  });
+  return Object.entries(byChannel).map(([label,v])=>({label,count:v.n,value:v.val}))
+    .sort((a,b)=>b.count-a.count);
+}
+function execTopReferralPartners(limit){
+  const byPartner = {};
+  D.opportunities.filter(o=>o.referralPartnerId).forEach(o=>{
+    const e = byPartner[o.referralPartnerId] = byPartner[o.referralPartnerId] || {n:0,val:0};
+    e.n++; e.val+=o.facilitySize;
+  });
+  return Object.entries(byPartner).map(([id,v])=>({label:(PARTNERS[id]?PARTNERS[id].name:id), count:v.n, value:v.val}))
+    .sort((a,b)=>b.count-a.count).slice(0, limit==null?Infinity:limit);
+}
+
+/* ---------- production: closed-won by product ---------- */
+function execClosedWonByProduct(){
+  const won = execFirmWon();
+  return ['Factoring','ABL','TermLoan'].map(pt=>{
+    const g = won.filter(o=>o.productType===pt);
+    return {label:pt, count:g.length, value:g.reduce((s,o)=>s+o.facilitySize,0)};
+  });
+}
+
+/* ---------- production: closed-lost intelligence — declined by credit / lost to competitor /
+   borrower withdrew / Other. Per Kevin's decision: an honest Other bucket rather than forcing
+   every reason into three categories — 26 of 88 closedLostReason values don't map cleanly to any
+   of the three, and folding them in would make the numbers wrong. Same governed-freedom pattern
+   as CLAUDE.md §2c (a controlled taxonomy plus a genuine, visible escape hatch, never a forced
+   fit). Uses the dataset's own `lostToCompetitor` field for the competitor bucket — a real tagged
+   signal, not reason-text inference — checked first since it's authoritative regardless of
+   closedLostReason (confirmed zero overlap with the credit-decline reasons below). */
+const EXEC_LOST_CREDIT_REASONS = ['Declined in credit committee','Financials disqualified','Failed field exam / appraisal','Structure rejected'];
+const EXEC_LOST_WITHDREW_REASONS = ['Borrower withdrew','Timing — not ready','Unresponsive / went dark'];
+/* `pool` defaults to every firm-wide loss (the production-band card's own use), but accepts any
+   subset — the Proposal-jam diagnostic modal (D91) passes only deals lost specifically at
+   Proposal, reusing this exact bucketing rather than a second copy scoped to one stage. */
+function execClosedLostBuckets(pool){
+  pool = pool || execFirmLost();
+  const buckets = {credit:[], competitor:[], withdrew:[], other:[]};
+  pool.forEach(o=>{
+    if(o.lostToCompetitor) buckets.competitor.push(o);
+    else if(EXEC_LOST_CREDIT_REASONS.includes(o.closedLostReason)) buckets.credit.push(o);
+    else if(EXEC_LOST_WITHDREW_REASONS.includes(o.closedLostReason)) buckets.withdrew.push(o);
+    else buckets.other.push(o);
+  });
+  return [
+    {label:'Declined by credit', list:buckets.credit},
+    {label:'Lost to competitor', list:buckets.competitor},
+    {label:'Borrower withdrew', list:buckets.withdrew},
+    {label:'Other', list:buckets.other},
+  ].map(b=>({label:b.label, count:b.list.length, value:b.list.reduce((s,o)=>s+o.facilitySize,0), deals:b.list}));
+}
+
+/* ================================================================
+   EXEC HOME — shared render helpers. One generic ranked-bar-list builder, one range-strip
+   (min/p25/median/p75/max) builder, one monthly-bar builder — each used by several cards below
+   rather than copied per card, same discipline as packGrid() (D73) and alignGridColumns() (D80).
+   ================================================================ */
+
+/* Generalizes the ad hoc hbar-row markup already used by Partners/loss (BDO Home) into one
+   shared function for every NEW ranked list this page needs — reuses the exact .hbar-row/
+   .hbar-track/.hbar-fill CSS, no new classes. rows: [{label, value, display, tip, cls, onclick}] */
+function hbarListHtml(rows, opts){
+  opts = opts || {};
+  const max = opts.max!=null ? opts.max : Math.max(1, ...rows.map(r=>r.value));
+  return rows.map(r=>{
+    const width = Math.max(r.value>0?2:0, (r.value/max)*100);
+    return '<div class="hbar-row'+(r.rowCls?(' '+r.rowCls):'')+'"'+(r.onclick?' onclick="'+r.onclick+'"':'')+
+      (r.tip||'')+(r.onclick?' style="cursor:pointer"':'')+'>'+
+      '<div class="hbar-name">'+r.label+'</div>'+
+      '<div class="hbar-val">'+r.display+'</div>'+
+      '<div class="hbar-track"><div class="'+('hbar-fill '+(r.fillCls||'')).trim()+'" style="width:'+width.toFixed(1)+'%"></div></div>'+
     '</div>';
+  }).join('');
+}
+
+/* Single stacked bar for a part-to-whole ("mix") question (D93) — one bar, segments sized by
+   share of the total, reusing the exact .segbar/.segbar-seg tint ramp pipelineByStageHtml and
+   the coverage card already use, rather than N separate ranked bars (a ranking form for a mix
+   question misrepresents it as N-1 independent comparisons instead of one whole being divided).
+   rows: [{label, value, display, cls}] — `cls` overrides the default tint-ramp assignment (e.g.
+   'muted' for an Other/catch-all bucket, matching the same convention hbarListHtml's fillCls
+   already uses). A flex-wrap legend, not the 4-column .stagebar-legend grid, since a mix can be
+   3, 4, or 5 categories and a fixed 4-column grid doesn't fit all of them cleanly. */
+function stackedBarHtml(rows, opts){
+  opts = opts || {};
+  const total = Math.max(1, rows.reduce((s,r)=>s+r.value,0));
+  const segs = rows.filter(r=>r.value>0).map((r,i)=>{
+    const cls = r.cls!=null ? r.cls : EXEC_CONV_TINTS[i % EXEC_CONV_TINTS.length];
+    return '<div class="segbar-seg '+cls+'" style="width:'+(r.value/total*100).toFixed(2)+'%"'+
+      tipAttr(r.label, r.display, pct(r.value/total)+' of the total')+'></div>';
+  }).join('');
+  const legend = rows.map(r=>
+    '<div class="stagebar-item"><span class="k">'+r.label+'</span><span class="v">'+r.display+'</span></div>'
+  ).join('');
+  const body = '<div class="segbar'+(opts.narrow?' segbar-mix':'')+'">'+segs+'</div>'+
+    '<div class="stackedbar-legend">'+legend+'</div>';
+  /* D94: `narrow` marks a "supporting mix" bar — a part-to-whole read that is secondary to the
+     page's real diagnostics, not the thing itself (see the .stackedbar-narrow rule for why).
+     Callers inside a MODAL deliberately do not pass this — a modal is already a dedicated detail
+     view competing with nothing else for visual weight, so the full-width table-plus-chart
+     presentation there is unaffected. */
+  return opts.narrow ? '<div class="stackedbar-narrow">'+body+'</div>' : body;
+}
+
+/* Count/size TOGGLE (D94) — one control, two views, the visual shape itself changes between
+   them, not just the tooltip/subtitle text. This is distinct from Monthly volume's dual-axis
+   line, which stays dual-axis deliberately (simultaneous-and-diverging IS the insight there);
+   everywhere else a toggle is the right control, per Kevin's correction — the previous pass
+   built "both encoded at once" everywhere and dropped the toggle that was actually asked for.
+   `execMeasureRows(data, measure)` is the one function every count/size card uses to turn a
+   common {label, count, value, cls?} shape into whichever measure is active — "count" and "size"
+   mean the same thing everywhere on the page, not a per-card reinvention. */
+const EXEC_MEASURE_VIEWS = [{key:'count', label:'Count'}, {key:'size', label:'Size'}];
+function execMeasureRows(data, measure){
+  return data.map(r=>({
+    label: r.label, count: r.count, dollars: r.value, cls: r.cls,
+    value: measure==='size' ? r.value : r.count,
+    display: measure==='size'
+      ? moneyShort(r.value)+' · '+r.count+' deal'+(r.count===1?'':'s')
+      : r.count+' · '+moneyShort(r.value),
+  }));
+}
+
+/* Horizontal attainment bars sharing ONE scale (unlike hbarListHtml's per-row-independent max),
+   so a single dashed target line at 100% lines up across every row — the spread top-to-bottom
+   IS the point (brief: "attainment distribution... averages hide the story"). */
+function attainmentChartHtml(rows, targetPct){
+  const max = Math.max(targetPct, ...rows.map(r=>r.pctOf)) * 1.08;
+  const targetLeft = (targetPct/max*100).toFixed(2);
+  const bars = rows.map(r=>{
+    const width = Math.max(2, (r.pctOf/max)*100);
+    const cls = r.pctOf>=100 ? '' : (r.pctOf<40?'warn':'muted');
+    return '<div class="hbar-row"'+tipAttr(r.label, Math.round(r.pctOf)+'% of quota', moneyShort(r.fundedVal)+' of '+moneyShort(r.quotaVal)+' target')+'>'+
+      '<div class="hbar-name">'+esc(r.label)+'</div>'+
+      '<div class="hbar-val">'+Math.round(r.pctOf)+'%</div>'+
+      '<div class="hbar-track"><div class="'+('hbar-fill '+cls).trim()+'" style="width:'+width.toFixed(1)+'%"></div></div>'+
+    '</div>';
+  }).join('');
+  return '<div class="attain-wrap">'+
+    '<div class="attain-target-line" style="left:'+targetLeft+'%"'+tipAttr('Target','100%','full-year quota attainment')+'></div>'+
+    bars+'</div>';
+}
+
+/* Min/p25/median/p75/max on one horizontal axis — spread, not just an average (brief: cycle time
+   "with its spread... variance is the insight"). Shared by cycle time and Underwriting age. */
+function rangeStripSvg(values, unit){
+  const W=560, H=64, padL=10, padR=10, y=H/2;
+  const plotW=W-padL-padR;
+  const sorted = values.slice().sort((a,b)=>a-b);
+  const n = sorted.length;
+  const min=sorted[0], max=sorted[n-1];
+  const p25=sorted[Math.floor(n*0.25)], median=sorted[Math.floor(n*0.5)], p75=sorted[Math.floor(n*0.75)];
+  const x = v => padL + ((v-min)/((max-min)||1))*plotW;
+  return '<svg class="rangestrip-svg" viewBox="0 0 '+W+' '+H+'" aria-hidden="true">'+
+    '<line class="rangestrip-whisker" x1="'+x(min).toFixed(1)+'" x2="'+x(max).toFixed(1)+'" y1="'+y+'" y2="'+y+'"></line>'+
+    '<rect class="rangestrip-box" x="'+x(p25).toFixed(1)+'" y="'+(y-9)+'" width="'+Math.max(1,x(p75)-x(p25)).toFixed(1)+'" height="18" rx="3"'+
+      tipAttr('Middle 50%', p25+'-'+p75+unit, n+' deals')+'></rect>'+
+    '<line class="rangestrip-median" x1="'+x(median).toFixed(1)+'" x2="'+x(median).toFixed(1)+'" y1="'+(y-12)+'" y2="'+(y+12)+'"'+
+      tipAttr('Median', median+unit, n+' deals')+'></line>'+
+    '<circle class="rangestrip-cap" cx="'+x(min).toFixed(1)+'" cy="'+y+'" r="3.5"'+tipAttr('Fastest',min+unit,'')+'></circle>'+
+    '<circle class="rangestrip-cap" cx="'+x(max).toFixed(1)+'" cy="'+y+'" r="3.5"'+tipAttr('Slowest',max+unit,'')+'></circle>'+
+    '<text class="rangestrip-label" x="'+x(min).toFixed(1)+'" y="'+(H-4)+'" text-anchor="middle">'+min+unit+'</text>'+
+    '<text class="rangestrip-label" x="'+x(max).toFixed(1)+'" y="'+(H-4)+'" text-anchor="middle">'+max+unit+'</text>'+
+  '</svg>';
+}
+
+/* Stage-conversion funnel — one segbar row per stage, reusing the exact .segbar-seg tint ramp
+   pipelineByStageHtml already uses for these four stages, plus a .neg segment for "died here."
+   Sized by COUNT (a conversion question), not by dollars. */
+const EXEC_CONV_TINTS = ['','t2','t3','t4'];
+function stageConversionHtml(conv){
+  return conv.map((c,i)=>{
+    const total = Math.max(1,c.entered);
+    const seg = (n,cls,label)=> n ? '<div class="segbar-seg '+cls+'" style="width:'+(n/total*100).toFixed(2)+'%"'+
+      tipAttr(c.stage, n+' '+label, pct(n/total)+' of '+c.entered+' that entered '+c.stage)+'></div>' : '';
+    return '<div class="convrow">'+
+      '<div class="convrow-label">'+c.stage+'</div>'+
+      '<div class="segbar convrow-bar">'+
+        seg(c.advanced, EXEC_CONV_TINTS[i], 'advanced')+
+        seg(c.diedHere, 'neg', 'lost here')+
+        seg(c.stillHere, 'muted', 'still open')+
+      '</div>'+
+      '<div class="convrow-val">'+c.entered+'</div>'+
+    '</div>';
+  }).join('');
+}
+
+const EXEC_CHART_HEADROOM = 0.2;
+
+/* ================================================================
+   LINE CHART (D93) — the app's first, and canonical, dual-series line-chart pattern. Any future
+   line chart in the app should reuse this function, not fork a one-off — the same generalization
+   discipline as packGrid() (D73) and alignGridColumns() (D80).
+
+   This is a second attempt at a count-vs-dollars trend chart: D82 built one, and Kevin killed it
+   on sight with no specific complaint beyond "I don't like how this looks" — nothing from that
+   attempt survives to reuse (the commit was reverted before publish), so read this as a fresh
+   build of an already-approved CONCEPT, not a blind rebuild of the same execution.
+
+   Both axes are anchored at zero and topped independently at their own series' max plus a fixed
+   proportional headroom (EXEC_CHART_HEADROOM) — so wherever the two lines cross falls out of that
+   arithmetic, never from a hand-picked pair of axis scales chosen to make them cross somewhere
+   specific. The two series are distinguished by BOTH colour (--brand solid vs --brand-2 dashed)
+   AND a dash pattern, never colour alone. `series`: [{label, a, b}] — generic names since this
+   chart type isn't inherently about "count vs dollars," just two zero-anchored series over a
+   shared x-axis; `opts.tipA`/`tipB` format each series' tooltip value, `opts.axisA`/`axisB`
+   format the gridline axis labels (defaulting to a plain rounded number). */
+/* D96: axis-label padding is ESTIMATED from the actual label text this chart renders, not a
+   fixed literal — a fixed number only ever fits the dataset it was tuned against ($432.6M clipped
+   the old padR=46 the moment a real month crossed a wider dollar figure than whatever it was
+   sized for). .execchart-axis is JetBrains Mono (monospace), so every glyph advances the same
+   fraction of its font-size; 0.6em is that font's real average advance width, 0.68 adds headroom
+   so this keeps working for any string moneyShort()/Math.round() can produce, not just today's
+   widest value. AXIS_FONT_SIZE must match .execchart-axis's own font-size in the CSS below. */
+const AXIS_FONT_SIZE = 10;
+const AXIS_CHAR_WIDTH_EM = 0.68;
+const AXIS_LABEL_BUFFER = 4; // extra units beyond the estimate itself, so a label lands short of the edge, never flush against it
+function estimateLabelWidth(str){ return String(str).length * AXIS_FONT_SIZE * AXIS_CHAR_WIDTH_EM + AXIS_LABEL_BUFFER; }
+function dualLineChartSvg(series, opts){
+  opts = opts || {};
+  const fmtAxisA = opts.axisA || (v=>Math.round(v));
+  const fmtAxisB = opts.axisB || (v=>Math.round(v));
+  const fmtTipA = opts.tipA || (s=>s.a);
+  const fmtTipB = opts.tipB || (s=>s.b);
+  const W=600,H=180,padT=14,padB=24;
+  const n=series.length;
+  const topA = Math.max(1,...series.map(s=>s.a))*(1+EXEC_CHART_HEADROOM);
+  const topB = Math.max(1,...series.map(s=>s.b))*(1+EXEC_CHART_HEADROOM);
+  const axisAVals = [0,1,2,3].map(i=>fmtAxisA(topA*(1-i/3)));
+  const axisBVals = [0,1,2,3].map(i=>fmtAxisB(topB*(1-i/3)));
+  const LABEL_GAP = 6, MIN_PAD = 24; // MIN_PAD: breathing room for a very short label (e.g. a single-digit count)
+  const padL = Math.max(MIN_PAD, LABEL_GAP + Math.max(...axisAVals.map(estimateLabelWidth)));
+  const padR = Math.max(MIN_PAD, LABEL_GAP + Math.max(...axisBVals.map(estimateLabelWidth)));
+  const plotW=W-padL-padR, plotH=H-padT-padB;
+  const xAt = i => n<=1 ? padL+plotW/2 : padL+(i/(n-1))*plotW;
+  const yForA = v => padT+(1-(v/topA))*plotH;
+  const yForB = v => padT+(1-(v/topB))*plotH;
+
+  const gridLines = [0,1,2,3].map(i=>{
+    const gy = padT+(i/3)*plotH;
+    return '<line class="execchart-grid" x1="'+padL+'" x2="'+(W-padR)+'" y1="'+gy.toFixed(1)+'" y2="'+gy.toFixed(1)+'"></line>'+
+      '<text class="execchart-axis" x="'+(padL-LABEL_GAP)+'" y="'+(gy+3).toFixed(1)+'" text-anchor="end">'+axisAVals[i]+'</text>'+
+      '<text class="execchart-axis" x="'+(W-padR+LABEL_GAP)+'" y="'+(gy+3).toFixed(1)+'" text-anchor="start">'+axisBVals[i]+'</text>';
+  }).join('');
+
+  const ptsA = series.map((s,i)=>({x:xAt(i), y:yForA(s.a), s}));
+  const ptsB = series.map((s,i)=>({x:xAt(i), y:yForB(s.b), s}));
+  const pathA = 'M'+ptsA.map(p=>p.x.toFixed(1)+' '+p.y.toFixed(1)).join(' L');
+  const pathB = 'M'+ptsB.map(p=>p.x.toFixed(1)+' '+p.y.toFixed(1)).join(' L');
+
+  const labelStep = n>8?2:1;
+  const xLabels = series.map((s,i)=>
+    (i%labelStep!==0 && i!==n-1) ? '' :
+    '<text class="execchart-xlabel" x="'+xAt(i).toFixed(1)+'" y="'+(H-6)+'" text-anchor="middle">'+s.label+'</text>'
+  ).join('');
+
+  const dotsA = ptsA.map(p=>
+    '<circle class="linechart-hit" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="9"'+
+      tipAttr(p.s.label, fmtTipA(p.s), '')+'></circle>'+
+    '<circle class="linechart-dot-a" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="2.5"></circle>'
+  ).join('');
+  const dotsB = ptsB.map(p=>
+    '<circle class="linechart-hit" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="9"'+
+      tipAttr(p.s.label, fmtTipB(p.s), '')+'></circle>'+
+    '<circle class="linechart-dot-b" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="2.5"></circle>'
+  ).join('');
+
+  return '<svg class="execchart-svg" viewBox="0 0 '+W+' '+H+'" aria-hidden="true">'+
+    gridLines+
+    '<path class="linechart-line-a" d="'+pathA+'"></path>'+
+    '<path class="linechart-line-b" d="'+pathB+'"></path>'+
+    dotsA+dotsB+xLabels+
+  '</svg>';
+}
+
+/* ================================================================
+   EXEC HOME — action feed (the hero element). Scoping rule (PROJECT_STATE D86): an item belongs
+   here only if it is the EXEC's to act on — a firm-wide pattern, not a single rep's single
+   overdue task (that stays on BDO Home). Every item derives from real records; nothing here is
+   scripted (CLAUDE.md §2b).
+
+   Five candidate item types were audited before building (PROJECT_STATE D86 / Unit 0); two were
+   cut rather than shipped thin or fabricated:
+   - product/industry win-rate "moved materially" — splitting the closed book into two time
+     halves reads as noise (Factoring 64%->61%, ABL 39%->33%, TermLoan 39%->35%), not a designed
+     shift like the count-vs-size divergence is.
+   - firm-wide coverage falling below target — real coverage is 1.42x today, comfortably covered;
+     there is nothing to alert on, and manufacturing one would be exactly the fabrication
+     CLAUDE.md §2b forbids.
+   That leaves 5 real items, not 8 — a shorter, honest feed rather than a padded one, because the
+   generated business is broadly healthy today (flagged for Kevin, not solved by loosening any
+   threshold — see the D86 log entry).
+   ================================================================ */
+function execBuildFeed(){
+  const cand = [];
+
+  // dormant referral partner — the single most valuable one, not all nine; the Sourcing card
+  // below already covers the full ranked list, so the feed surfaces the one pattern instance
+  // worth an exec's attention, not a duplicate of that card.
+  // D88 found the destination was wrong (a deal page that never shows the partner connection);
+  // D91 gives it the right one instead of leaving it bare: a modal built around the partner
+  // itself (MODALS.execDormantPartner) — referral history, not a single arbitrary deal.
+  const dormant = D.partners.filter(p=>p.isDormant).map(p=>{
+    const deals = D.opportunities.filter(o=>o.referralPartnerId===p.id);
+    return {p, value:deals.reduce((s,o)=>s+o.facilitySize,0), n:deals.length};
+  }).sort((a,b)=>b.value-a.value);
+  if(dormant.length){
+    const top = dormant[0];
+    const days = top.p.lastReferralDate ? daysBetween(top.p.lastReferralDate,TODAY) : null;
+    cand.push({type:'dormant', score:70, icon:'warn', glyph:'&#9675;',
+      title: esc(top.p.name)+' has gone quiet',
+      sub: moneyShort(top.value)+' across '+top.n+' referred deal'+(top.n===1?'':'s')+' · '+
+        (days!=null?'no referral in '+days+' days':'no referral on record')+' · '+
+        dormant.length+' partner'+(dormant.length===1?'':'s')+' gone quiet firm-wide',
+      modalKey:'execDormantPartner'});
+  }
+
+  // stage where deals are jamming — highest death rate among stages with a real sample.
+  // D91: destination is now MODALS.execStageJam (why Proposal dies — reason/competitor/BDO/
+  // product breakdown, D89's rule), not a filtered Pipeline list of 19 undifferentiated deals.
+  const worstStage = execWorstJamStage();
+  if(worstStage){
+    cand.push({type:'jam', score:60, icon:'neg', glyph:'&#9888;',
+      title: worstStage.stage+' is where deals die most often',
+      sub: pct(worstStage.deathRate)+' of deals that reach '+worstStage.stage+' end there ('+
+        worstStage.diedHere+' of '+worstStage.entered+'), the highest rate of any stage',
+      modalKey:'execStageJam'});
+  }
+
+  // BDO volume-vs-quality tension — a present-tense snapshot, not a fabricated trend. Every BDO
+  // shows the same recent-heavy deal-creation skew (a generation-density artifact — checked and
+  // logged, PROJECT_STATE D86 — do not retry a "volume is up" framing on this dataset).
+  // No destination (checked, not assumed, D89 audit): this rep's own losses are scattered across
+  // 9 different closedLostReason values, 1-3 each — the same thin/scattered-sample problem the
+  // loss card's own fallback logic already guards against. A breakdown here would show noise, not
+  // insight, so none is built — same discipline that correctly killed the win-rate-shift item
+  // and the fabricated coverage alert (D86).
+  const byBdo = D.bdos.map(b=>{
+    const opps = Object.values(OPPS).filter(o=>o.bdoId===b.id);
+    const closed = opps.filter(o=>o.outcome!=='open');
+    const won = closed.filter(o=>o.outcome==='won').length;
+    return {b, n:opps.length, winRate: closed.length?won/closed.length:null, closedN:closed.length};
+  }).filter(x=>x.closedN>=8);
+  const avgWinRate = byBdo.length ? byBdo.reduce((s,x)=>s+(x.winRate||0),0)/byBdo.length : 0;
+  const highestVolume = byBdo.slice().sort((a,b)=>b.n-a.n)[0];
+  if(highestVolume && highestVolume.winRate!=null && highestVolume.winRate<avgWinRate){
+    cand.push({type:'tension', score:55, icon:'warn', glyph:'&#9651;',
+      title: esc(highestVolume.b.name)+' has the most volume, a below-average win rate',
+      sub: highestVolume.n+' deals firm-wide (the most of any rep) at '+pct(highestVolume.winRate)+
+        ' win rate, vs. '+pct(avgWinRate)+' average', hash:null});
+  }
+
+  // stalled-deal concentration — the stage carrying the largest share; exec-scoped as a pattern
+  // across the book, not one rep's one overdue call.
+  // D91 bug fix: this linked to #/pipeline/stage/X, a Pipeline list of EVERY open deal in that
+  // stage (19 in Underwriting) when only the stalled subset (5) is the actual point — overstating
+  // the problem by nearly 4x. MODALS.execStalled already existed (D86) and shows exactly the
+  // right 5; the feed just never opened it. Not an enhancement, a bug (see D91's log entry for
+  // why the wiring defaulted to navigation in the first place).
+  const stalled = execStalledDeals();
+  const worstStalledStage = stalled.byStage.slice().sort((a,b)=>b.value-a.value)[0];
+  if(stalled.count && worstStalledStage && worstStalledStage.count){
+    cand.push({type:'stalled', score:50, icon:'warn', glyph:'&#9201;',
+      title: stalled.count+' deals stalled firm-wide, no activity in '+EXEC_STALE_DAYS+'+ days',
+      sub: moneyShort(stalled.value)+' total · '+worstStalledStage.count+' of them ('+
+        moneyShort(worstStalledStage.value)+') sitting in '+worstStalledStage.stage,
+      modalKey:'execStalled'});
+  }
+
+  // slippage — pattern-level, kept distinct from the BDO tension item above rather than naming
+  // the same rep twice. D91: MODALS.execSlippage already existed (D86) with exactly the right
+  // deal-level list; wired up here instead of leaving this item with no destination at all.
+  const slip = execSlippage();
+  if(slip.count){
+    cand.push({type:'slip', score:45, icon:'warn', glyph:'&#8635;',
+      title: slip.count+' deals have slipped their close date firm-wide',
+      sub: moneyShort(slip.value)+' in facility size, averaging '+slip.avgDays+' days pushed out per deal',
+      modalKey:'execSlippage'});
+  }
+
+  cand.sort((a,b)=>b.score-a.score);
+  return cand;
+}
+/* D91: a feed item's destination is either a modalKey (opens the modal that actually answers the
+   question, D89's rule) or a hash (navigates when the item genuinely is a call to specific
+   records — D89 again: "the deals ARE the point"). Never both; modalKey wins if both were set by
+   mistake, since navigating away is strictly the worse failure mode of the two. Before D91, every
+   item defaulted to hash-navigation because that was the only destination type this function
+   supported — the stalled-deals and slippage items got wired to a Pipeline redirect not because
+   it was the right answer but because it was the *only* option available at the time, even
+   though their own diagnostics-band modals already existed. Supporting modalKey here removes
+   that default's pull for every item after these two. */
+function execFeedHtml(){
+  const items = execBuildFeed();
+  if(!items.length) return '<div class="empty">No firm-wide signals right now.</div>';
+  return items.map(c=>{
+    const onclick = c.modalKey ? 'openModal(\''+c.modalKey+'\')' : (c.hash ? 'location.hash=\''+c.hash+'\'' : null);
+    return '<div class="feedrow"'+(onclick?(' onclick="'+onclick+'"'):'')+'>'+
+      '<div class="feed-icon '+c.icon+'">'+c.glyph+'</div>'+
+      '<div class="feed-main">'+
+        '<div class="feed-title">'+c.title+'</div>'+
+        '<div class="feed-sub">'+c.sub+'</div>'+
+      '</div>'+
+      (onclick ? '<div class="feed-action">View<span class="arrow">&rsaquo;</span></div>' : '')+
+    '</div>';
+  }).join('');
+}
+
+/* ================================================================
+   EXEC HOME — diagnostics band card builders.
+   ================================================================ */
+function execCoveragePanelHtml(){
+  const cov = execCoverageStats();
+  const total = Math.max(cov.weightedPipeline, cov.remaining, 1);
+  const segs = cov.byStage.filter(b=>b.weighted>0).map(b=>
+    '<div class="segbar-seg '+EXEC_CONV_TINTS[TRACK_STAGES.indexOf(b.stage)]+' clickable" style="width:'+
+      (b.weighted/total*100).toFixed(2)+'%" onclick="goToPipelineStage(\''+b.stage+'\')"'+
+      tipAttr(b.stage, b.count+' deal'+(b.count===1?'':'s')+' · '+moneyShort(b.value),
+        moneyShort(b.weighted)+' weighted at '+pct(EXEC_STAGE_WEIGHTS[b.stage])+' conversion')+'></div>').join('');
+  const targetLeft = Math.min(100, cov.remaining/total*100).toFixed(2);
+  const verdict = cov.ratio>=1 ? {cls:'pos', label:'Covered'} : {cls:'neg', label:'Below target'};
+  const legend = cov.byStage.map(b=>
+    '<div class="stagebar-item clickable" onclick="goToPipelineStage(\''+b.stage+'\')"'+
+      tipAttr(b.stage, b.count+' deal'+(b.count===1?'':'s'), moneyShort(b.weighted)+' weighted')+'>'+
+      '<span class="k">'+b.stage+'</span><span class="v">'+moneyShort(b.weighted)+'</span></div>').join('');
+  return '<div class="panel" id="panel-exec-coverage">'+
+    '<div class="panel-header"><div class="panel-header-text">'+
+      '<div class="panel-title">Pipeline coverage</div>'+
+      '<div class="panel-scope">Weighted open pipeline vs. remaining annual goal, firm-wide</div>'+
+    '</div><span class="tag '+verdict.cls+'">'+verdict.label+'</span></div>'+
+    '<div class="panel-body">'+
+      '<div class="exec-ratio">'+cov.ratio.toFixed(2)+'<span class="un">x</span></div>'+
+      '<div class="segbar cov-segbar">'+segs+
+        '<div class="exec-target-line" style="left:'+targetLeft+'%"'+
+          tipAttr('Remaining goal', moneyShort(cov.remaining), 'what\'s left of the firm target this year')+'></div>'+
+      '</div>'+
+      '<div class="stagebar-legend">'+legend+'</div>'+
+      '<p class="chart-note mt-3">Weighted pipeline: '+moneyShort(cov.weightedPipeline)+
+        '. Remaining goal: '+moneyShort(cov.remaining)+'.</p>'+
+    '</div>'+
+  '</div>';
+}
+function execStageConversionPanelHtml(){
+  const conv = execStageConversion();
+  return '<div class="panel" id="panel-exec-conversion">'+
+    '<div class="panel-header"><div class="panel-header-text">'+
+      '<div class="panel-title">Stage conversion</div>'+
+      '<div class="panel-scope">Where deals advance vs. where they die, all-time</div>'+
+    '</div></div>'+
+    '<div class="panel-body">'+stageConversionHtml(conv)+
+      '<div class="convrow-legend">'+
+        '<span><span class="convdot t4"></span>Advanced</span>'+
+        '<span><span class="convdot neg"></span>Lost here</span>'+
+        '<span><span class="convdot muted"></span>Still open</span>'+
+      '</div>'+
+    '</div>'+
+  '</div>';
+}
+function execCycleTimePanelHtml(){
+  const c = execCycleTime();
+  const median = c.days.length ? c.days[Math.floor(c.days.length/2)] : 0;
+  return '<div class="panel" id="panel-exec-cycle">'+
+    '<div class="panel-header"><div class="panel-header-text">'+
+      '<div class="panel-title">Cycle time</div>'+
+      '<div class="panel-scope">Application to funding, '+c.count+' closed-won deals, all-time</div>'+
+    '</div></div>'+
+    '<div class="panel-body">'+
+      '<div class="exec-ratio">'+median+'<span class="un">d median</span></div>'+
+      (c.days.length ? rangeStripSvg(c.days,'d') : '<div class="empty">No funded deals yet.</div>')+
+    '</div>'+
+  '</div>';
+}
+function execUnderwritingPanelHtml(){
+  const uw = execUnderwritingThroughput();
+  return '<div class="panel expandable" id="panel-exec-uw" onclick="openModal(\'execUnderwriting\')">'+
+    '<div class="panel-header"><div class="panel-header-text">'+
+      '<div class="panel-title">Underwriting throughput</div>'+
+      '<div class="panel-scope">Queue depth and turnaround, throughput only, not decision quality</div>'+
+    '</div><span class="expand-hint">Expand &rsaquo;</span></div>'+
+    '<div class="panel-body">'+
+      '<div class="modal-strip">'+
+        '<div><div class="modal-lab">In queue</div><div class="modal-fig">'+uw.deals.length+'</div></div>'+
+        '<div><div class="modal-lab">Oldest</div><div class="modal-fig">'+(uw.ages.length?uw.ages[uw.ages.length-1]:0)+'<span class="un">d</span></div></div>'+
+        '<div><div class="modal-lab">Avg turnaround</div><div class="modal-fig">'+uw.avgTurnaround+'<span class="un">d</span></div></div>'+
+      '</div>'+
+      (uw.turnarounds.length ? '<div class="mt-4">'+rangeStripSvg(uw.turnarounds,'d')+'</div>' : '')+
+    '</div>'+
+  '</div>';
+}
+let EXEC_STALLED_MEASURE = 'count';
+function execStalledPanelHtml(){
+  const s = execStalledDeals();
+  const measure = EXEC_STALLED_MEASURE;
+  const rows = execMeasureRows(s.byStage.map(b=>({label:esc(b.stage), count:b.count, value:b.value})), measure)
+    .map(r=>({...r, tip:tipAttr(r.label, r.count+' deal'+(r.count===1?'':'s'), moneyShort(r.dollars))}));
+  return '<div class="panel expandable" id="panel-exec-stalled" onclick="openModal(\'execStalled\')">'+
+    '<div class="panel-header"><div class="panel-header-text">'+
+      '<div class="panel-title">Stalled deals</div>'+
+      '<div class="panel-scope">No activity in '+EXEC_STALE_DAYS+'+ days, firm-wide</div>'+
+    '</div><span class="expand-hint">Expand &rsaquo;</span></div>'+
+    '<div class="panel-body">'+
+      '<div class="exec-ratio">'+s.count+'</div>'+
+      '<div class="chart-note">'+moneyShort(s.value)+' in facility size</div>'+
+      '<div class="mt-4">'+viewToggleHtml(EXEC_MEASURE_VIEWS, measure, 'setExecStalledMeasure')+'</div>'+
+      '<div class="mt-3">'+hbarListHtml(rows)+'</div>'+
+    '</div>'+
+  '</div>';
+}
+window.setExecStalledMeasure = function(v){
+  EXEC_STALLED_MEASURE = v;
+  if(swapPanel('panel-exec-stalled', execStalledPanelHtml())) applyGridAlignment('.exec-diag-grid');
+  else renderExecHome();
+};
+/* D94: pulled out of the packed grid entirely — it is two numbers and a line of text, and
+   CLAUDE.md §4's "metric strip, not a KPI-card grid" rule already answers what that belongs in.
+   It was also the single shortest card in the diagnostics grid by a wide margin (no other card
+   came close), which is exactly the shape of card D80's alignment mechanism handles worst —
+   removing it from the packing pool entirely is more reliable than hoping a reorder always keeps
+   it paired with something similarly short. Reuses BDO Home's own .strip/.met pattern verbatim,
+   not a new component. Each tile opens the same modal (they're three facets of one fact, not
+   three separate things) — matching the existing "click a metric tile, open its modal" idiom. */
+function execSlippageStripHtml(){
+  const s = execSlippage();
+  return '<div class="strip strip-3">'+
+    '<div class="met expandable" tabindex="0" onclick="openModal(\'execSlippage\')">'+
+      '<div class="met-label">Slipped deals</div><div class="met-figure">'+s.count+'</div></div>'+
+    '<div class="met expandable" tabindex="0" onclick="openModal(\'execSlippage\')">'+
+      '<div class="met-label">Facility</div><div class="met-figure">'+money(s.value)+'</div></div>'+
+    '<div class="met expandable" tabindex="0" onclick="openModal(\'execSlippage\')">'+
+      '<div class="met-label">Avg days pushed</div><div class="met-figure">'+s.avgDays+'<span class="un">d</span></div></div>'+
+  '</div>';
+}
+
+/* ================================================================
+   EXEC HOME — production band card builders.
+   ================================================================ */
+const EXEC_MONTHLY_VIEWS = [{key:'created', label:'Opportunities'}, {key:'won', label:'Closed-won'}];
+/* D96: default is Closed-won, not Opportunities-created — a deliberate call, not the toggle's
+   first entry winning by default. "Opportunities created" is top-of-funnel volume; the count-vs-
+   dollars DIVERGENCE this chart exists to show (CLAUDE.md §2) is only real in the Closed-won view
+   — created tracks flat because average deal size barely varies month to month across the pooled
+   population (see PROJECT_STATE D96 for the actual numbers). The default should carry the
+   insight, and here that's also the view where the insight is visible — but that's a consequence
+   of the reasoning, not the reasoning itself. "Opportunities" stays on the toggle: it's honest,
+   real data, just not the headline. */
+let EXEC_MONTHLY_VIEW = 'won';
+function execMonthlySeriesFor(view){
+  return view==='created' ? execMonthlySeries('createdDate', Object.values(OPPS)) : execMonthlySeries('fundedDate', execFirmWon());
+}
+/* Count and size as two lines on one chart (D93) rather than a bar with dollars only in the
+   tooltip — CLAUDE.md §2's count-and-size divergence is meant to be visible in the chart's own
+   shape, via how far the two lines pull apart, not just readable in text. */
+function execMonthlyLegendLabels(view){
+  return view==='created' ? {a:'Opportunities created', b:'Facility size'} : {a:'Deals funded', b:'Facility funded'};
+}
+function execMonthlyLineChart(series){
+  return dualLineChartSvg(series.map(s=>({label:s.label, a:s.count, b:s.value})), {
+    axisB: v=>moneyShort(v),
+    tipA: s=>s.a+' deal'+(s.a===1?'':'s'),
+    tipB: s=>moneyShort(s.b),
+  });
+}
+function execMonthlyLegendHtml(view){
+  const labels = execMonthlyLegendLabels(view);
+  return '<div class="linechart-legend">'+
+    '<div class="linechart-legend-item"><span class="linechart-swatch"></span>'+labels.a+'</div>'+
+    '<div class="linechart-legend-item"><span class="linechart-swatch b"></span>'+labels.b+'</div>'+
+  '</div>';
+}
+function execMonthlyPanelHtml(){
+  const view = EXEC_MONTHLY_VIEW;
+  const series = execMonthlySeriesFor(view);
+  const total = series.reduce((s,p)=>s+p.count,0), totalVal = series.reduce((s,p)=>s+p.value,0);
+  const scope = (view==='created' ? total+' opportunities created' : total+' deals funded')+
+    ' · '+moneyShort(totalVal)+' · trailing '+series.length+' months';
+  return '<div class="panel expandable" id="panel-exec-monthly" onclick="openModal(\'execMonthly\', \''+view+'\')">'+
+    '<div class="panel-header"><div class="panel-header-text">'+
+      '<div class="panel-title">Monthly volume</div>'+
+      '<div class="panel-scope">'+scope+'</div>'+
+    '</div><span class="expand-hint">Expand &rsaquo;</span></div>'+
+    '<div class="panel-body pad-top">'+viewToggleHtml(EXEC_MONTHLY_VIEWS, view, 'setExecMonthlyView')+'</div>'+
+    '<div class="panel-body flush">'+
+      '<div class="execchart-wrap">'+execMonthlyLineChart(series)+'</div>'+
+      execMonthlyLegendHtml(view)+
+    '</div>'+
+  '</div>';
+}
+window.setExecMonthlyView = function(v){
+  EXEC_MONTHLY_VIEW = v;
+  if(swapPanel('panel-exec-monthly', execMonthlyPanelHtml())) applyGridAlignment('.exec-prod-grid');
+  else renderExecHome();
+};
+function execPipelineByStagePanelHtml(){
+  const open = execFirmOpen();
+  const total = open.reduce((s,o)=>s+o.facilitySize,0);
+  return '<div class="panel" id="panel-exec-stagepipe">'+
+    '<div class="panel-header"><div class="panel-header-text">'+
+      '<div class="panel-title">Opportunities by stage</div>'+
+      '<div class="panel-scope">'+open.length+' open deal'+(open.length===1?'':'s')+' · '+moneyShort(total)+' firm-wide</div>'+
+    '</div></div>'+
+    '<div class="panel-body">'+pipelineByStageHtml(open)+'</div>'+
+  '</div>';
+}
+function execAttainmentPanelHtml(){
+  const rows = execBdoAttainment();
+  return '<div class="panel" id="panel-exec-attainment">'+
+    '<div class="panel-header"><div class="panel-header-text">'+
+      '<div class="panel-title">Volume by BDO</div>'+
+      '<div class="panel-scope">Attainment distribution, year to date, highest to lowest</div>'+
+    '</div></div>'+
+    '<div class="panel-body">'+attainmentChartHtml(rows,100)+'</div>'+
+  '</div>';
+}
+const EXEC_SOURCING_VIEWS = [{key:'partners', label:'By partner'}, {key:'channel', label:'By channel'}];
+let EXEC_SOURCING_VIEW = 'partners';
+let EXEC_SOURCING_MEASURE = 'count';
+function execSourcingRows(view, limit, measure){
+  const base = view==='partners' ? execTopReferralPartners(limit) : execChannelMix();
+  const label = view==='partners' ? 'referred deal' : 'deal';
+  return execMeasureRows(base.map(r=>({label:esc(r.label), count:r.count, value:r.value})), measure)
+    .map(r=>({...r, tip:tipAttr(r.label, r.count+' '+label+(r.count===1?'':'s'), moneyShort(r.dollars))}));
+}
+function execSourcingPanelHtml(){
+  const view = EXEC_SOURCING_VIEW, measure = EXEC_SOURCING_MEASURE;
+  const scope = view==='partners' ? 'Top referral partners by volume, firm-wide' : 'Deal channel mix, firm-wide';
+  /* "By partner" is a ranking (stays a horizontal-bar list, §4's "a genuine list stays a list");
+     "By channel" is a part-to-whole mix question, so it gets the single stacked bar (D93) instead
+     of a second ranked-bar list — same card, two different questions, two different forms.
+     D94 fix: .hbar-row self-pads (its own left/right padding), which is why this container was
+     built `flush` — but .segbar/.stackedbar-legend do NOT self-pad, so the same flush container
+     let "By channel"'s stacked bar render edge-to-edge against the card border. The container's
+     padding is now conditional on which view is active, matching the ALREADY-correct pattern
+     Closed-won by product and Closed-lost intelligence already use (a plain, padded .panel-body)
+     for the exact same stackedBarHtml() output — not a new padding rule invented for this card.
+     D94: this card also carries a SECOND control (count/size measure) alongside the dimension
+     toggle above — the only card with two independent toggles, since it's the only one where
+     both "which dimension" and "which measure" are separately real questions. */
+  const chart = view==='partners'
+    ? hbarListHtml(execSourcingRows(view,6,measure))
+    : stackedBarHtml(execSourcingRows(view,6,measure), {narrow:true});
+  const bodyCls = view==='partners' ? 'panel-body flush mt-3 toggle-rows' : 'panel-body mt-3 toggle-rows';
+  return '<div class="panel expandable" id="panel-exec-sourcing" onclick="openModal(\'execSourcing\', \''+view+'\')">'+
+    '<div class="panel-header"><div class="panel-header-text">'+
+      '<div class="panel-title">Sourcing</div>'+
+      '<div class="panel-scope">'+scope+'</div>'+
+    '</div><span class="expand-hint">Expand &rsaquo;</span></div>'+
+    '<div class="panel-body pad-top">'+viewToggleHtml(EXEC_SOURCING_VIEWS, view, 'setExecSourcingView')+'</div>'+
+    '<div class="panel-body pad-top">'+viewToggleHtml(EXEC_MEASURE_VIEWS, measure, 'setExecSourcingMeasure')+'</div>'+
+    '<div class="'+bodyCls+'">'+chart+'</div>'+
+  '</div>';
+}
+window.setExecSourcingView = function(v){
+  EXEC_SOURCING_VIEW = v;
+  if(swapPanel('panel-exec-sourcing', execSourcingPanelHtml())) applyGridAlignment('.exec-prod-grid');
+  else renderExecHome();
+};
+window.setExecSourcingMeasure = function(v){
+  EXEC_SOURCING_MEASURE = v;
+  if(swapPanel('panel-exec-sourcing', execSourcingPanelHtml())) applyGridAlignment('.exec-prod-grid');
+  else renderExecHome();
+};
+let EXEC_WONPRODUCT_MEASURE = 'count';
+function execClosedWonProductPanelHtml(){
+  const measure = EXEC_WONPRODUCT_MEASURE;
+  const data = execClosedWonByProduct();
+  const rows = execMeasureRows(data.map(r=>({label:esc(r.label), count:r.count, value:r.value})), measure);
+  const totalCount = data.reduce((s,r)=>s+r.count,0);
+  return '<div class="panel" id="panel-exec-wonproduct">'+
+    '<div class="panel-header"><div class="panel-header-text">'+
+      '<div class="panel-title">Closed-won by product</div>'+
+      '<div class="panel-scope">'+totalCount+' deal'+(totalCount===1?'':'s')+' funded, all-time, by product type</div>'+
+    '</div></div>'+
+    '<div class="panel-body pad-top">'+viewToggleHtml(EXEC_MEASURE_VIEWS, measure, 'setExecWonProductMeasure')+'</div>'+
+    '<div class="panel-body">'+stackedBarHtml(rows, {narrow:true})+'</div>'+
+  '</div>';
+}
+window.setExecWonProductMeasure = function(v){
+  EXEC_WONPRODUCT_MEASURE = v;
+  // D98: no applyGridAlignment call - this card lives in .exec-mix-row now, a plain CSS grid row
+  // that re-stretches on its own whenever its content changes. Nothing to recompute in JS.
+  if(!swapPanel('panel-exec-wonproduct', execClosedWonProductPanelHtml())) renderExecHome();
+};
+let EXEC_LOSTINTEL_MEASURE = 'count';
+function execClosedLostPanelHtml(){
+  const measure = EXEC_LOSTINTEL_MEASURE;
+  const data = execClosedLostBuckets();
+  const rows = execMeasureRows(data.map(r=>({label:esc(r.label), count:r.count, value:r.value,
+    cls: r.label==='Other' ? 'muted' : null})), measure);
+  const totalCount = data.reduce((s,r)=>s+r.count,0);
+  return '<div class="panel" id="panel-exec-lostintel">'+
+    '<div class="panel-header"><div class="panel-header-text">'+
+      '<div class="panel-title">Closed-lost intelligence</div>'+
+      '<div class="panel-scope">'+totalCount+' lost deal'+(totalCount===1?'':'s')+', all-time, by failure mode</div>'+
+    '</div></div>'+
+    '<div class="panel-body pad-top">'+viewToggleHtml(EXEC_MEASURE_VIEWS, measure, 'setExecLostIntelMeasure')+'</div>'+
+    '<div class="panel-body">'+stackedBarHtml(rows, {narrow:true})+
+      '<p class="chart-note mt-3">Three different failure modes, three different fixes: credit-declined, '+
+      'lost to a named competitor, and borrower withdrew. \'Other\' covers reasons that do not map cleanly '+
+      'to any of the three (pricing, product fit, deal size, documentation issues).</p>'+
+    '</div>'+
+  '</div>';
+}
+window.setExecLostIntelMeasure = function(v){
+  EXEC_LOSTINTEL_MEASURE = v;
+  // D98: no applyGridAlignment call - this card lives in .exec-mix-row now, a plain CSS grid row
+  // that re-stretches on its own whenever its content changes. Nothing to recompute in JS.
+  if(!swapPanel('panel-exec-lostintel', execClosedLostPanelHtml())) renderExecHome();
+};
+
+/* ================================================================
+   EXEC HOME — diagnostic modals (D91, per the D89 feed-destination rule: a diagnostic item's
+   destination must itself be diagnostic, not a filtered list handing the reader raw rows).
+   ================================================================ */
+
+/* "Why does [stage] kill deals" — reason/competitor/BDO/product breakdown for deals lost
+   specifically at whichever stage execWorstJamStage() currently names (Proposal today; if the
+   underlying data ever shifts, this modal follows without needing a rewrite — it recomputes the
+   worst stage itself rather than hardcoding "Proposal"). Reuses execClosedLostBuckets() (D86)
+   scoped to this stage's own losses, and stageConversionHtml() (D86) for the stage-comparison
+   chart — no new bucketing or chart logic. */
+MODALS.execStageJam = function(){
+  const worst = execWorstJamStage();
+  if(!worst) return {title:'Stage conversion', scope:'Not enough data yet', body:'<div class="empty">No stage has enough history to compare.</div>'};
+  const stageLost = execFirmLost().filter(o=>o.lostAtStage===worst.stage);
+  const buckets = execClosedLostBuckets(stageLost);
+  const bucketRows = stackedBarHtml(buckets.map(b=>({label:esc(b.label), value:b.count,
+    display:b.count+' · '+moneyShort(b.value), cls:b.label==='Other'?'muted':null})));
+
+  const compT = {};
+  stageLost.filter(o=>o.lostToCompetitor).forEach(o=>{ compT[o.lostToCompetitor]=(compT[o.lostToCompetitor]||0)+1; });
+  const compEntries = Object.entries(compT).sort((a,b)=>b[1]-a[1]);
+  const compRows = compEntries.length ? hbarListHtml(compEntries.map(([name,n])=>({label:esc(name), value:n,
+    display:n+' deal'+(n===1?'':'s'), tip:tipAttr(name, n+' deal'+(n===1?'':'s'), 'won at '+worst.stage)}))) :
+    '<div class="empty">No competitor named in these losses.</div>';
+
+  const byBdoT = {};
+  stageLost.forEach(o=>{ byBdoT[o.bdoId]=(byBdoT[o.bdoId]||0)+1; });
+  const bdoRows = hbarListHtml(Object.entries(byBdoT).sort((a,b)=>b[1]-a[1]).map(([id,n])=>{
+    const name = BDOS[id]?BDOS[id].name:id;
+    return {label:esc(name), value:n, display:n+' · '+pct(n/stageLost.length),
+      tip:tipAttr(name, n+' of '+stageLost.length+' losses at '+worst.stage, pct(n/stageLost.length))};
+  }));
+  const byProductT = {};
+  stageLost.forEach(o=>{ byProductT[o.productType]=(byProductT[o.productType]||0)+1; });
+  const productRows = hbarListHtml(['Factoring','ABL','TermLoan'].map(pt=>{
+    const n = byProductT[pt]||0;
+    return {label:pt, value:n, display:n+' · '+pct(stageLost.length?n/stageLost.length:0),
+      tip:tipAttr(pt, n+' of '+stageLost.length+' losses at '+worst.stage, '')};
+  }));
+
+  const conv = execStageConversion();
+  return {
+    title: worst.stage+': why deals die here',
+    scope: stageLost.length+' deals lost at '+worst.stage+', all-time. '+pct(worst.deathRate)+
+      ' of everything that reaches this stage, the highest rate of any stage',
+    body: modalStrip([
+      {label:'Lost at '+worst.stage, value:stageLost.length},
+      {label:'Facility lost', value:moneyShort(stageLost.reduce((s,o)=>s+o.facilitySize,0))},
+      {label:'Named a competitor', value:pct(stageLost.length?stageLost.filter(o=>o.lostToCompetitor).length/stageLost.length:0)},
+    ]) +
+    '<div class="panel-title mt-4">Stage comparison</div>'+
+    stageConversionHtml(conv)+
+    '<div class="convrow-legend">'+
+      '<span><span class="convdot t4"></span>Advanced</span>'+
+      '<span><span class="convdot neg"></span>Lost here</span>'+
+      '<span><span class="convdot muted"></span>Still open</span>'+
+    '</div>'+
+    '<div class="panel-title mt-5">Failure mode</div>'+bucketRows+
+    '<div class="panel-title mt-5">Who wins these deals</div>'+compRows+
+    '<div class="panel-title mt-5">By rep</div>'+bdoRows+
+    '<div class="panel-title mt-5">By product</div>'+productRows,
+  };
+};
+
+/* "Why does this partner matter" — referral history for whichever dormant partner
+   execBuildFeed() surfaced (the single highest-value one), not a generic partner list (the
+   Sourcing card already ranks all of them). */
+MODALS.execDormantPartner = function(){
+  const dormant = D.partners.filter(p=>p.isDormant).map(p=>{
+    const deals = D.opportunities.filter(o=>o.referralPartnerId===p.id);
+    return {p, value:deals.reduce((s,o)=>s+o.facilitySize,0), deals};
+  }).sort((a,b)=>b.value-a.value);
+  const top = dormant[0];
+  if(!top) return {title:'Dormant partners', scope:'None right now', body:'<div class="empty">No dormant partners.</div>'};
+  const days = top.p.lastReferralDate ? daysBetween(top.p.lastReferralDate,TODAY) : null;
+  const rows = top.deals.slice().sort((a,b)=>b.facilitySize-a.facilitySize).map(o=>{
+    const outcome = o.outcome==='won' ? 'Won' : o.outcome==='lost' ? 'Lost' : 'Open · '+o.stage;
+    return modalRow([
+      {v:esc(getAccount(o.accountId).name), cls:'name'},
+      {v:o.productType, cls:'sec'},
+      {v:outcome, cls:'sec'},
+      {v:o.referralDate?fmtDate(o.referralDate):'—', cls:'sec', sort:o.referralDate},
+      {v:moneyPlain(o.facilitySize), cls:'num', sort:o.facilitySize},
+    ]);
+  });
+  return {
+    title: esc(top.p.name),
+    scope: top.deals.length+' referred deal'+(top.deals.length===1?'':'s')+' · '+moneyShort(top.value)+' · '+
+      (days!=null ? 'no referral in '+days+' days' : 'no referral on record'),
+    body: modalStrip([
+      {label:'Referrals (all-time)', value:top.p.referralCount},
+      {label:'Total referred value', value:moneyShort(top.value)},
+      {label:'Last referral', value:top.p.lastReferralDate?fmtDate(top.p.lastReferralDate):'—'},
+    ]) +
+    modalTable([{label:'Account',type:'text'},{label:'Product',type:'text'},{label:'Outcome',type:'text'},
+      {label:'Referred',type:'date'},{label:'Facility',num:true,type:'currency'}], rows),
+  };
+};
+
+/* ================================================================
+   EXEC HOME — modals (deal-level drill-down, same pattern as BDO Home's metric tiles).
+   ================================================================ */
+MODALS.execStalled = function(){
+  const s = execStalledDeals();
+  return {
+    title:'Stalled deals',
+    scope: s.count+' deal'+(s.count===1?'':'s')+' with no activity in '+EXEC_STALE_DAYS+'+ days, firm-wide',
+    body: modalStrip([
+      {label:'Stalled', value:s.count},
+      {label:'Facility', value:moneyShort(s.value)},
+      {label:'Threshold', value:EXEC_STALE_DAYS+'d'},
+    ]) + oppRowsTable(s.deals, o=>{
+      const last = D.activities.filter(a=>a.opportunityId===o.id).sort((a,b)=>b.date.localeCompare(a.date))[0];
+      return last ? daysBetween(last.date,TODAY)+'d since last activity' : 'No activity logged';
+    }, 'number', o=>{
+      const last = D.activities.filter(a=>a.opportunityId===o.id).sort((a,b)=>b.date.localeCompare(a.date))[0];
+      return last ? daysBetween(last.date,TODAY) : 9999;
+    }),
+  };
+};
+MODALS.execSlippage = function(){
+  const s = execSlippage();
+  const rows = s.deals.slice().sort((a,b)=>b.opp.facilitySize-a.opp.facilitySize).map(x=>modalRow([
+    {v:esc(getAccount(x.opp.accountId).name), cls:'name'},
+    {v:x.opp.productType, cls:'sec'},
+    {v:x.days+'d pushed', cls:'sec', sort:x.days},
+    {v:moneyPlain(x.opp.facilitySize), cls:'num', sort:x.opp.facilitySize},
+  ]));
+  return {
+    title:'Slippage',
+    scope: s.count+' deal'+(s.count===1?'':'s')+' with a pushed-out close date, firm-wide',
+    body: modalStrip([
+      {label:'Slipped deals', value:s.count},
+      {label:'Facility', value:moneyShort(s.value)},
+      {label:'Avg days pushed', value:s.avgDays+'d'},
+    ]) + modalTable([{label:'Account',type:'text'},{label:'Product',type:'text'},
+      {label:'Slip',num:true,type:'number'},{label:'Facility',num:true,type:'currency'}], rows),
+  };
+};
+MODALS.execUnderwriting = function(){
+  const uw = execUnderwritingThroughput();
+  return {
+    title:'Underwriting throughput',
+    scope: uw.deals.length+' deal'+(uw.deals.length===1?'':'s')+' currently in Underwriting, firm-wide',
+    body: modalStrip([
+      {label:'In queue', value:uw.deals.length},
+      {label:'Oldest', value:(uw.ages.length?uw.ages[uw.ages.length-1]:0)+'d'},
+      {label:'Avg turnaround', value:uw.avgTurnaround+'d'},
+    ]) + oppRowsTable(uw.deals, o=>currentDaysInStage(o)+'d in queue', 'number', o=>currentDaysInStage(o)),
+  };
+};
+MODALS.execMonthly = function(){
+  const view = MODAL_VIEW.execMonthly || EXEC_MONTHLY_VIEW;
+  const series = execMonthlySeriesFor(view);
+  const total = series.reduce((s,p)=>s+p.count,0), totalVal = series.reduce((s,p)=>s+p.value,0);
+  const rows = series.map(p=>modalRow([
+    {v:p.label, cls:'name'}, {v:p.count, cls:'num', sort:p.count}, {v:moneyPlain(p.value), cls:'num', sort:p.value},
+  ]));
+  return {
+    title:'Monthly volume',
+    scope: series.length+' months · '+total+' '+(view==='created'?'opportunities created':'deals funded')+' · '+moneyShort(totalVal),
+    body: viewToggleHtml(EXEC_MONTHLY_VIEWS, view, 'setModalExecMonthlyView')+
+      '<div class="execchart-wrap mt-3">'+execMonthlyLineChart(series)+'</div>'+
+      execMonthlyLegendHtml(view)+
+      modalTable([{label:'Month',type:'text'},{label:'Count',num:true,type:'number'},{label:'Value',num:true,type:'currency'}], rows),
+  };
+};
+window.setModalExecMonthlyView = function(v){ MODAL_VIEW.execMonthly = v; refreshModalIfOpen('execMonthly'); };
+MODALS.execSourcing = function(){
+  const view = MODAL_VIEW.execSourcing || EXEC_SOURCING_VIEW;
+  const measure = MODAL_VIEW.execSourcingMeasure || EXEC_SOURCING_MEASURE;
+  const data = view==='partners' ? execTopReferralPartners() : execChannelMix();
+  const rows = data.map(r=>modalRow([{v:esc(r.label),cls:'name'},{v:r.count,cls:'num',sort:r.count},{v:moneyPlain(r.value),cls:'num',sort:r.value}]));
+  /* the measure toggle only changes the CHANNEL chart's segment sizing — the partner view has no
+     chart here (the table below already carries both numbers side by side), so the toggle is a
+     no-op for "By partner". Kept present rather than conditionally hidden so the control doesn't
+     jump in and out as the dimension toggle is switched. */
+  const chart = view==='channel'
+    ? stackedBarHtml(execMeasureRows(data.map(r=>({label:esc(r.label), count:r.count, value:r.value})), measure))
+    : '';
+  return {
+    title:'Sourcing',
+    scope: view==='partners' ? 'Every referral partner by volume, firm-wide' : 'Deal channel mix, firm-wide',
+    body: viewToggleHtml(EXEC_SOURCING_VIEWS, view, 'setModalExecSourcingView')+
+      viewToggleHtml(EXEC_MEASURE_VIEWS, measure, 'setModalExecSourcingMeasure')+
+      chart+
+      modalTable([{label:view==='partners'?'Partner':'Channel',type:'text'},
+        {label:'Deals',num:true,type:'number'},{label:'Facility',num:true,type:'currency'}], rows),
+  };
+};
+window.setModalExecSourcingView = function(v){ MODAL_VIEW.execSourcing = v; refreshModalIfOpen('execSourcing'); };
+window.setModalExecSourcingMeasure = function(v){ MODAL_VIEW.execSourcingMeasure = v; refreshModalIfOpen('execSourcing'); };
+
+/* ================================================================
+   EXEC HOME — page assembly.
+   ================================================================ */
+function execHeroHtml(){
+  const goal = execGoalStats();
+  const todayLabel = toDateObj(TODAY).toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',timeZone:'UTC'});
+  return '<h1 class="page-heading">Firm performance</h1>'+
+    '<div class="dayline"><span class="dayline-date">'+todayLabel+'</span>'+
+      '<span class="dayline-sum">Year to date · firm-wide</span></div>'+
+    '<div class="exec-hero">'+
+      '<div class="exec-hero-label">Percent of annual goal achieved</div>'+
+      '<div class="exec-hero-figure">'+pct(goal.ratio)+'</div>'+
+      '<div class="exec-hero-sub">'+moneyShort(goal.fundedYTD)+' funded of '+moneyShort(goal.target)+
+        ' target · '+goal.count+' deals YTD</div>'+
+    '</div>';
+}
+function renderExecHome(){
+  document.getElementById('view-home').innerHTML =
+    execHeroHtml()+
+    '<div class="panel">'+
+      '<div class="panel-header"><div class="panel-header-text">'+
+        '<div class="panel-title">Firm-wide signals</div>'+
+        '<div class="panel-scope">Patterns worth a decision, ranked by materiality</div>'+
+      '</div></div>'+
+      '<div class="panel-body flush">'+execFeedHtml()+'</div>'+
+    '</div>'+
+    '<h2 class="exec-band-heading">Diagnostics</h2>'+
+    execSlippageStripHtml()+
+    /* D94: insertion order chosen so the packer's shortest-column-first placement (packGrid())
+       pairs Stalled deals (the tallest remaining diagnostics card, ~400px) against Cycle time
+       first, letting the two mid-sized cards (Coverage, Underwriting) balance against Stage
+       conversion in the other column — reasoned by hand against packGrid()'s own algorithm using
+       each card's real rendered content, not guessed. Still not a general fix — see the D94 log
+       entry for the mechanism this doesn't solve. */
+    '<div class="exec-diag-grid">'+
+      execStalledPanelHtml()+execCycleTimePanelHtml()+execCoveragePanelHtml()+
+      execUnderwritingPanelHtml()+execStageConversionPanelHtml()+
+    '</div>'+
+    '<h2 class="exec-band-heading">Production</h2>'+
+    /* D97: Monthly volume extracted from the packed grid entirely — same reasoning that took
+       Slippage out in D94. It is the single heaviest visual on the page (180px dual-line chart),
+       structurally has no column-mate at that scale, and was the mechanism's second victim (D96)
+       after Slippage's first. Rendering it as its own full-width row removes it from the risk pool
+       outright, rather than managing its position by reorder — which only relocates the failure
+       (Kevin's instruction: "do not reorder again"). The remaining stretch-mechanism fix
+       (GRID_STRETCH_CAP_RATIO, above) still applies to whatever's left in the grid below. */
+    execMonthlyPanelHtml()+
+    /* D98: only Volume by BDO and Sourcing remain in the packed grid — both are comparably tall
+       (8-row ranked list vs. two toggles plus a 344px-minimum chart body, ~550-575px each), so the
+       35% stretch cap (GRID_STRETCH_CAP_RATIO) is never even close to binding between them. The
+       three genuinely short cards that used to share this grid (Opportunities by stage, Closed-won
+       by product, Closed-lost intelligence — each under 300px) are NOT here any more; see the
+       .exec-mix-row below. This supersedes D94's insertion-order reasoning for this grid — that
+       comment managed WHICH short card absorbed the stretch; this removes the short cards from the
+       grid entirely, which is what actually made the mismatch stop happening. */
+    '<div class="exec-prod-grid">'+
+      execAttainmentPanelHtml()+execSourcingPanelHtml()+
+    '</div>'+
+    /* D98: Opportunities by stage, Closed-won by product, and Closed-lost intelligence pulled out
+       of the packed grid into their own row — third extraction of this kind (Slippage D94, Monthly
+       volume D97), same underlying reason: these three sit in a ~190-300px natural-height cluster,
+       nowhere near the ~550-575px cluster Attainment/Sourcing occupy, and a packed masonry column
+       can't put one short card against one tall card without either stretching or gapping. A plain
+       CSS grid row sidesteps the whole question — see .exec-mix-row's own comment for why no JS
+       alignment is needed here at all. See PROJECT_STATE D98 for the broader pattern this is now
+       the third instance of. */
+    '<div class="exec-mix-row">'+
+      execPipelineByStagePanelHtml()+execClosedWonProductPanelHtml()+execClosedLostPanelHtml()+
+    '</div>';
+  packExecDiagGrid();
+  packExecProdGrid();
 }
 
 /* ================================================================
@@ -47608,38 +48882,77 @@ function packOppGrid(){
    nothing for an incremental offsetHeight read to depend on. `alignGridColumns(selector)` runs
    only from a grid's own `packGrid()` `after` callback — after packing has fully finished
    appending every card — takes ONE measurement of each column's finished height, and writes ONE
-   explicit pixel height to each shorter column's last card. No listener, no observer, nothing
+   explicit pixel height to the column's chosen stretch target. No listener, no observer, nothing
    left watching for the next reflow. Content renders at natural size at the top; the extra height
    is blank space at the card's own bottom, inside its border — expected, per the brief, and not
    filled with anything (D73's content-reveal approach was rejected on review and stays removed,
    see D76/D78). Generalized the same way packGrid() itself was (D73): one shared pair of
-   functions, keyed by selector, rather than a second copy for Home (D79). */
-const GRID_LAST_CARD_EXTRA = {}; // selector -> [px to add to each column's last card], from that
-  // grid's last real pack — reapplied on every render that doesn't repack, including a replayed
-  // Opportunity edit and a Home toggle-card swap, so alignment survives without recomputing.
+   functions, keyed by selector, rather than a second copy for Home (D79).
+
+   D97: the stretch TARGET is no longer always `lastElementChild`. That was the actual bug behind
+   three separate incidents (Slippage D94, Monthly volume D96, and whatever the next short card
+   to land last would have been) — the mechanism dumped the ENTIRE column deficit on whichever
+   card happened to be last, with no regard for whether that card had anywhere near enough natural
+   height to absorb it invisibly. Reordering cards (D94) only ever chose which card that was; it
+   never changed the rule, so a future card addition could reintroduce the exact symptom. See
+   GRID_STRETCH_CAP_RATIO below for the actual fix. */
+const GRID_LAST_CARD_EXTRA = {}; // selector -> [px of deficit per column], from that grid's last
+  // real pack — reapplied on every render that doesn't repack, including a replayed Opportunity
+  // edit and a Home toggle-card swap, so alignment survives without recomputing.
 function alignGridColumns(selector){
   const grid = document.querySelector(selector);
   if(!grid) return;
   const cols = Array.from(grid.querySelectorAll(':scope > .home-col'));
-  // Clear any previous pass's explicit height before remeasuring, so a stale inflated height
-  // from an earlier resize/pack can't corrupt this pass's "natural height" reading.
-  cols.forEach(col=>{ const c = col.lastElementChild; if(c) c.style.height = ''; });
+  // D97: reset EVERY card's explicit height (not just the last child) before remeasuring. The
+  // stretch target now varies pass to pass (see applyGridAlignment), so a stale height left on
+  // ANY card by a previous pass — not only the one that was last then — would corrupt this pass's
+  // "natural height" reading of it, and a resize-triggered repack can reparent a previously-
+  // stretched card into a different column entirely.
+  cols.forEach(col=>{ Array.from(col.children).forEach(c=>{ c.style.height = ''; }); });
   if(cols.length < 2){ GRID_LAST_CARD_EXTRA[selector] = null; return; } // single column — nothing to align
   const heights = cols.map(c=>c.offsetHeight);
   const maxHeight = Math.max.apply(null, heights);
   GRID_LAST_CARD_EXTRA[selector] = heights.map(h=>Math.max(0, maxHeight - h));
   applyGridAlignment(selector);
 }
+
+/* D97: a card may be stretched at most this much beyond its own natural height before it is
+   disqualified as its column's stretch target. This is what protects against the exact failure
+   that hit Slippage (D94) and Monthly volume (D96): a short card landing last in its column and
+   absorbing the ENTIRE deficit regardless of how grotesque the result looked. 0.35 is a starting
+   point Kevin chose, not a derived constant — revisit it if a real card's stretch still reads
+   wrong at this cap, in either direction. */
+const GRID_STRETCH_CAP_RATIO = 0.35;
 function applyGridAlignment(selector){
   const grid = document.querySelector(selector);
   const extras = GRID_LAST_CARD_EXTRA[selector];
   if(!grid || !extras) return;
   const cols = Array.from(grid.querySelectorAll(':scope > .home-col'));
   cols.forEach((col, i)=>{
-    const lastCard = col.lastElementChild;
-    if(!lastCard) return;
+    const cards = Array.from(col.children);
+    if(!cards.length) return;
+    // Reset first, so the "natural height" reads below are never a stale, previously-stretched
+    // value. This has to run on every call, not only via alignGridColumns' own reset above — every
+    // toggle setter calls applyGridAlignment() directly, repeatedly, with no repack in between.
+    cards.forEach(c=>{ c.style.height = ''; });
     const extra = extras[i] || 0;
-    lastCard.style.height = extra > 0 ? (lastCard.offsetHeight + extra) + 'px' : '';
+    if(extra <= 0) return;
+    // Search last-to-first for the first card whose stretch ratio stays under the cap, so the
+    // result matches the old "stretch the last card" shape whenever the last card genuinely has
+    // room for it, and only reaches further up the column when it doesn't — decoupling the
+    // outcome from insertion order, which is the actual fix (see the block comment above).
+    let target = null;
+    for(let j = cards.length - 1; j >= 0; j--){
+      const natural = cards[j].offsetHeight;
+      if(natural > 0 && extra / natural <= GRID_STRETCH_CAP_RATIO){ target = cards[j]; break; }
+    }
+    // D97: if no card qualifies, apply NO stretch — this column's bottom ends uneven for this
+    // render. THIS IS THE INTENDED FAILURE MODE, NOT A DEFECT. After three decision cycles
+    // (D77/D78/D80) forcing level bottoms, the mechanism is deliberately allowed to fail visibly
+    // rather than silently elect a bad victim. If a future session finds an uneven bottom here, do
+    // NOT "fix" it by raising the cap or reverting to always-stretch-last — that reintroduces the
+    // whole bug class this round closed. See PROJECT_STATE D97.
+    if(target) target.style.height = (target.offsetHeight + extra) + 'px';
   });
 }
 function sectionNetworkHtml(o){
