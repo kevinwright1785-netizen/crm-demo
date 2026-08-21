@@ -470,14 +470,32 @@ table.tbl{width:100%;border-collapse:collapse}
 .opp-meta-item{font-size:12px;color:var(--ink-2)}
 .opp-meta-item b{color:var(--ink);font-weight:500}
 
-/* record page: persistent header (above) + persistent left rail + section-nav'd main.
-   minmax(0,1fr) on the main track is what actually stops wide content (tables) from
-   blowing the grid past the viewport — the old .two-col lacked it. */
-.record-layout{display:grid;grid-template-columns:300px minmax(0,1fr);gap:var(--s5);align-items:start}
-@media (max-width:900px){.record-layout{grid-template-columns:1fr}}
-.record-rail{position:sticky;top:calc(57px + var(--s5))}
-@media (max-width:900px){.record-rail{position:static}}
+/* record page (D69 shape): persistent header, then a full-width computed-signals band, then a
+   full-width section-nav'd main. Round 4's persistent left rail is gone — a 300px column sitting
+   beside the tab bar read as two different kinds of thing at the same level. min-width:0 on
+   .record-main is what stops wide content (tables) from blowing past the viewport. */
 .record-main{min-width:0}
+/* Band: one panel, three groups side by side, hairline dividers. Fixed height (not min-height) —
+   the same "reserve for the tallest content, never grow" discipline as the toggle-card rule and
+   the Calendar/Pipeline Snapshot pair-row, sized for a title line + ~3 content lines per group. */
+.opp-band{display:flex;background:var(--paper);border:1px solid var(--line);border-radius:var(--r-l);
+  margin-bottom:var(--s5);height:136px}
+@media (max-width:900px){.opp-band{flex-direction:column;height:auto}}
+.opp-band-group{flex:1 1 0;min-width:0;padding:var(--s4) var(--s5);border-right:1px solid var(--line);
+  display:flex;flex-direction:column;gap:var(--s2);overflow:hidden}
+.opp-band-group:last-child{border-right:none}
+@media (max-width:900px){.opp-band-group{border-right:none;border-bottom:1px solid var(--line)}
+  .opp-band-group:last-child{border-bottom:none}}
+.opp-band-title{font-size:11px;font-weight:500;color:var(--ink-3);flex:0 0 auto}
+.opp-band-body{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:var(--s1);overflow:hidden}
+.band-line{display:flex;align-items:baseline;gap:var(--s2);font-size:12px;color:var(--ink);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.band-glyph{flex:0 0 auto;color:var(--ink-3)}
+.band-glyph.warn{color:var(--warn-ink)}
+.band-glyph.pos{color:var(--pos-ink)}
+.band-meta{font-size:11px;color:var(--ink-3)}
+.band-empty{font-size:12px;color:var(--ink-3)}
+.band-more{font-size:11px;color:var(--ink-3)}
 .section-nav{display:flex;gap:var(--s1);border-bottom:1px solid var(--line);margin-bottom:var(--s5);overflow-x:auto}
 .section-nav-item{height:var(--h);padding:0 var(--s4);display:inline-flex;align-items:center;font-size:12.5px;
   color:var(--ink-2);border-bottom:2px solid transparent;white-space:nowrap;cursor:pointer;flex:0 0 auto;
@@ -588,6 +606,7 @@ table.tbl{width:100%;border-collapse:collapse}
 .ef:hover::after{opacity:1}
 .ef.editing{cursor:default;background:transparent;padding:0;margin:0}
 .ef.editing::after{content:none}
+.ef.ef-empty{color:var(--ink-3)}
 .ef-editing{display:inline-flex;align-items:center;gap:var(--s2);flex-wrap:wrap}
 .ef-input{height:var(--h);padding:0 var(--s3);border:1px solid var(--line-2);border-radius:var(--r-s);
   background:var(--paper);color:var(--ink);font-size:12.5px;min-width:140px}
@@ -45506,8 +45525,10 @@ let EF_RERENDER = null;
 function registerRecord(recId, obj){ EF_STORE[recId]={obj}; return recId; }
 function efSpan(recId, def){
   const obj = EF_STORE[recId].obj;
-  return '<span class="ef" data-rec="'+esc(recId)+'" data-key="'+esc(def.key)+'" title="Click to edit">'+
-    displayValue(def, def.get(obj))+'</span>';
+  const val = def.get(obj);
+  const isEmpty = val==null || val==='' || (Array.isArray(val) && !val.length);
+  return '<span class="ef'+(isEmpty?' ef-empty':'')+'" data-rec="'+esc(recId)+'" data-key="'+esc(def.key)+'" title="Click to edit">'+
+    displayValue(def, val)+'</span>';
 }
 function findDef(recId, key){
   if(key==='core.closedLostReason'){
@@ -47036,10 +47057,31 @@ function lienPanelHtml(o){
 }
 
 /* ================================================================
-   RAIL (D64): "the rail carries what the system computed, the main panel
-   carries what the record holds." Three computed reads, never a field dump.
+   SIGNALS BAND (D69): "the band carries what the system computed, the main
+   panel carries what the record holds." One full-width band, three groups,
+   never a field dump. Replaces round 4's persistent left rail — see D69.
+   Each group is capped near 3 lines (fixed band height, never grows); a
+   group with more candidates than fit shows the top ones plus a count.
    ================================================================ */
-function railSignalsHtml(o){
+function bandGroupHtml(title, bodyHtml){
+  return '<div class="opp-band-group"><div class="opp-band-title">'+title+'</div>'+
+    '<div class="opp-band-body">'+bodyHtml+'</div></div>';
+}
+function nextBestActionMeta(o){
+  const edits = (AUDIT_BY_OPP[o.id]||[]).filter(a=>a.field==='Next Best Action');
+  if(!edits.length) return '';
+  const last = edits[edits.length-1];
+  return (BDOS[last.changedBy]?BDOS[last.changedBy].name:'')+' · '+fmtDate(last.changedAt);
+}
+function bandNextBestActionHtml(o, recId){
+  const set = !!o.nextBestAction;
+  const body = set
+    ? '<div class="band-line">'+efSpan(recId,DEF_INDEX['core.nextBestAction'])+'</div>'+
+      '<div class="band-meta">'+esc(nextBestActionMeta(o))+'</div>'
+    : '<div class="band-line">'+efSpan(recId,DEF_INDEX['core.nextBestAction'])+'</div>';
+  return bandGroupHtml('Next best action', body);
+}
+function bandSignalsHtml(o){
   const liens = LIENS_BY_ACCT[o.accountId] || [];
   const hasSub = liens.some(l=>l.subordinated);
   const edges = EDGES_BY_ACCT[o.accountId] || [];
@@ -47051,44 +47093,36 @@ function railSignalsHtml(o){
   const stale = days!=null && days >= (STAGE_P75[o.stage]||Infinity);
 
   const rows = [];
-  if(hasSub) rows.push(
-    '<div class="feedrow static"><div class="feed-icon warn">&#9878;</div>'+
-    '<div class="feed-main"><div class="feed-title">Subordinated lien on file</div></div>'+
-    '<div class="tagrow"><span class="tag warn">Subordinated</span></div></div>'
-  );
-  if(wonEdges.length) rows.push(
-    '<div class="feedrow static"><div class="feed-icon">&#8644;</div>'+
-    '<div class="feed-main"><div class="feed-title">Trade ties to '+wonEdges.length+' Closed-Won account'+(wonEdges.length===1?'':'s')+'</div></div>'+
-    '<div class="tagrow"><span class="tag pos">Closed-Won</span></div></div>'
-  );
-  if(stale) rows.push(
-    '<div class="feedrow static"><div class="feed-icon warn">&#9888;</div>'+
-    '<div class="feed-main"><div class="feed-title">Longer in '+o.stage+' than most open deals</div></div>'+
-    '<div class="tagrow">'+
-      '<span class="tag fig warn"'+tipAttr(o.stage, days+' day'+(days===1?'':'s')+' in stage',
-        'Beyond the '+Math.max(STAGE_P75[o.stage]||0,1)+'d typical for '+o.stage)+'>'+days+'d</span>'+
-    '</div></div>'
-  );
+  if(hasSub) rows.push('<div class="band-line"><span class="band-glyph warn">&#9878;</span>'+
+    '<span>Subordinated lien on file</span></div>');
+  if(wonEdges.length) rows.push('<div class="band-line"><span class="band-glyph pos">&#8644;</span>'+
+    '<span>Trade ties to '+wonEdges.length+' Closed-Won account'+(wonEdges.length===1?'':'s')+'</span></div>');
+  if(stale) rows.push('<div class="band-line"><span class="band-glyph warn">&#9888;</span>'+
+    '<span'+tipAttr(o.stage, days+' day'+(days===1?'':'s')+' in stage',
+      'Beyond the '+Math.max(STAGE_P75[o.stage]||0,1)+'d typical for '+o.stage)+'>Longer in '+o.stage+' than most open deals</span></div>');
 
-  return '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
-      '<div class="panel-title">Signals</div>'+
-      '<div class="panel-scope">Computed from liens, network, and stage history</div>'+
-    '</div></div>'+
-    '<div class="panel-body'+(rows.length?' flush':'')+'">'+
-      (rows.length ? rows.join('') : '<div class="empty">No signals on this deal right now.</div>')+
-    '</div></div>';
+  const MAX = 3;
+  let body;
+  if(!rows.length) body = '<div class="band-empty">No signals on this deal right now.</div>';
+  else if(rows.length<=MAX) body = rows.join('');
+  else body = rows.slice(0,MAX).join('')+'<div class="band-more">+'+(rows.length-MAX)+' more</div>';
+
+  return bandGroupHtml('Signals', body);
 }
-function railBorrowerContextHtml(o, acct){
+function bandBorrowerContextHtml(o, acct){
   const openOpps = D.opportunities.filter(x=>x.accountId===o.accountId && x.outcome==='open');
   const openTotal = openOpps.reduce((s,x)=>s+x.facilitySize,0);
-  return '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
-      '<div class="panel-title">Borrower context</div>'+
-      '<div class="panel-scope">From Account</div>'+
-    '</div></div>'+
-    '<div class="panel-body"><dl class="kv">'+
-      '<div><dt>Open Opportunities</dt><dd>'+openOpps.length+' · '+moneyPlain(openTotal)+'</dd></div>'+
-      '<div><dt>Client Since</dt><dd>'+fmtDate(acct.createdDate)+'</dd></div>'+
-    '</dl></div></div>';
+  const body =
+    '<div class="band-line"><span>'+openOpps.length+' open · '+moneyPlain(openTotal)+'</span></div>'+
+    '<div class="band-line"><span>Client since '+fmtDate(acct.createdDate)+'</span></div>';
+  return bandGroupHtml('Borrower context', body);
+}
+function oppBandHtml(o, recId, acct){
+  return '<div class="opp-band">'+
+    bandNextBestActionHtml(o, recId)+
+    bandSignalsHtml(o)+
+    bandBorrowerContextHtml(o, acct)+
+  '</div>';
 }
 
 function auditPanelHtml(o){
@@ -47279,19 +47313,6 @@ function renderOpp(id){
   if(OPP_SECTION_FOR !== id) OPP_SECTION = 'details';
   OPP_SECTION_FOR = id;
 
-  /* Rail (D64): Next Best Action leads only when populated (a full panel, top of the rail); empty,
-     it drops to a single quiet kv row below Signals and Borrower context instead of an empty hero
-     in the best position on screen. */
-  const nbaSet = !!o.nextBestAction;
-  const nbaPanel = nbaSet
-    ? '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
-        '<div class="panel-title">Next Best Action</div>'+
-        '<div class="panel-scope">Rep or underwriter status, read in pipeline meetings</div>'+
-      '</div></div><div class="panel-body">'+efSpan(recId,DEF_INDEX['core.nextBestAction'])+'</div></div>'
-    : '';
-  const nbaQuietRow = nbaSet ? '' :
-    '<dl class="kv"><div><dt>Next Best Action</dt><dd class="muted">'+efSpan(recId,DEF_INDEX['core.nextBestAction'])+'</dd></div></dl>';
-
   let sectionBody;
   if(OPP_SECTION==='network') sectionBody = sectionNetworkHtml(o);
   else if(OPP_SECTION==='intelligence') sectionBody = lienPanelHtml(o);
@@ -47319,15 +47340,8 @@ function renderOpp(id){
       renderStageTrackHtml(o)+
     '</div>'+
 
-    '<div class="record-layout">'+
-      '<div class="record-rail">'+
-        nbaPanel+
-        railSignalsHtml(o)+
-        railBorrowerContextHtml(o, acct)+
-        nbaQuietRow+
-      '</div>'+
-      '<div class="record-main">'+navHtml+sectionBody+'</div>'+
-    '</div>';
+    oppBandHtml(o, recId, acct)+
+    '<div class="record-main">'+navHtml+sectionBody+'</div>';
 }
 
 /* ================================================================
