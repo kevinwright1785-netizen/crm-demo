@@ -161,13 +161,27 @@ h1,h2,h3,p,dl,dd{margin:0}
 .strip{background:var(--paper);border-radius:var(--r-l);box-shadow:var(--lift);display:grid;margin-bottom:var(--s5)}
 .strip-4{grid-template-columns:repeat(4,minmax(0,1fr))}
 .strip-3{grid-template-columns:repeat(3,minmax(0,1fr))}
-.met{padding:var(--s4) var(--s5);border-left:1px solid var(--line)}
+.met{position:relative;padding:var(--s4) var(--s5);border-left:1px solid var(--line)}
 .met:first-child{border-left:none}
 .met-label{font-size:11px;font-weight:500;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .met-figure{font-family:var(--ui);font-size:22px;font-weight:500;letter-spacing:-.03em;color:var(--ink);margin-top:var(--s1)}
 .met-figure.emphasis{font-size:29px}
 .met-figure .cur,.met-figure .un{font-size:.66em;font-weight:400;color:var(--ink-2)}
 .met-sub{font-size:11px;color:var(--ink-3);margin-top:var(--s1)}
+/* D115: strip cell anatomy, applied uniformly to every .strip/.met consumer app-wide (BDO Home,
+   Exec Home, the Opportunity record). Change line direction is a class, never inline/literal
+   colour, same rule as everywhere else in the app. */
+.met-change{font-size:11px;margin-top:var(--s1);color:var(--ink-3)}
+.met-change.pos{color:var(--pos-ink)}
+.met-change.neg{color:var(--neg-ink)}
+/* Hover-revealed "view" affordance, cells that already open a modal only (.met.expandable). Pure
+   CSS opacity fade, no JS, so no separate prefers-reduced-motion handling is needed the way a
+   JS-timed animation would require (D48/§11.7's two-layer rule applies to JS-driven motion; this
+   has none). pointer-events:none so it stays a label, not a second click target competing with
+   the cell's own onclick. */
+.met-view{position:absolute;top:var(--s3);right:var(--s3);font-size:11px;font-weight:500;
+  color:var(--brand);opacity:0;transition:opacity var(--t-fast) var(--ease);pointer-events:none}
+.met.expandable:hover .met-view,.met.expandable:focus-visible .met-view{opacity:1}
 
 /* ---------- panels ---------- */
 .panel{position:relative;background:var(--paper);border:1px solid var(--line);border-radius:var(--r-l);margin-bottom:var(--s5)}
@@ -318,19 +332,75 @@ h1,h2,h3,p,dl,dd{margin:0}
 .viewtoggle.seg{width:100%}
 .viewtoggle.seg button{flex:1}
 
-/* ---------- calendar: fills the pair-row's stretched height, scrolls only past that ----------
-   No fixed max-height any more — .pair-row > .panel > .panel-body already supplies flex:1, so
-   this panel-body's real height is whatever the row's tallest sibling (Snapshot) sets. overflow
-   only engages if the calendar's real entries still run longer than that. */
+/* ---------- calendar: fills home-calendar-panel's flexed remainder, scrolls only past that ----------
+   No fixed height any more (D104/D123 retired the pair-row fixed-562px mechanism). See the
+   .home-row-feed block below for how Calendar's height is now derived. overflow only engages if
+   the calendar's real entries still run longer than the space it's given. */
 .agenda-scroll{overflow-y:auto}
 
-/* ---------- home body: multi-column packing ----------
-   Replaces the rigid 2fr/1fr split. That split stacked every rail card in one tall column, so
-   whenever the action feed was shorter than the rail, everything below the agenda sat beside
-   nothing and left a dead void under the feed. Multi-column lets the cards balance across both
-   columns instead, filling the space. break-inside keeps a card whole. */
-.home-grid,.exec-diag-grid,.exec-prod-grid{display:flex;gap:var(--s5);align-items:flex-start}
+/* ---------- exec home: multi-column packing (D104 retired this on BDO Home; Exec keeps it) ----------
+   Firm-wide diagnostics/production cards still vary in count and height, so Exec Home continues to
+   use the measured shortest-column JS packer (packGrid(), D34/D73). BDO Home's own body is now a
+   fixed CSS grid (see .home-fixed-grid below), with no JS packing involved. break-inside keeps a
+   card whole. */
+.exec-diag-grid,.exec-prod-grid{display:flex;gap:var(--s5);align-items:flex-start}
 .home-col{flex:1;min-width:0;display:flex;flex-direction:column}
+
+/* ---------- BDO Home body: fixed grid (D104/D123) ----------
+   Masonry (packGrid()/.home-col/alignGridColumns) is retired on Home: source order in the markup
+   now equals visual order top to bottom, and the row shape is fixed rather than measured. D123
+   chose this specific arrangement from an inline mockup of two options. The rejected alternative
+   paired Snapshot alone beside the feed and Calendar with Partners on row 2, which left a void
+   under the (shorter) Snapshot, the same bug family as the old masonry dead-void cases this
+   whole mechanism exists to avoid, just in a fixed layout instead of a packed one. */
+/* Explicit gap between the three rows, rather than relying on each row's last panel's own
+   margin-bottom to bleed through. That would double up wherever a row's last visible element
+   already carries one (e.g. Partners/Loss, D115) and vanish wherever it's been suppressed for a
+   height calculation (e.g. feed-panel, below), giving inconsistent row-to-row spacing either way. */
+.home-fixed-grid{display:flex;flex-direction:column;gap:var(--s5)}
+.home-row-feed{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:var(--s5);
+  align-items:stretch}
+@media (max-width:1140px){.home-row-feed{grid-template-columns:minmax(0,1fr)}}
+/* The feed never stretches beyond its own content; it's the row's height driver by design (it's
+   consistently the tallest card here), so align-self:start keeps it from ever being pulled taller
+   by a right column that briefly outgrows it (e.g. a near-empty feed on a quiet day). margin-bottom
+   is suppressed for the same reason .home-col-right's last card suppresses its own below: a grid
+   item's margin counts toward the row's auto-height just as much as its content does, and the
+   outer .home-fixed-grid gap above already supplies the space to the next row. Left unsuppressed,
+   the row would resolve to the feed's height plus its own margin, silently pushing the right column
+   24px past the feed it's supposed to match. */
+.home-row-feed > .feed-panel{align-self:start;margin-bottom:0}
+.home-col-right{display:flex;flex-direction:column;min-width:0}
+/* No trailing margin on the column's last card: nothing sits below it inside home-col-right, and
+   an unsuppressed margin there would count toward the column's own natural height (see below) for
+   no visual benefit. */
+.home-col-right > .panel:last-child{margin-bottom:0}
+/* Calendar absorbs whatever height the feed leaves on the table, instead of the two panels sharing
+   a stretch-to-tallest row directly (that was tried and rejected once already, D34/§13n: Calendar's
+   own uncapped content, a full 7am-7pm day, became the tallest thing in the row and dragged
+   Snapshot's fixed top-5 up with it, reintroducing the dead-void bug on Snapshot instead).
+   flex-basis is a definite length, NOT auto: an auto basis measures the item at its own content
+   size first, and a flex column's own intrinsic height (what .home-row-feed's stretch measures
+   home-col-right against) is the SUM of its children's content sizes, so an auto-basis Calendar
+   would still contribute its full uncapped agenda height upward and could out-grow the feed, the
+   exact bug this replaces. A definite basis makes Calendar's contribution exactly this many pixels
+   regardless of its content, so home-col-right's own natural height stays small (Snapshot's real
+   height plus this), the feed wins as the row's height driver in the common case, and grid stretch
+   then hands Calendar's flex:1 whatever extra height that leaves: the "absorbs the difference"
+   behavior. 160px is a CSS fallback (header plus roughly a row and a half), not tuned against the
+   dataset. Checked against today's real render (bdo_05: feed 660px vs. Snapshot+this floor
+   634px, so the feed wins and Calendar stretches well past this floor in practice) but not a
+   guarantee against every possible future regeneration of the dataset. If a future render ever
+   makes the floor win when it shouldn't, that's a dataset question to flag, not a bigger floor to
+   pad in; a bigger floor only narrows the margin further. */
+.home-calendar-panel{display:flex;flex-direction:column;flex:1 1 160px;min-height:160px}
+.home-calendar-panel > .panel-header{flex:0 0 auto}
+.home-calendar-panel > .panel-body{flex:1 1 auto;min-height:0}
+.home-row-secondary{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--s5)}
+@media (max-width:1140px){.home-row-secondary{grid-template-columns:minmax(0,1fr)}}
+/* Same margin-suppression reasoning as .feed-panel above: the outer .home-fixed-grid gap already
+   supplies the space to row 3, so each card's own margin-bottom would otherwise double it up. */
+.home-row-secondary > .panel{margin-bottom:0}
 
 /* ---------- expandable cards + modal (v7 tier 3: scrim + --lift-hi) ---------- */
 .panel.expandable{cursor:pointer;transition:border-color .12s var(--ease)}
@@ -504,25 +574,6 @@ h1,h2,h3,p,dl,dd{margin:0}
   font-size:11px;font-weight:500;cursor:pointer;padding:0}
 .stage-filter-clear:hover{color:var(--brand-ink)}
 
-/* ---------- today/now pair row (calendar + pipeline snapshot, side by side) ----------
-   An EXPLICIT fixed height on both panels, not grid stretch-to-tallest-sibling. Stretch-to-
-   tallest was last round's mechanism and it broke the moment Calendar's own content grew to a
-   full 7am-7pm day (§13n): Calendar's un-capped natural content height (~920px+) became the
-   tallest thing in the row, so grid stretch pulled the whole row — including Snapshot — up to
-   match it, and Snapshot's fixed top-5-plus-footer had nothing to fill that extra space with,
-   reintroducing the exact dead-void bug this pairing already went through twice, just relocated
-   to the other card. A calendar is SUPPOSED to have more content than fits — that's the point of
-   giving it real internal scroll — so its natural size can no longer be allowed to drive the
-   row's height. A fixed height breaks the circularity: both panels are this height regardless of
-   either one's content, Calendar's real day genuinely overflows it (scrolls), and Snapshot's
-   fixed top-5 fits inside it with at most the same "minor slack, no bug" already sanctioned for
-   toggle-cards. Value matches Snapshot's own measured natural height (5 rows + footer). */
-.pair-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--s5)}
-@media (max-width:1140px){.pair-row{grid-template-columns:minmax(0,1fr)}}
-.pair-row > .panel{display:flex;flex-direction:column;height:562px}
-.pair-row > .panel > .panel-header{flex:0 0 auto}
-.pair-row > .panel > .panel-body{flex:1 1 auto;min-height:0}
-.pair-row > .panel > .panel-footer{flex:0 0 auto}
 
 /* ---------- compact label/value rows (no hard-right islands with an empty middle) ---------- */
 .kv-line{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--s3);align-items:baseline;
@@ -707,10 +758,12 @@ table.tbl{width:100%;border-collapse:collapse}
    inventing record-page-specific components, so it stops reading as a different app glued onto
    Home. min-width:0 on .record-main stops wide content (tables) from blowing past the viewport. */
 .record-main{min-width:0}
-/* Details tab (D73): a real packed grid, reusing Home's own packHomeGrid()/.home-col — not a
+/* Details tab (D73): a real packed grid, reusing the same packGrid()/.home-col mechanism Exec
+   Home's diagnostics/production grids use (D104 retired packing on BDO Home itself, but the
+   generic packer stays shared infrastructure, see .exec-diag-grid/.exec-prod-grid), not a
    hand-assigned two-column split (that read as a fixed layout, not a pack, and is why the left
-   column used to run dry while the right kept going). Same shape as .home-grid deliberately, so
-   this reads as the same component, not a lookalike: equal-width flex columns, cards placed at
+   column used to run dry while the right kept going). Same shape deliberately, so this reads as
+   the same component, not a lookalike: equal-width flex columns, cards placed at
    runtime by measured shortest-column packing, Next Best Action anchored to column one exactly
    like the action feed anchors Home's. */
 .opp-details-grid{display:flex;gap:var(--s5);align-items:flex-start}
@@ -45572,6 +45625,23 @@ const TRAILING_12_START = (function(){
 })();
 function inYTD(dateStr){ return !!dateStr && dateStr.slice(0,4)===YTD_YEAR; }
 function inTrailing12(dateStr){ return !!dateStr && dateStr>=TRAILING_12_START; }
+/* D115: the strip's period-over-period change line needs a PRIOR window comparable to each of the
+   two above, same shape, one year further back. Prior YTD is capped to today's month-day (not the
+   whole prior calendar year) so it measures the same elapsed fraction of the year as the current
+   YTD figure does; comparing a partial current year to a full prior one would be dishonest, the
+   exact kind of invented-looking number CLAUDE.md §2b already forbids for narration, applied here
+   to a computed comparison instead. */
+const PRIOR_YTD_YEAR = String(Number(YTD_YEAR)-1);
+function inPriorYTD(dateStr){
+  return !!dateStr && dateStr.slice(0,4)===PRIOR_YTD_YEAR && dateStr.slice(5,10)<=TODAY.slice(5,10);
+}
+const PRIOR_TRAILING_12_START = (function(){
+  const d = toDateObj(TRAILING_12_START);
+  return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth()-12, 1)).toISOString().slice(0,10);
+})();
+function inPriorTrailing12(dateStr){
+  return !!dateStr && dateStr>=PRIOR_TRAILING_12_START && dateStr<TRAILING_12_START;
+}
 /* Lost opportunities carry no closedDate of their own — the terminal ClosedLost entry in
    stageHistory's own enteredDate IS that date, read once here rather than re-derived per caller. */
 function lostDateOf(o){
@@ -45613,6 +45683,39 @@ function moneyShort(n){
 }
 function pct(n,d){ d=d==null?0:d; return (n*100).toFixed(d)+'%'; }
 function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ---------- D115: strip cell "change line" ----------
+   Shared by every metric strip so a period-over-period comparison always reads the same way.
+   Value change (dollars, counts) is a percent of the prior figure; a rate's change is its own
+   point movement, not a percent-of-a-percent, which is why the two are separate helpers. Tint is
+   whether the movement is good for THIS metric, not raw sign: a rise in slipped deals is bad, a
+   rise in funded volume is good, both computed the same way from opposite goodDirection
+   arguments. Returns '' (no element at all) when there's no honest prior-period figure to compare
+   against, never a fabricated or zero-filled delta (CLAUDE.md §2b's no-fabrication rule, applied
+   to a computed number instead of narration copy). */
+function metChangeValueHtml(current, prior, label, goodDirection){
+  if(!prior) return '';
+  const delta = (current-prior)/prior;
+  if(!isFinite(delta)) return '';
+  const up = delta>0;
+  const good = delta===0 ? null : (goodDirection==='up' ? up : !up);
+  const cls = good==null ? '' : (good?'pos':'neg');
+  const sign = delta===0 ? '' : (up?'+':'−');
+  const mag = Math.abs(delta*100);
+  const shown = mag<10 ? mag.toFixed(1) : String(Math.round(mag));
+  return '<div class="met-change'+(cls?' '+cls:'')+'">'+sign+shown+'% '+label+'</div>';
+}
+function metChangePointsHtml(currentRatio, priorRatio, label, goodDirection){
+  const deltaPts = (currentRatio-priorRatio)*100;
+  if(!isFinite(deltaPts)) return '';
+  const up = deltaPts>0;
+  const good = deltaPts===0 ? null : (goodDirection==='up' ? up : !up);
+  const cls = good==null ? '' : (good?'pos':'neg');
+  const sign = deltaPts===0 ? '' : (up?'+':'−');
+  const mag = Math.abs(deltaPts);
+  const shown = mag<10 ? mag.toFixed(1) : String(Math.round(mag));
+  return '<div class="met-change'+(cls?' '+cls:'')+'">'+sign+shown+'pts '+label+'</div>';
+}
 
 /* ================================================================
    CONTROLLED VOCABULARIES — mirrors data/generate.js exactly so
@@ -46658,8 +46761,7 @@ function swapPanel(id, html){
 }
 window.setPartnerView = function(v){
   PARTNER_VIEW = v;
-  if(swapPanel('panel-partners', partnersPanelHtml(partnerStats(CURRENT_BDO_ID)))) applyGridAlignment('.home-grid');
-  else renderHome();
+  if(!swapPanel('panel-partners', partnersPanelHtml(partnerStats(CURRENT_BDO_ID)))) renderHome();
 };
 
 function partnerStats(bdoId){
@@ -46783,8 +46885,7 @@ const LOSS_VIEWS = [
 let LOSS_VIEW = 'stage';
 window.setLossView = function(v){
   LOSS_VIEW = v;
-  if(swapPanel('panel-loss', lossPanelHtml(CURRENT_BDO_ID))) applyGridAlignment('.home-grid');
-  else renderHome();
+  if(!swapPanel('panel-loss', lossPanelHtml(CURRENT_BDO_ID))) renderHome();
 };
 const LOSS_MIN_SAMPLE = 5;
 
@@ -47100,21 +47201,71 @@ function packGrid(selector, breakpoint, after){
   PACK_RETRY[selector] = 0;
   if(after) after();
 }
-function packHomeGrid(){ packGrid('.home-grid', HOME_BREAKPOINT, function(){ alignGridColumns('.home-grid'); }); }
 let HOME_RESIZE_TIMER = null;
 function packExecDiagGrid(){ packGrid('.exec-diag-grid', HOME_BREAKPOINT, function(){ alignGridColumns('.exec-diag-grid'); }); }
 function packExecProdGrid(){ packGrid('.exec-prod-grid', HOME_BREAKPOINT, function(){ alignGridColumns('.exec-prod-grid'); }); }
 window.addEventListener('resize', function(){
-  if(!document.querySelector('.home-grid') && !document.querySelector('.opp-details-grid') &&
+  /* BDO Home's own grid (D104) is a fixed CSS grid now: it re-flows via the @media breakpoint on
+     its own, no JS packing or repack-on-resize involved. Only the still-JS-packed grids need this. */
+  if(!document.querySelector('.opp-details-grid') &&
      !document.querySelector('.exec-diag-grid') && !document.querySelector('.exec-prod-grid')) return;
   clearTimeout(HOME_RESIZE_TIMER);
   HOME_RESIZE_TIMER = setTimeout(function(){
-    if(document.querySelector('.home-grid')) packHomeGrid();
     if(document.querySelector('.opp-details-grid')) packOppGrid();
     if(document.querySelector('.exec-diag-grid')) packExecDiagGrid();
     if(document.querySelector('.exec-prod-grid')) packExecProdGrid();
   }, 120);
 });
+
+/* D118: once per session, per page ('bdo' vs. 'exec' tracked separately so toggling personas the
+   first time still plays each page's own entrance, but toggling back to one already seen never
+   replays it). The flag is set before any of the animation work below runs, deliberately: if
+   anything here were interrupted (a route change, the tab backgrounding mid-transition) a later
+   render of the same page must still land on fully-visible cards, never retry a half-finished
+   reveal and never leave one stuck at opacity 0. Cards are every .panel/.strip/.exec-hero inside
+   #view-home, in DOM order, which for BDO Home is already visual order (D104) and for Exec Home
+   is that page's own unchanged layout.
+   Web Animations API (element.animate()), not a CSS class toggle. A CSS-transition version of this
+   (add a "hidden" class, force a reflow, add a "visible" class) was built and tested first, and
+   worked correctly on BDO Home but silently failed on Exec Home every time: confirmed via
+   getAnimations() in headless Chrome that the opacity:0 state was never actually committed as the
+   element's current value before the "visible" class re-targeted it back to 1, so nothing ever
+   visibly moved (this reproduced identically whether the class flip happened on the very next
+   frame or in the same task with a forced reflow in between, and was unrelated to Exec's packed
+   grids, reordering those calls around this one made no difference). element.animate() sidesteps
+   the whole "was the previous style really committed" question, since it takes explicit from/to
+   keyframes instead of inferring a transition from two separate style changes. Duration and the
+   stagger step are still read from --t-slow/--t-fast at call time (via getComputedStyle on
+   :root), not hardcoded, so :root stays the only place those numbers are actually defined. */
+const ENTRANCE_SEEN = {bdo:false, exec:false};
+function playHomeEntrance(seenKey){
+  if(ENTRANCE_SEEN[seenKey]) return;
+  ENTRANCE_SEEN[seenKey] = true;
+  if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  requestAnimationFrame(()=>{
+    const cards = Array.from(document.querySelectorAll('#view-home .panel, #view-home .strip, #view-home .exec-hero'));
+    if(!cards.length || typeof cards[0].animate !== 'function') return;
+    const root = getComputedStyle(document.documentElement);
+    const durationMs = parseFloat(root.getPropertyValue('--t-slow')) || 280;
+    const stepMs = (parseFloat(root.getPropertyValue('--t-fast')) || 120) * 0.5;
+    const easing = (root.getPropertyValue('--ease') || '').trim() || 'ease';
+    const anims = cards.map((c,i)=>c.animate(
+      [{opacity:0, transform:'translateY(8px)'}, {opacity:1, transform:'translateY(0)'}],
+      {duration:durationMs, delay:i*stepMs, easing:easing, fill:'both'}
+    ));
+    /* Safety net for the "never leave a card stuck invisible" requirement: fill:'both' already
+       holds each animation's end state once it finishes on its own, but a pathological case (the
+       tab was backgrounded through the whole sequence, a browser quirk stalls one) could still
+       leave a card part-way through. finish() jumps an Animation straight to its end state
+       regardless of what frame it's currently on, so this guarantees full visibility outright once
+       the whole sequence should be well past done. Harmless no-op in the normal case, since by then
+       every animation has already finished on its own and finish() on an already-finished
+       animation is a no-op. */
+    setTimeout(()=>{
+      anims.forEach(a=>{ try{ a.finish(); }catch(e){} });
+    }, cards.length*stepMs + durationMs + 400);
+  });
+}
 
 function renderHome(){
   if(ROLE==='exec'){ renderExecHome(); return; }
@@ -47128,6 +47279,9 @@ function renderHome(){
   const pipelineValue = myOpen.reduce((s,o)=>s+o.facilitySize,0);
   const wonYTD = myWon.filter(o=>inYTD(o.fundedDate));
   const wonYTDValue = wonYTD.reduce((s,o)=>s+o.facilitySize,0);
+  /* D115: Funded YTD's change line, prior-year same-elapsed-window (inPriorYTD), the natural,
+     already-YTD-scoped comparison for this cell. */
+  const wonPriorYTDValue = myWon.filter(o=>inPriorYTD(o.fundedDate)).reduce((s,o)=>s+o.facilitySize,0);
   /* D100: Win Rate is a performance measure, not a snapshot — it must obey the period-scope rule
      (trailing 12 months, since a single rep's YTD closed count runs too thin some months of the
      year) and the small-sample rule (MIN_RATE_SAMPLE): below 10 closed deals, show the counts,
@@ -47140,14 +47294,26 @@ function renderHome(){
   const lostSize = myLostT12.reduce((s,o)=>s+o.facilitySize,0);
   const winByCount = closedN ? myWonT12.length/closedN : 0;
   const winBySize = (wonSize+lostSize) ? wonSize/(wonSize+lostSize) : 0;
+  /* D115: Win Rate's change line needs the PRIOR trailing-12 window at the same reliability bar as
+     the current one. Comparing a real rate to one built on a handful of deals would be exactly
+     the over-confident-number problem MIN_RATE_SAMPLE exists to prevent, just moved into the delta
+     instead of the headline figure. */
+  const myWonPriorT12 = myWon.filter(o=>inPriorTrailing12(o.fundedDate));
+  const myLostPriorT12 = myLost.filter(o=>inPriorTrailing12(lostDateOf(o)));
+  const closedPriorN = myWonPriorT12.length+myLostPriorT12.length;
+  const winRatePriorReliable = rateReliable(closedPriorN);
+  const winByCountPrior = closedPriorN ? myWonPriorT12.length/closedPriorN : 0;
   const inUW = myOpen.filter(o=>o.stage==='Underwriting');
   const inUWValue = inUW.reduce((s,o)=>s+o.facilitySize,0);
 
   const feed = buildFeed(CURRENT_BDO_ID);
   const agenda = buildAgenda(CURRENT_BDO_ID);
 
+  /* D104/D123: Recent activity moved to a full-width row 3, where rows no longer compete for
+     column width with a masonry sibling. Raised from 6 to 10 to show more of the log in
+     comparable panel height. */
   const recent = D.activities.filter(a=>a.bdoId===CURRENT_BDO_ID)
-    .slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,6);
+    .slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,10);
 
   const partners = partnerStats(CURRENT_BDO_ID);
 
@@ -47163,33 +47329,47 @@ function renderHome(){
         ' need you today · <b>'+moneyShort(pipelineValue)+'</b> active pipeline</span>'+
     '</div>'+
 
+    /* D115: Active Pipeline and Deals in Underwriting have no change line, deliberately. Both are
+       snapshot totals of deals currently open/at-stage, and an honest prior-period comparison
+       would mean reconstructing which deals were open (or in Underwriting) as of a past date from
+       the full stage-history audit trail, deal by deal. That's a real computation, not a quick
+       one, and out of scope for this pass; flagged here as a dataset question rather than rushed
+       into a fragile reconstruction that risks being wrong in edge cases (a deal that re-entered a
+       stage, for instance). Win Rate and Funded YTD both have a genuine, already-scoped prior
+       window to compare against (see above), so they get real computed change lines. */
     '<div class="strip strip-4">'+
       '<div class="met expandable" tabindex="0" onclick="openModal(\'pipeline\')">'+
         '<div class="met-label">Active Pipeline</div>'+
         '<div class="met-figure emphasis">'+money(pipelineValue)+'</div>'+
         '<div class="met-sub">'+myOpen.length+' open deals · '+
-          new Set(myOpen.map(o=>o.accountId)).size+' accounts</div></div>'+
+          new Set(myOpen.map(o=>o.accountId)).size+' accounts</div>'+
+        '<span class="met-view">View</span></div>'+
       '<div class="met expandable" tabindex="0" onclick="openModal(\'underwriting\')">'+
         '<div class="met-label">Deals in Underwriting</div>'+
         '<div class="met-figure">'+inUW.length+'</div>'+
-        '<div class="met-sub">'+moneyShort(inUWValue)+' at the credit gate</div></div>'+
+        '<div class="met-sub">'+moneyShort(inUWValue)+' at the credit gate</div>'+
+        '<span class="met-view">View</span></div>'+
       '<div class="met expandable" tabindex="0" onclick="openModal(\'winrate\')">'+
         '<div class="met-label">Win Rate</div>'+
         (winRateReliable
           ? '<div class="met-figure">'+pct(winByCount)+'</div>'+
-            '<div class="met-sub">by count · '+pct(winBySize)+' by size, on '+closedN+' closed, trailing 12mo</div>'
+            '<div class="met-sub">by count · '+pct(winBySize)+' by size, on '+closedN+' closed, trailing 12mo</div>'+
+            (winRatePriorReliable ? metChangePointsHtml(winByCount, winByCountPrior, 'vs prior 12mo', 'up') : '')
           : '<div class="met-figure">'+myWonT12.length+'W &middot; '+myLostT12.length+'L</div>'+
             '<div class="met-sub">Too few closed deals to rate, trailing 12mo</div>'
-        )+'</div>'+
+        )+
+        '<span class="met-view">View</span></div>'+
       '<div class="met expandable" tabindex="0" onclick="openModal(\'funded\')">'+
         '<div class="met-label">Funded YTD</div>'+
         '<div class="met-figure">'+money(wonYTDValue)+'</div>'+
-        '<div class="met-sub">'+wonYTD.length+' deal'+(wonYTD.length===1?'':'s')+' funded this year</div></div>'+
+        '<div class="met-sub">'+wonYTD.length+' deal'+(wonYTD.length===1?'':'s')+' funded this year</div>'+
+        metChangeValueHtml(wonYTDValue, wonPriorYTDValue, 'vs last year', 'up')+
+        '<span class="met-view">View</span></div>'+
     '</div>'+
 
     /* Pipeline by stage sits directly under the metric strip — the highest-altitude "shape of
-       my book" read, right where the strip leaves off. The today/now pair (agenda + snapshot)
-       and the analytical grid follow below it. */
+       my book" read, right where the strip leaves off. The fixed grid (D104/D123) follows below
+       it; source order here is visual order top to bottom, per D104. Nothing below reorders it. */
     '<div class="panel">'+
       '<div class="panel-header"><div class="panel-header-text">'+
         '<div class="panel-title">Pipeline by stage</div>'+
@@ -47198,46 +47378,14 @@ function renderHome(){
       '<div class="panel-body">'+pipelineByStageHtml(myOpen)+'</div>'+
     '</div>'+
 
-    /* Today/now pair — agenda (your day) and Pipeline Snapshot (your book) — belong together,
-       above the step-back-and-think analytical cards. A fixed two-column row, not the masonry
-       pool below: with exactly two cards the packer would always place them side by side anyway,
-       but a dedicated row makes the pairing explicit and collapses to stacked (agenda then
-       snapshot) under the same 1140px breakpoint the rest of the home body already uses. */
-    '<div class="pair-row">'+
-      '<div class="panel">'+
-        '<div class="panel-header"><div class="panel-header-text">'+
-          '<div class="panel-title">Calendar</div>'+
-          '<div class="panel-scope">'+agenda.filter(r=>!r.past && !r.empty).length+' left today · demo calendar</div>'+
-        '</div></div>'+
-        '<div class="panel-body flush agenda-scroll" id="calendar-scroll">'+
-          agenda.map(r=>
-            r.empty
-              ? '<div class="agenda-row empty"><div class="agenda-time">'+hhmm12(r.time)+'</div></div>'
-              : '<div class="agenda-row'+(r.past?' past':'')+(r.next?' next':'')+'"'+
-                (r.oppId?(' onclick="location.hash=\'#/opp/'+r.oppId+'\'"'):'')+'>'+
-                '<div class="agenda-time">'+hhmm12(r.time)+'</div>'+
-                '<div class="agenda-main">'+
-                  '<div class="agenda-title">'+esc(r.title)+'</div>'+
-                  '<div class="agenda-sub">'+esc(r.sub)+'</div>'+
-                '</div>'+
-                (r.next?'<div class="agenda-tag">Next</div>':'')+
-              '</div>').join('')+
-        '</div>'+
-      '</div>'+
+    '<div class="home-fixed-grid">'+
 
-      '<div class="panel">'+
-        '<div class="panel-header"><div class="panel-header-text">'+
-          '<div class="panel-title">Pipeline Snapshot</div>'+
-          '<div class="panel-scope">Top 5 by facility size · active opportunities</div>'+
-        '</div><span class="panel-header-count">'+myOpen.length+' total deal'+(myOpen.length===1?'':'s')+'</span></div>'+
-        '<div class="panel-body flush">'+pipelineSnapshotHtml(myOpen)+'</div>'+
-        '<div class="panel-footer"><span>'+stageMixSummary(myOpen)+'</span>'+
-          '<span class="drill" onclick="location.hash=\'#/pipeline\'">Pipeline &rsaquo;</span></div>'+
-      '</div>'+
-    '</div>'+
-
-    '<div class="home-grid">'+
-        '<div class="panel">'+
+      /* Row 1 (D123): the action feed is the hero, wide left column. The right column stacks
+         Pipeline Snapshot above Calendar; Calendar absorbs whatever height the feed leaves on the
+         table (see .home-calendar-panel in CSS) so the right column matches the feed's height with
+         no dead void under either card. */
+      '<div class="home-row-feed">'+
+        '<div class="panel feed-panel">'+
           '<div class="panel-header"><div class="panel-header-text">'+
             '<div class="panel-title">Today</div>'+
             '<div class="panel-scope">'+feed.length+
@@ -47257,30 +47405,68 @@ function renderHome(){
           '</div>'+
         '</div>'+
 
-        partnersPanelHtml(partners)+
+        '<div class="home-col-right">'+
+          '<div class="panel">'+
+            '<div class="panel-header"><div class="panel-header-text">'+
+              '<div class="panel-title">Pipeline Snapshot</div>'+
+              '<div class="panel-scope">Top 5 by facility size · active opportunities</div>'+
+            '</div><span class="panel-header-count">'+myOpen.length+' total deal'+(myOpen.length===1?'':'s')+'</span></div>'+
+            '<div class="panel-body flush">'+pipelineSnapshotHtml(myOpen)+'</div>'+
+            '<div class="panel-footer"><span>'+stageMixSummary(myOpen)+'</span>'+
+              '<span class="drill" onclick="location.hash=\'#/pipeline\'">Pipeline &rsaquo;</span></div>'+
+          '</div>'+
 
-        lossPanelHtml(CURRENT_BDO_ID)+
-
-        '<div class="panel">'+
-          '<div class="panel-header"><div class="panel-header-text">'+
-            '<div class="panel-title">Recent activity</div>'+
-            '<div class="panel-scope">Last '+recent.length+' logged on my deals</div>'+
-          '</div></div>'+
-          '<div class="panel-body flush">'+
-            (recent.length ? recent.map(a=>{
-              const opp=getOpp(a.opportunityId);
-              return '<div class="feedrow" onclick="location.hash=\'#/opp/'+a.opportunityId+'\'">'+
-                '<div class="feed-icon">'+esc(a.type[0])+'</div>'+
-                '<div class="feed-main"><div class="feed-title">'+esc(a.subject)+'</div>'+
-                  '<div class="feed-sub"><span class="mono-inline">'+fmtDate(a.date)+'</span> · '+
-                    esc(opp?opp.name:'')+'</div></div>'+
-              '</div>';
-            }).join('') : '<div class="empty">No activity logged yet.</div>')+
+          '<div class="panel home-calendar-panel">'+
+            '<div class="panel-header"><div class="panel-header-text">'+
+              '<div class="panel-title">Calendar</div>'+
+              '<div class="panel-scope">'+agenda.filter(r=>!r.past && !r.empty).length+' left today · demo calendar</div>'+
+            '</div></div>'+
+            '<div class="panel-body flush agenda-scroll" id="calendar-scroll">'+
+              agenda.map(r=>
+                r.empty
+                  ? '<div class="agenda-row empty"><div class="agenda-time">'+hhmm12(r.time)+'</div></div>'
+                  : '<div class="agenda-row'+(r.past?' past':'')+(r.next?' next':'')+'"'+
+                    (r.oppId?(' onclick="location.hash=\'#/opp/'+r.oppId+'\'"'):'')+'>'+
+                    '<div class="agenda-time">'+hhmm12(r.time)+'</div>'+
+                    '<div class="agenda-main">'+
+                      '<div class="agenda-title">'+esc(r.title)+'</div>'+
+                      '<div class="agenda-sub">'+esc(r.sub)+'</div>'+
+                    '</div>'+
+                    (r.next?'<div class="agenda-tag">Next</div>':'')+
+                  '</div>').join('')+
+            '</div>'+
           '</div>'+
         '</div>'+
-    '</div>';
+      '</div>'+
 
-  packHomeGrid();
+      /* Row 2 (D123): Partners and Where we're losing, one card each. */
+      '<div class="home-row-secondary">'+
+        partnersPanelHtml(partners)+
+        lossPanelHtml(CURRENT_BDO_ID)+
+      '</div>'+
+
+      /* Row 3 (D123): Recent activity, full width. Full width means each row no longer competes
+         for column width with a masonry sibling, so more rows fit in comparable panel height.
+         Raised from 6 to 10 for that reason (see the `recent` slice above). */
+      '<div class="panel">'+
+        '<div class="panel-header"><div class="panel-header-text">'+
+          '<div class="panel-title">Recent activity</div>'+
+          '<div class="panel-scope">Last '+recent.length+' logged on my deals</div>'+
+        '</div></div>'+
+        '<div class="panel-body flush">'+
+          (recent.length ? recent.map(a=>{
+            const opp=getOpp(a.opportunityId);
+            return '<div class="feedrow" onclick="location.hash=\'#/opp/'+a.opportunityId+'\'">'+
+              '<div class="feed-icon">'+esc(a.type[0])+'</div>'+
+              '<div class="feed-main"><div class="feed-title">'+esc(a.subject)+'</div>'+
+                '<div class="feed-sub"><span class="mono-inline">'+fmtDate(a.date)+'</span> · '+
+                  esc(opp?opp.name:'')+'</div></div>'+
+            '</div>';
+          }).join('') : '<div class="empty">No activity logged yet.</div>')+
+        '</div>'+
+      '</div>'+
+
+    '</div>';
   /* Default scroll window: near working hours / the next thing on the clock, not the very top
      of the 7am day-start. Mirrors how a real calendar app opens — scrolled to "now," with a
      little past context still visible above, not to the literal beginning of the day.
@@ -47300,6 +47486,8 @@ function renderHome(){
   };
   if(document.fonts && document.fonts.ready) document.fonts.ready.then(positionCalendarScroll);
   else requestAnimationFrame(positionCalendarScroll);
+
+  playHomeEntrance('bdo');
 }
 
 /* ================================================================
@@ -47377,10 +47565,14 @@ function execStalledDeals(){
    than assuming a direction. Where a deal has more than one recorded push, only the latest is
    counted (its own delta, not the cumulative slide) — the question is "how much did the CURRENT
    date move," not a lifetime total. */
-function execSlippage(){
+/* D115: takes the period predicate as a parameter (default inYTD, same as before) so the strip's
+   change line can call this again with inPriorYTD and get a genuinely comparable prior figure,
+   not a second reimplementation of the same filter/dedupe/aggregate logic. */
+function execSlippage(pred){
+  pred = pred || inYTD;
   /* D100: year to date, by changedAt (was all-time, unlabeled) — healthy sample either way (37 of
      58 pushes fall in YTD), no reliability concern here. */
-  const pushes = D.auditEvents.filter(a=>a.field==='expectedCloseDate' && a.newValue>a.oldValue && inYTD(a.changedAt));
+  const pushes = D.auditEvents.filter(a=>a.field==='expectedCloseDate' && a.newValue>a.oldValue && pred(a.changedAt));
   const latestByOpp = {};
   pushes.forEach(a=>{
     const cur = latestByOpp[a.opportunityId];
@@ -48063,13 +48255,26 @@ window.setExecStalledMeasure = function(v){
    three separate things) — matching the existing "click a metric tile, open its modal" idiom. */
 function execSlippageStripHtml(){
   const s = execSlippage();
+  /* D115: prior year to date, same shape as execSlippage() itself just re-called with inPriorYTD
+     (see that function's own comment). Slippage getting worse is bad in all three cells, so every
+     change line here reads 'up is bad' (goodDirection 'down'). */
+  const p = execSlippage(inPriorYTD);
   return '<div class="strip strip-3">'+
     '<div class="met expandable" tabindex="0" onclick="openModal(\'execSlippage\')">'+
-      '<div class="met-label">Slipped deals</div><div class="met-figure">'+s.count+'</div></div>'+
+      '<div class="met-label">Slipped deals</div><div class="met-figure">'+s.count+'</div>'+
+      '<div class="met-sub">Year to date</div>'+
+      metChangeValueHtml(s.count, p.count, 'vs last year', 'down')+
+      '<span class="met-view">View</span></div>'+
     '<div class="met expandable" tabindex="0" onclick="openModal(\'execSlippage\')">'+
-      '<div class="met-label">Facility</div><div class="met-figure">'+money(s.value)+'</div></div>'+
+      '<div class="met-label">Facility</div><div class="met-figure">'+money(s.value)+'</div>'+
+      '<div class="met-sub">Total facility, year to date</div>'+
+      metChangeValueHtml(s.value, p.value, 'vs last year', 'down')+
+      '<span class="met-view">View</span></div>'+
     '<div class="met expandable" tabindex="0" onclick="openModal(\'execSlippage\')">'+
-      '<div class="met-label">Avg days pushed</div><div class="met-figure">'+s.avgDays+'<span class="un">d</span></div></div>'+
+      '<div class="met-label">Avg days pushed</div><div class="met-figure">'+s.avgDays+'<span class="un">d</span></div>'+
+      '<div class="met-sub">Per deal, year to date</div>'+
+      metChangeValueHtml(s.avgDays, p.avgDays, 'vs last year', 'down')+
+      '<span class="met-view">View</span></div>'+
   '</div>';
 }
 
@@ -48517,6 +48722,7 @@ function renderExecHome(){
     '</div>';
   packExecDiagGrid();
   packExecProdGrid();
+  playHomeEntrance('exec');
 }
 
 /* ================================================================
@@ -48891,6 +49097,13 @@ function lienPanelHtml(o){
    reused rather than reinvented. Four computed figures about THIS deal,
    never facility size (already the header hero — repeating it here would
    be exactly the kind of filler the strip exists to avoid).
+   D115: none of these four cells gets a change line. A change line is a period-over-period
+   comparison, and every figure here is a point-in-time fact about ONE deal (its stage age, its
+   own close date, its owner, its own contact count), not a portfolio metric with a period scope
+   to compare across. There is no honest "prior period" version of "who owns this deal" to diff
+   against. None of the four cells opens a modal either (no .expandable, no onclick), so none gets
+   the hover "view" affordance: clicking through isn't how this strip works, the fields below it
+   on the page are the actual detail.
    ================================================================ */
 function oppMetricStripHtml(o, acct){
   const owner = BDOS[o.bdoId];
