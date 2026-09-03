@@ -9,10 +9,22 @@
   --pos:#3F6E46; --pos-soft:#E7EFE7; --pos-ink:#33593A;
   --warn:#A96F1F; --warn-soft:#F6EDDC; --warn-ink:#7E5416;
   --neg:#9C3B25; --neg-soft:#F4E0DA; --neg-ink:#83321F;
+  /* D103: bounded categorical/status layer, DATA ONLY (stage pills, product tags, stage track).
+     Surfaces, chrome, controls, and charts stay on the budget above, not a general colour
+     expansion. Stage track uses the sequential ramp below, not these triples. */
+  --cat-a:#5B4E8C; --cat-a-soft:#ECE8F4; --cat-a-ink:#3F3566;
+  --cat-b:#8A5A2B; --cat-b-soft:#F3EAE0; --cat-b-ink:#5F3D1B;
+  --cat-c:#3D6A8A; --cat-c-soft:#E3ECF2; --cat-c-ink:#2A4A62;
   --brand-a05:rgba(14,94,99,.05); --brand-a06:rgba(14,94,99,.06);
   --brand-a07:rgba(14,94,99,.07);
   --brand-a15:rgba(14,94,99,.15); --brand-a25:rgba(14,94,99,.25);
   --brand-a30:rgba(14,94,99,.30); --brand-a65:rgba(14,94,99,.65); --brand-a80:rgba(14,94,99,.80);
+  /* D103: sequential tint ramp of --brand for the stage track (lighter early, darker late).
+     D121: track dots ONLY. Stage pills use --sp-* below, not this. */
+  --st-1:var(--brand-a15); --st-2:var(--brand-a30); --st-3:var(--brand-a65); --st-4:var(--brand);
+  /* D121: stage PILL fills, soft, dark-ink text. --st-* is dots only. */
+  --sp-1:var(--brand-a06); --sp-2:var(--brand-a15);
+  --sp-3:var(--brand-a25); --sp-4:var(--brand-a30);
   --brand2-a10:rgba(20,121,127,.10); --brand2-a15:rgba(20,121,127,.15);
   --brand2-a30:rgba(20,121,127,.30); --brand2-a60:rgba(20,121,127,.60); --brand2-a80:rgba(20,121,127,.80);
   --pos-a15:rgba(63,110,70,.15); --pos-a30:rgba(63,110,70,.30);
@@ -28,11 +40,24 @@
   --scrim:rgba(20,22,20,.32); /* tier-3 modal backdrop — the rules always specified a scrim, this names it */
   --lift:0 1px 1px rgba(20,22,20,.03),0 8px 28px -12px rgba(20,22,20,.14);
   --lift-hi:0 2px 4px rgba(20,22,20,.04),0 24px 56px -20px rgba(20,22,20,.20);
+  --lift-thumb:0 1px 2px var(--brand-a15); /* D113: segmented-control thumb ONLY */
   --h:32px;
   --ease:cubic-bezier(.2,.7,.3,1);
+  /* D109: one sans, everywhere. --mono and --display are retired. */
   --ui:'Inter Tight',-apple-system,BlinkMacSystemFont,sans-serif;
-  --mono:'JetBrains Mono',ui-monospace,monospace;
-  --display:'Newsreader',Georgia,serif;
+  /* D120 found these missing from the real :root: ratified in CLAUDE.md/DESIGN_STANDARDS.md
+     §11 (D51) and documented as resident, but never actually landed in the template. Every
+     var(--focus), var(--t-fast/-base/-slow) reference already in this file (.th-sort's focus
+     ring, D107/D113/D117's transitions, D120's own marker) has been silently resolving to
+     nothing this whole time. An invalid custom property invalidates the whole shorthand
+     using it, so these transitions have been running at the shorthand's initial 0s/all, and
+     these outlines have been falling back to the browser's default focus ring, not this one.
+     Copied verbatim from CLAUDE.md §4, not invented here. --z-* currently has zero consumers
+     (all z-index in the app is still raw literals, the pre-existing debt tracked in
+     PROJECT_STATE §1) but is added anyway, matching what's already ratified. */
+  --focus:2px; --focus-offset:2px;
+  --z-sticky:100; --z-topbar:200; --z-scrim:300; --z-modal:400; --z-tip:500;
+  --t-fast:120ms; --t-base:180ms; --t-slow:280ms;
 }
 
 /* ---------- base ---------- */
@@ -62,17 +87,24 @@ h1,h2,h3,p,dl,dd{margin:0}
   position:sticky;top:0;height:100vh;display:flex;flex-direction:column}
 .rail-header{display:flex;align-items:center;gap:var(--s2);padding:var(--s4) var(--s4) var(--s3)}
 .rail-mark{width:26px;height:26px;border-radius:var(--r-s);background:var(--brand);color:var(--paper);
-  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex:0 0 26px}
+  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex:0 0 26px}
 .rail-mark.neutral{background:var(--sunken);color:var(--ink-2)}
 .rail-id{min-width:0}
 .rail-name{font-size:14px;font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rail-codename{font-size:11px;color:var(--ink-3)}
-.rail-nav{flex:1;padding:var(--s3) 0;overflow-y:auto}
+.rail-nav{position:relative;flex:1;padding:var(--s3) 0;overflow-y:auto}
+/* D120: sliding active marker. position:absolute with top:0 set explicitly, its static
+   position would otherwise place it after its last sibling in the flow, throwing translateY
+   off by the whole list's height. Recomputed on route change, resize, and font load; see
+   positionRailMarker(). Replaces the old background-fill position cue on .rail-item.active
+   below; the text colour/weight change on the active item stays. */
+.rail-marker{position:absolute;top:0;left:0;width:2px;background:var(--brand);
+  transition:transform var(--t-base) var(--ease),height var(--t-base) var(--ease)}
 .rail-group-label{font-size:11px;font-weight:500;color:var(--ink-3);padding:var(--s3) var(--s4) var(--s1)}
 .rail-item{display:flex;align-items:center;gap:var(--s2);height:34px;padding:0 var(--s4);font-size:13px;
   color:var(--ink-2);cursor:pointer;transition:background .12s var(--ease),color .12s var(--ease)}
 .rail-item:hover{background:var(--hover);color:var(--ink)}
-.rail-item.active{background:var(--paper);color:var(--ink);font-weight:500}
+.rail-item.active{color:var(--ink);font-weight:500}
 .rail-item.inert{color:var(--ink-3)}
 .rail-item.inert:hover{background:var(--hover);color:var(--ink-2)}
 .rail-item .spacer{margin-left:auto}
@@ -86,17 +118,29 @@ h1,h2,h3,p,dl,dd{margin:0}
   gap:var(--s3);padding:0 var(--s5);border-bottom:1px solid var(--line);
   background:color-mix(in srgb, var(--page) 82%, transparent);
   backdrop-filter:blur(14px) saturate(140%);-webkit-backdrop-filter:blur(14px) saturate(140%)}
-.topbar-title{font-family:var(--display);font-size:19px;color:var(--ink);white-space:nowrap}
+.topbar-title{font-family:var(--ui);font-size:19px;letter-spacing:-.01em;color:var(--ink);white-space:nowrap}
 .topbar-spacer{margin-left:auto}
 .searchbox{display:flex;align-items:center;gap:var(--s2);height:var(--h);padding:0 var(--s3);
   border:1px solid var(--line-2);border-radius:var(--r-s);color:var(--ink-3);font-size:12px;width:240px}
 .searchbox input{border:none;outline:none;background:transparent;width:100%;font-size:12px;color:var(--ink)}
 .searchbox input::placeholder{color:var(--ink-3)}
-.roletoggle{display:flex;height:var(--h);border:1px solid var(--line-2);border-radius:var(--r-s);overflow:hidden}
-.roletoggle button{height:100%;padding:0 var(--s3);border:none;background:transparent;font-size:12px;
-  color:var(--ink-2);transition:background .12s var(--ease),color .12s var(--ease)}
-.roletoggle button.active{background:var(--brand);color:var(--paper)}
-.roletoggle button:not(.active):hover{background:var(--hover);color:var(--ink)}
+/* D113 consumer note (not a new decision): the BDO/Exec persona switch is a same-data view
+   toggle exactly like .viewtoggle (same underlying shell, different lens on it), drawn to the
+   identical spec, track/segments/thumb/transitions all the same values. Kept as its own
+   selector rather than reusing .viewtoggle's class directly so the topbar's persona switch
+   stays a distinct component identity from the in-card view toggles, even sharing the same
+   drawing. This makes --lift-thumb a two-consumer token; the single-consumer check from D113
+   is updated to assert the consumers are exactly {.viewtoggle button.active, .roletoggle
+   button.active}, not still exactly one. */
+.roletoggle{display:flex;align-items:center;height:var(--h);padding:var(--s1);gap:var(--s1);
+  box-sizing:border-box;background:var(--brand-soft);border-radius:var(--r-s)}
+.roletoggle button{display:inline-flex;align-items:center;justify-content:center;height:24px;
+  padding:0 var(--s2);border:none;border-radius:var(--r-s);background:none;font-size:11px;
+  font-weight:500;color:var(--ink-3);
+  transition:background var(--t-fast) var(--ease),color var(--t-fast) var(--ease),box-shadow var(--t-fast) var(--ease)}
+.roletoggle button:hover:not(.active){color:var(--ink)}
+.roletoggle button:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
+.roletoggle button.active{background:var(--paper);color:var(--ink);box-shadow:var(--lift-thumb)}
 
 .btn{height:var(--h);padding:0 11px;font-size:12px;color:var(--ink-2);background:transparent;
   border:1px solid var(--line-2);border-radius:var(--r-s);display:inline-flex;align-items:center;
@@ -110,7 +154,7 @@ h1,h2,h3,p,dl,dd{margin:0}
 .viewport{padding:var(--s5);max-width:1360px;width:100%;margin:0 auto}
 .view{display:none}
 .view.active{display:block}
-.page-heading{font-family:var(--display);font-size:20px;color:var(--ink);margin-bottom:var(--s1)}
+.page-heading{font-family:var(--ui);font-size:20px;letter-spacing:-.01em;color:var(--ink);margin-bottom:var(--s1)}
 .page-sub{font-size:12px;color:var(--ink-3);margin-bottom:var(--s5)}
 
 /* ---------- metric strip ---------- */
@@ -120,16 +164,16 @@ h1,h2,h3,p,dl,dd{margin:0}
 .met{padding:var(--s4) var(--s5);border-left:1px solid var(--line)}
 .met:first-child{border-left:none}
 .met-label{font-size:11px;font-weight:500;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.met-figure{font-family:var(--display);font-size:22px;font-weight:500;letter-spacing:-.03em;color:var(--ink);margin-top:var(--s1)}
+.met-figure{font-family:var(--ui);font-size:22px;font-weight:500;letter-spacing:-.03em;color:var(--ink);margin-top:var(--s1)}
 .met-figure.emphasis{font-size:29px}
-.met-figure .cur,.met-figure .un{font-size:.66em;font-weight:400;color:var(--ink-2);letter-spacing:0}
+.met-figure .cur,.met-figure .un{font-size:.66em;font-weight:400;color:var(--ink-2)}
 .met-sub{font-size:11px;color:var(--ink-3);margin-top:var(--s1)}
 
 /* ---------- panels ---------- */
 .panel{position:relative;background:var(--paper);border:1px solid var(--line);border-radius:var(--r-l);margin-bottom:var(--s5)}
 .panel-header{padding:var(--s4) var(--s5) var(--s3);display:flex;align-items:flex-start;gap:var(--s3)}
 .panel-header-text{flex:1;min-width:0}
-.panel-title{font-size:13.5px;font-weight:500;letter-spacing:-.005em;color:var(--ink)}
+.panel-title{font-size:13.5px;font-weight:500;letter-spacing:-.01em;color:var(--ink)}
 .panel-scope{font-size:12px;color:var(--ink-3);margin-top:var(--s1)}
 .panel-body{padding:0 var(--s5) var(--s5)}
 .panel-body.flush{padding:0}
@@ -156,7 +200,7 @@ h1,h2,h3,p,dl,dd{margin:0}
 .ml-auto{margin-left:auto}
 .velocity-note{margin-top:var(--s4);font-size:12px;color:var(--ink-2)}
 .center-mt{margin-top:var(--s4);text-align:center}
-.mono-inline{font-family:var(--mono);color:var(--ink-3)}
+.mono-inline{font-family:var(--ui);color:var(--ink-3)}
 .mt-3{margin-top:var(--s3)}
 .mt-4{margin-top:var(--s4)}
 .mt-5{margin-top:var(--s5)}
@@ -169,7 +213,7 @@ h1,h2,h3,p,dl,dd{margin:0}
 .feed-main{flex:1;min-width:0}
 .feed-title{font-size:12.5px;font-weight:500;color:var(--ink)}
 .feed-sub{font-size:12px;color:var(--ink-3);margin-top:var(--s1)}
-.feed-time{font-family:var(--mono);font-size:11px;color:var(--ink-3);flex:0 0 auto;white-space:nowrap;
+.feed-time{font-family:var(--ui);font-size:11px;color:var(--ink-3);flex:0 0 auto;white-space:nowrap;
   padding-top:var(--s1)}
 /* right-aligned action label on an action-feed card — what you'd do about this signal */
 .feed-action{font-size:11px;font-weight:500;color:var(--brand);flex:0 0 auto;white-space:nowrap;
@@ -191,7 +235,7 @@ h1,h2,h3,p,dl,dd{margin:0}
 .agenda-row{display:flex;align-items:flex-start;gap:var(--s3);padding:var(--s3) var(--s5);
   box-shadow:inset 0 1px 0 var(--row-sep)}
 .agenda-row:first-child{box-shadow:none}
-.agenda-time{font-family:var(--mono);font-size:11px;color:var(--ink-3);padding-top:var(--s1);
+.agenda-time{font-family:var(--ui);font-size:11px;color:var(--ink-3);padding-top:var(--s1);
   flex:0 0 calc(var(--s7) + var(--s4));white-space:nowrap}
 .agenda-row.past{opacity:.55}
 .agenda-row.next{background:var(--brand-a05)}
@@ -216,7 +260,7 @@ h1,h2,h3,p,dl,dd{margin:0}
   background:var(--ink);color:var(--paper);border-radius:var(--r-s);
   padding:var(--s2) var(--s3);font-size:11px;line-height:1.45}
 .tip-t{font-weight:500}
-.tip-v{font-family:var(--mono);color:var(--paper)}
+.tip-v{font-family:var(--ui);color:var(--paper)}
 .tip-s{color:var(--ink-3)}
 
 /* ---------- pipeline snapshot (ranked deal list — a list stays a list, per the chart rule) ---------- */
@@ -228,15 +272,15 @@ h1,h2,h3,p,dl,dd{margin:0}
 .snap-name-line{display:flex;align-items:center;gap:var(--s2)}
 .snap-name{font-size:12.5px;font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .snap-sub{font-size:11px;color:var(--ink-3);margin-top:var(--s1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.snap-size{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--ink);flex:0 0 auto}
-.tag.fig{font-family:var(--mono);letter-spacing:-.01em;flex:0 0 auto}
+.snap-size{font-family:var(--ui);font-size:12px;font-weight:500;color:var(--ink);flex:0 0 auto}
+.tag.fig{font-family:var(--ui);flex:0 0 auto}
 .panel-header-count{flex:0 0 auto;font-size:11px;color:var(--ink-3);white-space:nowrap}
 
 /* ---------- horizontal ranked bars (partners) ---------- */
 .hbar-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--s3);align-items:center;
   padding:var(--s2) var(--s5)}
 .hbar-name{font-size:12px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hbar-val{font-family:var(--mono);font-size:11px;color:var(--ink-2)}
+.hbar-val{font-family:var(--ui);font-size:11px;color:var(--ink-2)}
 .hbar-row.warnrow .hbar-val{color:var(--warn-ink)}
 .hbar-track{grid-column:1 / -1;height:var(--s2);background:var(--sunken);border-radius:var(--r-s);
   overflow:hidden;margin-top:var(--s1)}
@@ -260,10 +304,19 @@ h1,h2,h3,p,dl,dd{margin:0}
    attribution footer) without painting it — visibility:hidden, not omitting the element, so a
    view without that content doesn't lose its height too. General-purpose, not loss-card-specific. */
 .invisible{visibility:hidden}
+/* Toggle-card stable height (CLAUDE.md), a second axis of the same rule the two fixes above
+   handle: the loss card's own .panel-scope sentence is a genuinely different length per view
+   ("By stage"/"By reason" wrap to 2 lines; "Lost to" fits 1), so the HEADER was still resizing
+   even after row count (.toggle-rows) and the footer were both already reserved. Measured, not
+   guessed: .panel-scope is 12px/1.45 line-height, 2 lines is 34.8px (2 * 17.4). Scoped to
+   #panel-loss specifically. Partners' three scope sentences are all naturally one line
+   already (checked directly, not assumed), so this reservation would only add unneeded slack
+   there. A one-line view leaves minor slack at the header's bottom, sanctioned, not a bug. */
+#panel-loss .panel-scope{min-height:34.8px}
 
 /* ---------- segmented control (reuses the .viewtoggle idiom, full-width in a rail) ---------- */
 .viewtoggle.seg{width:100%}
-.viewtoggle.seg button{flex:1;padding:0 var(--s2);font-size:11px}
+.viewtoggle.seg button{flex:1}
 
 /* ---------- calendar: fills the pair-row's stretched height, scrolls only past that ----------
    No fixed max-height any more — .pair-row > .panel > .panel-body already supplies flex:1, so
@@ -293,7 +346,7 @@ h1,h2,h3,p,dl,dd{margin:0}
   width:100%;max-width:880px;outline:none}
 .modal-head{display:flex;align-items:flex-start;gap:var(--s4);padding:var(--s5) var(--s5) var(--s4)}
 .modal-head-text{flex:1;min-width:0}
-.modal-title{font-family:var(--display);font-size:20px;color:var(--ink)}
+.modal-title{font-family:var(--ui);font-size:20px;letter-spacing:-.01em;color:var(--ink)}
 .modal-scope{font-size:12px;color:var(--ink-3);margin-top:var(--s1)}
 .modal-close{height:var(--h);width:var(--h);border:1px solid var(--line-2);border-radius:var(--r-s);
   background:var(--paper);color:var(--ink-2);font-size:14px;line-height:1;flex:0 0 auto}
@@ -302,7 +355,7 @@ h1,h2,h3,p,dl,dd{margin:0}
 .modal-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s5);
   padding:var(--s4) 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
   margin-bottom:var(--s4)}
-.modal-fig{font-family:var(--display);font-size:22px;font-weight:500;letter-spacing:-.03em;color:var(--ink)}
+.modal-fig{font-family:var(--ui);font-size:22px;font-weight:500;letter-spacing:-.03em;color:var(--ink)}
 .modal-lab{font-size:11px;font-weight:500;color:var(--ink-3)}
 
 /* ---------- segmented bar (generic — stacked proportional segments, tint ramp by depth) ----------
@@ -325,7 +378,7 @@ h1,h2,h3,p,dl,dd{margin:0}
 .stagebar-legend{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--s4);margin-top:var(--s3)}
 @media (max-width:1140px){.stagebar-legend{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .stagebar-item .k{font-size:11px;color:var(--ink-2);display:block}
-.stagebar-item .v{font-family:var(--mono);font-size:11px;color:var(--ink);margin-top:var(--s1);display:block}
+.stagebar-item .v{font-family:var(--ui);font-size:11px;color:var(--ink);margin-top:var(--s1);display:block}
 .stagebar-item.clickable{cursor:pointer;border-radius:var(--r-s);
   margin:calc(var(--s1) * -1) calc(var(--s2) * -1);padding:var(--s1) var(--s2);
   transition:background .12s var(--ease)}
@@ -351,10 +404,10 @@ h1,h2,h3,p,dl,dd{margin:0}
 .exec-hero{background:var(--paper);border-radius:var(--r-l);box-shadow:var(--lift);
   padding:var(--s5) var(--s6);margin-bottom:var(--s5)}
 .exec-hero-label{font-size:12px;color:var(--ink-3)}
-.exec-hero-figure{font-family:var(--display);font-size:48px;font-weight:500;letter-spacing:-.03em;
+.exec-hero-figure{font-family:var(--ui);font-size:48px;font-weight:500;letter-spacing:-.03em;
   color:var(--ink);margin-top:var(--s1)}
 .exec-hero-sub{font-size:12px;color:var(--ink-2);margin-top:var(--s2)}
-.exec-band-heading{font-family:var(--display);font-size:16px;font-weight:500;color:var(--ink);
+.exec-band-heading{font-family:var(--ui);font-size:16px;font-weight:500;color:var(--ink);
   margin:var(--s6) 0 var(--s3)}
 /* D98: a plain CSS grid row for cards with genuinely comparable natural heights — no JS, no
    packGrid()/alignGridColumns() involved at all. `align-items:stretch` is Grid's own default
@@ -369,8 +422,8 @@ h1,h2,h3,p,dl,dd{margin:0}
 @media (max-width:1140px){.exec-mix-row{grid-template-columns:1fr}}
 /* One hero figure per view (CLAUDE.md §4) — .exec-hero above owns that slot, so per-card figures
    in the diagnostics band use this smaller, non-emphasis size, never .met-figure.emphasis. */
-.exec-ratio{font-family:var(--display);font-size:22px;font-weight:500;letter-spacing:-.03em;color:var(--ink)}
-.exec-ratio .un{font-size:.6em;font-weight:400;color:var(--ink-2);letter-spacing:0}
+.exec-ratio{font-family:var(--ui);font-size:22px;font-weight:500;letter-spacing:-.03em;color:var(--ink)}
+.exec-ratio .un{font-size:.6em;font-weight:400;color:var(--ink-2)}
 .exec-target-line{position:absolute;top:0;bottom:0;width:0;border-left:1px dashed var(--ink-3);pointer-events:auto}
 .attain-wrap{position:relative}
 .attain-target-line{position:absolute;top:0;bottom:0;width:0;border-left:1px dashed var(--ink-3);pointer-events:auto}
@@ -383,7 +436,7 @@ h1,h2,h3,p,dl,dd{margin:0}
 .convrow{display:grid;grid-template-columns:104px 1fr 44px;gap:var(--s3);align-items:center;padding:var(--s3) 0}
 .convrow-label{font-size:12px;color:var(--ink)}
 .convrow-bar{height:var(--s5)}
-.convrow-val{font-family:var(--mono);font-size:11px;color:var(--ink-2);text-align:right}
+.convrow-val{font-family:var(--ui);font-size:11px;color:var(--ink-2);text-align:right}
 .convrow-legend{display:flex;gap:var(--s5);margin-top:var(--s3);font-size:11px;color:var(--ink-2)}
 .convdot{display:inline-block;width:8px;height:8px;border-radius:var(--r-s);margin-right:var(--s1);background:var(--brand)}
 .convdot.t2{background:var(--brand-a65)}
@@ -405,7 +458,7 @@ h1,h2,h3,p,dl,dd{margin:0}
 .rangestrip-box{fill:var(--brand-a30);stroke:var(--brand);stroke-width:1}
 .rangestrip-median{stroke:var(--brand);stroke-width:2}
 .rangestrip-cap{fill:var(--ink-3)}
-.rangestrip-label{font-size:10px;fill:var(--ink-3);font-family:var(--mono)}
+.rangestrip-label{font-size:10px;fill:var(--ink-3);font-family:var(--ui)}
 
 /* exec chart infrastructure — shared gridline/axis language used by every exec SVG chart.
    D92: never give an SVG geometry element (rect/circle/path/line) a class built for a <div>
@@ -417,7 +470,7 @@ h1,h2,h3,p,dl,dd{margin:0}
 .execchart-wrap{height:180px;padding:0 var(--s5);overflow:hidden}
 .execchart-svg{width:100%;height:100%;overflow:hidden}
 .execchart-grid{stroke:var(--line);stroke-width:1}
-.execchart-axis{font-size:10px;fill:var(--ink-3);font-family:var(--mono)}
+.execchart-axis{font-size:10px;fill:var(--ink-3);font-family:var(--ui)}
 .execchart-xlabel{font-size:10px;fill:var(--ink-3)}
 
 /* dual-series line chart (D93) — solid brand line + dashed brand-2 line, colour AND dash pattern
@@ -425,8 +478,21 @@ h1,h2,h3,p,dl,dd{margin:0}
    than the visible dot, easier to hover without cluttering the mark itself). */
 .linechart-line-a{fill:none;stroke:var(--brand);stroke-width:2}
 .linechart-line-b{fill:none;stroke:var(--brand-2);stroke-width:2;stroke-dasharray:4 3}
-.linechart-dot-a{fill:var(--brand)}
-.linechart-dot-b{fill:var(--brand-2)}
+/* D117: --brand-a07 is the canonical chart area fill (:root), previously declared with no
+   consumer anywhere in the app; this is its first job. Area under the primary series only,
+   a second fill under the dashed series would compete with it on the same plot rather than
+   read as a second signal. */
+.linechart-area-a{fill:var(--brand-a07);stroke:none}
+/* D117: only the latest point stays visible at rest (radius 3.5, its own class below); every
+   other point sits at opacity 0 and reveals on :hover of the chart's own container, a pure CSS
+   opacity transition with no JS timer behind it. prefers-reduced-motion's existing global
+   transition-duration override (see the media query near the top of this file) already covers
+   it, nothing chart-specific to add. The invisible r=9 hit circle is unaffected either way, so
+   every point's tooltip fires whether or not its dot is currently drawn. */
+.linechart-dot-a{fill:var(--brand);opacity:0;transition:opacity var(--t-fast) var(--ease)}
+.linechart-dot-b{fill:var(--brand-2);opacity:0;transition:opacity var(--t-fast) var(--ease)}
+.linechart-dot-a.rest,.linechart-dot-b.rest{opacity:1}
+.execchart-wrap:hover .linechart-dot-a,.execchart-wrap:hover .linechart-dot-b{opacity:1}
 .linechart-hit{fill:transparent}
 .linechart-legend{display:flex;gap:var(--s5);padding:0 var(--s5) var(--s5);font-size:11px;color:var(--ink-2)}
 .linechart-legend-item{display:flex;align-items:center;gap:var(--s2)}
@@ -462,7 +528,7 @@ h1,h2,h3,p,dl,dd{margin:0}
 .kv-line{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--s3);align-items:baseline;
   padding:var(--s1) 0;font-size:12px}
 .kv-line .k{color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.kv-line .v{font-family:var(--mono);font-size:11px;color:var(--ink);text-align:right}
+.kv-line .v{font-family:var(--ui);font-size:11px;color:var(--ink);text-align:right}
 .kv-line .v .sec{color:var(--ink-3)}
 
 /* ---------- chips / segments ---------- */
@@ -472,10 +538,22 @@ h1,h2,h3,p,dl,dd{margin:0}
   transition:background .12s var(--ease),border-color .12s var(--ease),color .12s var(--ease)}
 .chip:hover{border-color:var(--ink-3);color:var(--ink)}
 .chip.active{background:var(--brand);border-color:var(--brand);color:var(--paper)}
-.chip .cnt{font-family:var(--mono);font-size:11px;opacity:.8}
-.viewtoggle{display:flex;height:var(--h);border:1px solid var(--line-2);border-radius:var(--r-s);overflow:hidden}
-.viewtoggle button{height:100%;padding:0 var(--s3);border:none;background:transparent;font-size:12px;color:var(--ink-2)}
-.viewtoggle button.active{background:var(--sunken);color:var(--ink);font-weight:500}
+.chip .cnt{font-family:var(--ui);font-size:11px;opacity:.8}
+/* D113: track-and-thumb segmented control, drawing only (structure/semantics were D107). Track
+   is a soft brand wash with no border; the selected segment is a lifted --paper thumb, never a
+   border, so this never collides with the border-and-shadow rule (the track itself has no
+   border for the thumb's shadow to sit alongside). --lift-thumb is control-level, not an
+   elevation tier, and has exactly one consumer (asserted in a test the same shape as the
+   --r-full single-consumer test). */
+.viewtoggle{display:flex;align-items:center;height:var(--h);padding:var(--s1);gap:var(--s1);
+  box-sizing:border-box;background:var(--brand-soft);border-radius:var(--r-s)}
+.viewtoggle button{display:inline-flex;align-items:center;justify-content:center;height:24px;
+  padding:0 var(--s2);border:none;border-radius:var(--r-s);background:none;font-size:11px;
+  font-weight:500;color:var(--ink-3);
+  transition:background var(--t-fast) var(--ease),color var(--t-fast) var(--ease),box-shadow var(--t-fast) var(--ease)}
+.viewtoggle button:hover:not(.active){color:var(--ink)}
+.viewtoggle button:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
+.viewtoggle button.active{background:var(--paper);color:var(--ink);box-shadow:var(--lift-thumb)}
 
 /* ---------- kanban ---------- */
 .kanban{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(248px,1fr);gap:var(--s4);
@@ -483,8 +561,8 @@ h1,h2,h3,p,dl,dd{margin:0}
 .kcol{background:var(--sunken);border-radius:var(--r-m);display:flex;flex-direction:column;min-height:120px}
 .kcol-header{padding:var(--s3) var(--s4);display:flex;align-items:center;gap:var(--s2)}
 .kcol-title{font-size:12px;font-weight:500;color:var(--ink-2)}
-.kcol-count{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--ink-3)}
-.kcol-total{font-family:var(--mono);font-size:11px;color:var(--ink-3);padding:0 var(--s4) var(--s3)}
+.kcol-count{margin-left:auto;font-family:var(--ui);font-size:11px;color:var(--ink-3)}
+.kcol-total{font-family:var(--ui);font-size:11px;color:var(--ink-3);padding:0 var(--s4) var(--s3)}
 .kcol-body{padding:0 var(--s3) var(--s3);display:flex;flex-direction:column;gap:var(--s2);overflow-y:auto}
 .kcard{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-m);padding:var(--s3);
   cursor:pointer;transition:border-color .12s var(--ease)}
@@ -492,7 +570,7 @@ h1,h2,h3,p,dl,dd{margin:0}
 .kcard-name{font-size:12.5px;font-weight:500;color:var(--ink)}
 .kcard-acct{font-size:11px;color:var(--ink-3);margin-top:var(--s1)}
 .kcard-foot{display:flex;align-items:center;justify-content:space-between;margin-top:var(--s2)}
-.kcard-size{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--ink)}
+.kcard-size{font-family:var(--ui);font-size:12px;font-weight:500;color:var(--ink)}
 .kcard-days{font-size:11px;color:var(--ink-3)}
 .kcol-empty{padding:var(--s4);font-size:11px;color:var(--ink-3);text-align:center}
 
@@ -505,7 +583,7 @@ table.tbl{width:100%;border-collapse:collapse}
 .tbl td{height:42px;padding:0 var(--s5);font-size:12px;color:var(--ink);vertical-align:middle;
   box-shadow:inset 0 1px 0 var(--row-sep);white-space:nowrap}
 .tbl tbody tr:first-child td{box-shadow:none}
-.tbl td.num{text-align:right;font-family:var(--mono);letter-spacing:-.01em}
+.tbl td.num{text-align:right;font-family:var(--ui)}
 .tbl td.sec{color:var(--ink-2)}
 .tbl td.name{font-weight:500}
 .tbl.clickable tbody tr{cursor:pointer;transition:background .12s var(--ease)}
@@ -555,17 +633,23 @@ table.tbl{width:100%;border-collapse:collapse}
   border-radius:var(--r-full);background:var(--paper);box-shadow:inset 0 0 0 1px var(--line-2);
   display:flex;align-items:center;justify-content:center;font-size:11px;line-height:1;
   color:var(--ink-3);transition:background .18s var(--ease),box-shadow .18s var(--ease)}
-.track-stage.done .track-dot{background:var(--brand);color:var(--paper);box-shadow:none}
-.track-stage.active .track-dot{background:var(--brand);color:var(--paper);
-  box-shadow:0 0 0 var(--s1) var(--brand-a15)}
+.track-stage.done .track-dot{box-shadow:none}
+.track-stage.active .track-dot{box-shadow:0 0 0 var(--s1) var(--brand-a15)}
 .track-stage.won .track-dot{background:var(--pos);color:var(--paper);box-shadow:none}
 .track-stage.lost .track-dot{background:var(--neg);color:var(--paper);box-shadow:none}
+/* D103: reached nodes take the sequential --st ramp by stage order, not a uniform --brand
+   fill, same crossover as the .tag pills below (st-1/st-2 need dark ink text, st-3/st-4 need
+   paper text; measured, not guessed, see PROJECT_STATE D103 commit log). */
+.track-stage.st-1.done .track-dot,.track-stage.st-1.active .track-dot{background:var(--st-1);color:var(--brand-ink)}
+.track-stage.st-2.done .track-dot,.track-stage.st-2.active .track-dot{background:var(--st-2);color:var(--brand-ink)}
+.track-stage.st-3.done .track-dot,.track-stage.st-3.active .track-dot{background:var(--st-3);color:var(--paper)}
+.track-stage.st-4.done .track-dot,.track-stage.st-4.active .track-dot{background:var(--st-4);color:var(--paper)}
 .track-label{font-size:11px;color:var(--ink-3);text-align:center;line-height:1.3;padding:0 var(--s2)}
 .track-stage.done .track-label{color:var(--ink-2)}
 .track-stage.active .track-label{color:var(--ink);font-weight:500}
 .track-stage.won .track-label{color:var(--pos-ink);font-weight:500}
 .track-stage.lost .track-label{color:var(--neg-ink);font-weight:500}
-.track-sub{font-family:var(--mono);font-size:11px;letter-spacing:-.01em;color:var(--ink-3)}
+.track-sub{font-family:var(--ui);font-size:11px;color:var(--ink-3)}
 /* Every stage a deal can be moved to is clickable — forward and backward alike — so one hover
    affordance covers both. Hollow (future) nodes tint up; already-filled (completed) nodes
    lighten to --brand-2 instead, so the hover doesn't hollow out a node that reads as done. */
@@ -584,13 +668,31 @@ table.tbl{width:100%;border-collapse:collapse}
 .tag.warn{background:var(--warn-soft);color:var(--warn-ink)}
 .tag.neg{background:var(--neg-soft);color:var(--neg-ink)}
 .tag.neutral{background:var(--sunken);color:var(--ink-2)}
+/* D121, replacing D103's original approach: stage pills no longer reuse the track's --st-*
+   ramp (D103's own fix, brand-ink on st-1/st-2 and paper on st-3/st-4, left st-3 stuck under
+   the 4.5:1 text-contrast bar, a property of the track ramp's own fixed values, not fixable
+   for a pill without breaking the track). Pills get their own soft, sequential ramp instead
+   (--sp-1..4, :root) with brand-ink text on all four, uniformly, no crossover needed: every
+   step clears 6:1+ (verified, not guessed, see PROJECT_STATE D121 commit log). Research:
+   RESEARCH_02 §1 documents Attio's soft-background status pills as the reference pattern this
+   follows. --st-* is the stage track's own token now, dots only. */
+.tag.st-1{background:var(--sp-1);color:var(--brand-ink)}
+.tag.st-2{background:var(--sp-2);color:var(--brand-ink)}
+.tag.st-3{background:var(--sp-3);color:var(--brand-ink)}
+.tag.st-4{background:var(--sp-4);color:var(--brand-ink)}
+/* D103: product-type tags, one categorical hue per product, soft fill + ink text (each triple
+   independently verified >=7.7:1). Mapping order (Factoring/ABL/TermLoan -> a/b/c) is an
+   ASSUMPTION, not ruled. See PROJECT_STATE D103 commit log. */
+.tag.cat-a{background:var(--cat-a-soft);color:var(--cat-a-ink)}
+.tag.cat-b{background:var(--cat-b-soft);color:var(--cat-b-ink)}
+.tag.cat-c{background:var(--cat-c-soft);color:var(--cat-c-ink)}
 
 /* ---------- opportunity record ---------- */
 .opp-header{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-l);padding:var(--s5);
   margin-bottom:var(--s5)}
 .opp-eyebrow{font-size:11px;color:var(--ink-3);display:flex;align-items:center;gap:var(--s2)}
-.opp-title{font-family:var(--display);font-size:20px;color:var(--ink);margin-top:var(--s1)}
-.opp-hero{font-family:var(--display);font-size:44px;font-weight:400;letter-spacing:-.03em;color:var(--ink);
+.opp-title{font-family:var(--ui);font-size:20px;letter-spacing:-.01em;color:var(--ink);margin-top:var(--s1)}
+.opp-hero{font-family:var(--ui);font-size:44px;font-weight:400;letter-spacing:-.03em;color:var(--ink);
   margin-top:var(--s3)}
 .opp-hero .cur,.opp-hero .un{font-size:.45em;font-weight:400;color:var(--ink-2)}
 .opp-hero-label{font-size:11px;font-weight:500;color:var(--ink-3);margin-top:var(--s1)}
@@ -636,12 +738,28 @@ table.tbl{width:100%;border-collapse:collapse}
   border:none;border-radius:var(--r-s);background:var(--sunken);color:var(--ink-3);font-size:11px;
   line-height:1;cursor:pointer;transition:background var(--t-fast) var(--ease),color var(--t-fast) var(--ease)}
 .card-expand:hover{background:var(--hover);color:var(--ink)}
-.section-nav{display:flex;gap:var(--s1);border-bottom:1px solid var(--line);margin-bottom:var(--s5);overflow-x:auto}
-.section-nav-item{height:var(--h);padding:0 var(--s4);display:inline-flex;align-items:center;font-size:12.5px;
-  color:var(--ink-2);border-bottom:2px solid transparent;white-space:nowrap;cursor:pointer;flex:0 0 auto;
-  transition:color .12s var(--ease),border-color .12s var(--ease)}
+/* D107: tabs, not a segmented control. This switcher navigates to DIFFERENT content per
+   section, the segmented control below is reserved for same-data view toggles. Real <button>s
+   (all:unset, same reset pattern .th-sort already uses), a roving tabindex (only the active
+   tab is a Tab stop; ArrowLeft/ArrowRight move focus and activate, matching WAI-ARIA APG's
+   automatic-activation tabs pattern), role="tablist"/"tab"/aria-selected reflecting real state. */
+.section-nav{position:relative;display:flex;gap:var(--s1);border-bottom:1px solid var(--line);
+  margin-bottom:var(--s5);overflow-x:auto}
+/* D120: sliding active marker, replacing the per-item border-bottom this tab row used to draw
+   for itself (the text colour change on the active tab, above, stays). position:absolute with
+   bottom:0 set explicitly, its static position would otherwise place it after its last
+   sibling in the flex row, throwing translateX off by the whole row's width. Recomputed on
+   click, resize, and font load; see positionTabMarker(). */
+.section-nav-marker{position:absolute;bottom:0;left:0;height:2px;background:var(--brand);
+  transition:transform var(--t-base) var(--ease),width var(--t-base) var(--ease)}
+.section-nav-item{all:unset;height:var(--h);padding:0 var(--s4);display:inline-flex;align-items:center;
+  gap:var(--s1);font-size:12px;font-weight:500;color:var(--ink-3);
+  white-space:nowrap;cursor:pointer;flex:0 0 auto;box-sizing:border-box;
+  transition:color var(--t-base) var(--ease)}
 .section-nav-item:hover{color:var(--ink)}
-.section-nav-item.active{color:var(--brand-ink);border-bottom-color:var(--brand);font-weight:500}
+.section-nav-item:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
+.section-nav-item[aria-selected="true"]{color:var(--ink)}
+.section-nav-count{font-family:var(--ui);color:inherit}
 
 .kv{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:var(--s4) var(--s5)}
 .kv dt{font-size:11px;font-weight:500;color:var(--ink-3)}
@@ -732,7 +850,7 @@ table.tbl{width:100%;border-collapse:collapse}
 .activity-item:first-child{box-shadow:none}
 .activity-type{flex:0 0 88px;font-size:11px;font-weight:500;color:var(--ink-3)}
 .activity-subject{font-size:12px;color:var(--ink)}
-.activity-date{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--ink-3);flex:0 0 auto}
+.activity-date{margin-left:auto;font-family:var(--ui);font-size:11px;color:var(--ink-3);flex:0 0 auto}
 
 /* ---------- inline edit engine ---------- */
 /* At rest: no persistent marker. On hover: cell fill + a right-edge edit glyph.
@@ -792,7 +910,7 @@ table.tbl{width:100%;border-collapse:collapse}
   cursor:pointer;transition:border-color .12s var(--ease)}
 .scenario-card:hover{border-color:var(--brand)}
 .scenario-product{font-size:11px;font-weight:500;color:var(--brand-ink)}
-.scenario-acct{font-family:var(--display);font-size:15px;color:var(--ink);margin-top:var(--s1)}
+.scenario-acct{font-family:var(--ui);font-size:15px;color:var(--ink);margin-top:var(--s1)}
 .scenario-meta{font-size:11px;color:var(--ink-3);margin-top:var(--s2)}
 
 @media (max-width:900px){
@@ -811,6 +929,7 @@ table.tbl{width:100%;border-collapse:collapse}
       </div>
     </div>
     <div class="rail-nav" id="rail-nav">
+      <div class="rail-marker" id="rail-marker"></div>
       <div class="rail-item" data-route="home" onclick="location.hash='#/home'">Home</div>
       <div class="rail-item" data-route="pipeline" onclick="location.hash='#/pipeline'">Pipeline</div>
       <div class="rail-item inert" data-route="accounts" onclick="location.hash='#/accounts'">
@@ -45429,7 +45548,7 @@ const CLOSED_WON_ACCT_IDS = new Set(D.opportunities.filter(o=>o.outcome==='won')
 function getAccount(id){ return PROSPECTS[id] || PARTNERS[id] || {name:'Unknown account'}; }
 function getOpp(id){ return OPPS[id]; }
 function getStageHistory(id){ return STAGEHIST[id] || []; }
-function initials(name){ return name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
+function initials(name){ return name.split(' ').map(w=>w[0]).slice(0,2).join(''); }
 
 /* ---------- dates & numbers ---------- */
 function toDateObj(s){ return new Date(s+'T00:00:00Z'); }
@@ -45794,6 +45913,54 @@ function computeUnderwritingStats(){
 }
 const UW_STATS = computeUnderwritingStats();
 
+/* D120: sliding active marker, shared mechanism for the rail nav (vertical) and the record's
+   section tabs (horizontal). Position/size come from the real active element's own layout
+   (offsetTop/offsetHeight or offsetLeft/offsetWidth), never hand-computed, so it can't drift
+   from whatever the browser actually laid out, a variable-width tab label or a variable-height
+   rail row either one just works. */
+function positionSlidingMarker(marker, activeEl, axis){
+  if(!marker || !activeEl) return;
+  if(axis==='x'){
+    marker.style.transform = 'translateX('+activeEl.offsetLeft+'px)';
+    marker.style.width = activeEl.offsetWidth+'px';
+  } else {
+    marker.style.transform = 'translateY('+activeEl.offsetTop+'px)';
+    marker.style.height = activeEl.offsetHeight+'px';
+  }
+}
+function positionRailMarker(){
+  positionSlidingMarker(document.getElementById('rail-marker'), document.querySelector('.rail-item.active'), 'y');
+}
+/* The rail marker above never needs this: route() only toggles .active on the existing
+   .rail-item elements, it never rewrites #rail-nav's innerHTML, so the same marker node lives
+   for the app's whole lifetime and the CSS transition always has something real to animate
+   from. The tab marker doesn't get that for free: renderOpp() rebuilds #view-opp's entire
+   innerHTML (header, strip, nav, body) on every section switch, so the markup above would
+   hand it a BRAND NEW <div> each time, with no prior on-screen position to glide from. A fresh
+   node's first style write is never a transition (nothing rendered it yet to transition away
+   from), so without this it would only ever look right when the previous tab happened to sit
+   at the row's start, confirmed empirically (Details -> Contacts looked like a real glide by
+   coincidence; Contacts -> Activity visibly snapped back to the left edge and slid out from
+   there instead of moving from Contacts). Fixed by keeping one persistent marker element and
+   splicing it into each fresh render in place of the throwaway one the HTML string creates,
+   so the same node's transform/width keep changing rather than a new node's initial paint. */
+let SECTION_NAV_MARKER_EL = null;
+function positionTabMarker(){
+  const freshMarker = document.getElementById('section-nav-marker');
+  if(freshMarker && SECTION_NAV_MARKER_EL && freshMarker!==SECTION_NAV_MARKER_EL){
+    freshMarker.replaceWith(SECTION_NAV_MARKER_EL);
+  } else if(freshMarker){
+    SECTION_NAV_MARKER_EL = freshMarker;
+  }
+  positionSlidingMarker(SECTION_NAV_MARKER_EL, document.querySelector('.section-nav-item[aria-selected="true"]'), 'x');
+}
+/* Resize covers both markers at once (window width can reflow either the rail or the tab row);
+   font load covers the one-time case where the very first paint measured labels in the
+   fallback font before Inter Tight arrived, so the marker's initial size/position would
+   otherwise be wrong until the next click or resize. */
+window.addEventListener('resize', function(){ positionRailMarker(); positionTabMarker(); });
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ positionRailMarker(); positionTabMarker(); });
+
 /* ---------- routing ---------- */
 function route(){
   const hash = location.hash || '#/home';
@@ -45804,6 +45971,7 @@ function route(){
   document.querySelectorAll('.rail-item').forEach(el=>{
     el.classList.toggle('active', el.dataset.route===view);
   });
+  positionRailMarker();
   document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
 
   const titles = {
@@ -45840,7 +46008,14 @@ function route(){
     }
     renderPipeline(); showView('view-pipeline');
   }
-  else if(view==='opp' && id){ renderOpp(id); showView('view-opp'); titles.opp = getOpp(id) ? getOpp(id).name : 'Opportunity'; }
+  else if(view==='opp' && id){
+    renderOpp(id); showView('view-opp'); titles.opp = getOpp(id) ? getOpp(id).name : 'Opportunity';
+    /* D120: renderOpp()'s own positionTabMarker() call runs while #view-opp is still the
+       inactive (display:none) .view, so every offset reads 0 there; a fresh navigation here
+       needs a second call after showView() makes the container real. setOppSection()'s
+       same-page re-renders don't hit this, the container is already visible by then. */
+    positionTabMarker();
+  }
   else if(view==='create'){ CREATE_PRODUCT='Factoring'; CREATE_ACCT_MODE='new'; CREATE_RATETYPE='Fixed'; renderCreate(); showView('view-create'); }
   else if(view==='intake'){ renderIntake(id); showView('view-intake'); }
   else if(view==='accounts'){ renderStub('view-accounts','Accounts','Prospect and Partner account records — list and record views. Not built in this skeleton pass; see PROJECT_STATE.md §12.'); showView('view-accounts'); }
@@ -46437,9 +46612,13 @@ function pipelineByStageHtml(myOpen){
    this exact same control twice — once on the card, once inside its modal (per the modal-scoping
    fix, CLAUDE.md's editability/consistency spirit) — wired to a different setter each time so
    switching the modal's view never touches the card's. One markup source, not one per caller. */
+/* D107: a segmented control, same-data view switch, not tabs. Deliberately no role="tablist"/
+   "tab" here (that pattern belongs to the section-nav above, which navigates different content).
+   Real <button>s already; aria-pressed now reflects which view is showing. The track-and-thumb
+   DRAWING is D113, next commit; this is structure and semantics only. */
 function viewToggleHtml(views, current, setterName){
   return '<div class="viewtoggle seg" onclick="event.stopPropagation()">'+views.map(v=>
-    '<button class="'+(current===v.key?'active':'')+'" onclick="'+setterName+'(\''+v.key+'\')">'+
+    '<button class="'+(current===v.key?'active':'')+'" aria-pressed="'+(current===v.key)+'" onclick="'+setterName+'(\''+v.key+'\')">'+
     v.label+'</button>').join('')+'</div>';
 }
 
@@ -47108,9 +47287,9 @@ function renderHome(){
      getBoundingClientRect() math, not .offsetTop: #calendar-scroll has no positioned ancestor of
      its own, so raw .offsetTop resolves against whatever positioned ancestor is further up the
      tree — not this container — and silently gives the wrong number. Deferred to document.fonts.
-     ready: setting scrollTop one requestAnimationFrame after mount raced the web fonts (Newsreader/
-     Inter Tight/JetBrains Mono) still loading, so the position was computed against a shorter,
-     pre-font-swap layout and never corrected once the real fonts came in and rows grew taller. */
+     ready: setting scrollTop one requestAnimationFrame after mount raced the web font still
+     loading, so the position was computed against a shorter, pre-font-swap layout and never
+     corrected once the real font came in and rows grew taller. */
   const positionCalendarScroll = () => {
     const cal = document.getElementById('calendar-scroll');
     if(!cal) return;
@@ -47541,10 +47720,14 @@ const EXEC_CHART_HEADROOM = 0.2;
 /* D96: axis-label padding is ESTIMATED from the actual label text this chart renders, not a
    fixed literal — a fixed number only ever fits the dataset it was tuned against ($432.6M clipped
    the old padR=46 the moment a real month crossed a wider dollar figure than whatever it was
-   sized for). .execchart-axis is JetBrains Mono (monospace), so every glyph advances the same
-   fraction of its font-size; 0.6em is that font's real average advance width, 0.68 adds headroom
-   so this keeps working for any string moneyShort()/Math.round() can produce, not just today's
-   widest value. AXIS_FONT_SIZE must match .execchart-axis's own font-size in the CSS below. */
+   sized for). 0.68em/glyph was calibrated when .execchart-axis used the app's former monospace
+   face, uniform glyph advance. D109 moved it to --ui (Inter Tight, proportional; digits still
+   render at a uniform width via the body's tabular-nums, non-digit glyphs like "$"/"."/"M" do
+   not). Measured directly against the built chart, the constant now over-estimates real label
+   width (e.g. "$67.1M" measures ~32 SVG units against an estimate of ~45), the safe direction
+   per AXIS_LABEL_BUFFER's own stated intent, so left as-is rather than re-tuned for a marginal
+   gain.
+   AXIS_FONT_SIZE must match .execchart-axis's own font-size in the CSS below. */
 const AXIS_FONT_SIZE = 10;
 const AXIS_CHAR_WIDTH_EM = 0.68;
 const AXIS_LABEL_BUFFER = 4; // extra units beyond the estimate itself, so a label lands short of the edge, never flush against it
@@ -47580,6 +47763,12 @@ function dualLineChartSvg(series, opts){
   const ptsB = series.map((s,i)=>({x:xAt(i), y:yForB(s.b), s}));
   const pathA = 'M'+ptsA.map(p=>p.x.toFixed(1)+' '+p.y.toFixed(1)).join(' L');
   const pathB = 'M'+ptsB.map(p=>p.x.toFixed(1)+' '+p.y.toFixed(1)).join(' L');
+  /* D117: area fill under the primary series only, closed down to its own zero baseline
+     (yForA(0), not the plot's bottom edge, the same line since topA/topB never go negative,
+     but named for what it means rather than what it happens to equal). */
+  const baselineA = yForA(0);
+  const areaA = pathA+' L'+ptsA[n-1].x.toFixed(1)+' '+baselineA.toFixed(1)+
+    ' L'+ptsA[0].x.toFixed(1)+' '+baselineA.toFixed(1)+' Z';
 
   const labelStep = n>8?2:1;
   const xLabels = series.map((s,i)=>
@@ -47587,19 +47776,33 @@ function dualLineChartSvg(series, opts){
     '<text class="execchart-xlabel" x="'+xAt(i).toFixed(1)+'" y="'+(H-6)+'" text-anchor="middle">'+s.label+'</text>'
   ).join('');
 
-  const dotsA = ptsA.map(p=>
-    '<circle class="linechart-hit" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="9"'+
-      tipAttr(p.s.label, fmtTipA(p.s), '')+'></circle>'+
-    '<circle class="linechart-dot-a" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="2.5"></circle>'
-  ).join('');
-  const dotsB = ptsB.map(p=>
-    '<circle class="linechart-hit" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="9"'+
-      tipAttr(p.s.label, fmtTipB(p.s), '')+'></circle>'+
-    '<circle class="linechart-dot-b" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="2.5"></circle>'
-  ).join('');
+  /* D117: every point keeps its invisible r=9 hit circle regardless, so its tooltip fires
+     whether or not the visible dot is currently drawn. Only the latest point (index n-1) is
+     the "rest" dot, larger (r=3.5) and always opaque; the rest sit at opacity 0 until the
+     container is hovered (CSS, see .linechart-dot-a/-b above).
+     Bug found and fixed here, pre-dating D117 (confirmed against the prior build, not
+     introduced by this commit): the hit circle was painted BEFORE the visible dot, so the
+     smaller opaque dot sat on top of it and silently ate every pointer event landing in its
+     own footprint, the exact centre of a point, the single most natural place to aim a
+     cursor, never showed a tooltip; only the exposed ring between the dot's edge and the hit
+     circle's r=9 edge did. Painting the hit circle LAST (transparent fill, so nothing visible
+     changes) puts it on top for hit-testing while the dot still shows through underneath. */
+  const dotsA = ptsA.map((p,i)=>{
+    const rest = i===n-1;
+    return '<circle class="linechart-dot-a'+(rest?' rest':'')+'" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="'+(rest?3.5:2.5)+'"></circle>'+
+      '<circle class="linechart-hit" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="9"'+
+      tipAttr(p.s.label, fmtTipA(p.s), '')+'></circle>';
+  }).join('');
+  const dotsB = ptsB.map((p,i)=>{
+    const rest = i===n-1;
+    return '<circle class="linechart-dot-b'+(rest?' rest':'')+'" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="'+(rest?3.5:2.5)+'"></circle>'+
+      '<circle class="linechart-hit" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="9"'+
+      tipAttr(p.s.label, fmtTipB(p.s), '')+'></circle>';
+  }).join('');
 
   return '<svg class="execchart-svg" viewBox="0 0 '+W+' '+H+'" aria-hidden="true">'+
     gridLines+
+    '<path class="linechart-area-a" d="'+areaA+'"></path>'+
     '<path class="linechart-line-a" d="'+pathA+'"></path>'+
     '<path class="linechart-line-b" d="'+pathB+'"></path>'+
     dotsA+dotsB+xLabels+
@@ -48391,14 +48594,13 @@ function renderPipeline(){
     sorted.map(o=>{
       const acct=getAccount(o.accountId);
       const owner=BDOS[o.bdoId];
-      const stageLabel = o.outcome==='won' ? 'Closed · Won' : o.outcome==='lost' ? 'Closed · Lost' : o.stage;
       const days = o.outcome==='open' ? currentDaysInStage(o) : null;
       return '<tr onclick="location.hash=\'#/opp/'+o.id+'\'">'+
         '<td class="name">'+esc(o.name)+'</td>'+
         '<td class="sec">'+esc(acct.name)+'</td>'+
         '<td class="sec">'+esc(owner?owner.name:'')+'</td>'+
-        '<td class="sec">'+o.productType+'</td>'+
-        '<td class="sec">'+stageLabel+'</td>'+
+        '<td class="sec">'+productTagHtml(o.productType)+'</td>'+
+        '<td class="sec">'+stageTagHtml(o)+'</td>'+
         '<td class="num" data-sort="'+o.facilitySize+'">'+moneyPlain(o.facilitySize)+'</td>'+
         '<td class="sec" data-sort="'+esc(o.expectedCloseDate||'')+'">'+fmtDate(o.expectedCloseDate)+'</td>'+
         '<td class="num"'+(days!=null?' data-sort="'+days+'"':'')+'>'+(days!=null?days:'—')+'</td>'+
@@ -48417,8 +48619,8 @@ function renderPipeline(){
         SEGMENTS.map(s=>'<button class="chip'+(s.key===PIPE_SEGMENT?' active':'')+'" onclick="setPipeSegment(\''+s.key+'\')">'+s.label+'</button>').join('')+
       '</div>'+
       '<div class="viewtoggle">'+
-        '<button class="'+(PIPE_VIEW==='list'?'active':'')+'" onclick="setPipeView(\'list\')">List</button>'+
-        '<button class="'+(PIPE_VIEW==='kanban'?'active':'')+'" onclick="setPipeView(\'kanban\')">Board</button>'+
+        '<button class="'+(PIPE_VIEW==='list'?'active':'')+'" aria-pressed="'+(PIPE_VIEW==='list')+'" onclick="setPipeView(\'list\')">List</button>'+
+        '<button class="'+(PIPE_VIEW==='kanban'?'active':'')+'" aria-pressed="'+(PIPE_VIEW==='kanban')+'" onclick="setPipeView(\'kanban\')">Board</button>'+
       '</div>'+
     '</div>'+
     (PIPE_VIEW==='kanban' ? kanbanHtml : listHtml);
@@ -48454,6 +48656,21 @@ function stageStatusText(o){
    an empty cls means "not reached". Outcome states are read off the record, never faked —
    a lost deal fills only to lostAtStage and leaves Closed unreached. */
 const TRACK_STAGES = ['Qualification','Analysis','Proposal','Underwriting'];
+/* D103: the bounded colour layer's two data-only consumers. stageTagHtml() covers the open
+   stages (the same st-N ramp the track uses, keyed the same way) plus the Closed Won/Lost
+   case, which stays on --pos/--neg rather than joining the ramp, per the ruling. PRODUCT_CAT
+   maps Factoring/ABL/TermLoan to cat-a/-b/-c in the order CLAUDE.md §2 lists them, an
+   ASSUMPTION, not ruled; see PROJECT_STATE D103 commit log for what to confirm or swap. */
+function stageTagHtml(o){
+  if(o.outcome==='won') return '<span class="tag pos">Closed · Won</span>';
+  if(o.outcome==='lost') return '<span class="tag neg">Closed · Lost</span>';
+  const idx = TRACK_STAGES.indexOf(o.stage);
+  return '<span class="tag st-'+(idx+1)+'">'+esc(o.stage)+'</span>';
+}
+const PRODUCT_CAT = {Factoring:'cat-a', ABL:'cat-b', TermLoan:'cat-c'};
+function productTagHtml(productType){
+  return '<span class="tag '+(PRODUCT_CAT[productType]||'neutral')+'">'+esc(productType)+'</span>';
+}
 /* Two defs, one per direction, so the audit trail distinguishes progression from regression
    rather than flattening both into a generic "stage changed". Where deals fall backward is
    itself signal — a stage that keeps getting kicked back is a stall the exec view should be
@@ -48511,7 +48728,11 @@ function renderStageTrackHtml(o){
        node beyond them, so they follow their own node — which is what makes a won deal read
        as filled edge to edge and leaves an open or lost one short. */
     const last = i===nodes.length-1;
-    html+='<div class="track-stage'+(n.cls?' '+n.cls:'')+(n.moveTo?' move':'')+'"'+attrs+'>'+
+    /* D103: the ramp is keyed by TRACK_STAGES position, not by .cls. The Closed node (index -1
+       here) never gets one, so .won/.lost stay exactly on --pos/--neg with no st-N to collide. */
+    const stIdx = TRACK_STAGES.indexOf(n.stage);
+    const stCls = stIdx>=0 ? ' st-'+(stIdx+1) : '';
+    html+='<div class="track-stage'+(n.cls?' '+n.cls:'')+stCls+(n.moveTo?' move':'')+'"'+attrs+'>'+
       '<div class="track-row">'+
         '<div class="track-seg l'+(reached(i)?' fill':'')+'"></div>'+
         '<div class="track-seg r'+((last?reached(i):reached(i+1))?' fill':'')+'"></div>'+
@@ -48837,6 +49058,24 @@ window.setOppSection = function(key){
   OPP_SECTION = key;
   if(OPP_SECTION_FOR) renderOpp(OPP_SECTION_FOR);
 };
+/* D107: WAI-ARIA APG's automatic-activation tabs pattern. ArrowLeft/ArrowRight both move focus
+   and activate, wrapping at either end. renderOpp() replaces the whole panel on activation, so
+   the pressed button is gone by the time the new one exists; re-query after the fact rather than
+   holding a reference across the re-render. */
+document.addEventListener('keydown', function(e){
+  if(e.key!=='ArrowLeft' && e.key!=='ArrowRight') return;
+  const btn = e.target.closest && e.target.closest('.section-nav-item');
+  if(!btn) return;
+  const items = Array.from(btn.closest('.section-nav').querySelectorAll('.section-nav-item'));
+  const idx = items.indexOf(btn);
+  const nextKey = items[e.key==='ArrowRight' ? (idx+1)%items.length : (idx-1+items.length)%items.length].dataset.key;
+  e.preventDefault();
+  setOppSection(nextKey);
+  requestAnimationFrame(()=>{
+    const fresh = document.querySelector('.section-nav-item[aria-selected="true"]');
+    if(fresh) fresh.focus();
+  });
+});
 
 /* D61 pattern, built once and reused twice (Decline Reason below, Closed Lost Reason in
    sectionOutcomeHtml): a governed picklist paired with a free-text explanation that's required
@@ -49110,6 +49349,17 @@ function renderOpp(id){
   const contacts = CONTACTS_BY_ACCT[o.accountId] || [];
   const docs = DOCS_BY_OPP[o.id] || [];
   const acts = (ACTS_BY_OPP[o.id] || []).slice().sort((a,b)=>b.date.localeCompare(a.date));
+  /* D107: each tab's count, read from the same source its own section body reads, never a
+     second count that could drift from what the tab actually shows on click. Details carries
+     no count, it's the overview, not a collection. */
+  const sectionCounts = {
+    network: (EDGES_BY_ACCT[o.accountId]||[]).length,
+    intelligence: (LIENS_BY_ACCT[o.accountId]||[]).length,
+    contacts: contacts.length,
+    activity: acts.length,
+    documents: docs.length,
+    audit: (AUDIT_BY_OPP[o.id]||[]).length,
+  };
 
   const recId = registerRecord(o.id, o);
   // Re-render the page and, if a card modal is open for this record (the Deal card modal is the
@@ -49137,9 +49387,16 @@ function renderOpp(id){
   else if(OPP_SECTION==='audit') sectionBody = auditPanelHtml(o);
   else sectionBody = sectionDetailsHtml(o, recId, acct);
 
-  const navHtml = '<div class="section-nav">'+OPP_SECTIONS.map(s=>
-    '<div class="section-nav-item'+(OPP_SECTION===s.key?' active':'')+'" onclick="setOppSection(\''+s.key+'\')">'+s.label+'</div>'
-  ).join('')+'</div>';
+  const navHtml = '<div class="section-nav" role="tablist">'+
+    '<div class="section-nav-marker" id="section-nav-marker"></div>'+
+    OPP_SECTIONS.map(s=>{
+      const active = OPP_SECTION===s.key;
+      const count = sectionCounts[s.key];
+      const countHtml = count!=null ? ' <span class="section-nav-count">'+count+'</span>' : '';
+      return '<button type="button" class="section-nav-item" role="tab" aria-selected="'+active+'" '+
+        'tabindex="'+(active?'0':'-1')+'" data-key="'+s.key+'" onclick="setOppSection(\''+s.key+'\')">'+
+        esc(s.label)+countHtml+'</button>';
+    }).join('')+'</div>';
 
   document.getElementById('view-opp').innerHTML =
     '<div class="opp-header">'+
@@ -49157,6 +49414,7 @@ function renderOpp(id){
 
     oppMetricStripHtml(o, acct)+
     '<div class="record-main">'+navHtml+sectionBody+'</div>';
+  positionTabMarker();
 
   /* Pack (and align) only when sectionDetailsHtml() actually emitted a flat, unpacked grid — a
      record's first arrival at Details, or the rendered card set changing (Outcome appearing) —
