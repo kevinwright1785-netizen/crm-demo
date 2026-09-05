@@ -142,10 +142,19 @@ h1,h2,h3,p,dl,dd{margin:0}
 .roletoggle button:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
 .roletoggle button.active{background:var(--paper);color:var(--ink);box-shadow:var(--lift-thumb)}
 
-.btn{height:var(--h);padding:0 11px;font-size:12px;color:var(--ink-2);background:transparent;
-  border:1px solid var(--line-2);border-radius:var(--r-s);display:inline-flex;align-items:center;
-  gap:var(--s1);transition:background .12s var(--ease),border-color .12s var(--ease),color .12s var(--ease)}
-.btn:hover{background:var(--paper);border-color:var(--ink-3);color:var(--ink)}
+/* D125: button hierarchy. .btn with no modifier IS the secondary style, the default for every
+   button in the app except the shell's single "+ New" (ratified as the shell's own primary, a
+   separate category from page-content primaries). Secondary: --paper fill, --line-2 border,
+   --ink text, hover --hover. Primary (.btn.primary below): --brand fill, --paper text, hover
+   --brand-2. Both share --h, --r-s, 13px/500 and this same horizontal padding. Padding moved
+   onto the 4pt scale (was a bare 11px) while this rule was already being rewritten for the
+   ruling. */
+.btn{height:var(--h);padding:0 var(--s3);font-size:13px;font-weight:500;color:var(--ink);
+  background:var(--paper);border:1px solid var(--line-2);border-radius:var(--r-s);
+  display:inline-flex;align-items:center;gap:var(--s1);
+  transition:background var(--t-fast) var(--ease),border-color var(--t-fast) var(--ease),color var(--t-fast) var(--ease)}
+.btn:hover{background:var(--hover)}
+.btn:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
 .btn.primary{background:var(--brand);border-color:var(--brand);color:var(--paper)}
 .btn.primary:hover{background:var(--brand-2);border-color:var(--brand-2);color:var(--paper)}
 .btn.ghost{border-color:transparent}
@@ -183,6 +192,18 @@ h1,h2,h3,p,dl,dd{margin:0}
   color:var(--brand);opacity:0;transition:opacity var(--t-fast) var(--ease);pointer-events:none}
 .met.expandable:hover .met-view,.met.expandable:focus-visible .met-view{opacity:1}
 
+/* D124: verdict block, BDO Home only. Sits on .panel's own surface (--paper/--line/--r-l), a
+   tier-1 element rather than a second shadowed one competing with the strip's tier-2 --lift
+   slot right below it. Reuses .met-view for its own hover-revealed "view" affordance, same
+   trigger pattern as .met.expandable, its own selector since the block isn't a strip cell. */
+.verdict-block{padding:var(--s4) var(--s5);display:flex;align-items:baseline;gap:var(--s3);
+  flex-wrap:wrap;cursor:pointer;transition:background var(--t-fast) var(--ease)}
+.verdict-block:hover{background:var(--hover)}
+.verdict-block:hover .met-view,.verdict-block:focus-visible .met-view{opacity:1}
+.verdict-figure{font-family:var(--ui);font-size:29px;font-weight:500;letter-spacing:-.03em;color:var(--ink)}
+.verdict-figure .cur,.verdict-figure .un{font-size:.66em;font-weight:400;color:var(--ink-2)}
+.verdict-context{font-size:12px;color:var(--ink-3)}
+
 /* ---------- panels ---------- */
 .panel{position:relative;background:var(--paper);border:1px solid var(--line);border-radius:var(--r-l);margin-bottom:var(--s5)}
 .panel-header{padding:var(--s4) var(--s5) var(--s3);display:flex;align-items:flex-start;gap:var(--s3)}
@@ -193,7 +214,8 @@ h1,h2,h3,p,dl,dd{margin:0}
 .panel-body.flush{padding:0}
 .panel-footer{border-top:1px solid var(--line);padding:var(--s3) var(--s5);font-size:12px;color:var(--ink-3);
   display:flex;align-items:center}
-.panel-footer .drill{margin-left:auto;color:var(--brand);font-weight:500;cursor:pointer}
+.drill{color:var(--brand);font-weight:500;cursor:pointer}
+.panel-footer .drill{margin-left:auto}
 /* minmax(0,...) on both tracks: without it a wide child (a table, a long unbroken title) can
    blow a grid track past the viewport. Same fix the record layout needed in round 2. */
 .two-col{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:var(--s5)}
@@ -412,16 +434,25 @@ h1,h2,h3,p,dl,dd{margin:0}
 
 .scrim{position:fixed;inset:0;z-index:80;background:var(--scrim);display:flex;
   align-items:flex-start;justify-content:center;padding:var(--s7) var(--s5);overflow-y:auto}
-.modal{background:var(--paper);border-radius:var(--r-l);box-shadow:var(--lift-hi);
-  width:100%;max-width:880px;outline:none}
-.modal-head{display:flex;align-items:flex-start;gap:var(--s4);padding:var(--s5) var(--s5) var(--s4)}
+.modal{background:var(--paper);border-radius:var(--r-m);box-shadow:var(--lift-hi);
+  width:100%;max-width:640px;max-height:84vh;display:flex;flex-direction:column;outline:none}
+.modal-head{display:flex;align-items:flex-start;gap:var(--s4);padding:var(--s5) var(--s5) var(--s3);
+  flex:0 0 auto;border-bottom:1px solid transparent}
+/* D119: no divider under the header by default; a hairline appears only once the body actually
+   scrolls (toggled in openModal/refreshModalIfOpen). Transparent-by-default rather than
+   none/none so the hairline's arrival never shifts layout. */
+.modal-head.scrolled{border-bottom-color:var(--line)}
 .modal-head-text{flex:1;min-width:0}
-.modal-title{font-family:var(--ui);font-size:20px;letter-spacing:-.01em;color:var(--ink)}
+.modal-title{font-family:var(--ui);font-size:19px;font-weight:500;letter-spacing:-.01em;color:var(--ink)}
 .modal-scope{font-size:12px;color:var(--ink-3);margin-top:var(--s1)}
 .modal-close{height:var(--h);width:var(--h);border:1px solid var(--line-2);border-radius:var(--r-s);
   background:var(--paper);color:var(--ink-2);font-size:14px;line-height:1;flex:0 0 auto}
 .modal-close:hover{background:var(--sunken);color:var(--ink)}
-.modal-body{padding:0 var(--s5) var(--s5)}
+.modal-body{padding:0 var(--s5) var(--s5);flex:1;min-height:0;overflow-y:auto}
+/* D119: right-aligned, secondary then primary. No divider by default, matching the header.
+   Quick-create (its first consumer) never overflows the 84vh body, so there's nothing for a
+   scrolled-state footer hairline to react to yet; revisit if a future footer consumer does. */
+.modal-footer{display:flex;align-items:center;gap:var(--s3);padding:var(--s4) var(--s5);flex:0 0 auto}
 .modal-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s5);
   padding:var(--s4) 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
   margin-bottom:var(--s4)}
@@ -948,13 +979,28 @@ table.tbl{width:100%;border-collapse:collapse}
 .newmenu-item-title{font-size:12.5px;font-weight:500;color:var(--ink)}
 .newmenu-item-sub{font-size:11px;color:var(--ink-3);margin-top:var(--s1)}
 
-/* ---------- forms (manual create) ---------- */
+/* ---------- forms (quick-create, D105) ---------- */
 .form-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:var(--s4) var(--s5)}
 .form-field label{display:block;font-size:11px;font-weight:500;color:var(--ink-3);margin-bottom:var(--s1)}
 .form-field input,.form-field select{width:100%;height:var(--h);padding:0 var(--s3);
   border:1px solid var(--line-2);border-radius:var(--r-s);background:var(--paper);color:var(--ink);font-size:12.5px}
+.form-field.span-2{grid-column:span 2}
+.form-field.has-error input,.form-field.has-error select{border-color:var(--neg)}
+.form-field-error{font-size:11px;color:var(--neg);margin-top:var(--s1)}
+.form-field-hint{font-size:11px;color:var(--ink-3);margin-top:var(--s1)}
 .form-section-label{font-size:11px;font-weight:500;color:var(--ink-3);margin:var(--s5) 0 var(--s3)}
 .form-section-label:first-child{margin-top:0}
+/* Product-type picker (quick-create, D105): three selectable controls reusing the .tag
+   component's own colour logic (--cat-a/-b/-c) rather than a new chip family. Unselected state
+   is carried by :not() (specificity (0,0,3,0)) so it wins over .tag.cat-a's background
+   ((0,0,2,0)) without depending on source order; selecting a product just adds/removes the
+   .cat-* class and the plain .tag.cat-* rule takes over unchanged. */
+.prodpick-row{display:flex;gap:var(--s2);flex-wrap:wrap}
+.prodpick{height:var(--h);padding:0 var(--s3);cursor:pointer;border:1px solid transparent;
+  transition:background var(--t-fast) var(--ease),border-color var(--t-fast) var(--ease),color var(--t-fast) var(--ease)}
+.prodpick:not(.cat-a):not(.cat-b):not(.cat-c){background:var(--paper);border-color:var(--line-2);color:var(--ink-2)}
+.prodpick:not(.cat-a):not(.cat-b):not(.cat-c):hover{border-color:var(--ink-3);color:var(--ink)}
+.prodpick:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
 
 /* ---------- scenario picker ---------- */
 .scenario-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s4)}
@@ -1022,9 +1068,9 @@ table.tbl{width:100%;border-collapse:collapse}
       <div class="newmenu-wrap">
         <button class="btn primary" id="newmenu-btn" onclick="toggleNewMenu(event)">+ New</button>
         <div class="newmenu" id="newmenu" style="display:none">
-          <div class="newmenu-item" onclick="closeNewMenu();location.hash='#/create'">
+          <div class="newmenu-item" onclick="closeNewMenu();resetQuickCreate();openModal('quickCreate')">
             <div class="newmenu-item-title">Manual entry</div>
-            <div class="newmenu-item-sub">Blank form — create an Account + Opportunity yourself</div>
+            <div class="newmenu-item-sub">A short modal for the fields only you know, the rest finishes on the record</div>
           </div>
           <div class="newmenu-item" onclick="closeNewMenu();location.hash='#/intake'">
             <div class="newmenu-item-title">Drop documents</div>
@@ -1042,7 +1088,6 @@ table.tbl{width:100%;border-collapse:collapse}
       <div class="view" id="view-home"></div>
       <div class="view" id="view-pipeline"></div>
       <div class="view" id="view-opp"></div>
-      <div class="view" id="view-create"></div>
       <div class="view" id="view-intake"></div>
       <div class="view" id="view-accounts"></div>
       <div class="view" id="view-network"></div>
@@ -45742,10 +45787,6 @@ const INDUSTRIES = [
   { code: '2131', name: 'Energy Services' },
   { code: '3399', name: 'Consumer Products' },
 ];
-const CITY_STATE = ['Charlotte, NC','New York, NY','Chicago, IL','Dallas, TX','Atlanta, GA','Los Angeles, CA',
-  'Denver, CO','Boston, MA','Houston, TX','Philadelphia, PA','Minneapolis, MN','Phoenix, AZ',
-  'Nashville, TN','Columbus, OH','Cincinnati, OH','Milwaukee, WI','Kansas City, MO','Indianapolis, IN',
-  'Memphis, TN','Salt Lake City, UT'];
 const CLOSED_LOST_REASONS = {
   Qualification: ['Not a fit — product/segment mismatch', 'Unresponsive / went dark', 'Deal size below minimum'],
   Analysis: ['Financials disqualified', 'Went with incumbent bank', 'Timing — not ready'],
@@ -45847,12 +45888,12 @@ const PDEF = {
   arAdvanceRatePct: pdef('arAdvanceRatePct','AR Advance Rate','percent'),
   inventoryAdvanceRatePct: pdef('inventoryAdvanceRatePct','Inventory Advance Rate','percent'),
   collateralTypes: pdef('collateralTypes','Collateral Types','multiselect',['AR','Inventory','M&E','RE']),
-  rateSpreadBps: pdef('rateSpreadBps','Rate','number',null,{format:v=>v==null?'—':'SOFR + '+v+' bps'}),
+  rateSpreadBps: pdef('rateSpreadBps','Rate','number',null,{format:v=>v==null?'–':'SOFR + '+v+' bps'}),
   fieldExamStatus: pdef('fieldExamStatus','Field Exam Status','select',['Not Started','Scheduled','In Progress','Complete']),
   primaryCovenant: pdef('primaryCovenant','Primary Covenant','text'),
   rateType: pdef('rateType','Rate Type','select',['Fixed','Floating']),
   fixedRatePct: pdef('fixedRatePct','Fixed Rate','percent'),
-  termMonths: pdef('termMonths','Term','select',[24,36,48,60,72,84],{format:v=>v==null?'—':v+' months'}),
+  termMonths: pdef('termMonths','Term','select',[24,36,48,60,72,84],{format:v=>v==null?'–':v+' months'}),
   amortizationType: pdef('amortizationType','Amortization','select',['Straight-line','Interest-only w/ bullet','Custom']),
   maturityDate: pdef('maturityDate','Maturity','date'),
   seniority: pdef('seniority','Seniority','select',['Senior','Unitranche','Subordinated']),
@@ -46081,7 +46122,6 @@ function route(){
     home: ROLE==='bdo' ? 'BDO Home' : 'Exec Home',
     pipeline: 'Pipeline',
     opp: 'Opportunity',
-    create: 'New Opportunity',
     intake: 'New Opportunity',
     accounts: 'Accounts',
     network: 'Network',
@@ -46119,7 +46159,6 @@ function route(){
        same-page re-renders don't hit this, the container is already visible by then. */
     positionTabMarker();
   }
-  else if(view==='create'){ CREATE_PRODUCT='Factoring'; CREATE_ACCT_MODE='new'; CREATE_RATETYPE='Fixed'; renderCreate(); showView('view-create'); }
   else if(view==='intake'){ renderIntake(id); showView('view-intake'); }
   else if(view==='accounts'){ renderStub('view-accounts','Accounts','Prospect and Partner account records — list and record views. Not built in this skeleton pass; see PROJECT_STATE.md §12.'); showView('view-accounts'); }
   else if(view==='network'){ renderStub('view-network','Network','The full trade-relationship graph explorer. This pass wires network insight into the Opportunity record only; the standalone explorer is next.'); showView('view-network'); }
@@ -46611,6 +46650,7 @@ window.openModal = function(key, view){
         '<div class="modal-scope">'+d.scope+'</div>'+
       '</div><button type="button" class="modal-close" aria-label="Close">&#10005;</button></div>'+
       '<div class="modal-body">'+d.body+'</div>'+
+      (d.footer ? '<div class="modal-footer">'+d.footer+'</div>' : '')+
     '</div>';
   document.body.appendChild(scrim);
   lockScroll();
@@ -46618,6 +46658,14 @@ window.openModal = function(key, view){
   scrim.querySelector('.modal-close').addEventListener('click', closeModal);
   scrim.addEventListener('mousedown', e=>{ if(e.target===scrim) closeModal(); });
   box.focus();
+
+  /* D119 scrolled-state header hairline: only the .modal-body scrolls (the shell is capped at
+     84vh), so this is the one place scroll position is actually known. */
+  const modalBodyEl = scrim.querySelector('.modal-body');
+  const modalHeadEl = scrim.querySelector('.modal-head');
+  const syncModalScrollState = ()=> modalHeadEl.classList.toggle('scrolled', modalBodyEl.scrollTop > 0);
+  modalBodyEl.addEventListener('scroll', syncModalScrollState);
+  syncModalScrollState();
 
   /* focus trap: Tab cycles only within the dialog while it is open */
   scrim.addEventListener('keydown', function(e){
@@ -46664,6 +46712,14 @@ function refreshModalIfOpen(key){
      it's describing. */
   const scope = scrim.querySelector('.modal-scope');
   if(scope) scope.innerHTML = d.scope;
+  /* Footer only exists on modals that had one at open time (quick-create today); every other
+     MODALS.* entry returns no `footer` and this is a no-op for them. */
+  const footer = scrim.querySelector('.modal-footer');
+  if(footer && d.footer) footer.innerHTML = d.footer;
+  /* Rebuilding .modal-body's content can change whether it overflows, so the D119 scrolled-state
+     hairline (openModal) needs re-checking here too, not just on initial open. */
+  const head = scrim.querySelector('.modal-head');
+  if(body && head) head.classList.toggle('scrolled', body.scrollTop > 0);
 }
 
 /* ---------- quota progress ----------
@@ -47305,6 +47361,9 @@ function renderHome(){
   const winByCountPrior = closedPriorN ? myWonPriorT12.length/closedPriorN : 0;
   const inUW = myOpen.filter(o=>o.stage==='Underwriting');
   const inUWValue = inUW.reduce((s,o)=>s+o.facilitySize,0);
+  /* D124: verdict block's own context line reuses this count, same computation the old strip
+     cell used before Active Pipeline moved out of the strip. */
+  const myOpenAccts = new Set(myOpen.map(o=>o.accountId)).size;
 
   const feed = buildFeed(CURRENT_BDO_ID);
   const agenda = buildAgenda(CURRENT_BDO_ID);
@@ -47326,24 +47385,34 @@ function renderHome(){
       '<span class="dayline-date">'+todayLabel+'</span>'+
       '<span class="dayline-sum">Year to date · your book</span>'+
       '<span class="dayline-sum"><b>'+feed.length+'</b> item'+(feed.length===1?'':'s')+
-        ' need you today · <b>'+moneyShort(pipelineValue)+'</b> active pipeline</span>'+
+        ' need you today</span>'+
     '</div>'+
 
-    /* D115: Active Pipeline and Deals in Underwriting have no change line, deliberately. Both are
-       snapshot totals of deals currently open/at-stage, and an honest prior-period comparison
-       would mean reconstructing which deals were open (or in Underwriting) as of a past date from
-       the full stage-history audit trail, deal by deal. That's a real computation, not a quick
-       one, and out of scope for this pass; flagged here as a dataset question rather than rushed
-       into a fragile reconstruction that risks being wrong in edge cases (a deal that re-entered a
-       stage, for instance). Win Rate and Funded YTD both have a genuine, already-scoped prior
-       window to compare against (see above), so they get real computed change lines. */
-    '<div class="strip strip-4">'+
-      '<div class="met expandable" tabindex="0" onclick="openModal(\'pipeline\')">'+
-        '<div class="met-label">Active Pipeline</div>'+
-        '<div class="met-figure emphasis">'+money(pipelineValue)+'</div>'+
-        '<div class="met-sub">'+myOpen.length+' open deals · '+
-          new Set(myOpen.map(o=>o.accountId)).size+' accounts</div>'+
-        '<span class="met-view">View</span></div>'+
+    /* D124: verdict block, BDO Home only. Active Pipeline lifted out of the strip into its own
+       block so the figure is said once, directly under the state-of-day line. A .panel (same
+       --paper/--line/--r-l on-page surface as every other top-level card, §3a) rather than a
+       shadowed tier-2 element, since the strip right below it already holds the page's one
+       tier-2 (--lift) slot, see BUILD_LOG for the correction from the task brief's literal
+       "--r-m" (that token is §3a's floating-surface radius, not the right tier for an on-page
+       block; --r-l is). Figure size 29px reuses the existing .met-figure.emphasis value (the
+       size Active Pipeline already rendered at inside the old strip) rather than introducing a
+       new type-scale rung, which stays deferred/coupled per §4a. Keeps Active Pipeline's own
+       click-to-open target and the D115 hover "view" affordance, since it is still expandable. */
+    '<div class="panel verdict-block" tabindex="0" onclick="openModal(\'pipeline\')">'+
+      '<div class="verdict-figure">'+money(pipelineValue)+'</div>'+
+      '<div class="verdict-context">active pipeline · '+myOpen.length+' open deal'+(myOpen.length===1?'':'s')+
+        ' across '+myOpenAccts+' account'+(myOpenAccts===1?'':'s')+' · '+moneyShort(inUWValue)+' at the credit gate</div>'+
+      '<span class="met-view">View</span></div>'+
+
+    /* D115: Deals in Underwriting has no change line, deliberately: a snapshot total of deals
+       currently at that stage, and an honest prior-period comparison would mean reconstructing
+       which deals were in Underwriting as of a past date from the full stage-history audit
+       trail, deal by deal. That's a real computation, not a quick one, and out of scope for this
+       pass; flagged here as a dataset question rather than rushed into a fragile reconstruction
+       that risks being wrong in edge cases (a deal that re-entered a stage, for instance). Win
+       Rate and Funded YTD both have a genuine, already-scoped prior window to compare against
+       (see above), so they get real computed change lines. */
+    '<div class="strip strip-3">'+
       '<div class="met expandable" tabindex="0" onclick="openModal(\'underwriting\')">'+
         '<div class="met-label">Deals in Underwriting</div>'+
         '<div class="met-figure">'+inUW.length+'</div>'+
@@ -50215,139 +50284,194 @@ window.completeIntake = function(){
 };
 
 /* ================================================================
-   MANUAL CREATE — the third "+ New" path: a blank form that creates
-   Account + Opportunity together in one motion (D6: no Lead object).
+   QUICK-CREATE (D105), the "+ New" > Manual entry path. A six-field
+   modal, drawn on the D119 shell, that creates Account + Opportunity
+   together in one motion (D6: no Lead object) and hands everything
+   else to the record's own inline-edit engine (CLAUDE.md §2c Rule 3:
+   field cost is required rep entry, not field count). Replaces the
+   old full-page form (#/create), which asked for industry, location,
+   owner, expected close, use of proceeds, and every product-specific
+   term up front, all of it either arrives populated by default or is
+   completed inline on the created record, never blocking creation.
+
+   State lives in QC, reset fresh on every open (resetQuickCreate) so
+   a Cancel never leaks into the next open. Every field writes through
+   to QC on input/change, whether or not that change triggers a full
+   re-render, so a re-render triggered by one field (Product type,
+   Source) never loses what was typed into another (Account name,
+   Facility): the render function always derives its markup from QC,
+   never reads stale DOM after the fact.
    ================================================================ */
-let CREATE_PRODUCT = 'Factoring';
-let CREATE_ACCT_MODE = 'new';
-let CREATE_RATETYPE = 'Fixed';
-
-function productDefsFor(productType){
-  if(productType==='Factoring') return [PDEF.advanceRatePct,PDEF.recourse,PDEF.notification,PDEF.discountFeePct,PDEF.estMonthlyARVolume,PDEF.debtorConcentrationPct];
-  if(productType==='ABL') return [PDEF.arAdvanceRatePct,PDEF.inventoryAdvanceRatePct,PDEF.collateralTypes,PDEF.rateSpreadBps,PDEF.fieldExamStatus,PDEF.primaryCovenant];
-  const rateDef = CREATE_RATETYPE==='Fixed' ? PDEF.fixedRatePct : PDEF.rateSpreadBps;
-  return [PDEF.rateType, rateDef, PDEF.termMonths, PDEF.amortizationType, PDEF.maturityDate, PDEF.seniority, PDEF.securedStatus, PDEF.callProtection];
+let QC = null;
+window.resetQuickCreate = function(){
+  QC = {
+    acctName: '', product: 'Factoring', name: '', nameEdited: false,
+    facility: null, source: 'Outbound Prospecting', referralPartnerId: '',
+    errors: {},
+  };
+};
+function qcResolveAccount(){
+  const typed = QC.acctName.trim();
+  if(!typed) return null;
+  return D.prospects.find(p=>p.name.toLowerCase()===typed.toLowerCase()) || null;
 }
-function accountOptionsHtml(){
-  const sorted = D.prospects.slice().sort((a,b)=>a.name.localeCompare(b.name));
-  return '<option value="">Select an account&hellip;</option>'+
-    sorted.map(p=>'<option value="'+p.id+'">'+esc(p.name)+'</option>').join('');
+/* Byte-consistent with data/generate.js's own opportunity-naming template
+   (`${prospect.name} – ${productType}`, en dash, raw productType with no
+   space) so a manually created deal is indistinguishable in any list from
+   a generated one. The old form's fallback used an em dash instead and
+   was never actually consistent with the generator; not carried forward. */
+function qcDefaultName(){
+  const acct = qcResolveAccount();
+  const acctName = acct ? acct.name : QC.acctName.trim();
+  return acctName ? acctName+' – '+QC.product : '';
 }
-window.setCreateAcctMode = function(mode){ CREATE_ACCT_MODE=mode; renderCreate(); };
-window.setCreateProduct = function(pt){ CREATE_PRODUCT=pt; CREATE_RATETYPE='Fixed'; renderCreate(); };
-window.setCreateRateType = function(rt){ CREATE_RATETYPE=rt; renderCreate(); };
+function qcAccountListHtml(){
+  return D.prospects.slice().sort((a,b)=>a.name.localeCompare(b.name))
+    .map(p=>'<option value="'+esc(p.name)+'">').join('');
+}
+window.setQcAccountName = function(v){
+  QC.acctName = v;
+  if(v.trim()) qcClearFieldError('acctName');
+  if(!QC.nameEdited){
+    QC.name = qcDefaultName();
+    const nameEl = document.getElementById('qc_name');
+    if(nameEl) nameEl.value = QC.name;
+    if(QC.name.trim()) qcClearFieldError('name');
+  }
+};
+window.setQcProduct = function(p){
+  QC.product = p;
+  if(!QC.nameEdited) QC.name = qcDefaultName();
+  refreshModalIfOpen('quickCreate');
+};
+window.setQcName = function(v){
+  QC.name = v; QC.nameEdited = true;
+  if(v.trim()) qcClearFieldError('name');
+};
+window.setQcFacility = function(v){
+  const n = parseFloat(v);
+  QC.facility = isNaN(n) ? null : n;
+  if(QC.facility!=null) qcClearFieldError('facility');
+};
+window.setQcSource = function(v){
+  QC.source = v;
+  if(v) qcClearFieldError('source');
+  if(v!=='Partner-Referred') delete QC.errors.referralPartnerId;
+  refreshModalIfOpen('quickCreate');
+};
+window.setQcReferralPartner = function(v){
+  QC.referralPartnerId = v;
+  if(v) qcClearFieldError('referralPartnerId');
+};
 
-function renderCreate(){
-  const el = document.getElementById('view-create');
-  const prodDefs = productDefsFor(CREATE_PRODUCT);
-  el.innerHTML =
-    '<h1 class="page-heading">New Opportunity — Manual Entry</h1>'+
-    '<div class="page-sub">Create the Account and Opportunity together, in one motion — no Lead object</div>'+
-    '<div class="panel"><div class="panel-body pad-top">'+
-
-      '<div class="form-section-label">Account</div>'+
-      '<div class="chipbar tight">'+
-        '<button class="chip'+(CREATE_ACCT_MODE==='new'?' active':'')+'" onclick="setCreateAcctMode(\'new\')">New account</button>'+
-        '<button class="chip'+(CREATE_ACCT_MODE==='existing'?' active':'')+'" onclick="setCreateAcctMode(\'existing\')">Existing account</button>'+
-      '</div>'+
+function qcValidate(){
+  const errors = {};
+  if(!QC.acctName.trim()) errors.acctName = 'Enter an account name.';
+  if(QC.facility==null) errors.facility = 'Enter a facility size.';
+  if(!QC.name.trim()) errors.name = 'Enter an opportunity name.';
+  if(!QC.source) errors.source = 'Choose a source.';
+  if(QC.source==='Partner-Referred' && !QC.referralPartnerId) errors.referralPartnerId = 'Choose a referral partner.';
+  QC.errors = errors;
+  return Object.keys(errors).length===0;
+}
+function qcFieldHtml(id, label, inputHtml, opts){
+  opts = opts || {};
+  const err = QC.errors[id];
+  return '<div class="form-field'+(opts.span2?' span-2':'')+(err?' has-error':'')+'" id="qc-field-'+id+'">'+
+    '<label>'+label+'</label>'+inputHtml+
+    (err ? '<div class="form-field-error">'+esc(err)+'</div>' : '')+
+  '</div>';
+}
+/* Clears one field's error the moment its value becomes valid, not just on the next submit
+   attempt. Needed because acctName/facility/name write through to QC without a full re-render
+   (so typing stays responsive, see the section comment above): without this, fixing one of
+   those fields after a failed submit would leave its red border and message stranded until some
+   OTHER field happened to trigger a re-render. Direct DOM edit, not a re-render, for the same
+   typing-responsiveness reason those setters avoid one. */
+function qcClearFieldError(id){
+  if(!QC.errors[id]) return;
+  delete QC.errors[id];
+  const wrap = document.getElementById('qc-field-'+id);
+  if(!wrap) return;
+  wrap.classList.remove('has-error');
+  const msg = wrap.querySelector('.form-field-error');
+  if(msg) msg.remove();
+}
+MODALS.quickCreate = function(){
+  const productBtns = ['Factoring','ABL','TermLoan'].map(p=>
+    '<button type="button" class="tag prodpick'+(QC.product===p?' '+(PRODUCT_CAT[p]||'neutral'):'')+'" onclick="setQcProduct(\''+p+'\')">'+esc(p)+'</button>'
+  ).join('');
+  const showReferralPartner = QC.source==='Partner-Referred';
+  return {
+    title: 'New opportunity',
+    scope: 'Account + Opportunity, created together. Everything else finishes on the record',
+    body:
       '<div class="form-grid">'+
-        (CREATE_ACCT_MODE==='new'
-          ? '<div class="form-field"><label>Account Name</label><input type="text" id="cf_acct_name" placeholder="Borrower legal name"></div>'+
-            '<div class="form-field"><label>Industry</label><select id="cf_acct_industry">'+INDUSTRIES.map(i=>'<option value="'+esc(i.name)+'">'+esc(i.name)+'</option>').join('')+'</select></div>'+
-            '<div class="form-field"><label>Location</label><select id="cf_acct_location">'+CITY_STATE.map(c=>'<option value="'+esc(c)+'">'+esc(c)+'</option>').join('')+'</select></div>'
-          : '<div class="form-field"><label>Account</label><select id="cf_acct_existing">'+accountOptionsHtml()+'</select></div>')+
-      '</div>'+
-
-      '<div class="form-section-label">Deal</div>'+
-      '<div class="form-grid">'+
-        '<div class="form-field"><label>Opportunity Name</label><input type="text" id="cf_core_name" placeholder="Auto-filled from account + product if left blank"></div>'+
-        '<div class="form-field"><label>Product Type</label><select id="cf_product" onchange="setCreateProduct(this.value)">'+
-          ['Factoring','ABL','TermLoan'].map(p=>'<option value="'+p+'"'+(p===CREATE_PRODUCT?' selected':'')+'>'+p+'</option>').join('')+
-        '</select></div>'+
-        '<div class="form-field"><label>Facility Size</label>'+controlHtml({type:'money'},'cf_core_facilitySize',null)+'</div>'+
-        '<div class="form-field"><label>Owner</label>'+controlHtml(DEF_INDEX['core.bdoId'],'cf_core_bdoId',CURRENT_BDO_ID)+'</div>'+
-        '<div class="form-field"><label>Expected Close</label>'+controlHtml({type:'date'},'cf_core_expectedCloseDate',addDaysStr(TODAY,90))+'</div>'+
-        '<div class="form-field"><label>Channel</label>'+controlHtml(DEF_INDEX['core.channel'],'cf_core_channel','Outbound Prospecting')+'</div>'+
-        '<div class="form-field"><label>Referral Partner</label>'+controlHtml(DEF_INDEX['core.referralPartnerId'],'cf_core_referralPartnerId','')+'</div>'+
-        '<div class="form-field"><label>Use of Proceeds</label>'+controlHtml(DEF_INDEX['core.useOfProceeds'],'cf_core_useOfProceeds',USE_OF_PROCEEDS[0])+'</div>'+
-      '</div>'+
-
-      '<div class="form-section-label">'+CREATE_PRODUCT+' terms</div>'+
-      '<div class="form-grid">'+
-        prodDefs.map(d=>{
-          const key = d.key.replace('prod.','');
-          const elId = 'cf_prod_'+key;
-          const defaultVal = d.type==='select' ? (d.options[0]?d.options[0].value:null) : null;
-          let ctrl = controlHtml(d, elId, defaultVal);
-          if(key==='rateType') ctrl = ctrl.replace('<select ', '<select onchange="setCreateRateType(this.value)" ');
-          return '<div class="form-field"><label>'+d.label+'</label>'+ctrl+'</div>';
-        }).join('')+
-      '</div>'+
-    '</div>'+
-    '<div class="panel-footer">'+
-      '<span>New Account + Opportunity created in one motion</span>'+
+        qcFieldHtml('acctName','Account',
+          '<input type="text" id="qc_acctName" list="qc-acct-list" placeholder="Type an existing account, or a new borrower name"'+
+            ' value="'+esc(QC.acctName)+'" oninput="setQcAccountName(this.value)">'+
+          '<datalist id="qc-acct-list">'+qcAccountListHtml()+'</datalist>',
+          {span2:true})+
+        qcFieldHtml('product','Product type', '<div class="prodpick-row">'+productBtns+'</div>', {span2:true})+
+        qcFieldHtml('name','Opportunity name',
+          '<input type="text" id="qc_name" value="'+esc(QC.name || qcDefaultName())+'" oninput="setQcName(this.value)">'+
+          '<div class="form-field-hint">Filled from account and product. Edit if you want.</div>',
+          {span2:true})+
+        qcFieldHtml('facility','Requested facility',
+          '<input type="number" step="any" id="qc_facility" value="'+(QC.facility==null?'':QC.facility)+'" oninput="setQcFacility(this.value)">')+
+        qcFieldHtml('source','Source',
+          '<select id="qc_source" onchange="setQcSource(this.value)">'+
+            CHANNELS.map(c=>'<option value="'+esc(c)+'"'+(c===QC.source?' selected':'')+'>'+esc(c)+'</option>').join('')+
+          '</select>')+
+        (showReferralPartner ? qcFieldHtml('referralPartnerId','Referral partner',
+          '<select id="qc_referralPartnerId" onchange="setQcReferralPartner(this.value)">'+
+            '<option value="">Choose a partner&hellip;</option>'+
+            D.partners.map(p=>'<option value="'+p.id+'"'+(p.id===QC.referralPartnerId?' selected':'')+'>'+esc(p.name)+'</option>').join('')+
+          '</select>') : '')+
+      '</div>',
+    footer:
+      '<span class="drill" onclick="closeModal();location.hash=\'#/intake\'">Have documents? Drop them instead.</span>'+
       '<div class="actions-end ml-auto">'+
-        '<button class="btn" onclick="location.hash=\'#/home\'">Cancel</button>'+
-        '<button class="btn primary" onclick="submitCreate()">Create Opportunity</button>'+
-      '</div>'+
-    '</div></div>';
-}
+        '<button type="button" class="btn" onclick="closeModal()">Cancel</button>'+
+        '<button type="button" class="btn primary" onclick="submitQuickCreate()">Create and open</button>'+
+      '</div>',
+  };
+};
+window.submitQuickCreate = function(){
+  if(!qcValidate()){ refreshModalIfOpen('quickCreate'); return; }
 
-window.submitCreate = function(){
-  let acct;
-  if(CREATE_ACCT_MODE==='new'){
-    const name = (document.getElementById('cf_acct_name').value||'').trim();
-    if(!name){ alert('Enter an account name.'); return; }
-    const industryName = document.getElementById('cf_acct_industry').value;
-    const industry = INDUSTRIES.find(i=>i.name===industryName);
-    const location = document.getElementById('cf_acct_location').value;
+  let acct = qcResolveAccount();
+  if(!acct){
     RUNTIME_COUNTER++;
     acct = {
-      id:'acct_c_NEW_'+RUNTIME_COUNTER, name, accountType:'Prospect',
-      industryCode: industry?industry.code:null, industryName, location,
-      employeeCount:null, annualRevenue:null, createdDate:TODAY, domain:null
+      id: 'acct_c_NEW_'+RUNTIME_COUNTER, name: QC.acctName.trim(), accountType: 'Prospect',
+      industryCode: null, industryName: null, location: null,
+      employeeCount: null, annualRevenue: null, createdDate: TODAY, domain: null
     };
-    PROSPECTS[acct.id]=acct;
-  } else {
-    const id = document.getElementById('cf_acct_existing').value;
-    if(!id){ alert('Choose an existing account.'); return; }
-    acct = PROSPECTS[id];
+    PROSPECTS[acct.id] = acct;
   }
 
-  const productType = CREATE_PRODUCT;
-  const facilitySize = controlValue({type:'money'},'cf_core_facilitySize');
-  if(facilitySize==null){ alert('Enter a facility size.'); return; }
-  const nameField = document.getElementById('cf_core_name').value.trim();
-  const referralPartnerId = controlValue(DEF_INDEX['core.referralPartnerId'],'cf_core_referralPartnerId')||null;
-
+  const referralPartnerId = QC.source==='Partner-Referred' ? QC.referralPartnerId : null;
   RUNTIME_COUNTER++;
   const opp = {
     id: 'opp_NEW_'+RUNTIME_COUNTER,
-    name: nameField || (acct.name+' — '+productType),
-    accountId: acct.id, bdoId: controlValue(DEF_INDEX['core.bdoId'],'cf_core_bdoId'),
-    productType, facilitySize, referralPartnerId,
-    channel: controlValue(DEF_INDEX['core.channel'],'cf_core_channel'),
-    industryCode: acct.industryCode, useOfProceeds: controlValue(DEF_INDEX['core.useOfProceeds'],'cf_core_useOfProceeds'),
-    competitors: [], outcome:'open', stage:'Qualification', createdDate:TODAY,
-    expectedCloseDate: controlValue({type:'date'},'cf_core_expectedCloseDate') || addDaysStr(TODAY,90),
-    fundedDate:null, referralDate: referralPartnerId ? TODAY : null,
+    name: QC.name.trim(),
+    accountId: acct.id, bdoId: CURRENT_BDO_ID,
+    productType: QC.product, facilitySize: Math.round(QC.facility), referralPartnerId,
+    channel: QC.source,
+    industryCode: acct.industryCode, useOfProceeds: USE_OF_PROCEEDS[0],
+    competitors: [], outcome: 'open', stage: 'Qualification', createdDate: TODAY,
+    expectedCloseDate: addDaysStr(TODAY,90), fundedDate: null,
+    referralDate: referralPartnerId ? TODAY : null,
     productFields: {}
   };
 
-  productDefsFor(productType).forEach(d=>{
-    const key = d.key.replace('prod.','');
-    opp.productFields[key] = controlValue(d, 'cf_prod_'+key);
-  });
-  if(productType==='TermLoan'){
-    opp.productFields.rateType = CREATE_RATETYPE;
-    if(CREATE_RATETYPE==='Fixed') opp.productFields.rateSpreadBps=null; else opp.productFields.fixedRatePct=null;
-  }
-
-  OPPS[opp.id]=opp;
+  OPPS[opp.id] = opp;
   STAGEHIST[opp.id] = [
     {stage:'Qualification', enteredDate:TODAY, exitedDate:null, durationDays:null},
     {stage:'Qualification', enteredDate:TODAY, exitedDate:null, durationDays:null, terminal:false}
   ];
+  closeModal();
   location.hash = '#/opp/'+opp.id;
 };
 
