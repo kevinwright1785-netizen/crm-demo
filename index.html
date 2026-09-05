@@ -50313,7 +50313,12 @@ window.resetQuickCreate = function(){
 function qcResolveAccount(){
   const typed = QC.acctName.trim();
   if(!typed) return null;
-  return D.prospects.find(p=>p.name.toLowerCase()===typed.toLowerCase()) || null;
+  /* PROSPECTS, not D.prospects: D.prospects is the static array snapshot from the original
+     dataset, and never gains an entry submitQuickCreate adds to the live PROSPECTS object. Read
+     from the static array here, and a quick-created account would be invisible to every
+     subsequent lookup in the same session, creating a fresh duplicate every time its exact name
+     was typed again rather than ever reusing the one already created. */
+  return Object.values(PROSPECTS).find(p=>p.name.toLowerCase()===typed.toLowerCase()) || null;
 }
 /* Byte-consistent with data/generate.js's own opportunity-naming template
    (`${prospect.name} – ${productType}`, en dash, raw productType with no
@@ -50326,7 +50331,10 @@ function qcDefaultName(){
   return acctName ? acctName+' – '+QC.product : '';
 }
 function qcAccountListHtml(){
-  return D.prospects.slice().sort((a,b)=>a.name.localeCompare(b.name))
+  /* PROSPECTS, not D.prospects, for the same reason as qcResolveAccount above: this needs to
+     offer accounts quick-create itself has already created this session, not just the original
+     dataset. */
+  return Object.values(PROSPECTS).sort((a,b)=>a.name.localeCompare(b.name))
     .map(p=>'<option value="'+esc(p.name)+'">').join('');
 }
 window.setQcAccountName = function(v){
