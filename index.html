@@ -760,6 +760,23 @@ table.tbl{width:100%;border-collapse:collapse}
 .tag.cat-b{background:var(--cat-b-soft);color:var(--cat-b-ink)}
 .tag.cat-c{background:var(--cat-c-soft);color:var(--cat-c-ink)}
 
+/* ---------- D106 parts (b)/(c) / D129: return bar ----------
+   A slim bar above the record card, outside it (--page background, no border/shadow of its own)
+   deliberately not inside .opp-header, which is an already-approved surface Kevin chose not to
+   redraw. Removed cleanly and completely once a peek/side panel replaces this whole mechanism
+   (D106's deferred second half). */
+.pipe-return-bar{display:flex;align-items:center;gap:var(--s3);margin-bottom:var(--s4)}
+.pipe-return-right{display:flex;align-items:center;gap:var(--s3);margin-left:auto}
+.pipe-return-pos{font-size:12px;color:var(--ink-3)}
+/* Its own small control family, sized and drawn independently of .btn (D125 governs buttons;
+   this is a compact icon control like .modal-close/.ef-btn, not a button). */
+.pipe-return-arrow{all:unset;box-sizing:border-box;width:24px;height:24px;border:1px solid var(--line-2);
+  border-radius:var(--r-s);color:var(--ink-2);display:inline-flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:14px;line-height:1;transition:background var(--t-fast) var(--ease)}
+.pipe-return-arrow:not([disabled]):hover{background:var(--hover)}
+.pipe-return-arrow:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
+.pipe-return-arrow[disabled]{color:var(--ink-3);background:var(--sunken);cursor:not-allowed}
+
 /* ---------- opportunity record ---------- */
 .opp-header{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-l);padding:var(--s5);
   margin-bottom:var(--s5)}
@@ -46080,14 +46097,31 @@ function positionRailMarker(){
    splicing it into each fresh render in place of the throwaway one the HTML string creates,
    so the same node's transform/width keep changing rather than a new node's initial paint. */
 let SECTION_NAV_MARKER_EL = null;
-function positionTabMarker(){
+/* D106 part (a) found a real D120 bug while landing on a non-Details section for the first time:
+   a fresh navigation calls this twice (once from renderOpp() itself while #view-opp is still
+   display:none, where every offset reads 0, then again from route() after showView() with the
+   real numbers); before this pass every fresh landing's target WAS 0 (Details, the first tab),
+   so the bogus intermediate 0 and the real target were the same value and the bug was invisible.
+   Landing on Network/Intelligence/Activity for the first time exposed it: the marker visibly slid
+   in from Details every time, confirmed by sampling getComputedStyle across animation frames in
+   headless Chrome (reading the code alone would not have caught this, the two calls look
+   correct individually). `instant`, passed only by route()'s post-showView() call, suppresses the
+   transition for that one positioning so arrival is never animated; setOppSection()'s same-page
+   tab clicks and the D129 return-bar/keyboard next-previous calls omit it, so the intended glide
+   between tabs on an already-visible page is untouched. */
+function positionTabMarker(instant){
   const freshMarker = document.getElementById('section-nav-marker');
   if(freshMarker && SECTION_NAV_MARKER_EL && freshMarker!==SECTION_NAV_MARKER_EL){
     freshMarker.replaceWith(SECTION_NAV_MARKER_EL);
   } else if(freshMarker){
     SECTION_NAV_MARKER_EL = freshMarker;
   }
+  if(instant && SECTION_NAV_MARKER_EL) SECTION_NAV_MARKER_EL.style.transition = 'none';
   positionSlidingMarker(SECTION_NAV_MARKER_EL, document.querySelector('.section-nav-item[aria-selected="true"]'), 'x');
+  if(instant && SECTION_NAV_MARKER_EL){
+    void SECTION_NAV_MARKER_EL.offsetWidth; // force the 'none' transition to actually apply first
+    SECTION_NAV_MARKER_EL.style.transition = '';
+  }
 }
 /* Resize covers both markers at once (window width can reflow either the rail or the tab row);
    font load covers the one-time case where the very first paint measured labels in the
@@ -46137,18 +46171,55 @@ function route(){
       PIPE_STAGE_FILTER = parts[2];
       PIPE_SEGMENT = ROLE==='exec' ? 'allOpen' : 'myOpen';
       PIPE_VIEW = 'list';
+    } else if(PIPE_PENDING_RESTORE){
+      /* D106 parts (b)/(c)/D129: pipeReturnToList() set this before navigating here. Restoring
+         segment/filter before renderPipeline() runs, rather than the plain #/pipeline branch's own
+         unconditional PIPE_STAGE_FILTER=null below, is what makes "returns restore the list
+         exactly" true for the filter too, not just row order/sort/scroll (those three are replayed
+         after the render, further down). */
+      PIPE_SEGMENT = PIPE_PENDING_RESTORE.segment;
+      PIPE_STAGE_FILTER = PIPE_PENDING_RESTORE.stageFilter;
+      PIPE_VIEW = 'list';
     } else {
       PIPE_STAGE_FILTER = null;
     }
     renderPipeline(); showView('view-pipeline');
   }
   else if(view==='opp' && id){
-    renderOpp(id); showView('view-opp'); titles.opp = getOpp(id) ? getOpp(id).name : 'Opportunity';
+    /* D106 part (a): #/opp/<id>/<section> carries the intended landing section. An absent or
+       unrecognized third segment passes null through to renderOpp(), which falls back to Details
+       exactly the way every pre-existing #/opp/<id> link already did, not a new default: it's
+       the same fallback made explicit now that a second kind of call exists. Validated
+       against OPP_SECTIONS rather than accepted as free text, so a typo'd or stale section name
+       can't silently strand a reader on a section key with no matching tab. */
+    const section = OPP_SECTIONS.some(s=>s.key===parts[2]) ? parts[2] : null;
+    /* D106 parts (b)/(c)/D129: PIPE_RETURN_CTX only stays valid for the record it actually
+       describes. openPipelineOpp() and pipeStepRecord() both keep ctx.ids[ctx.index] in sync with
+       whatever id they're about to navigate to; any other way of reaching an opportunity (a feed
+       item, a snapshot row, a board card, a modal table row, create-and-open) lands on some other
+       id that won't match, so the stale context is dropped here rather than surviving into a
+       record it has nothing to do with. This is the one central check that makes every other
+       #/opp/ site in the app correct by construction, with no need to touch each one individually. */
+    if(PIPE_RETURN_CTX && PIPE_RETURN_CTX.ids[PIPE_RETURN_CTX.index] !== id) PIPE_RETURN_CTX = null;
+    renderOpp(id, section, true); showView('view-opp'); titles.opp = getOpp(id) ? getOpp(id).name : 'Opportunity';
     /* D120: renderOpp()'s own positionTabMarker() call runs while #view-opp is still the
-       inactive (display:none) .view, so every offset reads 0 there; a fresh navigation here
-       needs a second call after showView() makes the container real. setOppSection()'s
-       same-page re-renders don't hit this, the container is already visible by then. */
-    positionTabMarker();
+       inactive (display:none) .view, so every offset reads 0 there. renderOpp() skips it
+       entirely on this path (the `true` isNav argument above), leaving this the only call, run
+       after showView() makes the container real, with `instant` so arrival is never animated
+       (see positionTabMarker()'s own comment for the bug this fixes). setOppSection()'s same-page
+       re-renders don't take this path at all; the container is already visible and the animated
+       glide there is the intended D120 behavior. */
+    positionTabMarker(true);
+    /* D106 part (c): the j/k keydown handler set this right before changing location.hash, since
+       hashchange (and therefore this whole render) happens asynchronously; this is the first
+       point that can be sure the new record has actually finished rendering. Focus lands on the
+       active section tab, an already-focusable, already-labelled roving-tabindex target (D107),
+       rather than left stranded on a control that belonged to the record just replaced. */
+    if(PIPE_KEYBOARD_STEP_PENDING){
+      PIPE_KEYBOARD_STEP_PENDING = false;
+      const tab = document.querySelector('.section-nav-item[aria-selected="true"]');
+      if(tab) tab.focus();
+    }
   }
   else if(view==='intake'){ renderIntake(id); showView('view-intake'); }
   else if(view==='accounts'){ renderStub('view-accounts','Accounts','Prospect and Partner account records — list and record views. Not built in this skeleton pass; see PROJECT_STATE.md §12.'); showView('view-accounts'); }
@@ -46159,6 +46230,13 @@ function route(){
 
   document.getElementById('topbar-title').textContent = titles[view] || 'Keystone';
   window.scrollTo(0,0);
+  /* D106 parts (b)/(c)/D129: applied AFTER the scrollTo(0,0) above, or it would be immediately
+     overwritten. Reordering the fresh table's rows and restoring scroll only make sense once the
+     rest of route() (including that reset) has already run. */
+  if(PIPE_PENDING_RESTORE){
+    restorePipelineListState(PIPE_PENDING_RESTORE);
+    PIPE_PENDING_RESTORE = null;
+  }
 }
 function showView(id){ document.getElementById(id).classList.add('active'); }
 window.addEventListener('hashchange', route);
@@ -46219,7 +46297,12 @@ function buildFeed(bdoId){
   const sizeW = o => (o.facilitySize/maxSize)*18;
   const cand = [];
 
-  // warm intro — the network signal, our lead differentiator (D4)
+  /* D106/D89: each candidate below carries the section that answers the question it raises
+     (BUILD_LOG's destination inventory for this pass). Omitted `section` means Details, the
+     correct answer for a type where the question is about the deal generally. */
+
+  // warm intro — the network signal, our lead differentiator (D4). Question: "is there a warm
+  // path in." Network is where that trade-relationship tie and the Request-intro CTA live.
   myOpen.forEach(o=>{
     const edges=(EDGES_BY_ACCT[o.accountId]||[]).filter(e=>{
       const other = e.fromAccountId===o.accountId ? e.toAccountId : e.fromAccountId;
@@ -46230,7 +46313,7 @@ function buildFeed(bdoId){
     const otherId = edge.fromAccountId===o.accountId ? edge.toAccountId : edge.fromAccountId;
     const acct=getAccount(o.accountId), other=getAccount(otherId);
     cand.push({
-      type:'warm', score: 58 + sizeW(o) + (edge.goldenPath?6:0), oppId:o.id,
+      type:'warm', score: 58 + sizeW(o) + (edge.goldenPath?6:0), oppId:o.id, section:'network',
       icon:'brand', glyph:'⇄', action:'Request intro',
       title:'Warm intro available into '+esc(acct.name),
       sub:(edge.relationship==='buys_from'?'Buys from ':'Sells to ')+esc(other.name)+
@@ -46238,7 +46321,9 @@ function buildFeed(bdoId){
     });
   });
 
-  // stalled — in-stage longer than the p75 for that stage
+  // stalled — in-stage longer than the p75 for that stage. Question: "what's this deal's overall
+  // status." Details already surfaces the stage track and the strip's Days-in-Stage figure, so no
+  // `section` override, since the omitted-section default is the right answer here, not a gap.
   myOpen.forEach(o=>{
     const hist=getStageHistory(o.id);
     const days=daysBetween(hist[hist.length-1].enteredDate,TODAY);
@@ -46253,7 +46338,9 @@ function buildFeed(bdoId){
     });
   });
 
-  // new lien filed against one of my accounts
+  // new lien filed against one of my accounts. Question: "what does this lien look like." The
+  // Intelligence tab is where lienPanelHtml() reads LIENS_BY_ACCT for the account, so it answers
+  // correctly regardless of which specific opportunity `rel` resolves to.
   const myAccountIds = new Set(myOpps.map(o=>o.accountId));
   D.liens.filter(l=>myAccountIds.has(l.accountId)).forEach(l=>{
     const days=daysBetween(l.filingDate,TODAY);
@@ -46265,7 +46352,7 @@ function buildFeed(bdoId){
     const beatUs = l.wonDealWeLost ? OPPS[l.wonDealWeLost] : null;
     const stillOpen = beatUs ? myOpen.filter(o=>o.accountId===l.accountId).length : 0;
     cand.push({
-      type:'lien',
+      type:'lien', section:'intelligence',
       score: 46 + (l.subordinated?8:0) + Math.max(0,14-days/4) + (beatUs?10:0) + (stillOpen?4:0),
       oppId: (beatUs && stillOpen) ? myOpen.find(o=>o.accountId===l.accountId).id : (rel?rel.id:null),
       icon:'neg', glyph:'⚖', action: beatUs ? 'See who won' : 'Review lien',
@@ -46279,19 +46366,26 @@ function buildFeed(bdoId){
     });
   });
 
-  // follow-up due — no logged activity in a while
+  // follow-up due — no logged activity in a while. Question: "there's been no activity here, go
+  // do something." Activity is where the staleness itself is visible (the log confirms the gap).
   myOpen.forEach(o=>{
     const days=lastActivityDays(o.id);
     if(days==null || days<=10) return;
     cand.push({
-      type:'followup', score: 38 + Math.min(26,(days-10)*0.8), oppId:o.id,
+      type:'followup', section:'activity', score: 38 + Math.min(26,(days-10)*0.8), oppId:o.id,
       icon:'', glyph:'⏱', action:'Log follow-up',
       title:'Follow up with '+esc(getAccount(o.accountId).name),
       sub:'No activity logged in '+days+' days · '+o.stage+' · '+moneyPlain(o.facilitySize)
     });
   });
 
-  // partner going dormant — referral source decaying
+  // partner going dormant — referral source decaying. Question: "why did this referral source go
+  // quiet." No section answers it: Referral Partner/Date are real fields but only ever surface
+  // inside the Deal card's "show all fields" modal (D88 found the identical gap on Exec Home's
+  // own dormant-partner item), and there is no Partner-scoped page to route to instead. Flagged
+  // here rather than picked: stays on the omitted-section default (Details), same as `stall`,
+  // but for the opposite reason: `stall` is a genuine match, this is a genuine gap with no better
+  // option today.
   const seenPartner = new Set();
   myOpps.forEach(o=>{
     const p = o.referralPartnerId && PARTNERS[o.referralPartnerId];
@@ -47435,7 +47529,10 @@ function renderHome(){
           '</div></div>'+
           '<div class="panel-body flush">'+
             (feed.length ? feed.map(c=>
-              '<div class="feedrow" '+(c.oppId?('onclick="location.hash=\'#/opp/'+c.oppId+'\'"'):'')+'>'+
+              /* D106: each item's own `section` (set in buildFeed(), per D89's destination rule)
+                 rides along in the hash so the record lands on the section that answers the
+                 question the item raised, instead of always forcing Details. */
+              '<div class="feedrow" '+(c.oppId?('onclick="location.hash=\'#/opp/'+c.oppId+(c.section?'/'+c.section:'')+'\'"'):'')+'>'+
                 '<div class="feed-icon '+c.icon+'">'+c.glyph+'</div>'+
                 '<div class="feed-main">'+
                   '<div class="feed-title">'+c.title+'</div>'+
@@ -48771,6 +48868,26 @@ let PIPE_SEGMENT = 'allOpen';
 let PIPE_VIEW = 'list';   // reps live in lists — list is the default, board is opt-in
 let PIPE_STAGE_FILTER = null;   // set by #/pipeline/stage/X (BDO Home's stage-bar drill-down)
 
+/* D106 parts (b)/(c) and D129: the list's own state at the moment a row was clicked, captured
+   only for Pipeline's List view (D129 scopes next/previous to the list, never the board or any
+   feed). Held in a module-level variable, never the URL: a reload genuinely losing this and the
+   return bar correctly not rendering is the ruled behavior, not a bug (see capturePipeReturnCtx()
+   and route()'s own id-match check below for how it stays honest rather than going stale). */
+let PIPE_RETURN_CTX = null;
+/* Set only when returning from the bar's back-link (pipeReturnToList()); consumed once, at the end
+   of route()'s own pipeline branch, to restore segment/filter/sort/scroll onto the fresh render
+   route() already produces. Not the same variable as PIPE_RETURN_CTX above: that one describes
+   "where a currently-open record came from," this one is a one-shot instruction "restore this
+   exact state into the list you're about to render." */
+let PIPE_PENDING_RESTORE = null;
+/* Commit 3, D106 part (c) keyboard bindings: set by the j/k keydown handler immediately before it
+   navigates, consumed once by route()'s own opp branch right after the fresh record renders, to
+   move focus onto the new record's active section tab. location.hash changes fire hashchange
+   asynchronously, so focus can't just be restored inline in the keydown handler; this flag carries
+   the intent across that gap to the one place (route()) that knows for certain the new render has
+   actually finished. */
+let PIPE_KEYBOARD_STEP_PENDING = false;
+
 function currentDaysInStage(o){
   const hist=getStageHistory(o.id); const term=hist[hist.length-1];
   return daysBetween(term.enteredDate,TODAY);
@@ -48823,7 +48940,16 @@ function renderPipeline(){
       const acct=getAccount(o.accountId);
       const owner=BDOS[o.bdoId];
       const days = o.outcome==='open' ? currentDaysInStage(o) : null;
-      return '<tr onclick="location.hash=\'#/opp/'+o.id+'\'">'+
+      /* D106 parts (b)/(c)/D129: data-opp-id lets capturePipeReturnCtx() and
+         restorePipelineListState() read/reorder the literal displayed row order straight from the
+         DOM, without re-parsing each row's own onclick string. openPipelineOpp() captures the
+         list's full context (segment, filter, this exact row order, scroll position) before
+         navigating, since that's the last moment the list is still on screen to read from. No
+         index is baked into the onclick itself: the D84 sortable-table listener reorders rows via
+         plain DOM appendChild() without rewriting any onclick attribute, so a literal index here
+         would go stale the moment a column is sorted; capturePipeReturnCtx() derives the clicked
+         row's index fresh from wherever it actually sits in the DOM at click time instead. */
+      return '<tr data-opp-id="'+o.id+'" onclick="openPipelineOpp(\''+o.id+'\')">'+
         '<td class="name">'+esc(o.name)+'</td>'+
         '<td class="sec">'+esc(acct.name)+'</td>'+
         '<td class="sec">'+esc(owner?owner.name:'')+'</td>'+
@@ -48859,6 +48985,103 @@ window.setPipeSegment = function(key){ PIPE_SEGMENT=key; PIPE_STAGE_FILTER=null;
 window.setPipeView = function(v){ PIPE_VIEW=v; renderPipeline(); };
 window.clearPipeStageFilter = function(){ PIPE_STAGE_FILTER=null; renderPipeline(); };
 window.goToPipelineStage = function(stage){ location.hash = '#/pipeline/stage/'+stage; };
+
+/* ---------- D106 parts (b)/(c) and D129: return bar and next/previous ----------
+   Captures the list exactly as displayed (segment, stage filter, the literal row order, which
+   column was sorted and in which direction, and scroll position) at the moment a row is clicked,
+   so returning replays that exact state rather than recomputing it, the same "remember and
+   replay" shape D73/D78 already use for the Details grid, not a new persistent-sort mechanism
+   that would contradict DESIGN_STANDARDS §7b's deliberate reset-on-rebuild rule for tables
+   generally. This capture is additive to that rule, not an exception to it: a plain segment
+   switch or view toggle still resets to default order exactly as before; only this one
+   dedicated return path replays a snapshot. */
+function capturePipeReturnCtx(clickedId){
+  const table = document.querySelector('#view-pipeline table.tbl');
+  if(!table) return null;
+  const ids = Array.from(table.querySelectorAll('tbody > tr')).map(tr=>tr.dataset.oppId);
+  const ths = Array.from(table.querySelectorAll('thead th'));
+  const sortedTh = ths.find(th=>th.hasAttribute('aria-sort'));
+  return {
+    segment: PIPE_SEGMENT,
+    stageFilter: PIPE_STAGE_FILTER,
+    ids: ids,
+    index: ids.indexOf(clickedId),
+    sortColIndex: sortedTh ? ths.indexOf(sortedTh) : null,
+    sortDir: sortedTh ? sortedTh.getAttribute('aria-sort') : null,
+    scrollY: window.scrollY,
+  };
+}
+window.openPipelineOpp = function(id){
+  PIPE_RETURN_CTX = capturePipeReturnCtx(id);
+  location.hash = '#/opp/'+id;
+};
+/* The back-link and the arrows both funnel through here. Returning to the list is a one-shot
+   instruction (PIPE_PENDING_RESTORE) consumed by route()'s own pipeline branch right after it
+   renders the plain, default-order list, then reorders the fresh table's rows to match the
+   snapshot and reapplies the sort indicator, rather than teaching renderPipeline() a second,
+   parallel rendering path. PIPE_RETURN_CTX itself is left alone (not nulled): there is nothing on
+   the Pipeline page that reads it, and the next real list-row click overwrites it anyway. */
+window.pipeReturnToList = function(){
+  if(!PIPE_RETURN_CTX) return;
+  PIPE_PENDING_RESTORE = PIPE_RETURN_CTX;
+  location.hash = '#/pipeline';
+};
+/* Shared by the bar's arrow buttons (this commit) and the j/k keyboard bindings (commit 3).
+   Mutates PIPE_RETURN_CTX.index in place, rather than replacing it with a new object, so route()'s
+   id-match check (see the #/opp branch) recognizes the *next* target as still coming from this
+   same list, not an unrelated navigation. Section is carried through deliberately: stepping to the
+   next deal while reviewing Documents lands you on that deal's Documents, not back on Details. */
+window.pipeStepRecord = function(delta){
+  const ctx = PIPE_RETURN_CTX;
+  if(!ctx) return;
+  const next = ctx.index + delta;
+  if(next < 0 || next >= ctx.ids.length) return; // the disabled arrow already prevents this; guard anyway
+  ctx.index = next;
+  location.hash = '#/opp/'+ctx.ids[next]+'/'+OPP_SECTION;
+};
+/* Reorders the fresh table's rows to the captured snapshot (authoritative, independent of the
+   comparator that produced it) and reapplies the sort indicator (cosmetic only, purely visual;
+   the row order above is what's actually shown either way). Scroll restoration happens after
+   route()'s own trailing window.scrollTo(0,0), or it would be immediately overwritten. */
+function restorePipelineListState(ctx){
+  const table = document.querySelector('#view-pipeline table.tbl');
+  if(table){
+    const tbody = table.querySelector('tbody');
+    const rowsById = {};
+    Array.from(tbody.querySelectorAll(':scope > tr')).forEach(tr=>{ rowsById[tr.dataset.oppId]=tr; });
+    ctx.ids.forEach(id=>{ const tr=rowsById[id]; if(tr) tbody.appendChild(tr); });
+    if(ctx.sortColIndex!=null){
+      const ths = Array.from(table.querySelectorAll('thead th'));
+      const th = ths[ctx.sortColIndex];
+      if(th) th.setAttribute('aria-sort', ctx.sortDir);
+    }
+  }
+  window.scrollTo(0, ctx.scrollY);
+}
+/* The bar itself: a slim strip above the record card, outside it (D129), never inside
+   .opp-header, which is already an approved, closed surface Kevin chose not to redraw. Renders
+   nothing at all when PIPE_RETURN_CTX is absent (a direct hash, a reload, a bookmark) rather than
+   a disabled or empty bar, per D129's own ruling. The back-link reuses .drill verbatim, no new
+   link style; the arrows are their own small control family (like .modal-close/.ef-btn), never
+   .btn, since D125 governs .btn and this isn't one. The disabled-end arrow stays in the DOM with
+   its space reserved (a native disabled <button>, not removed), so the bar's contents never shift. */
+function pipeReturnBarHtml(){
+  if(!PIPE_RETURN_CTX) return '';
+  const ctx = PIPE_RETURN_CTX;
+  const seg = SEGMENTS.find(s=>s.key===ctx.segment);
+  const label = seg ? seg.label.toLowerCase() : 'the list';
+  const atStart = ctx.index<=0, atEnd = ctx.index>=ctx.ids.length-1;
+  return '<div class="pipe-return-bar">'+
+    '<span class="drill" onclick="pipeReturnToList()">Back to '+esc(label)+'</span>'+
+    '<span class="pipe-return-right">'+
+      '<span class="pipe-return-pos">'+(ctx.index+1)+' of '+ctx.ids.length+'</span>'+
+      '<button type="button" class="pipe-return-arrow" aria-label="Previous deal"'+
+        (atStart?' disabled':'')+' onclick="pipeStepRecord(-1)">&lsaquo;</button>'+
+      '<button type="button" class="pipe-return-arrow" aria-label="Next deal"'+
+        (atEnd?' disabled':'')+' onclick="pipeStepRecord(1)">&rsaquo;</button>'+
+    '</span>'+
+  '</div>';
+}
 
 /* ================================================================
    OPPORTUNITY RECORD
@@ -49312,6 +49535,34 @@ document.addEventListener('keydown', function(e){
   });
 });
 
+/* D106 part (c)/D129: j/k step to the next/previous record in the originating Pipeline list, the
+   Linear/Gmail convention rather than bare arrow keys, which D107 already binds to the section
+   tabs above; the two would collide on the same keys with different meanings. Bindings only
+   exist at all when PIPE_RETURN_CTX is set (matching the bar's own visibility) and only while an
+   Opportunity record is actually the active view; MODAL_OPEN_KEY blocks them the same way it
+   blocks every other page-level shortcut while a modal has focus; the tag/isContentEditable check
+   blocks them while typing in the global search box, a quick-create field, or an active
+   inline-edit cell (efSpan() renders a real <input>/<select> in edit mode, so this one check
+   covers both cases with nothing inline-edit-specific to add). The bounds check is duplicated from
+   pipeStepRecord()'s own, deliberately: it must run BEFORE PIPE_KEYBOARD_STEP_PENDING is set, since
+   pipeStepRecord() returning early with no navigation would otherwise leave that flag stuck true
+   for the next, unrelated hashchange to wrongly consume. */
+document.addEventListener('keydown', function(e){
+  if(e.key!=='j' && e.key!=='k') return;
+  const ctx = PIPE_RETURN_CTX;
+  if(!ctx) return;
+  if(MODAL_OPEN_KEY) return;
+  if(!document.getElementById('view-opp').classList.contains('active')) return;
+  const tag = e.target.tagName;
+  if(tag==='INPUT' || tag==='TEXTAREA' || tag==='SELECT' || e.target.isContentEditable) return;
+  const delta = e.key==='j' ? 1 : -1;
+  const next = ctx.index + delta;
+  if(next < 0 || next >= ctx.ids.length) return;
+  e.preventDefault();
+  PIPE_KEYBOARD_STEP_PENDING = true;
+  pipeStepRecord(delta);
+});
+
 /* D61 pattern, built once and reused twice (Decline Reason below, Closed Lost Reason in
    sectionOutcomeHtml): a governed picklist paired with a free-text explanation that's required
    when the picklist is set. The `--warn` "Required" tag is the visible tax on the escape hatch —
@@ -49573,7 +49824,19 @@ function sectionDocumentsHtml(docs){
     '</div></div><div class="panel-body flush">'+docsHtml+'</div></div>';
 }
 
-function renderOpp(id){
+/* D106 part (a): `section`, when passed, is the intended landing section from the route (or from
+   the D129 return bar's / keyboard next-previous navigation, commit 2/3). It is deliberately a
+   parameter, never read from location.hash in here: EF_RERENDER's re-renders (every inline-edit
+   save runs through renderOpp(), not only real navigation) call renderOpp(id) with no second
+   argument, so an edit can never accidentally re-apply a stale or unrelated hash's section.
+   `isNav`, true only when route() itself is the caller, skips this function's own internal
+   positionTabMarker() call, since that call runs while #view-opp is still display:none (every offset
+   reads 0), and route() always repositions correctly afterward; leaving both calls in on a fresh
+   navigation is exactly what produced the D120 arrival-animation bug this pass found and fixed
+   (see positionTabMarker()'s own comment). setOppSection() and EF_RERENDER both call renderOpp()
+   with the container already visible, where the internal call is correct and, for setOppSection(),
+   the intended animated glide. */
+function renderOpp(id, section, isNav){
   const o = getOpp(id);
   if(!o){
     document.getElementById('view-opp').innerHTML = '<div class="empty">Opportunity not found.</div>';
@@ -49601,16 +49864,20 @@ function renderOpp(id){
   // first modal in the app where fields are actually editable inside it), refresh its body in
   // place too — otherwise a save made inside the modal would show stale data until it's reopened.
   EF_RERENDER = ()=>{ renderOpp(id); if(MODAL_OPEN_KEY) refreshModalIfOpen(MODAL_OPEN_KEY); };
-  // Section resets to Details on a *different* record (you land on the overview, not
-  // wherever a previous unrelated deal happened to leave off) but persists across
-  // re-renders of the *same* record (e.g. an edit-triggered refresh while on Audit).
+  // Packed-grid memory (D73) resets on a genuinely different record regardless of which section
+  // it lands on, since this is about the grid's own per-record state, not about section choice.
   const freshRecord = OPP_SECTION_FOR !== id;
   if(freshRecord){
-    OPP_SECTION = 'details';
     OPP_GRID_COLUMNS = null;
     OPP_GRID_CARD_KEY_SET = null;
     GRID_LAST_CARD_EXTRA['.opp-details-grid'] = null;
   }
+  // D106 part (a): an explicit `section` (a real navigation, via route() or the D129 return
+  // bar/keyboard) always wins. Absent (an EF_RERENDER edit re-render) falls back to Details on a
+  // fresh record (landing on the overview, not wherever a previous unrelated deal happened to
+  // leave off), or, on the *same* record, simply leaves OPP_SECTION exactly where it already was,
+  // which is what lets an edit-triggered refresh on Audit stay on Audit.
+  OPP_SECTION = section || (freshRecord ? 'details' : OPP_SECTION);
   OPP_SECTION_FOR = id;
 
   let sectionBody;
@@ -49634,6 +49901,7 @@ function renderOpp(id){
     }).join('')+'</div>';
 
   document.getElementById('view-opp').innerHTML =
+    pipeReturnBarHtml()+
     '<div class="opp-header">'+
       '<div class="opp-eyebrow"><span>'+o.productType+'</span><span>·</span><span>'+esc(acct.name)+'</span></div>'+
       '<div class="opp-title">'+efSpan(recId,DEF_INDEX['core.name'])+'</div>'+
@@ -49649,7 +49917,7 @@ function renderOpp(id){
 
     oppMetricStripHtml(o, acct)+
     '<div class="record-main">'+navHtml+sectionBody+'</div>';
-  positionTabMarker();
+  if(!isNav) positionTabMarker();
 
   /* Pack (and align) only when sectionDetailsHtml() actually emitted a flat, unpacked grid — a
      record's first arrival at Details, or the rendered card set changing (Outcome appearing) —
