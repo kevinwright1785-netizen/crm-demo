@@ -170,11 +170,15 @@ h1,h2,h3,p,dl,dd{margin:0}
 .strip{background:var(--paper);border-radius:var(--r-l);box-shadow:var(--lift);display:grid;margin-bottom:var(--s5)}
 .strip-4{grid-template-columns:repeat(4,minmax(0,1fr))}
 .strip-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+/* D127: vertical separators between strip cells, ratifying a rule that predates the D-number.
+   This border-left has been here since the original skeleton build, never formally logged as its
+   own decision until now. Applies app-wide via this shared .strip/.met component: BDO Home
+   (.strip-4), Exec Home's slippage strip (.strip-3), and the Opportunity record's strip
+   (.strip-4). */
 .met{position:relative;padding:var(--s4) var(--s5);border-left:1px solid var(--line)}
 .met:first-child{border-left:none}
 .met-label{font-size:11px;font-weight:500;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .met-figure{font-family:var(--ui);font-size:22px;font-weight:500;letter-spacing:-.03em;color:var(--ink);margin-top:var(--s1)}
-.met-figure.emphasis{font-size:29px}
 .met-figure .cur,.met-figure .un{font-size:.66em;font-weight:400;color:var(--ink-2)}
 .met-sub{font-size:11px;color:var(--ink-3);margin-top:var(--s1)}
 /* D115: strip cell anatomy, applied uniformly to every .strip/.met consumer app-wide (BDO Home,
@@ -191,18 +195,6 @@ h1,h2,h3,p,dl,dd{margin:0}
 .met-view{position:absolute;top:var(--s3);right:var(--s3);font-size:11px;font-weight:500;
   color:var(--brand);opacity:0;transition:opacity var(--t-fast) var(--ease);pointer-events:none}
 .met.expandable:hover .met-view,.met.expandable:focus-visible .met-view{opacity:1}
-
-/* D124: verdict block, BDO Home only. Sits on .panel's own surface (--paper/--line/--r-l), a
-   tier-1 element rather than a second shadowed one competing with the strip's tier-2 --lift
-   slot right below it. Reuses .met-view for its own hover-revealed "view" affordance, same
-   trigger pattern as .met.expandable, its own selector since the block isn't a strip cell. */
-.verdict-block{padding:var(--s4) var(--s5);display:flex;align-items:baseline;gap:var(--s3);
-  flex-wrap:wrap;cursor:pointer;transition:background var(--t-fast) var(--ease)}
-.verdict-block:hover{background:var(--hover)}
-.verdict-block:hover .met-view,.verdict-block:focus-visible .met-view{opacity:1}
-.verdict-figure{font-family:var(--ui);font-size:29px;font-weight:500;letter-spacing:-.03em;color:var(--ink)}
-.verdict-figure .cur,.verdict-figure .un{font-size:.66em;font-weight:400;color:var(--ink-2)}
-.verdict-context{font-size:12px;color:var(--ink-3)}
 
 /* ---------- panels ---------- */
 .panel{position:relative;background:var(--paper);border:1px solid var(--line);border-radius:var(--r-l);margin-bottom:var(--s5)}
@@ -236,7 +228,6 @@ h1,h2,h3,p,dl,dd{margin:0}
 .ml-auto{margin-left:auto}
 .velocity-note{margin-top:var(--s4);font-size:12px;color:var(--ink-2)}
 .center-mt{margin-top:var(--s4);text-align:center}
-.mono-inline{font-family:var(--ui);color:var(--ink-3)}
 .mt-3{margin-top:var(--s3)}
 .mt-4{margin-top:var(--s4)}
 .mt-5{margin-top:var(--s5)}
@@ -522,7 +513,7 @@ h1,h2,h3,p,dl,dd{margin:0}
   align-items:stretch;margin-bottom:var(--s5)}
 @media (max-width:1140px){.exec-mix-row{grid-template-columns:1fr}}
 /* One hero figure per view (CLAUDE.md §4) — .exec-hero above owns that slot, so per-card figures
-   in the diagnostics band use this smaller, non-emphasis size, never .met-figure.emphasis. */
+   in the diagnostics band use this smaller, non-hero size. */
 .exec-ratio{font-family:var(--ui);font-size:22px;font-weight:500;letter-spacing:-.03em;color:var(--ink)}
 .exec-ratio .un{font-size:.6em;font-weight:400;color:var(--ink-2)}
 .exec-target-line{position:absolute;top:0;bottom:0;width:0;border-left:1px dashed var(--ink-3);pointer-events:auto}
@@ -47361,18 +47352,11 @@ function renderHome(){
   const winByCountPrior = closedPriorN ? myWonPriorT12.length/closedPriorN : 0;
   const inUW = myOpen.filter(o=>o.stage==='Underwriting');
   const inUWValue = inUW.reduce((s,o)=>s+o.facilitySize,0);
-  /* D124: verdict block's own context line reuses this count, same computation the old strip
-     cell used before Active Pipeline moved out of the strip. */
+  /* D126: Active pipeline's strip-cell scope line. */
   const myOpenAccts = new Set(myOpen.map(o=>o.accountId)).size;
 
   const feed = buildFeed(CURRENT_BDO_ID);
   const agenda = buildAgenda(CURRENT_BDO_ID);
-
-  /* D104/D123: Recent activity moved to a full-width row 3, where rows no longer compete for
-     column width with a masonry sibling. Raised from 6 to 10 to show more of the log in
-     comparable panel height. */
-  const recent = D.activities.filter(a=>a.bdoId===CURRENT_BDO_ID)
-    .slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,10);
 
   const partners = partnerStats(CURRENT_BDO_ID);
 
@@ -47388,31 +47372,20 @@ function renderHome(){
         ' need you today</span>'+
     '</div>'+
 
-    /* D124: verdict block, BDO Home only. Active Pipeline lifted out of the strip into its own
-       block so the figure is said once, directly under the state-of-day line. A .panel (same
-       --paper/--line/--r-l on-page surface as every other top-level card, §3a) rather than a
-       shadowed tier-2 element, since the strip right below it already holds the page's one
-       tier-2 (--lift) slot, see BUILD_LOG for the correction from the task brief's literal
-       "--r-m" (that token is §3a's floating-surface radius, not the right tier for an on-page
-       block; --r-l is). Figure size 29px reuses the existing .met-figure.emphasis value (the
-       size Active Pipeline already rendered at inside the old strip) rather than introducing a
-       new type-scale rung, which stays deferred/coupled per §4a. Keeps Active Pipeline's own
-       click-to-open target and the D115 hover "view" affordance, since it is still expandable. */
-    '<div class="panel verdict-block" tabindex="0" onclick="openModal(\'pipeline\')">'+
-      '<div class="verdict-figure">'+money(pipelineValue)+'</div>'+
-      '<div class="verdict-context">active pipeline · '+myOpen.length+' open deal'+(myOpen.length===1?'':'s')+
-        ' across '+myOpenAccts+' account'+(myOpenAccts===1?'':'s')+' · '+moneyShort(inUWValue)+' at the credit gate</div>'+
-      '<span class="met-view">View</span></div>'+
-
-    /* D115: Deals in Underwriting has no change line, deliberately: a snapshot total of deals
-       currently at that stage, and an honest prior-period comparison would mean reconstructing
-       which deals were in Underwriting as of a past date from the full stage-history audit
-       trail, deal by deal. That's a real computation, not a quick one, and out of scope for this
-       pass; flagged here as a dataset question rather than rushed into a fragile reconstruction
-       that risks being wrong in edge cases (a deal that re-entered a stage, for instance). Win
-       Rate and Funded YTD both have a genuine, already-scoped prior window to compare against
-       (see above), so they get real computed change lines. */
-    '<div class="strip strip-3">'+
+    /* D126: BDO Home strip returns to four cells, reversing D124's verdict block. Active pipeline
+       is a snapshot total of currently-open deals, so, like Deals in Underwriting, it deliberately
+       carries no change line: an honest prior-period comparison would mean reconstructing which
+       deals were open as of a past date from the full stage-history audit trail, deal by deal, a
+       real computation out of scope for this pass. Win Rate and Funded YTD both have a genuine,
+       already-scoped prior window to compare against (see above), so they get real computed change
+       lines. */
+    '<div class="strip strip-4">'+
+      '<div class="met expandable" tabindex="0" onclick="openModal(\'pipeline\')">'+
+        '<div class="met-label">Active pipeline</div>'+
+        '<div class="met-figure">'+moneyShort(pipelineValue)+'</div>'+
+        '<div class="met-sub">'+myOpen.length+' open deal'+(myOpen.length===1?'':'s')+
+          ' · '+myOpenAccts+' account'+(myOpenAccts===1?'':'s')+'</div>'+
+        '<span class="met-view">View</span></div>'+
       '<div class="met expandable" tabindex="0" onclick="openModal(\'underwriting\')">'+
         '<div class="met-label">Deals in Underwriting</div>'+
         '<div class="met-figure">'+inUW.length+'</div>'+
@@ -47508,31 +47481,11 @@ function renderHome(){
         '</div>'+
       '</div>'+
 
-      /* Row 2 (D123): Partners and Where we're losing, one card each. */
+      /* Row 2 (D123, now the last row per D128): Partners and Where we're losing, one card each.
+         D128 removed row 3 (Recent activity, full width) from BDO Home; the page ends here. */
       '<div class="home-row-secondary">'+
         partnersPanelHtml(partners)+
         lossPanelHtml(CURRENT_BDO_ID)+
-      '</div>'+
-
-      /* Row 3 (D123): Recent activity, full width. Full width means each row no longer competes
-         for column width with a masonry sibling, so more rows fit in comparable panel height.
-         Raised from 6 to 10 for that reason (see the `recent` slice above). */
-      '<div class="panel">'+
-        '<div class="panel-header"><div class="panel-header-text">'+
-          '<div class="panel-title">Recent activity</div>'+
-          '<div class="panel-scope">Last '+recent.length+' logged on my deals</div>'+
-        '</div></div>'+
-        '<div class="panel-body flush">'+
-          (recent.length ? recent.map(a=>{
-            const opp=getOpp(a.opportunityId);
-            return '<div class="feedrow" onclick="location.hash=\'#/opp/'+a.opportunityId+'\'">'+
-              '<div class="feed-icon">'+esc(a.type[0])+'</div>'+
-              '<div class="feed-main"><div class="feed-title">'+esc(a.subject)+'</div>'+
-                '<div class="feed-sub"><span class="mono-inline">'+fmtDate(a.date)+'</span> · '+
-                  esc(opp?opp.name:'')+'</div></div>'+
-            '</div>';
-          }).join('') : '<div class="empty">No activity logged yet.</div>')+
-        '</div>'+
       '</div>'+
 
     '</div>';
