@@ -927,6 +927,63 @@ table.tbl{width:100%;border-collapse:collapse}
 .acct-header-meta-dot{color:var(--ink-3)}
 .acct-header-actions{display:flex;gap:var(--s2);margin-top:var(--s3)}
 
+/* Pass 2: the Account 360 Summary tab, D137. Both mocks lay their four panels as a fixed 2x2
+   grid (D104: fixed grid, not masonry), matching the mock's own .grid exactly: 12px/16px are
+   both already-legal tokens (--s3/--s4), no snap needed. */
+.acct-summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--s3);margin-top:var(--s4)}
+/* Verdict badge (DESIGN_STANDARDS §6a): a panel's own real conclusion, right-aligned opposite its
+   title, tinted per §2a's semantic map (brand/pos/warn/neg only, no invented meaning). Sits as a
+   sibling of .panel-header-text inside the existing .panel-header (already flex,
+   align-items:flex-start), so it lands top-right with no new layout rule needed there. */
+.panel-verdict{font-size:11.5px;font-weight:500;flex:0 0 auto;white-space:nowrap}
+.panel-verdict.brand{color:var(--brand-ink)}
+.panel-verdict.pos{color:var(--pos-ink)}
+.panel-verdict.warn{color:var(--warn-ink)}
+.panel-verdict.neg{color:var(--neg-ink)}
+/* Referral cadence panel (Partner Summary): a dot timeline, one dot per referral in the trailing
+   12 months, plus an inset callout naming the current gap. */
+.acct-cadence-timeline{display:block;width:100%;height:70px}
+.acct-cadence-axis{stroke:var(--line);stroke-width:1}
+.acct-cadence-tl-dot{fill:var(--brand)}
+.acct-cadence-tl-hit{fill:transparent}
+.acct-cadence-gap-box{fill:var(--warn-soft)}
+.acct-cadence-gap-box.quiet{fill:var(--sunken)}
+.acct-cadence-gap-text{font-family:var(--ui);font-size:9.5px;font-weight:600;fill:var(--warn-ink)}
+.acct-cadence-gap-text.quiet{fill:var(--ink-2)}
+.acct-cadence-xlabel{font-family:var(--ui);font-size:9px;fill:var(--ink-3)}
+/* Count vs size panel (Partner Summary): two rows, label/track/value, matching the mock's own
+   3-column grid (auto 1fr auto) rather than the unrelated .hbar-* ranked-bar component (a
+   different shape: 2-row-per-item there, one row here). */
+.acct-cvs{display:grid;grid-template-columns:auto 1fr auto;row-gap:var(--s3);column-gap:var(--s3);
+  align-items:center;font-size:12px}
+.acct-cvs-label{color:var(--ink-2)}
+.acct-cvs-track{height:10px;background:var(--sunken);border-radius:var(--r-s);overflow:hidden}
+.acct-cvs-fill{height:100%;background:var(--brand)}
+.acct-cvs-fill.muted{background:var(--brand-a30)}
+.acct-cvs-value{font-family:var(--ui);font-weight:500;text-align:right}
+/* Referred opportunities / Where their referrals lose panels: compact rows, reusing the app's
+   own tag/money conventions rather than a second table component. */
+.acct-summary-row{display:grid;grid-template-columns:1fr auto auto;column-gap:var(--s3);
+  align-items:center;padding:var(--s2) 0;font-size:12px}
+.acct-summary-row+.acct-summary-row{border-top:1px solid var(--line)}
+.acct-summary-row .r{text-align:right;font-family:var(--ui)}
+.acct-summary-row .sec{color:var(--ink-2)}
+.acct-summary-row.clickable{cursor:pointer}
+.acct-summary-row.clickable:hover{background:var(--hover)}
+/* Trade relationships panel (Prospect Summary): the Account centred, buys-from left, sells-to
+   right, matching the mock's own mini-graph. Node/line counts vary by account (a real graph, not
+   a fixed illustration), so positions are computed to distribute evenly, not copied verbatim. */
+.acct-graph{display:block;width:100%;height:128px}
+.acct-graph-line{stroke:var(--line-2);stroke-width:1.25}
+.acct-graph-line.warm{stroke:var(--brand);stroke-width:1.75}
+.acct-graph-node{fill:var(--page);stroke:var(--line)}
+.acct-graph-node.center{fill:var(--ink);stroke:none}
+.acct-graph-node.warm{fill:var(--brand);stroke:none}
+.acct-graph-label{font-family:var(--ui);font-size:9.5px;fill:var(--ink-2)}
+.acct-graph-label.center,.acct-graph-label.warm{fill:var(--paper);font-weight:600}
+.acct-graph-caption{font-family:var(--ui);font-size:9px;fill:var(--ink-3)}
+.acct-graph-hit{fill:transparent}
+
 /* record page (D71 shape): persistent header, a metric strip (Home's own component, D33/D34), a
    full-width section-nav, then section content as a packed grid rather than a stack of equal
    height boxes. Round 4b's full-width band is gone the same way round 4a's rail went — the record
@@ -57931,13 +57988,11 @@ function buildFeed(bdoId){
   });
 
   // partner going dormant — referral source decaying. Question: "why did this referral source go
-  // quiet." D134/D152: the Partner Account 360 now exists, and its Partner configuration leads
-  // with exactly this story (D141's header pill + strip cell), so this item routes there instead
-  // of an Opportunity record. Interim target is /referrals, not /summary: the Summary tab is still
-  // a D51 stub (pass 2) and landing a diagnostic click on a stub panel is worse than landing it one
-  // tab over on the real referral history, which already answers "how quiet, since when" via the
-  // header pill and strip cell above the tab bar either way. D152 logs the mandatory flip to
-  // /summary once D137's cadence panel exists in pass 2: see PROJECT_STATE §1 item 8.
+  // quiet." D134/D152: the Partner Account 360 now exists, and its Summary tab leads with exactly
+  // this story (D141's header pill, strip cell, and now the Cadence panel's own "Gone quiet"
+  // verdict), so this item routes there instead of an Opportunity record. Flipped to /summary,
+  // mandatory per D152, now that D137's Summary tab is real (pass 2, commit 2) rather than the
+  // interim /referrals landing.
   const seenPartner = new Set();
   myOpps.forEach(o=>{
     const p = o.referralPartnerId && PARTNERS[o.referralPartnerId];
@@ -57946,7 +58001,7 @@ function buildFeed(bdoId){
     const days = p.lastReferralDate ? daysBetween(p.lastReferralDate,TODAY) : null;
     cand.push({
       type:'dormant', score: 32 + (days!=null?Math.min(24,(days-90)/8):24),
-      href: '#/account/'+p.id+'/referrals',
+      href: '#/account/'+p.id+'/summary',
       icon:'warn', glyph:'○', action:'Re-engage',
       title:esc(p.name)+' has gone quiet',
       sub:(days!=null?'No referral in '+days+' days':'No referral on record')+
@@ -60814,6 +60869,20 @@ const FIRM_REFERRAL_WIN_RATE = (function(){
   const won = closed.filter(o=>o.outcome==='won');
   return closed.length ? won.length/closed.length : null;
 })();
+/* Pass 2, commit 2: the Partner Summary's Count vs size panel needs the firm-wide trailing-12-
+   month referral pool (every partner's own referred Opportunities in that window) to compute one
+   partner's own share by count and by size: the same real-comparison-point pattern
+   FIRM_AVG_REFERRAL_SIZE/FIRM_REFERRAL_WIN_RATE already establish above. */
+const FIRM_TTM_REFERRED = (function(){
+  const opps = D.opportunities.filter(o=>o.referralPartnerId && inTrailing12(o.createdDate));
+  return {count: opps.length, value: opps.reduce((s,o)=>s+o.facilitySize,0)};
+})();
+/* Pass 2: the one verdict-badge renderer (DESIGN_STANDARDS §6a): a panel's own real conclusion,
+   tinted per §2a's brand/pos/warn/neg map, or nothing at all when a panel has no real conclusion
+   to state (never a placeholder badge). */
+function panelVerdictHtml(text, cls){
+  return text ? '<div class="panel-verdict'+(cls?' '+cls:'')+'">'+text+'</div>' : '';
+}
 
 /* D153: the one "warm path" definition, shared by the Prospect strip's Warm paths cell (this
    pass) and, per D153's own logging, whichever function pass 2's D137 Trade relationships panel
@@ -60838,9 +60907,15 @@ function warmPathsFor(accountId){
     fundedValue: D.opportunities.filter(o=>o.accountId===otherId && o.outcome==='won')
       .reduce((s,o)=>s+o.facilitySize,0),
   })).sort((x,y)=>y.fundedValue-x.fundedValue);
+  /* Pass 2, commit 3: `list` (every real warm counterparty, not just the strongest) is exposed so
+     the Trade relationships panel's mini-graph can light every one of them: the same
+     CLOSED_WON_ACCT_IDS test this function already applies, read once. If the graph and this
+     cell could ever disagree about which accounts are warm paths, one of them would be wrong;
+     sharing this one list is what rules that out. */
   return {
     count: list.length,
     strongest: list.length ? {account:getAccount(list[0].accountId), fundedValue:list[0].fundedValue} : null,
+    list: list.map(x=>x.accountId),
   };
 }
 
@@ -61191,6 +61266,16 @@ function accountConfig(a){
       {k:'Referral count, lifetime', v:profile.referralCount},
     ];
     cfg.bandScope = repCount+' rep-entered field'+(repCount===1?'':'s')+' &middot; '+computedCount+' computed';
+    /* Pass 2, commit 2: exposed for acctPartnerSummaryHtml() so the Summary tab's Cadence panel
+       reads the exact same isDormant/gapDays/referred this config and the strip already computed
+       : one definition of dormant, one of typical gap, never a second derivation that could
+       quietly disagree with the strip's own D141 telling. */
+    cfg.profile = profile;
+    cfg.referred = referred;
+    cfg.isDormant = isDormant;
+    cfg.gapDays = gapDays;
+    cfg.daysSinceReferral = daysSinceReferral;
+    cfg.winRateByCount = winRateByCount;
   }
   return cfg;
 }
@@ -61288,6 +61373,310 @@ function acctDealsTabHtml(opps, title, noun){
       '<div class="panel-title">'+esc(title)+'</div><div class="panel-scope">'+opps.length+' '+noun+'</div>'+
     '</div></div><div class="panel-body flush">'+body+'</div></div>';
 }
+/* ================================================================
+   PASS 2, COMMIT 2: Partner Summary tab (D137), four panels, D137's own order.
+   ================================================================ */
+/* Referral cadence: a dot timeline of this partner's own referred Opportunities in the trailing
+   12 months (TRAILING_12_START, the same window D100's own helpers use everywhere else), plus the
+   real current gap. The verdict badge and the "longest gap" note are D141's third dormancy
+   telling, and only render while isDormant: the strip's own first two tellings already carry the
+   day-for-day story otherwise, so a quiet-but-not-dormant partner's timeline stands on its own
+   without a badge or box overstating a normal gap. isDormant/gapDays/daysSinceReferral are all
+   read off cfg (accountConfig()'s own Partner branch), never re-derived, so this panel can never
+   quietly disagree with the strip's own D141 cells about what "dormant" or "typical gap" means. */
+function acctReferralCadenceHtml(a, cfg){
+  const referred = cfg.referred, isDormant = cfg.isDormant, daysSinceReferral = cfg.daysSinceReferral;
+  const ttm = referred.filter(o=>inTrailing12(o.createdDate)).slice().sort((x,y)=>x.createdDate.localeCompare(y.createdDate));
+  const W=320,H=70,padL=14,padR=14,baseY=30;
+  const totalDays = Math.max(1, daysBetween(TRAILING_12_START, TODAY));
+  const xAt = d => padL + (W-padL-padR) * (daysBetween(TRAILING_12_START,d)/totalDays);
+  const dots = ttm.map(o=>{
+    const x = xAt(o.createdDate);
+    return '<circle class="acct-cadence-tl-dot" cx="'+x.toFixed(1)+'" cy="'+baseY+'" r="5"></circle>'+
+      '<circle class="acct-cadence-tl-hit" cx="'+x.toFixed(1)+'" cy="'+baseY+'" r="9"'+
+        tipAttr(fmtDate(o.createdDate), esc(getAccount(o.accountId).name)+' referred', '')+'></circle>';
+  }).join('');
+  const gapX = W-padR-4;
+  const gapBox = (isDormant && daysSinceReferral!=null)
+    ? '<rect class="acct-cadence-gap-box" x="'+(gapX-38).toFixed(1)+'" y="'+(baseY-8)+'" width="76" height="16" rx="4"></rect>'+
+      '<text class="acct-cadence-gap-text" x="'+gapX.toFixed(1)+'" y="'+(baseY+3.5)+'" text-anchor="middle">'+daysSinceReferral+' days</text>'
+    : '';
+  const startMonth = toDateObj(TRAILING_12_START).toLocaleDateString('en-US',{month:'short',timeZone:'UTC'});
+  const xlabels = '<text class="acct-cadence-xlabel" x="'+padL+'" y="58" text-anchor="middle">'+startMonth+'</text>'+
+    '<text class="acct-cadence-xlabel" x="'+(W-padR)+'" y="58" text-anchor="end">Today</text>';
+
+  /* "Longest gap in the relationship": computed, not assumed: every historical gap between
+     consecutive referrals, checked against the current one. The mock's own note also names a
+     specific last-contacted date ("has not been contacted since Jul 28"); dropped, not
+     approximated: a Partner Account has no per-partner activity/contact-touch data on file
+     (BUILD_LOG §13al's own finding, D156), so that specific claim has nothing real to trace to
+     per CLAUDE.md §2b. */
+  let note = '';
+  if(isDormant && daysSinceReferral!=null){
+    const dates = referred.map(o=>o.createdDate).sort();
+    let maxHistGap = 0;
+    for(let i=1;i<dates.length;i++) maxHistGap = Math.max(maxHistGap, daysBetween(dates[i-1],dates[i]));
+    if(dates.length<2 || daysSinceReferral>=maxHistGap) note = 'Longest gap in the relationship.';
+  }
+
+  return '<div class="panel">'+
+    '<div class="panel-header"><div class="panel-header-text">'+
+      '<div class="panel-title">Referral cadence</div>'+
+      '<div class="panel-scope">Last 12 months, one dot per referral</div>'+
+    '</div>'+panelVerdictHtml(isDormant?'Gone quiet':'', 'warn')+'</div>'+
+    '<div class="panel-body">'+
+      '<svg class="acct-cadence-timeline" viewBox="0 0 '+W+' '+H+'" aria-hidden="true">'+
+        '<line class="acct-cadence-axis" x1="'+padL+'" y1="'+baseY+'" x2="'+(W-padR)+'" y2="'+baseY+'"></line>'+
+        dots+gapBox+xlabels+
+      '</svg>'+
+      (note ? '<div class="note">'+note+'</div>' : '')+
+    '</div>'+
+  '</div>';
+}
+/* Count vs size: this partner's share of every partner's trailing-12-month referrals, by count
+   and by size: the window the mock's own scope line names, computed to it. The verdict only
+   fires when the two shares genuinely diverge (a 3-point floor, not any nonzero gap); the "highest
+   ratio of any active partner" claim is checked against every real partner, never assumed true
+   the way the mock's own single illustrative example states it as fact. */
+function partnerSizeToCountShares(partnerId){
+  const ttm = D.opportunities.filter(o=>o.referralPartnerId===partnerId && inTrailing12(o.createdDate));
+  if(!ttm.length || !FIRM_TTM_REFERRED.count) return null;
+  const byCount = ttm.length/FIRM_TTM_REFERRED.count;
+  const value = ttm.reduce((s,o)=>s+o.facilitySize,0);
+  const bySize = FIRM_TTM_REFERRED.value ? value/FIRM_TTM_REFERRED.value : 0;
+  return {byCount, bySize};
+}
+function isHighestSizeToCountRatio(partnerId, ratio){
+  if(ratio==null || !isFinite(ratio)) return false;
+  return D.partners.every(p=>{
+    if(p.id===partnerId) return true;
+    const s = partnerSizeToCountShares(p.id);
+    const r = (s && s.byCount) ? s.bySize/s.byCount : null;
+    return r==null || !isFinite(r) || r<=ratio;
+  });
+}
+function acctCountVsSizeHtml(a, shares){
+  const byCount = shares ? shares.byCount : null, bySize = shares ? shares.bySize : null;
+  let verdict = '', verdictCls = '';
+  if(byCount!=null && bySize!=null && Math.abs(bySize-byCount)>=0.03){
+    verdict = bySize>byCount ? 'Fewer, larger deals' : 'More, smaller deals';
+    verdictCls = 'brand';
+  }
+  let note = '';
+  if(byCount!=null && bySize!=null && byCount>0){
+    note = 'Sends '+pct(byCount,1)+' of the firm’s referrals but '+pct(bySize,1)+' of the dollars.';
+    const ratio = bySize/byCount;
+    if(isHighestSizeToCountRatio(a.id, ratio)) note += ' The highest size-to-count ratio of any active partner.';
+  }
+  const bars = byCount!=null ? '<div class="acct-cvs">'+
+      '<span class="acct-cvs-label">By count</span>'+
+      '<div class="acct-cvs-track"><div class="acct-cvs-fill muted" style="width:'+Math.min(100,byCount*100).toFixed(1)+'%"'+tipAttr('By count', pct(byCount,1), '')+'></div></div>'+
+      '<span class="acct-cvs-value">'+pct(byCount,1)+'</span>'+
+      '<span class="acct-cvs-label">By size</span>'+
+      '<div class="acct-cvs-track"><div class="acct-cvs-fill" style="width:'+Math.min(100,bySize*100).toFixed(1)+'%"'+tipAttr('By size', pct(bySize,1), '')+'></div></div>'+
+      '<span class="acct-cvs-value">'+pct(bySize,1)+'</span>'+
+    '</div>' : '<div class="empty">No referrals in the trailing 12 months.</div>';
+  return '<div class="panel">'+
+    '<div class="panel-header"><div class="panel-header-text">'+
+      '<div class="panel-title">Count vs size</div>'+
+      '<div class="panel-scope">Share of all partner referrals, trailing 12 months</div>'+
+    '</div>'+panelVerdictHtml(verdict, verdictCls)+'</div>'+
+    '<div class="panel-body">'+bars+(note?'<div class="note">'+note+'</div>':'')+'</div>'+
+  '</div>';
+}
+/* Referred opportunities: open first, then most recent, top 4 with a real "View all N" drill to
+   the account's own Referrals tab. Reuses stageTagHtml()/moneyPlain() (acctDealsTabHtml()'s own
+   row ingredients) in a compact 3-column row rather than that function's full 5-column table:
+   the mocks draw a compact preview here, and the full table already exists one tab over; this is
+   not a second list, it's a narrower view of the same data with the same click-through. */
+function acctReferredOppsSummaryHtml(referred){
+  const sorted = referred.slice().sort((x,y)=>{
+    const xOpen = x.outcome==='open', yOpen = y.outcome==='open';
+    return xOpen!==yOpen ? (xOpen?-1:1) : y.createdDate.localeCompare(x.createdDate);
+  });
+  const rows = sorted.slice(0,4).map(o=>
+    '<div class="acct-summary-row clickable" onclick="location.hash=\'#/opp/'+o.id+'\'">'+
+      '<span class="name">'+esc(o.name)+'</span>'+stageTagHtml(o)+
+      '<span class="r">'+moneyPlain(o.facilitySize)+'</span>'+
+    '</div>').join('');
+  return '<div class="panel">'+
+    '<div class="panel-header"><div class="panel-header-text">'+
+      '<div class="panel-title">Referred opportunities</div>'+
+      '<div class="panel-scope">Open first, then most recent</div>'+
+    '</div>'+(referred.length ? '<div class="drill" onclick="setAccountSection(\'referrals\')">View all '+referred.length+'</div>' : '')+'</div>'+
+    '<div class="panel-body">'+(rows || '<div class="empty">No referrals on file yet.</div>')+'</div>'+
+  '</div>';
+}
+/* Where their referrals lose: the BDO Home loss card's own reason tally (lossTally(), shared,
+   never a second counting rule) filtered to this partner's own referred Closed-Lost deals, never
+   lossViewData()'s firm-wide fallback, which exists specifically to pad a THIN BDO sample and
+   would fabricate confidence a 2-6-referral partner's own real, thin sample doesn't have. No
+   "View all" drill: there is no lost-referrals list page to send it to, and a link to nowhere is
+   its own small dishonesty. */
+function acctReferralLossHtml(referred){
+  const lost = referred.filter(o=>o.outcome==='lost');
+  const tally = lossTally(lost, o=>o.closedLostReason);
+  const rows = Object.entries(tally).sort((x,y)=>y[1].n-x[1].n).map(([reason,v])=>
+    '<div class="acct-summary-row">'+
+      '<span class="name">'+esc(reason)+'</span>'+
+      '<span class="sec">'+v.n+'</span>'+
+      '<span class="r sec">'+moneyPlain(v.val)+'</span>'+
+    '</div>').join('');
+  return '<div class="panel">'+
+    '<div class="panel-header"><div class="panel-header-text">'+
+      '<div class="panel-title">Where their referrals lose</div>'+
+      '<div class="panel-scope">'+lost.length+' lost referral'+(lost.length===1?'':'s')+', lifetime</div>'+
+    '</div></div>'+
+    '<div class="panel-body">'+(rows || '<div class="empty">No lost referrals on file.</div>')+'</div>'+
+  '</div>';
+}
+/* D137's fixed 2x2 order for the Partner Summary. */
+function acctPartnerSummaryHtml(a, cfg){
+  const referred = cfg.referred;
+  return '<div class="acct-summary-grid">'+
+    acctReferralCadenceHtml(a, cfg)+
+    acctCountVsSizeHtml(a, partnerSizeToCountShares(a.id))+
+    acctReferredOppsSummaryHtml(referred)+
+    acctReferralLossHtml(referred)+
+  '</div>';
+}
+
+/* ================================================================
+   PASS 2, COMMIT 3: Prospect Summary tab (D137), slots 2 and 3 (Liens on file, Trade
+   relationships). Slots 1 and 4 (Opportunities+cross-sell badge, Key contacts, D163) are blocked
+   on a redrawn, re-approved mock (commit 4) and still render the D51 stub this commit.
+   ================================================================ */
+/* Liens on file: real LIENS_BY_ACCT rows, the verdict badge computing the exact same
+   subordinate-lien velocity finding lienPanelHtml() already states (lienVelocityLine(), shared,
+   not a second wording): rendered only when this account's own position actually triggers the
+   finding (a subordinated lien on file AND the book-wide subordinated average genuinely exceeds
+   the clean average), per this task's own "if the position does not trigger the finding, no
+   badge" instruction. The middle column composes what's real per row: "Senior" is derived from
+   priorityRank===1 (the first lien is definitionally senior), a warn "Subordinate" pill from the
+   real `subordinated` flag, and the real `collateralDescription` for every other row, never a
+   single invented label standing in for three different real facts. */
+function acctLiensOnFileSummaryHtml(a){
+  const liens = LIENS_BY_ACCT[a.id] || [];
+  const hasSub = liens.some(l=>l.subordinated);
+  const triggers = hasSub && UW_STATS.sub!=null && UW_STATS.clean!=null && UW_STATS.sub>UW_STATS.clean;
+  const rows = liens.map(l=>{
+    const mid = l.subordinated ? '<span class="tag warn">Subordinate</span>'
+      : l.priorityRank===1 ? '<span class="sec">Senior</span>'
+      : '<span class="sec">'+esc(l.collateralDescription)+'</span>';
+    return '<div class="acct-summary-row">'+
+      '<span class="name">'+esc(l.securedParty)+'</span>'+mid+
+      '<span class="r sec">'+fmtDateMonthYear(l.filingDate)+'</span>'+
+    '</div>';
+  }).join('');
+  /* The mock's own scope line ("UCC search, run Sep 3 · from Account") names a search-run date
+     nothing in the dataset tracks (liens carry their own filingDate, not a single panel-level
+     "search run" event); an honest real count + provenance line stands in for it rather than
+     inventing that date, per CLAUDE.md §2b. */
+  return '<div class="panel">'+
+    '<div class="panel-header"><div class="panel-header-text">'+
+      '<div class="panel-title">Liens on file</div>'+
+      '<div class="panel-scope">'+liens.length+' filing'+(liens.length===1?'':'s')+' on record &middot; from Account</div>'+
+    '</div>'+panelVerdictHtml(triggers?'Expect longer underwriting':'', 'warn')+'</div>'+
+    '<div class="panel-body">'+
+      (rows || '<div class="empty">No liens on record for this account.</div>')+
+      (liens.length ? '<div class="note">'+lienVelocityLine(hasSub)+'</div>' : '')+
+    '</div>'+
+  '</div>';
+}
+/* Trade relationships: the Account centred, buys-from left, sells-to right, matching the mock's
+   own mini-graph. Uses warmPathsFor()'s own `list` (every real Closed-Won counterparty, not a
+   second CLOSED_WON_ACCT_IDS test) so this graph and the strip's Warm paths cell can never
+   disagree about which counterparties are warm. Node counts and positions vary by account: a
+   real graph computed from real edges, not the mock's own fixed illustrative coordinates. */
+function acctGraphNodeHtml(x, y, name, isWarm, isCenter){
+  const w = isCenter?84:76, h = isCenter?24:20, r = isCenter?7:6;
+  const max = isCenter?12:11;
+  const label = name.length>max ? name.slice(0,max-1)+'…' : name;
+  const cls = isCenter?'center':(isWarm?'warm':'');
+  return '<rect class="acct-graph-node'+(cls?' '+cls:'')+'" x="'+(x-w/2).toFixed(1)+'" y="'+(y-h/2).toFixed(1)+'" width="'+w+'" height="'+h+'" rx="'+r+'"></rect>'+
+    '<text class="acct-graph-label'+(cls?' '+cls:'')+'" x="'+x.toFixed(1)+'" y="'+(y+3.3).toFixed(1)+'" text-anchor="middle">'+esc(label)+'</text>'+
+    (isCenter?'':'<rect class="acct-graph-hit" x="'+(x-w/2).toFixed(1)+'" y="'+(y-h/2).toFixed(1)+'" width="'+w+'" height="'+h+'"'+
+      tipAttr(esc(name), isWarm?'Closed-Won &middot; warm path':'Trade relationship', '')+'></rect>');
+}
+function acctGraphColumnY(count, step, topY){
+  return Array.from({length:count}, (_,i)=>topY+i*step);
+}
+function acctTradeRelationshipsHtml(a){
+  const edges = EDGES_BY_ACCT[a.id] || [];
+  const warm = warmPathsFor(a.id);
+  const warmSet = new Set(warm.list);
+  const withOther = edges.map(e=>({
+    rel: e.fromAccountId===a.id ? 'buys' : 'sells',
+    otherId: e.fromAccountId===a.id ? e.toAccountId : e.fromAccountId,
+  })).map(x=>({...x, other:getAccount(x.otherId), isWarm:warmSet.has(x.otherId)}));
+  const buys = withOther.filter(x=>x.rel==='buys');
+  const sells = withOther.filter(x=>x.rel==='sells');
+
+  const verdict = warm.count>0 ? panelVerdictHtml(warm.count+' warm path'+(warm.count===1?'':'s'), 'brand') : '';
+  const scope = 'Buys from '+buys.length+' &middot; sells to '+sells.length+' &middot; from Account';
+
+  if(!withOther.length){
+    return '<div class="panel">'+
+      '<div class="panel-header"><div class="panel-header-text">'+
+        '<div class="panel-title">Trade relationships</div>'+
+        '<div class="panel-scope">'+scope+'</div>'+
+      '</div></div>'+
+      '<div class="panel-body"><div class="empty">No trade relationships on record for this account.</div></div>'+
+    '</div>';
+  }
+
+  /* Node count varies by account, so the drawing's own height grows to fit rather than letting
+     dense accounts (Castellano Manufacturing: 7 sells-to) overlap boxes at a fixed mock height,
+     a real, variable-density graph, not the mock's own fixed 6-node illustration. minStep (22px)
+     is exactly one 20px node box plus a 2px gap, the smallest spacing that never overlaps. */
+  const W=320,centerX=160,leftX=42,rightX=278;
+  const minStep=22, nodeHalf=10, topPad=14, bottomPad=28;
+  const maxCount = Math.max(buys.length, sells.length, 1);
+  const colSpan = minStep*(maxCount-1);
+  const H = Math.max(128, topPad+nodeHalf+colSpan+nodeHalf+bottomPad);
+  const centerY = topPad+nodeHalf+colSpan/2;
+  const buysY = acctGraphColumnY(buys.length, minStep, centerY-(minStep*(buys.length-1))/2);
+  const sellsY = acctGraphColumnY(sells.length, minStep, centerY-(minStep*(sells.length-1))/2);
+  const lines = [];
+  const nodes = [];
+  buys.forEach((x,i)=>{
+    lines.push('<line class="acct-graph-line'+(x.isWarm?' warm':'')+'" x1="'+leftX+'" y1="'+buysY[i].toFixed(1)+'" x2="'+centerX+'" y2="'+centerY+'"></line>');
+    nodes.push(acctGraphNodeHtml(leftX, buysY[i], x.other.name, x.isWarm, false));
+  });
+  sells.forEach((x,i)=>{
+    lines.push('<line class="acct-graph-line'+(x.isWarm?' warm':'')+'" x1="'+centerX+'" y1="'+centerY+'" x2="'+rightX+'" y2="'+sellsY[i].toFixed(1)+'"></line>');
+    nodes.push(acctGraphNodeHtml(rightX, sellsY[i], x.other.name, x.isWarm, false));
+  });
+  const captionY = H-6;
+  const captions = '<text class="acct-graph-caption" x="'+leftX+'" y="'+captionY+'" text-anchor="middle">buys from</text>'+
+    '<text class="acct-graph-caption" x="'+rightX+'" y="'+captionY+'" text-anchor="middle">sells to</text>';
+
+  const note = warm.strongest
+    ? '<div class="note">'+esc(warm.strongest.account.name)+' is an existing customer, the strongest warm path ('+money(warm.strongest.fundedValue)+' funded).</div>'
+    : '';
+
+  return '<div class="panel">'+
+    '<div class="panel-header"><div class="panel-header-text">'+
+      '<div class="panel-title">Trade relationships</div>'+
+      '<div class="panel-scope">'+scope+'</div>'+
+    '</div>'+verdict+'</div>'+
+    '<div class="panel-body">'+
+      '<svg class="acct-graph" viewBox="0 0 '+W+' '+H+'" aria-hidden="true">'+
+        lines.join('')+acctGraphNodeHtml(centerX, centerY, a.name, false, true)+nodes.join('')+captions+
+      '</svg>'+
+      note+
+    '</div>'+
+  '</div>';
+}
+function acctProspectSummaryHtml(a, cfg){
+  return '<div class="acct-summary-grid">'+
+    acctStubTabHtml('The Opportunities panel and its cross-sell verdict badge (D163) land in pass 2, commit 4, once the redrawn mock is approved.')+
+    acctLiensOnFileSummaryHtml(a)+
+    acctTradeRelationshipsHtml(a)+
+    acctStubTabHtml('The Key contacts panel (D163) lands in pass 2, commit 4, once the redrawn mock is approved.')+
+  '</div>';
+}
+
 /* Account-level Audit (D132/D138): activities/documents carry accountId or are Account-scoped
    directly, but field-edit history is still tracked per Opportunity only (AUDIT_BY_OPP); there is
    no Account-level edit concept to track separately. This aggregates the account's own real
@@ -61399,9 +61788,9 @@ function renderAccount(id, section, isNav){
   ACCOUNT_SECTION_FOR = id;
 
   let sectionBody;
-  if(ACCOUNT_SECTION==='summary') sectionBody = acctStubTabHtml(cfg.primaryType==='Prospect'
-    ? 'Opportunities, Products, Liens on file, and Trade relationships (D137) land in pass 2.'
-    : 'Referral cadence, Count vs size, Referred opportunities, and Where their referrals lose (D137) land in pass 2.');
+  if(ACCOUNT_SECTION==='summary') sectionBody = cfg.primaryType==='Prospect'
+    ? acctProspectSummaryHtml(a, cfg)
+    : acctPartnerSummaryHtml(a, cfg);
   else if(ACCOUNT_SECTION==='intelligence') sectionBody = acctStubTabHtml('Liens on file and D&B signal, surfaced with provenance (D130), land in pass 3.');
   else if(ACCOUNT_SECTION==='network') sectionBody = acctStubTabHtml('The trade-relationship graph, and the D143 factoring-debtor overlay, land in pass 3.');
   else if(ACCOUNT_SECTION==='opportunities') sectionBody = acctDealsTabHtml(acctOpps.slice().sort((x,y)=>y.createdDate.localeCompare(x.createdDate)), 'Opportunities', 'opportunities');
@@ -61681,6 +62070,15 @@ function networkPanelHtml(o){
   '</div>';
 }
 
+/* Pass 2, commit 3: shared by lienPanelHtml() (Opportunity Intelligence tab, unchanged behavior)
+   and the Prospect Summary's own Liens on file panel, so the subordinate-lien velocity finding
+   has one wording and one computation, never two that could quietly drift apart. */
+function lienVelocityLine(hasSub){
+  if(UW_STATS.sub==null || UW_STATS.clean==null) return '';
+  return hasSub
+    ? 'This account carries a subordinated lien. Book-wide, deals on subordinated-lien accounts average '+UW_STATS.sub.toFixed(0)+' days in Underwriting vs '+UW_STATS.clean.toFixed(0)+' days for clean-lien accounts (n='+UW_STATS.subN+' vs n='+UW_STATS.cleanN+').'
+    : 'This account’s liens are all first-priority. Book-wide, clean-lien accounts average '+UW_STATS.clean.toFixed(0)+' days in Underwriting vs '+UW_STATS.sub.toFixed(0)+' days for subordinated-lien accounts (n='+UW_STATS.cleanN+' vs n='+UW_STATS.subN+').';
+}
 function lienPanelHtml(o){
   const liens = LIENS_BY_ACCT[o.accountId] || [];
   const hasSub = liens.some(l=>l.subordinated);
@@ -61691,11 +62089,7 @@ function lienPanelHtml(o){
     '<td>'+(l.subordinated?'<span class="tag warn">Subordinated</span>':'<span class="tag neutral">First lien</span>')+'</td></tr>'
   ).join('');
 
-  const velocityLine = (UW_STATS.sub!=null && UW_STATS.clean!=null)
-    ? (hasSub
-        ? 'This account carries a subordinated lien. Book-wide, deals on subordinated-lien accounts average '+UW_STATS.sub.toFixed(0)+' days in Underwriting vs '+UW_STATS.clean.toFixed(0)+' days for clean-lien accounts (n='+UW_STATS.subN+' vs n='+UW_STATS.cleanN+').'
-        : 'This account’s liens are all first-priority. Book-wide, clean-lien accounts average '+UW_STATS.clean.toFixed(0)+' days in Underwriting vs '+UW_STATS.sub.toFixed(0)+' days for subordinated-lien accounts (n='+UW_STATS.cleanN+' vs n='+UW_STATS.subN+').')
-    : '';
+  const velocityLine = lienVelocityLine(hasSub);
 
   return '<div class="panel">'+
     '<div class="panel-header"><div class="panel-header-text">'+
