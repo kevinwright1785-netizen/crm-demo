@@ -196,6 +196,10 @@ h1,h2,h3,p,dl,dd{margin:0}
 .met-change.pos{color:var(--pos-ink)}
 .met-change.neg{color:var(--neg-ink)}
 .met-change.warn{color:var(--warn-ink)}
+/* D151 correction pass: the mock tints the strip FIGURE itself (not just its sub-line) while a
+   Partner is dormant. .met-change already had a warn tint; .met-figure had none, so this adds the
+   matching modifier rather than inventing a parallel scheme. */
+.met-figure.warn{color:var(--warn-ink)}
 /* Hover-revealed "view" affordance, cells that already open a modal only (.met.expandable). Pure
    CSS opacity fade, no JS, so no separate prefers-reduced-motion handling is needed the way a
    JS-timed animation would require (D48/§11.7's two-layer rule applies to JS-driven motion; this
@@ -818,35 +822,110 @@ table.tbl{width:100%;border-collapse:collapse}
    so there is no live component to reuse here; this is new markup, but modeled tightly on the
    hairline-separator language .met already uses for the strip (border-left, not a second border
    style), not an invented pattern. Fixed three columns, hairline-separated (never a card in the
-   grid, never a rail, per D136). */
-.acct-band{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-l);margin-bottom:var(--s5)}
-.acct-band-groups{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
-.acct-band-group{padding:var(--s4) var(--s5);border-left:1px solid var(--line)}
-.acct-band-group:first-child{border-left:none}
-.acct-band-group-title{font-size:11px;font-weight:500;color:var(--ink-3);margin-bottom:var(--s3)}
-.acct-band-field{display:flex;justify-content:space-between;align-items:baseline;gap:var(--s3);padding:var(--s1) 0}
-.acct-band-field .k{font-size:12px;color:var(--ink-2);white-space:nowrap}
-.acct-band-field .v{font-family:var(--ui);font-size:12px;color:var(--ink);text-align:right;font-weight:500}
+   grid, never a rail, per D136).
+   D151 correction pass: the approved mock (Other/mocks/account-360-*.html) puts a titled head row
+   (an h2 plus the provenance/drill scope line) at the TOP of the band, not a bottom footer bar the
+   way pass 1 built it: restructured to match; the band itself now carries the padding, and each
+   group's own vertical padding moved up to the band so the head row and the groups share one top
+   edge. */
+.acct-band{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-l);
+  margin-bottom:var(--s5);padding:var(--s4) var(--s5)}
+.acct-band-head{display:flex;justify-content:space-between;align-items:baseline;gap:var(--s4);
+  margin-bottom:var(--s3)}
+.acct-band-head h2{margin:0;font-size:13.5px;font-weight:500;color:var(--ink)}
+/* Fix commit: the approved mock's middle (chart) column is wider than the other two
+   (1fr 1.15fr 1fr), not an equal three-way split; matched exactly, no token involved (a grid
+   fr-ratio isn't a spacing value the 4pt scale governs). */
+.acct-band-groups{display:grid;grid-template-columns:1fr 1.15fr 1fr}
+.acct-band-group{padding:0 var(--s5)}
+.acct-band-group:first-child{padding-left:0}
+.acct-band-group:last-child{padding-right:0}
+.acct-band-group:not(:first-child){border-left:1px solid var(--line)}
+/* D162 fix commit: the mock's own band field is label-then-value flush left (a CSS Grid
+   `auto 1fr` column pair, the label column sized to its own group's widest label); pass 1 copied
+   the Opportunity's .kv table style instead (space-between, value right-aligned at the column
+   edge). Matched here with a fixed label width taken from the mock's own widest rendered label
+   across both configs (~96px, "Win rate, lifetime") rather than replicating CSS Grid's per-group
+   dynamic sizing: simpler, and the fixed width mock's the mechanism, not this exact per-group
+   number. Vertical spacing (padding:4px 0) is unchanged, D160/D161's own ruling. */
+.acct-band-field{display:flex;align-items:baseline;gap:var(--s3);padding:var(--s1) 0}
+.acct-band-field .k{flex:0 0 100px;font-size:12px;color:var(--ink-2);white-space:nowrap}
+.acct-band-field .v{font-family:var(--ui);font-size:12px;color:var(--ink);text-align:left;font-weight:500}
 .acct-band-field .v .sec{font-family:var(--ui);color:var(--ink-3);font-weight:400}
 .acct-band-chart{margin-top:var(--s2)}
-.acct-band-chart-wrap{margin:var(--s1) 0 var(--s2)}
-.acct-band-scope{border-top:1px solid var(--line);padding:var(--s3) var(--s5);font-size:12px;
-  color:var(--ink-3);display:flex;align-items:center;gap:var(--s3)}
-.acct-band-scope .drill{margin-left:auto}
+/* Fix commit: the mock's own scope-line class is 11px, the type floor; this component now sets
+   it explicitly rather than inheriting body's 12px, matching the mock rather than the broader
+   app's .panel-scope convention (12px), which is unrelated and untouched. */
+.acct-band-scope{font-size:11px;color:var(--ink-3);flex:0 0 auto;text-align:right}
+/* D161 fix commit: the band's one chart-bearing field per group (Revenue on a Prospect,
+   Cadence on a Partner) renders as the mocks' own composition, a caption+value text stack beside
+   the chart in one flex row, not a plain k/v field with the chart stacked underneath it (the
+   .acct-band-chart-wrap this replaces, now dead, removed). Matches D115's own "label above value"
+   anatomy already used everywhere else in the app, just laid out horizontally next to a chart
+   instead of vertically in a strip cell. */
+.acct-band-trend{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:var(--s2)}
+.acct-band-trend-label{font-size:12px;color:var(--ink-3)}
+/* 18px is a legal figure size; D112's -.03em negative tracking applies at 19px and up, so none is
+   set here, deliberately not matching the mock's own off-rule -.02em at this size (a rule-over-
+   mock case, same family as D160's pill-radius/pill-weight rulings). */
+.acct-band-trend-value{font-family:var(--ui);font-size:18px;font-weight:500;color:var(--ink);margin-top:var(--s1)}
+/* D162 fix commit: same smaller/lighter currency-unit treatment money() already applies via
+   .cur/.un everywhere else in the app (.met-figure, .opp-hero, .acct-hero); the mock's own
+   .unit class is .6em here specifically, the value this scoping uses. */
+.acct-band-trend-value .cur,.acct-band-trend-value .un{font-size:.6em;font-weight:400;color:var(--ink-2)}
+.acct-band-trend-change{font-size:11px;font-weight:500;color:var(--ink-3);margin-left:var(--s2)}
+.acct-band-trend-change.pos{color:var(--pos-ink)}
+.acct-band-trend-change.warn{color:var(--warn-ink)}
+.acct-band-trend-change.neg{color:var(--neg-ink)}
 /* Band charts (D136: revenue trend on a Prospect, referral cadence on a Partner). Every mark
    carries data-tip (§8's interactivity rule), styled entirely from :root tokens, no literal hex. */
-.acct-spark-svg,.acct-cadence-svg{display:block;width:140px;height:32px}
+/* D162 fix commit: box size matched to both mocks' own <svg width="96" height="34">, identical
+   in both configs, replacing an unmeasured 140x32. */
+.acct-spark-svg,.acct-cadence-svg{display:block;width:96px;height:34px}
 .acct-spark-line{fill:none;stroke:var(--brand);stroke-width:1.5}
-.acct-spark-dot{fill:var(--paper);stroke:var(--brand);stroke-width:1.3}
-.acct-spark-dot.rest{fill:var(--brand)}
+/* D162 fix commit, DESIGN_STANDARDS §8a/D117: only the latest point ("rest") stays visible at
+   rest; every other point sits at opacity 0 until the chart itself is hovered, mirroring the
+   already-established .linechart-dot-a/-b convention (execchart, D117's own first build) rather
+   than inventing a second pattern: this sparkline drew every point permanently, D117's own
+   miss, not caught until this pass measured against the mock's single end-dot. */
+.acct-spark-dot{fill:var(--brand);opacity:0;transition:opacity var(--t-fast) var(--ease)}
+.acct-spark-dot.rest{opacity:1}
+.acct-spark-svg:hover .acct-spark-dot{opacity:1}
 .acct-spark-hit{fill:transparent}
 .acct-cadence-bar{fill:var(--brand-a30)}
 .acct-cadence-bar.zero{fill:var(--sunken)}
-.acct-band-delta{font-family:var(--ui)}
-.acct-band-delta.pos{color:var(--pos-ink)}
-.acct-band-delta.neg{color:var(--neg-ink)}
-.acct-header-top{display:flex;justify-content:space-between;align-items:flex-start;gap:var(--s4)}
-.acct-header-actions{display:flex;gap:var(--s3);flex:0 0 auto}
+/* D151 correction pass: the header's own geometry (a two-column row, hero right-aligned opposite
+   a stacked name/pill + meta + actions column) genuinely differs from the Opportunity header's
+   single stacked column (name, hero, meta, all full width, D69). .opp-header itself (surface,
+   border, padding) is reused verbatim since that IS identical; everything inside it that governs
+   this two-column arrangement is new, per the build brief's "reuse where identical, fork where
+   not" rule.
+   Fix commit (D159): .opp-title/.opp-hero are NO LONGER reused here. Both render at
+   font-weight:400 (neither sets it to 500, and .opp-hero sets it to 400 explicitly), which never
+   matched the mock's 500 and was missed in the original pass; a scoped override on the Opportunity
+   record's own shared class is exactly what CLAUDE.md's don't-touch-the-Opportunity-record fence
+   is for avoiding, so the type treatment is forked to .acct-title/.acct-hero instead, weight 500
+   set there, and the mismatch on .opp-title/.opp-hero is left as D145's own finding to fix on the
+   Opportunity record (not fixed here). The type pill also moves: the mock draws it as a sibling of
+   the name in a flex row, not a child of the title text, so it no longer inherits the title's
+   -0.01em tracking (D112 doesn't permit negative tracking on a pill). */
+.acct-header-row{display:flex;justify-content:space-between;align-items:flex-start;gap:var(--s5)}
+.acct-header-left{flex:1 1 auto;min-width:0}
+.acct-title-row{display:flex;align-items:center;gap:var(--s2)}
+.acct-title{font-family:var(--ui);font-size:20px;font-weight:500;letter-spacing:-.01em;color:var(--ink)}
+.acct-header-hero{flex:0 0 auto;text-align:right}
+/* Fix commit: the mock's hero line-height is 1.05 (unitless), not the inherited body value
+   (1.45) the reused .opp-hero carried; at 44px that inherited line-height alone accounted for
+   17.6 of the header's 18.1px total height delta against the mock (63.8px rendered vs the mock's
+   46.2px), the dominant single cause. Not a spacing-scale value (line-height isn't a --s* token),
+   so matched to the mock's own literal ratio rather than snapped to anything. */
+.acct-hero{font-family:var(--ui);font-size:44px;font-weight:500;letter-spacing:-.03em;color:var(--ink);
+  line-height:1.05;margin-top:var(--s1)}
+.acct-hero .cur,.acct-hero .un{font-size:.45em;font-weight:400;color:var(--ink-2)}
+.acct-header-hero-label{font-size:11px;font-weight:500;color:var(--ink-3)}
+.acct-header-meta{display:flex;flex-wrap:wrap;gap:var(--s3);margin-top:var(--s1);font-size:12px;color:var(--ink-2)}
+.acct-header-meta-dot{color:var(--ink-3)}
+.acct-header-actions{display:flex;gap:var(--s2);margin-top:var(--s3)}
 
 /* record page (D71 shape): persistent header, a metric strip (Home's own component, D33/D34), a
    full-width section-nav, then section content as a packed grid rather than a stack of equal
@@ -1096,7 +1175,7 @@ table.tbl{width:100%;border-collapse:collapse}
     <div class="rail-nav" id="rail-nav">
       <div class="rail-marker" id="rail-marker"></div>
       <div class="rail-item" data-route="home" onclick="location.hash='#/home'">Home</div>
-      <div class="rail-item" data-route="pipeline" onclick="location.hash='#/pipeline'">Pipeline</div>
+      <div class="rail-item" data-route="pipeline" onclick="location.hash='#/pipeline'">Opportunities</div>
       <div class="rail-item" data-route="accounts" onclick="location.hash='#/accounts'">Accounts</div>
       <div class="rail-item inert" data-route="network" onclick="location.hash='#/network'">
         <span>Network</span><span class="spacer"></span><span class="tag">soon</span>
@@ -57065,6 +57144,51 @@ function fmtDate(s){
   if(!s) return '—';
   return toDateObj(s).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',timeZone:'UTC'});
 }
+/* D162 fix commit: two variants added to the one existing date formatter, per the task's own
+   instruction, rather than a second formatter written from scratch.
+   fmtDateMonthYear: "Mar 2024," a since-date or a lien filing date, granularity the mocks never
+   show a day for regardless of how recent or old the date is.
+   fmtDateShort: "Sep 1" for a date in TODAY's own year, falling back to "Sep 1, 2024" (fmtDate's
+   own full form) for a date in a different year, the mocks' own "current-year dates, no year"
+   convention for recent/operational dates (a D&B refresh, an activity touch). Both defer the
+   null case to fmtDate(s) rather than a second literal em dash. */
+function fmtDateMonthYear(s){
+  if(!s) return fmtDate(s);
+  return toDateObj(s).toLocaleDateString('en-US',{month:'short',year:'numeric',timeZone:'UTC'});
+}
+function fmtDateShort(s){
+  if(!s) return fmtDate(s);
+  if(s.slice(0,4)!==TODAY.slice(0,4)) return fmtDate(s);
+  return toDateObj(s).toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'UTC'});
+}
+/* D162 fix commit: a real-world D&B Paydex-to-days-slow conversion (the standard published
+   bracket table: 80 is "pays on time," each bracket below maps to a documented days-slow
+   figure), applied to the account's own real Paydex score. Not a dataset field, but not a
+   fabrication either: it's a known industry formula applied to a real number, the same kind of
+   derivation daysBetween() already applies to real dates elsewhere in this file. */
+const PAYDEX_DAYS_SLOW = {100:-30,90:-20,80:0,70:15,60:22,50:30,40:60,30:90,20:120};
+function paydexDaysSlow(score){
+  const bucket = Math.max(20, Math.min(100, Math.round(score/10)*10));
+  return PAYDEX_DAYS_SLOW[bucket];
+}
+/* D162 fix commit: US state abbreviation to full name, for band fields that compose a real
+   two-letter state (already stored) into the mock's own full-name form ("Indiana," not "IN").
+   Standard, unambiguous public reference data, not a per-account inference. */
+const US_STATE_NAMES = {AL:'Alabama',AK:'Alaska',AZ:'Arizona',AR:'Arkansas',CA:'California',
+  CO:'Colorado',CT:'Connecticut',DE:'Delaware',FL:'Florida',GA:'Georgia',HI:'Hawaii',ID:'Idaho',
+  IL:'Illinois',IN:'Indiana',IA:'Iowa',KS:'Kansas',KY:'Kentucky',LA:'Louisiana',ME:'Maine',
+  MD:'Maryland',MA:'Massachusetts',MI:'Michigan',MN:'Minnesota',MS:'Mississippi',MO:'Missouri',
+  MT:'Montana',NE:'Nebraska',NV:'Nevada',NH:'New Hampshire',NJ:'New Jersey',NM:'New Mexico',
+  NY:'New York',NC:'North Carolina',ND:'North Dakota',OH:'Ohio',OK:'Oklahoma',OR:'Oregon',
+  PA:'Pennsylvania',RI:'Rhode Island',SC:'South Carolina',SD:'South Dakota',TN:'Tennessee',
+  TX:'Texas',UT:'Utah',VT:'Vermont',VA:'Virginia',WA:'Washington',WV:'West Virginia',
+  WI:'Wisconsin',WY:'Wyoming',DC:'District of Columbia'};
+function stateFullName(abbr){ return US_STATE_NAMES[abbr] || abbr; }
+/* D162 fix commit: the mocks style a figure's unit/suffix ("days," "%," "ago") smaller and
+   lighter than its digits, the same treatment money()'s .cur/.un spans already give a currency
+   symbol; this is the non-currency equivalent, reusing the identical .un class so no new CSS
+   scoping is needed anywhere it's already applied (.met-figure, .acct-hero, .acct-band-trend-value). */
+function figUnit(value, suffix){ return value+'<span class="un">'+suffix+'</span>'; }
 
 /* ---------- period-scope helpers (D100) ----------
    Shared across both persona pages so "year to date" and "trailing 12 months" mean exactly one
@@ -57546,7 +57670,7 @@ function route(){
 
   const titles = {
     home: ROLE==='bdo' ? 'BDO Home' : 'Exec Home',
-    pipeline: 'Pipeline',
+    pipeline: 'Opportunities',
     opp: 'Opportunity',
     account: 'Account',
     intake: 'New Opportunity',
@@ -57807,12 +57931,13 @@ function buildFeed(bdoId){
   });
 
   // partner going dormant — referral source decaying. Question: "why did this referral source go
-  // quiet." No section answers it: Referral Partner/Date are real fields but only ever surface
-  // inside the Deal card's "show all fields" modal (D88 found the identical gap on Exec Home's
-  // own dormant-partner item), and there is no Partner-scoped page to route to instead. Flagged
-  // here rather than picked: stays on the omitted-section default (Details), same as `stall`,
-  // but for the opposite reason: `stall` is a genuine match, this is a genuine gap with no better
-  // option today.
+  // quiet." D134/D152: the Partner Account 360 now exists, and its Partner configuration leads
+  // with exactly this story (D141's header pill + strip cell), so this item routes there instead
+  // of an Opportunity record. Interim target is /referrals, not /summary: the Summary tab is still
+  // a D51 stub (pass 2) and landing a diagnostic click on a stub panel is worse than landing it one
+  // tab over on the real referral history, which already answers "how quiet, since when" via the
+  // header pill and strip cell above the tab bar either way. D152 logs the mandatory flip to
+  // /summary once D137's cadence panel exists in pass 2: see PROJECT_STATE §1 item 8.
   const seenPartner = new Set();
   myOpps.forEach(o=>{
     const p = o.referralPartnerId && PARTNERS[o.referralPartnerId];
@@ -57820,7 +57945,8 @@ function buildFeed(bdoId){
     seenPartner.add(p.id);
     const days = p.lastReferralDate ? daysBetween(p.lastReferralDate,TODAY) : null;
     cand.push({
-      type:'dormant', score: 32 + (days!=null?Math.min(24,(days-90)/8):24), oppId:o.id,
+      type:'dormant', score: 32 + (days!=null?Math.min(24,(days-90)/8):24),
+      href: '#/account/'+p.id+'/referrals',
       icon:'warn', glyph:'○', action:'Re-engage',
       title:esc(p.name)+' has gone quiet',
       sub:(days!=null?'No referral in '+days+' days':'No referral on record')+
@@ -58958,8 +59084,11 @@ function renderHome(){
             (feed.length ? feed.map(c=>
               /* D106: each item's own `section` (set in buildFeed(), per D89's destination rule)
                  rides along in the hash so the record lands on the section that answers the
-                 question the item raised, instead of always forcing Details. */
-              '<div class="feedrow" '+(c.oppId?('onclick="location.hash=\'#/opp/'+c.oppId+(c.section?'/'+c.section:'')+'\'"'):'')+'>'+
+                 question the item raised, instead of always forcing Details. D152: an item can
+                 carry an explicit `href` instead (the dormant-partner item routes to an Account,
+                 not an Opportunity): checked first, falling back to the oppId/section
+                 composition every other item type still uses. */
+              '<div class="feedrow" '+(c.href?('onclick="location.hash=\''+c.href+'\'"') : c.oppId?('onclick="location.hash=\'#/opp/'+c.oppId+(c.section?'/'+c.section:'')+'\'"'):'')+'>'+
                 '<div class="feed-icon '+c.icon+'">'+c.glyph+'</div>'+
                 '<div class="feed-main">'+
                   '<div class="feed-title">'+c.title+'</div>'+
@@ -58979,7 +59108,7 @@ function renderHome(){
             '</div><span class="panel-header-count">'+myOpen.length+' total deal'+(myOpen.length===1?'':'s')+'</span></div>'+
             '<div class="panel-body flush">'+pipelineSnapshotHtml(myOpen)+'</div>'+
             '<div class="panel-footer"><span>'+stageMixSummary(myOpen)+'</span>'+
-              '<span class="drill" onclick="location.hash=\'#/pipeline\'">Pipeline &rsaquo;</span></div>'+
+              '<span class="drill" onclick="location.hash=\'#/pipeline\'">Opportunities &rsaquo;</span></div>'+
           '</div>'+
 
           '<div class="panel home-calendar-panel">'+
@@ -60392,7 +60521,7 @@ function renderPipeline(){
     '</tbody></table></div>';
 
   document.getElementById('view-pipeline').innerHTML =
-    '<h1 class="page-heading">Pipeline</h1>'+
+    '<h1 class="page-heading">Opportunities</h1>'+
     '<div class="page-sub">'+opps.length+' deals · '+moneyPlain(totalVal)+' · '+seg.label+
       (PIPE_STAGE_FILTER ? ' · Stage: <b>'+esc(PIPE_STAGE_FILTER)+'</b> '+
         '<button class="stage-filter-clear" onclick="clearPipeStageFilter()">Clear filter &times;</button>' : '')+
@@ -60638,18 +60767,25 @@ window.openAccountRow = function(id){
 };
 
 /* ================================================================
-   ACCOUNT 360 RECORD (D54), commit 3 of 3: the record shell for both configurations (D135/D136).
-   ONE renderAccount() fed by ONE accountConfig() (branches inside, never two parallel render
-   functions, D133's rule made literal) reuses the Opportunity record's own shell classes
-   verbatim: .opp-header/.opp-eyebrow/.opp-title/.opp-hero/.opp-hero-label/.opp-meta (header),
-   .strip/.strip-4/.met/.met-label/.met-figure/.met-sub/.met-change (D115 strip, D127 separators),
-   .section-nav/.section-nav-marker/.section-nav-item plus positionTabMarker() (D107 tabs, D120
-   marker), listReturnBarHtml()/captureListReturnCtx()/LIST_RETURN_CTX (D106/D129, generalized by
-   D146). The D69 band (.acct-band*) is new markup: D71 removed the Opportunity's own band before
-   this pass began (PROJECT_STATE D71), so there is nothing live there to reuse; see that CSS
-   comment for detail. No entrance motion here: D118 (DESIGN_STANDARDS §9a) is ratified for BDO/Exec
-   Home only, and the Opportunity record it mirrors has none either, so matching it exactly means
-   having none.
+   ACCOUNT 360 RECORD (D54). ONE renderAccount() fed by ONE accountConfig() (branches inside,
+   never two parallel render functions, D133's rule made literal).
+   D151 correction pass (BUILD_LOG, this section): pass 1 reused the Opportunity's header classes
+   verbatim, including its single-stacked-column geometry; the approved mocks
+   (Other/mocks/account-360-*.html) draw a genuinely different two-column header (name/pills/meta/
+   actions on the left, the hero figure right-aligned opposite it), so per D151 ("the mock is the
+   spec; reuse where identical, fork where not") the header now forks its own
+   .acct-header-row/-left/-hero/-meta/-actions classes for that geometry while still reusing
+   .opp-header (the surface), .opp-title, and .opp-hero verbatim for their own type treatment
+   (size, weight, tracking are genuinely identical). The strip
+   (.strip/.strip-4/.met/.met-label/.met-figure/.met-sub/.met-change, D115/D127) and the tab
+   mechanics (.section-nav*, positionTabMarker(), D107/D120) are still reused verbatim: their
+   rendered result IS identical to the mock, nothing to fork. listReturnBarHtml()/
+   captureListReturnCtx()/LIST_RETURN_CTX (D106/D129, generalized by D146) likewise unchanged. The
+   D69 band (.acct-band*) is new markup, not a reuse: D71 removed the Opportunity's own band before
+   pass 1 began (PROJECT_STATE D71), so there was nothing live to point at; this pass restructures
+   it further to match the mock's top-of-band head row (see that CSS comment for detail). No
+   entrance motion here: D118 (DESIGN_STANDARDS §9a) is ratified for BDO/Exec Home only, and the
+   Opportunity record it mirrors has none either, so matching it exactly means having none.
    Header/strip/band fields are read-only this pass, the same call already made for
    sectionBorrowerDetailsHtml()'s Account-passthrough fields on the Opportunity record: most of
    this data is D&B-sourced, computed, or entered on another screen, surfaced here with provenance,
@@ -60668,6 +60804,55 @@ const FIRM_AVG_REFERRAL_SIZE = (function(){
   return referred.length ? referred.reduce((s,o)=>s+o.facilitySize,0)/referred.length : 0;
 })();
 
+/* D151 correction pass: the mock's Partner strip compares a partner's own referral win rate
+   against the firm-wide average across every partner, the same real-comparison-point pattern
+   FIRM_AVG_REFERRAL_SIZE already established above. Computed once from every closed referred
+   Opportunity that exists; null (not 0) when none exist yet, same honest-gap handling as
+   avgReferralGapDays() below. */
+const FIRM_REFERRAL_WIN_RATE = (function(){
+  const closed = D.opportunities.filter(o=>o.referralPartnerId && o.outcome!=='open');
+  const won = closed.filter(o=>o.outcome==='won');
+  return closed.length ? won.length/closed.length : null;
+})();
+
+/* D153: the one "warm path" definition, shared by the Prospect strip's Warm paths cell (this
+   pass) and, per D153's own logging, whichever function pass 2's D137 Trade relationships panel
+   calls to decide which counterparty to light in brand: never a second definition invented for
+   that panel later. The core test (an Account reachable via a networkEdge, either direction, that
+   itself holds a Closed-Won Opportunity) already exists three times in this file: the feed's
+   `warm` candidate, networkPanelHtml() (the Opportunity's own Network tab), and
+   pickIntakeAccount()/pickScenarioAccounts() (intake-scenario scoring), all built on the same
+   EDGES_BY_ACCT + CLOSED_WON_ACCT_IDS pair reused here. None of the three needed a DISTINCT
+   counterparty count (they count edges) or a funded-size ranking, which is why this is a new
+   function rather than a call to one of them: the underlying "is this a warm path" test is
+   identical everywhere, only the aggregation is new. */
+function warmPathsFor(accountId){
+  const edges = EDGES_BY_ACCT[accountId]||[];
+  const byOther = {};
+  edges.forEach(e=>{
+    const otherId = e.fromAccountId===accountId ? e.toAccountId : e.fromAccountId;
+    if(CLOSED_WON_ACCT_IDS.has(otherId)) byOther[otherId] = true;
+  });
+  const list = Object.keys(byOther).map(otherId=>({
+    accountId: otherId,
+    fundedValue: D.opportunities.filter(o=>o.accountId===otherId && o.outcome==='won')
+      .reduce((s,o)=>s+o.facilitySize,0),
+  })).sort((x,y)=>y.fundedValue-x.fundedValue);
+  return {
+    count: list.length,
+    strongest: list.length ? {account:getAccount(list[0].accountId), fundedValue:list[0].fundedValue} : null,
+  };
+}
+
+/* D151 correction pass: both mocks' meta line under the title (industry/type, location, since-
+   date, owner) is a flat row of dot-separated parts, drawn the same way in both configurations.
+   Shared here rather than built twice; falsy parts (an account with no computed owner yet) are
+   dropped rather than rendered as an empty "· ·". */
+function acctMetaLineHtml(parts){
+  return parts.filter(Boolean).map(p=>'<span>'+p+'</span>')
+    .join('<span class="acct-header-meta-dot">&middot;</span>');
+}
+
 /* D141's "typical gap": the real average spacing between this partner's own referred
    Opportunities' createdDate, not an authored number. null (not 0) when there's fewer than two
    referrals to gauge a gap from, an honest "not enough data" the caller must handle, per
@@ -60683,7 +60868,7 @@ function avgReferralGapDays(referredOpps){
 /* §8's chart rules: every mark carries data-tip (tipAttr, the app's one shared tooltip), styled
    only from :root tokens. Revenue trend (Prospect band). */
 function acctTrendSparklineHtml(values, labels){
-  const W=140,H=32,PAD=3, n=values.length;
+  const W=96,H=34,PAD=3, n=values.length;
   const min=Math.min.apply(null,values), max=Math.max.apply(null,values), span=(max-min)||1;
   const xAt = i => PAD + (W-PAD*2) * (n>1 ? i/(n-1) : 0.5);
   const yAt = v => H-PAD - (H-PAD*2) * ((v-min)/span);
@@ -60697,8 +60882,12 @@ function acctTrendSparklineHtml(values, labels){
   return '<svg class="acct-band-chart acct-spark-svg" viewBox="0 0 '+W+' '+H+'" aria-hidden="true"><path class="acct-spark-line" d="'+path+'"></path>'+marks+'</svg>';
 }
 /* Referral cadence, last 6 calendar quarters (Partner band): counted from the partner's own real
-   referred Opportunities' createdDate, bucketed by quarter, never an invented shape. */
-function acctCadenceQuartersHtml(referredOpps){
+   referred Opportunities' createdDate, bucketed by quarter, never an invented shape.
+   D161 fix commit: split into a data function and a render function so the band's own trend row
+   (this quarter's count vs. the trailing average, matching the Partner mock's "0 this quarter,
+   from 2.1 avg") can read the same real counts the chart already computes, rather than a second,
+   possibly-diverging calculation of "this quarter." */
+function acctCadenceQuarters(referredOpps){
   const d = toDateObj(TODAY);
   const curQStart = Math.floor(d.getUTCMonth()/3)*3;
   const quarters = [];
@@ -60712,8 +60901,11 @@ function acctCadenceQuartersHtml(referredOpps){
     quarters.push({start, end, label:'Q'+(Math.floor(mm/3)+1)+' '+y});
   }
   const counts = quarters.map(q=>referredOpps.filter(o=>o.createdDate>=q.start && o.createdDate<q.end).length);
+  return {quarters, counts};
+}
+function acctCadenceQuartersSvg(quarters, counts){
   const max = Math.max.apply(null, [1].concat(counts));
-  const W=140,H=32,gap=3, n=counts.length;
+  const W=96,H=34,gap=3, n=counts.length;
   const bw = (W-gap*(n-1))/n;
   const bars = counts.map((c,i)=>{
     const h = c===0 ? 1 : Math.max(2,(c/max)*(H-4));
@@ -60722,6 +60914,24 @@ function acctCadenceQuartersHtml(referredOpps){
       tipAttr(quarters[i].label, c+' referral'+(c===1?'':'s'), '')+'></rect>';
   }).join('');
   return '<svg class="acct-band-chart acct-cadence-svg" viewBox="0 0 '+W+' '+H+'" aria-hidden="true">'+bars+'</svg>';
+}
+/* D161 fix commit: the mock's own inline annotation beside a band trend value (Prospect's
+   "+9% yoy", both pos/neg tinted): a percent-change span, not the block-level .met-change this
+   math already exists for (D115's strip anatomy), since it sits inline beside an 18px value
+   rather than under a strip cell. Same computation as metChangeValueHtml(), a different wrapper;
+   kept as its own small function rather than force-fitting the block-level component into an
+   inline layout it wasn't built for. */
+function acctTrendChangeHtml(current, prior, label, goodDirection){
+  if(!prior) return '';
+  const delta = (current-prior)/prior;
+  if(!isFinite(delta)) return '';
+  const up = delta>0;
+  const good = delta===0 ? null : (goodDirection==='up' ? up : !up);
+  const cls = good==null ? '' : (good?'pos':'neg');
+  const sign = delta===0 ? '' : (up?'+':'−');
+  const mag = Math.abs(delta*100);
+  const shown = mag<10 ? mag.toFixed(1) : String(Math.round(mag));
+  return '<span class="acct-band-trend-change'+(cls?' '+cls:'')+'">'+sign+shown+'% '+label+'</span>';
 }
 
 function acctSectionsForType(primaryType){
@@ -60759,31 +60969,51 @@ function accountConfig(a){
   if(primaryType==='Prospect'){
     const openOpps = D.opportunities.filter(o=>o.accountId===a.id && o.outcome==='open');
     const wonOpps = D.opportunities.filter(o=>o.accountId===a.id && o.outcome==='won');
-    const lostOpps = D.opportunities.filter(o=>o.accountId===a.id && o.outcome==='lost');
     const openValue = openOpps.reduce((s,o)=>s+o.facilitySize,0);
     const exposureValue = wonOpps.reduce((s,o)=>s+o.facilitySize,0);
     const acctActs = ACTS_BY_ACCT[a.id]||[];
-    const lastTouch = acctActs.length ? acctActs.reduce((m,x)=>x.date>m?x.date:m, acctActs[0].date) : null;
-    const closedCount = wonOpps.length+lostOpps.length;
-    const winRate = closedCount ? wonOpps.length/closedCount : null;
+    /* D151 correction pass: the mock's "Last touch" strip figure is a day-count with a real
+       activity's own type/owner/date on the sub-line ("6 days" / "Call, R. Ochoa, Sep 1"), not a
+       bare date; needs the actual most-recent activity record, not just its date string. */
+    const lastAct = acctActs.length ? acctActs.reduce((m,x)=>x.date>m.date?x:m, acctActs[0]) : null;
     const ownerOpp = openOpps.slice().sort((x,y)=>y.facilitySize-x.facilitySize)[0]
       || D.opportunities.filter(o=>o.accountId===a.id).slice().sort((x,y)=>y.createdDate.localeCompare(x.createdDate))[0];
     const owner = ownerOpp ? BDOS[ownerOpp.bdoId] : null;
+    /* D151 correction pass: mock's "Liens on file" strip cell, real LIENS_BY_ACCT data (already
+       used by the Opportunity's own Intelligence tab, lienPanelHtml()), never fabricated. */
+    const acctLiens = LIENS_BY_ACCT[a.id]||[];
+    const subLiens = acctLiens.filter(l=>l.subordinated);
+    const latestSubDate = subLiens.length ? subLiens.reduce((m,l)=>l.filingDate>m?l.filingDate:m, subLiens[0].filingDate) : null;
+    /* D153: Kevin's explicit, logged deviation from the approved mock (which shows "Products
+       held"); see the D153 decisions-log entry for the domain reason. warmPathsFor() is the one
+       shared definition, above. */
+    const warmPaths = warmPathsFor(a.id);
 
-    cfg.eyebrow = '<span>'+esc(a.industryName)+'</span><span>&middot;</span><span>'+esc(a.location)+'</span>';
+    cfg.metaParts = [esc(a.industryName), esc(a.location), 'Customer since '+fmtDateMonthYear(a.createdDate),
+      owner ? 'Owner: '+esc(owner.name) : null];
     cfg.pills = accountTypeTagsHtml(a);
     cfg.heroLabel = 'Total exposure';
-    cfg.heroValue = '<span class="ef-hero">'+moneyPlain(exposureValue)+'</span>';
+    cfg.heroValue = '<span class="ef-hero">'+money(exposureValue)+'</span>';
     cfg.heroSub = wonOpps.length+' funded facilit'+(wonOpps.length===1?'y':'ies');
     cfg.primaryAction = {label:'New opportunity', onclick:"resetQuickCreate();openModal('quickCreate')"};
     cfg.secondaryAction = {label:'Log activity', onclick:"setAccountSection('activity')"};
 
     cfg.stripCells = [
-      {label:'Open pipeline', figure:moneyPlain(openValue), sub:openOpps.length+' open opportunit'+(openOpps.length===1?'y':'ies')},
-      {label:'Win rate', figure: winRate!=null ? pct(winRate) : '–',
-        sub: closedCount ? wonOpps.length+' won &middot; '+lostOpps.length+' lost' : 'No closed deals yet'},
-      {label:'Last touch', figure: fmtDate(lastTouch), sub:'Most recent activity'},
-      {label:'Owner', figure: esc(owner?owner.name:'–'), sub:'Relationship owner'},
+      {label:'Open pipeline', figure:money(openValue),
+        sub: openOpps.length===0 ? 'No open opportunities'
+          : openOpps.length===1 ? '1 deal, in '+esc(openOpps[0].stage)
+          : openOpps.length+' open opportunities'},
+      {label:'Warm paths', figure: warmPaths.count,
+        sub: warmPaths.strongest
+          ? 'via '+esc(warmPaths.strongest.account.name)+', '+money(warmPaths.strongest.fundedValue)+' funded'
+          : 'No existing clients in the trade graph'},
+      {label:'Liens on file', figure: acctLiens.length,
+        sub: subLiens.length ? subLiens.length+' subordinate, filed '+fmtDateMonthYear(latestSubDate)
+          : (acctLiens.length ? 'All first-priority' : 'No liens on file'),
+        subCls: subLiens.length ? 'warn' : ''},
+      {label:'Last touch', figure: lastAct ? figUnit(daysBetween(lastAct.date,TODAY), ' days') : '–',
+        sub: lastAct ? esc(lastAct.type)+', '+esc(BDOS[lastAct.bdoId]?BDOS[lastAct.bdoId].name:'')+', '+fmtDateShort(lastAct.date)
+          : 'No activity logged yet'},
     ];
 
     const prov = a.fieldProvenance;
@@ -60792,21 +61022,46 @@ function accountConfig(a){
     const latestRefresh = Object.keys(prov).filter(k=>prov[k].source==='dnb').map(k=>prov[k].asOf).sort().pop();
     const referredBy = a.referredByPartnerId ? getAccount(a.referredByPartnerId) : null;
 
+    cfg.bandTitle = 'About the business';
+
+    /* D162 fix commit: composed to the mocks' own form wherever data/generate.js holds what it
+       needs; where it doesn't (flagged in this pass's own report, not fabricated per CLAUDE.md
+       §2b), the raw field stays. Founded's ownership qualifier is derived from the real, already-
+       shown `ownership` enum (not invented); Paydex's "days slow" is a real D&B bracket-table
+       conversion applied to the real score (see paydexDaysSlow()'s own comment). Sites has no
+       per-site location data to compose "both Indiana" from, left raw. Ownership has no owner
+       name or share on file (the mock's "M. Castellano, 100%" is a specific person and a stake
+       size, neither modeled), left as the raw enum. */
+    const OWNERSHIP_QUALIFIER = {'Founder-owned':'founder owned','Family-owned':'family owned',
+      'PE-backed':'PE-backed','Employee-owned':'employee owned','Publicly traded':'publicly traded'};
+    const paydexDays = paydexDaysSlow(a.paydex);
+    const paydexPhrase = paydexDays>0 ? 'pays '+paydexDays+' days slow'
+      : paydexDays<0 ? 'pays '+Math.abs(paydexDays)+' days early' : 'pays on time';
+
     cfg.bandGroups = [
       {title:'The business', fields:[
-        {k:'Legal entity', v:esc(a.legalEntityType)+' &middot; '+esc(a.entityState)},
-        {k:'Founded', v:a.foundedYear},
+        {k:'Legal entity', v:esc(a.legalEntityType)+', '+esc(stateFullName(a.entityState))},
+        {k:'Founded', v:a.foundedYear+', '+esc(OWNERSHIP_QUALIFIER[a.ownership]||a.ownership.toLowerCase())},
         {k:'Employees', v:a.employeeCount.toLocaleString('en-US')},
         {k:'Sites', v:a.siteCount},
       ]},
       {title:'The financials', fields:[
-        {k:'Revenue', v:moneyPlain(a.annualRevenue), chart:acctTrendSparklineHtml(a.revenueTrend, ['FY-4','FY-3','FY-2','FY-1','FY0'])},
-        {k:'EBITDA', v:moneyPlain(a.ebitda)+' <span class="sec">('+pct(a.ebitda/a.annualRevenue)+' margin)</span>'},
+        {k:'Revenue', v:moneyPlain(a.annualRevenue),
+          /* trend.value uses money(), the same abbreviating-with-styled-units formatter the
+             hero and strip currency figures now use, not f.v's full-digit moneyPlain(): the mock
+             keeps the value and its inline "+9% yoy" change on one line beside the chart, and the
+             full-digit form doesn't fit that column width without wrapping to a third line. f.v
+             (moneyPlain) is untouched for the "View all N fields" modal, where precision reads as
+             real to a finance reader. */
+          trend:{label:'Revenue, FY'+TODAY.slice(0,4), value:money(a.annualRevenue),
+            change:acctTrendChangeHtml(a.revenueTrend[4], a.revenueTrend[3], 'yoy', 'up')},
+          chart:acctTrendSparklineHtml(a.revenueTrend, ['FY-4','FY-3','FY-2','FY-1','FY0'])},
+        {k:'EBITDA', v:money(a.ebitda)+', '+pct(a.ebitda/a.annualRevenue,1)+' margin'},
         {k:'Existing lenders', v: a.existingLenders.length ? esc(a.existingLenders.join(', ')) : '–'},
       ]},
       {title:'The credit picture', fields:[
-        {k:'D&amp;B rating', v:esc(a.dnbRating)},
-        {k:'Paydex', v:a.paydex},
+        {k:'D&B rating', v:esc(a.dnbRating)},
+        {k:'Paydex', v:a.paydex+' &middot; '+paydexPhrase},
         {k:'Ownership', v:esc(a.ownership)},
         {k:'Referred by', v: referredBy ? '<span class="drill" onclick="location.hash=\'#/account/'+referredBy.id+'\'">'+esc(referredBy.name)+'</span>' : '–'},
       ]},
@@ -60817,16 +61072,15 @@ function accountConfig(a){
       {k:'Industry code', v:esc(a.industryCode)},
       {k:'Client since', v:fmtDate(a.createdDate)},
     ];
-    cfg.bandScope = dnbCount+' field'+(dnbCount===1?'':'s')+' from D&amp;B'+(latestRefresh?' (refreshed '+fmtDate(latestRefresh)+')':'')+
+    cfg.bandScope = (latestRefresh ? 'D&amp;B, refreshed '+fmtDateShort(latestRefresh)
+        : dnbCount+' field'+(dnbCount===1?'':'s')+' from D&amp;B')+
       ' &middot; '+repCount+' rep-entered';
   } else {
     const profile = partnerProfileOf(a);
     const referred = D.opportunities.filter(o=>o.referralPartnerId===a.id);
     const funded = referred.filter(o=>o.outcome==='won');
     const ttmReferred = referred.filter(o=>inTrailing12(o.createdDate));
-    const priorTtmReferred = referred.filter(o=>inPriorTrailing12(o.createdDate));
     const ttmValue = ttmReferred.reduce((s,o)=>s+o.facilitySize,0);
-    const priorTtmValue = priorTtmReferred.reduce((s,o)=>s+o.facilitySize,0);
     const lifetimeValue = referred.reduce((s,o)=>s+o.facilitySize,0);
     const fundedValue = funded.reduce((s,o)=>s+o.facilitySize,0);
     const gapDays = avgReferralGapDays(referred);
@@ -60837,52 +61091,98 @@ function accountConfig(a){
     const owner = recentReferred ? BDOS[recentReferred.bdoId] : null;
     const contact = profile.primaryContactId ? CONTACTS_BY_ID[profile.primaryContactId] : null;
     const partnerAvg = referred.length ? lifetimeValue/referred.length : null;
-    const vsFirm = (partnerAvg!=null && FIRM_AVG_REFERRAL_SIZE) ? (partnerAvg-FIRM_AVG_REFERRAL_SIZE)/FIRM_AVG_REFERRAL_SIZE : null;
+    /* D151 correction pass: mock's "Win rate on referrals" strip cell, real closed-referral
+       outcomes, by count and by size, against FIRM_REFERRAL_WIN_RATE (every partner's own closed
+       referrals), never a guessed benchmark. */
+    const closedReferred = referred.filter(o=>o.outcome!=='open');
+    const wonReferred = closedReferred.filter(o=>o.outcome==='won');
+    const winRateByCount = closedReferred.length ? wonReferred.length/closedReferred.length : null;
+    const closedReferredValue = closedReferred.reduce((s,o)=>s+o.facilitySize,0);
+    const wonReferredValue = wonReferred.reduce((s,o)=>s+o.facilitySize,0);
+    const winRateBySize = closedReferredValue ? wonReferredValue/closedReferredValue : null;
+    /* D151 correction pass: mock's "Referrals in pipeline" strip cell, this partner's own open
+       referred Opportunities. */
+    const openReferred = referred.filter(o=>o.outcome==='open');
+    const openReferredValue = openReferred.reduce((s,o)=>s+o.facilitySize,0);
 
-    cfg.eyebrow = '<span>'+esc(partnerTypeOf(a))+'</span><span>&middot;</span><span>'+esc(a.location)+'</span>';
+    cfg.metaParts = [esc(partnerTypeOf(a)), esc(a.location), 'Partner since '+fmtDateMonthYear(profile.firstActiveDate),
+      owner ? 'Owner: '+esc(owner.name) : null];
     /* D141, location 1 of 3: the header pill. Locations 2 and 3 are the strip's first cell and,
        once Summary lands in pass 2, the cadence panel's verdict badge. */
-    cfg.pills = accountTypeTagsHtml(a) + (isDormant ? ' <span class="tag warn">Dormant'+(daysSinceReferral!=null?' '+daysSinceReferral+'d':'')+'</span>' : '');
+    cfg.pills = accountTypeTagsHtml(a) + (isDormant ? ' <span class="tag warn">Dormant'+(daysSinceReferral!=null?' '+daysSinceReferral+' days':'')+'</span>' : '');
     cfg.heroLabel = 'Referred volume, trailing 12 months';
-    cfg.heroValue = '<span class="ef-hero">'+moneyPlain(ttmValue)+'</span>';
+    cfg.heroValue = '<span class="ef-hero">'+money(ttmValue)+'</span>';
     cfg.heroSub = ttmReferred.length+' opportunit'+(ttmReferred.length===1?'y':'ies')+' referred';
     cfg.primaryAction = {label:'Log activity', onclick:"setAccountSection('activity')"};
     cfg.secondaryAction = {label:'New opportunity', onclick:"resetQuickCreate();openModal('quickCreate')"};
 
-    /* D141, location 2 of 3: tinted (met-change.warn, not the plain met-sub) only while dormant. */
+    /* D141, location 2 of 3: tinted (met-change.warn AND met-figure.warn, not the plain met-sub/
+       met-figure) only while dormant: the mock tints the figure itself too, not only the caption
+       beneath it. */
     const gapSub = gapDays!=null
       ? (isDormant ? daysSinceReferral+' days since last referral (typical '+gapDays+')' : 'Typical gap '+gapDays+' days')
       : 'Not enough referrals yet to gauge a typical gap';
     cfg.stripCells = [
-      {label:'Last referral', figure: fmtDate(lastReferralDate), sub: gapSub, subCls: isDormant?'warn':''},
-      {label:'Referred, TTM', figure: moneyPlain(ttmValue), sub: ttmReferred.length+' opportunit'+(ttmReferred.length===1?'y':'ies'),
-        change: priorTtmValue ? metChangeValueHtml(ttmValue, priorTtmValue, 'vs prior 12mo', 'up') : ''},
-      {label:'Referred, lifetime', figure: moneyPlain(lifetimeValue), sub: referred.length+' opportunit'+(referred.length===1?'y':'ies')},
+      {label:'Last referral', figure: daysSinceReferral!=null ? figUnit(daysSinceReferral,' days ago') : (lastReferralDate?fmtDate(lastReferralDate):'–'),
+        figureCls: isDormant?'warn':'', sub: gapSub, subCls: isDormant?'warn':''},
+      {label:'Win rate on referrals', figure: winRateByCount!=null ? figUnit(Math.round(winRateByCount*100),'%') : '–',
+        sub: winRateByCount!=null ? 'by count'+(winRateBySize!=null ? ' &middot; '+pct(winRateBySize)+' by size' : '') : 'No closed referrals yet',
+        change: (winRateByCount!=null && FIRM_REFERRAL_WIN_RATE!=null) ? metChangePointsHtml(winRateByCount, FIRM_REFERRAL_WIN_RATE, 'vs firm partners', 'up') : ''},
+      {label:'Referrals in pipeline', figure: openReferred.length,
+        sub: openReferred.length===0 ? 'None open right now'
+          : openReferred.length===1 ? money(openReferredValue)+', in '+esc(openReferred[0].stage)
+          : money(openReferredValue)+' across '+openReferred.length+' deals'},
       {label:'Owner', figure: esc(owner?owner.name:'–'), sub:'Relationship owner'},
     ];
 
     const prov = profile.fieldProvenance;
     const repCount = Object.keys(prov).filter(k=>prov[k].source==='rep').length;
     const computedCount = Object.keys(prov).filter(k=>prov[k].source==='computed').length;
+    /* D161 fix commit: the mock's cadence trend row reads "0 this quarter, from 2.1 avg": the
+       current quarter's real count against the average of the preceding 5 (the same 6-quarter
+       window the chart itself draws, read once via acctCadenceQuarters() so the two never
+       diverge). Tinted warn when running below that trailing pace, pos at or above it, the same
+       above/below-benchmark convention the Partner strip's own Win-rate-vs-firm-average cell
+       already uses, not an invented scheme. */
+    const cadence = acctCadenceQuarters(referred);
+    const cadenceCurrent = cadence.counts[cadence.counts.length-1];
+    const cadencePriorAvg = cadence.counts.slice(0,-1).reduce((s,c)=>s+c,0)/(cadence.counts.length-1);
 
+    cfg.bandTitle = 'About the relationship';
+
+    /* D162 fix commit: composed to the mock's own form using real, already-computed data.
+       "Firm" merges two already-real fields (partnerType, staffCount) the mock shows as one row
+       rather than two; "Entity" adds the real state (derived from a.location the same way a
+       Prospect's own entityState already is, computed here since Partners never got their own
+       stored entityState field, no dataset change needed) and "est." wording. "Avg referral"
+       shows the real firm-average dollar figure the mock names ("vs $1.9M firm"), not the
+       percent-delta this pass's own D151 commit had substituted for it: FIRM_AVG_REFERRAL_SIZE
+       was already computed for exactly this comparison. "Win rate, lifetime" reuses
+       winRateByCount, already computed above for the strip, rather than a second calculation.
+       Gaps, not fabricated: "Segment" (the mock's value describes an industry/deal-size band
+       nothing in data/generate.js models, PARTNER_SEGMENTS is a short category enum, unrelated)
+       and "Coverage" (a geographic-coverage list with no backing field at all, so no row is added
+       rather than inventing one), both listed in this pass's own report for D101's scope. */
+    const partnerEntityState = a.location.split(', ')[1];
     cfg.bandGroups = [
       {title:'The firm', fields:[
-        {k:'Partner type', v:esc(partnerTypeOf(a))},
-        {k:'Entity', v:esc(profile.entityType)+' &middot; founded '+profile.foundedYear},
-        {k:'Staff', v:profile.staffCount},
-        {k:'Primary contact', v: contact ? esc(contact.name)+' <span class="sec">('+esc(contact.role)+')</span>' : '–'},
+        {k:'Firm', v:esc(partnerTypeOf(a))+', '+profile.staffCount+' staff'},
+        {k:'Entity', v:esc(profile.entityType)+', '+esc(stateFullName(partnerEntityState))+', est. '+profile.foundedYear},
+        {k:'Primary contact', v: contact ? esc(contact.name)+', '+esc(contact.role) : '–'},
       ]},
       {title:'Referral cadence', fields:[
         {k:'Segment', v:esc(profile.segment)},
         {k:'Products sent', v: profile.productsSent.length ? profile.productsSent.map(productTagHtml).join(' ') : '<span class="sec">None yet</span>'},
-        {k:'Cadence, last 6 quarters', v:referred.length+' referred lifetime', chart: acctCadenceQuartersHtml(referred)},
+        {k:'Cadence, last 6 quarters', v:referred.length+' referred lifetime',
+          trend:{label:'Referrals per quarter', value:String(cadenceCurrent),
+            change:'<span class="acct-band-trend-change '+(cadenceCurrent>=cadencePriorAvg?'pos':'warn')+'">this quarter, from '+cadencePriorAvg.toFixed(1)+' avg</span>'},
+          chart: acctCadenceQuartersSvg(cadence.quarters, cadence.counts)},
       ]},
       {title:'Lifetime economics', fields:[
-        {k:'Referred', v:referred.length+' &middot; '+moneyPlain(lifetimeValue)},
-        {k:'Funded', v:funded.length+' &middot; '+moneyPlain(fundedValue)},
-        {k:'Avg referral vs. firm avg', v: partnerAvg==null ? '–' :
-          moneyPlain(partnerAvg)+' <span class="acct-band-delta '+(vsFirm>=0?'pos':'neg')+'">'+
-          (vsFirm>=0?'+':'−')+Math.abs(Math.round(vsFirm*100))+'%</span>'},
+        {k:'Referred', v:referred.length+' deals, '+money(lifetimeValue)},
+        {k:'Funded', v:funded.length+' deals, '+money(fundedValue)},
+        {k:'Avg referral', v: partnerAvg==null ? '–' : money(partnerAvg)+', vs '+money(FIRM_AVG_REFERRAL_SIZE)+' firm'},
+        {k:'Win rate, lifetime', v: winRateByCount!=null ? pct(winRateByCount)+' by count' : '–'},
       ]},
     ];
     cfg.bandExtraFields = [
@@ -60899,21 +61199,40 @@ function acctStripHtml(cfg){
   return '<div class="strip strip-4">'+cfg.stripCells.map(c=>
     '<div class="met">'+
       '<div class="met-label">'+esc(c.label)+'</div>'+
-      '<div class="met-figure">'+c.figure+'</div>'+
+      '<div class="met-figure'+(c.figureCls?' '+c.figureCls:'')+'">'+c.figure+'</div>'+
       (c.subCls==='warn' ? '<div class="met-change warn">'+c.sub+'</div>' : '<div class="met-sub">'+c.sub+'</div>')+
       (c.change||'')+
     '</div>'
   ).join('')+'</div>';
 }
+/* D161 fix commit: a field carrying `f.trend` renders as the mocks' own composition: a caption
+   stacked above a bigger value (with its inline change annotation) laid out BESIDE the chart in
+   one flex row, not a plain k/v field with the chart underneath (pass 1's shape, and the shape
+   both mocks never actually drew). `f.v` stays the plain value used everywhere else a field
+   renders (acctBandAllFields()/the "View all N fields" modal reads it unchanged); `f.trend` is
+   read only here, for the one field per group that needs this treatment. */
 function acctBandFieldHtml(f){
-  if(f.chart){
-    return '<div class="acct-band-field"><span class="k">'+esc(f.k)+'</span><span class="v sec">'+f.v+'</span></div>'+
-      '<div class="acct-band-chart-wrap">'+f.chart+'</div>';
+  if(f.trend){
+    /* f.trend.value overrides f.v for the band's own display only (Partner cadence needs the
+       current quarter's bare count here vs. a lifetime-summary sentence in the "View all N
+       fields" modal); when absent (Revenue, same value serves both), f.v is reused unchanged. */
+    const value = f.trend.value!=null ? f.trend.value : f.v;
+    return '<div class="acct-band-trend">'+
+        '<div class="acct-band-trend-text">'+
+          '<div class="acct-band-trend-label">'+esc(f.trend.label)+'</div>'+
+          '<div class="acct-band-trend-value">'+value+(f.trend.change?' '+f.trend.change:'')+'</div>'+
+        '</div>'+
+        f.chart+
+      '</div>';
   }
   return '<div class="acct-band-field"><span class="k">'+esc(f.k)+'</span><span class="v">'+f.v+'</span></div>';
 }
+/* Fix commit: the approved mock draws no per-group title text at all (D136's "The business"/
+   "The financials"/"The credit picture" names the groups for the reader of that spec, not for the
+   screen). g.title stays on the config object (accountConfig() and the "View all N fields" modal
+   read it nowhere, so nothing downstream breaks), it's just not rendered here any more. */
 function acctBandGroupHtml(g){
-  return '<div class="acct-band-group"><div class="acct-band-group-title">'+esc(g.title)+'</div>'+
+  return '<div class="acct-band-group">'+
     g.fields.map(acctBandFieldHtml).join('')+
   '</div>';
 }
@@ -60922,13 +61241,16 @@ function acctBandAllFields(cfg){
   cfg.bandGroups.forEach(g=>g.fields.forEach(f=>shown.push(f)));
   return shown.concat(cfg.bandExtraFields||[]);
 }
+/* D151 correction pass: the mock puts the h2 title and the provenance/drill scope line together
+   at the TOP of the band, not a bottom footer bar (pass 1's own layout). */
 function acctBandHtml(cfg){
   const allFields = acctBandAllFields(cfg);
   return '<div class="acct-band">'+
-    '<div class="acct-band-groups">'+cfg.bandGroups.map(acctBandGroupHtml).join('')+'</div>'+
-    '<div class="acct-band-scope"><span>'+cfg.bandScope+'</span>'+
-      '<span class="drill" onclick="openModal(\'acctFields\')">View all '+allFields.length+' fields</span>'+
+    '<div class="acct-band-head"><h2>'+esc(cfg.bandTitle)+'</h2>'+
+      '<span class="acct-band-scope">'+cfg.bandScope+' &middot; '+
+        '<span class="drill" onclick="openModal(\'acctFields\')">View all '+allFields.length+' fields</span></span>'+
     '</div>'+
+    '<div class="acct-band-groups">'+cfg.bandGroups.map(acctBandGroupHtml).join('')+'</div>'+
   '</div>';
 }
 MODALS.acctFields = function(){
@@ -61054,13 +61376,15 @@ function renderAccount(id, section, isNav){
   let secondaryCount = null;
   if(cfg.secondaryType==='Partner') secondaryCount = a.partnerProfile.referralCount;
   else if(cfg.secondaryType==='Prospect') secondaryCount = D.opportunities.filter(o=>o.accountId===a.id).length;
+  /* D162 fix commit: D138/the mocks show no count on Summary or Audit; `audit` was mistakenly
+     included here (the Opportunity record's own OPP_SECTIONS never counts Audit either, this
+     brought the Account record in line with that existing precedent, not a new rule). */
   const sectionCounts = {
     opportunities: acctOpps.length,
     referrals: referredOpps.length,
     contacts: contacts.length,
     activity: acts.length,
     documents: docs.length,
-    audit: auditOpps.reduce((n,o)=>n+(AUDIT_BY_OPP[o.id]||[]).length,0),
     secondary: secondaryCount,
   };
 
@@ -61100,20 +61424,32 @@ function renderAccount(id, section, isNav){
         esc(s.label)+countHtml+'</button>';
     }).join('')+'</div>';
 
+  /* D151 correction pass: the mock's header is a two-column row (name/pills, meta line, actions
+     stacked on the left; label/value/sub-line hero right-aligned opposite it), not the
+     Opportunity header's single stacked column; see the .acct-header-row CSS comment for why
+     this is a fork, not a reuse, of the surrounding structure. D140's primary action renders
+     first, matching the mock, not the secondary.
+     Fix commit (D159): .opp-title/.opp-hero are no longer reused (see the .acct-title/.acct-hero
+     CSS comment); the pill also moves out of the title element into its own row, a sibling of the
+     name, matching the mock's markup. .opp-header itself is still reused verbatim (unaffected). */
   document.getElementById('view-account').innerHTML =
     listReturnBarHtml()+
     '<div class="opp-header">'+
-      '<div class="acct-header-top">'+
-        '<div class="opp-eyebrow">'+cfg.eyebrow+'</div>'+
-        '<div class="acct-header-actions">'+
-          '<button type="button" class="btn" onclick="'+cfg.secondaryAction.onclick+'">'+esc(cfg.secondaryAction.label)+'</button>'+
-          '<button type="button" class="btn primary" onclick="'+cfg.primaryAction.onclick+'">'+esc(cfg.primaryAction.label)+'</button>'+
+      '<div class="acct-header-row">'+
+        '<div class="acct-header-left">'+
+          '<div class="acct-title-row"><span class="acct-title">'+esc(a.name)+'</span>'+cfg.pills+'</div>'+
+          '<div class="acct-header-meta">'+acctMetaLineHtml(cfg.metaParts)+'</div>'+
+          '<div class="acct-header-actions">'+
+            '<button type="button" class="btn primary" onclick="'+cfg.primaryAction.onclick+'">'+esc(cfg.primaryAction.label)+'</button>'+
+            '<button type="button" class="btn" onclick="'+cfg.secondaryAction.onclick+'">'+esc(cfg.secondaryAction.label)+'</button>'+
+          '</div>'+
+        '</div>'+
+        '<div class="acct-header-hero">'+
+          '<div class="acct-header-hero-label">'+esc(cfg.heroLabel)+'</div>'+
+          '<div class="acct-hero">'+cfg.heroValue+'</div>'+
+          '<div class="met-sub">'+cfg.heroSub+'</div>'+
         '</div>'+
       '</div>'+
-      '<div class="opp-title">'+esc(a.name)+' '+cfg.pills+'</div>'+
-      '<div class="opp-hero">'+cfg.heroValue+'</div>'+
-      '<div class="opp-hero-label">'+cfg.heroLabel+'</div>'+
-      '<div class="opp-meta"><div class="opp-meta-item">'+cfg.heroSub+'</div></div>'+
     '</div>'+
     acctStripHtml(cfg)+
     acctBandHtml(cfg)+
