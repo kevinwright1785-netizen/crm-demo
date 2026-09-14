@@ -364,17 +364,33 @@ h1,h2,h3,p,dl,dd{margin:0}
    the calendar's real entries still run longer than the space it's given. */
 .agenda-scroll{overflow-y:auto}
 
-/* ---------- exec home: multi-column packing (D104 retired this on BDO Home; Exec keeps it) ----------
-   Firm-wide diagnostics/production cards still vary in count and height, so Exec Home continues to
-   use the measured shortest-column JS packer (packGrid(), D34/D73). BDO Home's own body is now a
-   fixed CSS grid (see .home-fixed-grid below), with no JS packing involved. break-inside keeps a
-   card whole. */
-.exec-diag-grid,.exec-prod-grid{display:flex;gap:var(--s5);align-items:flex-start}
-.home-col{flex:1;min-width:0;display:flex;flex-direction:column}
+/* ---------- fixed two-column grids: Exec Home's diagnostics/production bands and the
+   Opportunity Details tab (D104 applied to record pages, D174/D175) ----------
+   Runtime packing (packGrid()) is retired everywhere it used to run: these three grids and
+   .opp-details-grid (below) share one fixed CSS grid, stated order in the DOM, column bottoms
+   level BY CONSTRUCTION rather than measured and stretched. Each .home-col is a flex column;
+   its last card (:last-child) takes the remaining height via flex:1 1 auto, so a column's own
+   variable-content card (never a short, fixed-field one) is what absorbs the difference — pure
+   CSS, no offsetHeight read, nothing written back by JS. Below 1140px (the same breakpoint
+   value .home-row-feed above uses, D104) the grid collapses to a single column and every card
+   renders at its own natural height, in DOM order — no JS breakpoint check anywhere, no JS
+   constant to keep in sync with the CSS literal. */
+.exec-diag-grid,.exec-prod-grid,.opp-details-grid{display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--s5);align-items:stretch}
+@media (max-width:1140px){
+  .exec-diag-grid,.exec-prod-grid,.opp-details-grid{grid-template-columns:minmax(0,1fr)}
+}
+.exec-diag-grid > .home-col,.exec-prod-grid > .home-col,.opp-details-grid > .home-col{
+  min-width:0;display:flex;flex-direction:column}
+.exec-diag-grid > .home-col > .panel:last-child,
+.exec-prod-grid > .home-col > .panel:last-child,
+.opp-details-grid > .home-col > .panel:last-child{flex:1 1 auto}
 
 /* ---------- BDO Home body: fixed grid (D104/D123) ----------
-   Masonry (packGrid()/.home-col/alignGridColumns) is retired on Home: source order in the markup
-   now equals visual order top to bottom, and the row shape is fixed rather than measured. D123
+   Masonry is retired on Home: source order in the markup now equals visual order top to bottom,
+   and the row shape is fixed rather than measured (BDO Home uses its own .home-row-feed/
+   .home-col-right shape below, not the .home-col above — that one is now shared by the three
+   still-two-column record/Exec Home grids, D174/D175). D123
    chose this specific arrangement from an inline mockup of two options. The rejected alternative
    paired Snapshot alone beside the feed and Calendar with Partners on row 2, which left a void
    under the (shorter) Snapshot, the same bug family as the old masonry dead-void cases this
@@ -514,14 +530,15 @@ h1,h2,h3,p,dl,dd{margin:0}
 .exec-hero-sub{font-size:12px;color:var(--ink-2);margin-top:var(--s2)}
 .exec-band-heading{font-family:var(--ui);font-size:16px;font-weight:500;color:var(--ink);
   margin:var(--s6) 0 var(--s3)}
-/* D98: a plain CSS grid row for cards with genuinely comparable natural heights — no JS, no
-   packGrid()/alignGridColumns() involved at all. `align-items:stretch` is Grid's own default
-   (named explicitly here since it IS the mechanism): every card in the row shares the row's own
-   height because they're laid out in the same row, not because one was chosen to absorb a
-   deficit. This is why there is no victim and no cap to satisfy — see PROJECT_STATE D98 for why
-   this exists instead of a fourth packed-grid extraction. Collapses to a single stacked column at
-   the same breakpoint the packed grids use, where natural per-card heights are correct again
-   (nothing to compare against once cards aren't side by side). */
+/* D98: a plain CSS grid row for cards with genuinely comparable natural heights — no JS involved
+   at all, predating and unaffected by the D174/D175 fixed-grid rebuild of the two-column grids
+   above. `align-items:stretch` is Grid's own default (named explicitly here since it IS the
+   mechanism): every card in the row shares the row's own height because they're laid out in the
+   same row, not because one was chosen to absorb a deficit. This is why there is no victim and no
+   cap to satisfy — see PROJECT_STATE D98 for why this exists instead of a fourth extraction.
+   Collapses to a single stacked column at the same breakpoint the two-column grids use, where
+   natural per-card heights are correct again (nothing to compare against once cards aren't side
+   by side). */
 .exec-mix-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s5);
   align-items:stretch;margin-bottom:var(--s5)}
 @media (max-width:1140px){.exec-mix-row{grid-template-columns:1fr}}
@@ -993,22 +1010,19 @@ table.tbl{width:100%;border-collapse:collapse}
 .acct-graph-caption{font-family:var(--ui);font-size:9px;fill:var(--ink-3)}
 .acct-graph-hit{fill:transparent}
 
-/* record page (D71 shape): persistent header, a metric strip (Home's own component, D33/D34), a
-   full-width section-nav, then section content as a packed grid rather than a stack of equal
-   height boxes. Round 4b's full-width band is gone the same way round 4a's rail went — the record
-   page now reuses Home's own vocabulary (strip, packed grid, expand-to-modal) instead of
-   inventing record-page-specific components, so it stops reading as a different app glued onto
-   Home. min-width:0 on .record-main stops wide content (tables) from blowing past the viewport. */
+/* record page (D71 shape, D174/D176): persistent header, a metric strip (Home's own component,
+   D33/D34), a full-width section-nav, then section content as a fixed grid with a stated order,
+   column bottoms level by construction, rather than a stack of equal height boxes. Round 4b's
+   full-width band is gone the same way round 4a's rail went — the record page now reuses Home's
+   own vocabulary (strip, fixed grid, expand-to-modal) instead of inventing record-page-specific
+   components, so it stops reading as a different app glued onto Home. min-width:0 on
+   .record-main stops wide content (tables) from blowing past the viewport. */
 .record-main{min-width:0}
-/* Details tab (D73): a real packed grid, reusing the same packGrid()/.home-col mechanism Exec
-   Home's diagnostics/production grids use (D104 retired packing on BDO Home itself, but the
-   generic packer stays shared infrastructure, see .exec-diag-grid/.exec-prod-grid), not a
-   hand-assigned two-column split (that read as a fixed layout, not a pack, and is why the left
-   column used to run dry while the right kept going). Same shape deliberately, so this reads as
-   the same component, not a lookalike: equal-width flex columns, cards placed at
-   runtime by measured shortest-column packing, Next Best Action anchored to column one exactly
-   like the action feed anchors Home's. */
-.opp-details-grid{display:flex;gap:var(--s5);align-items:flex-start}
+/* Details tab (D174/D175): a fixed two-column grid, sharing the .exec-diag-grid/.exec-prod-grid
+   CSS above rather than a second copy — see that block's own comment for the mechanism. Next
+   Best Action anchors column one (left), exactly like the action feed anchors Home's, and the
+   two variable-content cards (Borrower details on the left, Underwriting or Outcome on the
+   right) are each their column's last card so they're the ones that absorb any leftover height. */
 /* Compact single-line rows, reused by the Signals card. A small colored glyph (no icon box, no
    radius) plus text — deliberately not .feedrow/.feed-icon, whose zero-padding "static" variant
    combined with a "flush" panel body caused the icon-overlaps-the-edge bug (D69/D71); these rows
@@ -105281,15 +105295,12 @@ let PARTNER_VIEW = 'dormancy';
 /* Swap one card in place. Calling renderHome() for a view toggle rebuilt the whole home and
    emptied the grid container to re-pack it, which collapsed the document height for a frame and
    made the browser clamp scroll toward the top — the visible jump. Replacing just this card's
-   node leaves every other node, and the scroll position, untouched. Deliberately does NOT
-   re-pack the grid: re-packing moves cards between columns, which is itself a scroll jump.
-   IMPORTANT (D79): this replaces the card's node WHOLESALE (`replaceWith`), so any inline style
-   another mechanism wrote onto the old node — specifically alignGridColumns()'s explicit
-   `style.height` on a column's last card — is discarded, not carried over to the fresh node. Any
-   caller that swaps a card which might be an aligned column's last child MUST reapply alignment
-   afterward (applyGridAlignment(), a cheap reapply, not a remeasure); swapPanel() itself doesn't,
-   because it has no way to know which grid it's swapping inside. This generalizes beyond
-   alignment: anything that writes state onto a card node has the same obligation after a swap. */
+   node leaves every other node, and the scroll position, untouched.
+   D174/D175: the fixed grids (Exec Home's diagnostics/production bands, the Opportunity Details
+   tab) no longer have any JS-written state to lose on a swap — a column's last card takes the
+   remaining height via a live CSS flex rule (:last-child{flex:1 1 auto}), not a `style.height`
+   another mechanism wrote and would need reapplying. A toggle-card swap here just re-renders the
+   card; the column re-levels on its own as a side effect of the browser's own layout pass. */
 function swapPanel(id, html){
   const el = document.getElementById(id);
   if(!el) return false;
@@ -105618,8 +105629,8 @@ MODALS.funded = function(){
 /* Both partners/loss modals below are scoped to whichever view was active when the card was
    clicked (MODAL_VIEW[key], set by openModal's `view` arg) — never a fixed dump of every view
    stacked together. setModalPartnerView/setModalLossView switch only the modal's own state and
-   refresh the modal body in place; they never call swapPanel or applyGridAlignment, so the card
-   and the Home grid are untouched by a view change made inside the modal. */
+   refresh the modal body in place; they never call swapPanel, so the card and the Home grid are
+   untouched by a view change made inside the modal. */
 MODALS.partners = function(){
   const view = MODAL_VIEW.partners || PARTNER_VIEW;
   const stats = partnerStats(CURRENT_BDO_ID);
@@ -105690,168 +105701,6 @@ MODALS.loss = function(){
   };
 };
 window.setModalLossView = function(v){ MODAL_VIEW.loss = v; refreshModalIfOpen('loss'); };
-
-/* Packing (D34, generalized D73) so a second consumer — the Opportunity record's Details grid —
-   reuses this exact algorithm instead of a second packer. The first (stamped) card is pinned to
-   column one because it's the anchor (Home's action feed; the Opportunity record's Next Best
-   Action) — everything after it packs. `after`, if given, runs once packing has genuinely
-   completed (not on a discarded 0-height retry frame) — the Opportunity record uses it to run the
-   bottom-alignment flex pass (D73) only after real column heights exist to measure.
-
-   D166: `cards` is sorted by each card's stamped `data-pack-order` before placement, not left in
-   DOM query order — a repack (resize is the only trigger that fires one on already-packed DOM)
-   would otherwise read the CURRENT column-major order instead of the stable priority order
-   (`DETAILS_CARD_ORDER` for Details, each Exec Home grid's own concatenation order) the original
-   pack used, drifting the split with every resize. `stampPackOrder()` below stamps that priority
-   index onto each card once, at HTML-emission time. A card with no stamp (a future consumer that
-   hasn't adopted this) keeps its existing relative position — stable sort, not a hard requirement.
-
-   D168: placement itself is no longer greedy shortest-column. With six cards of very different
-   natural heights (the Opportunity Details grid's usual shape), incrementally placing each card
-   into whichever column is shortest SO FAR routinely left the columns 150-200px apart — more than
-   any single card could plausibly absorb under GRID_STRETCH_CAP_RATIO (D97), so open deals ended
-   permanently uneven, correctly per D97's own logic but wrongly per the actual goal (Kevin's
-   ruling: the cap stays, the split gets smarter). Two changes:
-   (1) Measure once, before placing. Every card is appended to column one in stamped order and
-   `offsetHeight` is read once per card, in a single pass — no reads happen during placement, which
-   also removes any possibility of the D77 circular-measurement class of bug recurring here.
-   (2) Choose the split by enumeration, not greed. The anchor stays first in column one always.
-   Every possible assignment of the REMAINING cards to the two columns is enumerated (a card's
-   column, not its order — within a column, cards always stay in stamped order), and the one
-   minimizing the difference between column totals is chosen; a tie prefers the split the old
-   greedy pass would have produced, and failing that, the split closest to greedy (fewest cards
-   differing from it) — `chooseBestSplit()` computes both the enumeration and the greedy reference
-   in one pass. Enumeration is 2^(n-1) for n cards, capped at `PACK_EXACT_MAX_CARDS`; above that,
-   greedy is used directly (computed from the same single measurement, not re-reading offsetHeight
-   incrementally — so it's safer than the pre-D168 greedy even as a fallback, just not exhaustive).
-   Nothing about `alignGridColumns()`/`applyGridAlignment()`, the cap, replay, or edit-triggered
-   behavior changes — this only changes what packing hands them. */
-function stampPackOrder(html, order){
-  // Matches the card's own opening tag regardless of extra classes (e.g. "panel expandable") —
-  // anchored to the start of the string, so it never touches a nested .panel-* class further in.
-  return html.replace(/^(<div class="panel[^"]*")/, '$1 data-pack-order="'+order+'"');
-}
-const HOME_BREAKPOINT = 1140;
-const PACK_RETRY = {}; // selector -> consecutive failed attempts so far this packing sequence
-const PACK_RETRY_MAX = 3;
-// D168: above this many cards, exact best-of-all-splits enumeration (2^(n-1)) falls back to the
-// greedy reference split instead. Every grid packGrid() serves today has at most 7 cards; this is
-// headroom, not a limit this app is expected to hit — 2^11 = 2048 is trivial either way.
-const PACK_EXACT_MAX_CARDS = 12;
-// D168: the same greedy assignment packGrid() used pre-D168, replicated over an already-measured
-// heights array (no DOM reads) rather than live incremental offsetHeight reads. Used directly as
-// the placement when there are too many cards to enumerate exactly, and as the tie-break reference
-// otherwise. `heights[0]` is the anchor (always column one); returns the set of indices, INTO
-// `heights`, of the remaining cards assigned to column two.
-function greedyColumnTwoSet(heights){
-  let col1 = heights[0], col2 = 0;
-  const col2Set = new Set();
-  for(let i=1;i<heights.length;i++){
-    // Replicates `a.offsetHeight <= b.offsetHeight ? a : b` with a=col1, b=col2: ties favor col1.
-    if(col1 <= col2){ col1 += heights[i]; }
-    else { col2 += heights[i]; col2Set.add(i); }
-  }
-  return col2Set;
-}
-// D168: enumerates every assignment of heights[1..] to column two (column one gets the rest,
-// always including the anchor heights[0]), picks the one minimizing the column-total difference;
-// ties prefer the greedy reference, then whichever tied candidate differs from it least. Returns
-// the chosen set of indices INTO `heights` assigned to column two.
-function chooseBestSplit(heights){
-  const greedyRef = greedyColumnTwoSet(heights);
-  if(heights.length <= 1) return new Set();
-  const remainingCount = heights.length - 1; // indices 1..heights.length-1
-  const totalSum = heights.reduce((s,h)=>s+h, 0);
-  let bestDiff = Infinity;
-  let bestMasks = [];
-  for(let mask = 0; mask < (1 << remainingCount); mask++){
-    let col2 = 0;
-    for(let i=0;i<remainingCount;i++){ if(mask & (1<<i)) col2 += heights[i+1]; }
-    const diff = Math.abs((totalSum - col2) - col2);
-    if(diff < bestDiff){ bestDiff = diff; bestMasks = [mask]; }
-    else if(diff === bestDiff){ bestMasks.push(mask); }
-  }
-  let chosenMask = bestMasks[0];
-  let bestDistance = Infinity;
-  bestMasks.forEach(mask => {
-    let distance = 0;
-    for(let i=0;i<remainingCount;i++){
-      if(!!(mask & (1<<i)) !== greedyRef.has(i+1)) distance++;
-    }
-    if(distance < bestDistance){ bestDistance = distance; chosenMask = mask; }
-  });
-  const col2Set = new Set();
-  for(let i=0;i<remainingCount;i++){ if(chosenMask & (1<<i)) col2Set.add(i+1); }
-  return col2Set;
-}
-function packGrid(selector, breakpoint, after){
-  const grid = document.querySelector(selector);
-  if(!grid) return;
-  const rawCards = Array.from(grid.querySelectorAll(':scope > .home-col > *, :scope > *'))
-    .filter(el => !el.classList.contains('home-col'));
-  if(!rawCards.length) return;
-  // D166: stable sort on the stamped priority index — ties (including two unstamped cards, or an
-  // unstamped card relative to a stamped one) keep their original relative order.
-  const cards = rawCards
-    .map((el, i) => ({el, i, order: el.dataset.packOrder !== undefined ? parseInt(el.dataset.packOrder, 10) : NaN}))
-    .sort((a, b) => {
-      if(isNaN(a.order) && isNaN(b.order)) return a.i - b.i;
-      if(isNaN(a.order)) return 1;
-      if(isNaN(b.order)) return -1;
-      return (a.order - b.order) || (a.i - b.i);
-    })
-    .map(x => x.el);
-  const colCount = window.innerWidth <= breakpoint ? 1 : 2;
-  grid.innerHTML = '';
-  const cols = [];
-  for(let i=0;i<colCount;i++){
-    const c = document.createElement('div');
-    c.className = 'home-col';
-    grid.appendChild(c);
-    cols.push(c);
-  }
-  // D168: place every card into column one first, in stamped order, then measure once — no
-  // offsetHeight reads happen while cards are still being moved around.
-  cards.forEach(card => cols[0].appendChild(card));
-  const heights = cards.map(card => card.offsetHeight);
-  // If we were measured inside a hidden container every height reads 0. Detect that directly (D168
-  // measures every card up front, so this no longer needs to be inferred from column two ending up
-  // empty) and re-pack once the view is actually laid out — but only while BOTH an attempt budget
-  // remains AND this attempt is still degenerate. A condition that's still degenerate after
-  // PACK_RETRY_MAX attempts is persistent, not the one-frame hidden-container artifact this retry
-  // was built for, and retrying forever would itself freeze the page regardless of what's causing
-  // the condition (D77) — so it stops here and renders the degenerate-but-stable result instead.
-  const degenerate = colCount > 1 && cards.length > 1 && heights.every(h => h === 0);
-  const attemptsSoFar = PACK_RETRY[selector] || 0;
-  if(degenerate && attemptsSoFar < PACK_RETRY_MAX && typeof requestAnimationFrame === 'function'){
-    PACK_RETRY[selector] = attemptsSoFar + 1;
-    requestAnimationFrame(()=>{ packGrid(selector, breakpoint, after); });
-    return;
-  }
-  PACK_RETRY[selector] = 0;
-  if(colCount > 1 && cards.length > 1){
-    const col2Set = heights.length <= PACK_EXACT_MAX_CARDS
-      ? chooseBestSplit(heights)
-      : greedyColumnTwoSet(heights);
-    cards.forEach((card, i) => { if(col2Set.has(i)) cols[1].appendChild(card); });
-  }
-  if(after) after();
-}
-let HOME_RESIZE_TIMER = null;
-function packExecDiagGrid(){ packGrid('.exec-diag-grid', HOME_BREAKPOINT, function(){ alignGridColumns('.exec-diag-grid'); }); }
-function packExecProdGrid(){ packGrid('.exec-prod-grid', HOME_BREAKPOINT, function(){ alignGridColumns('.exec-prod-grid'); }); }
-window.addEventListener('resize', function(){
-  /* BDO Home's own grid (D104) is a fixed CSS grid now: it re-flows via the @media breakpoint on
-     its own, no JS packing or repack-on-resize involved. Only the still-JS-packed grids need this. */
-  if(!document.querySelector('.opp-details-grid') &&
-     !document.querySelector('.exec-diag-grid') && !document.querySelector('.exec-prod-grid')) return;
-  clearTimeout(HOME_RESIZE_TIMER);
-  HOME_RESIZE_TIMER = setTimeout(function(){
-    if(document.querySelector('.opp-details-grid')) packOppGrid();
-    if(document.querySelector('.exec-diag-grid')) packExecDiagGrid();
-    if(document.querySelector('.exec-prod-grid')) packExecProdGrid();
-  }, 120);
-});
 
 /* D118: once per session, per page ('bdo' vs. 'exec' tracked separately so toggling personas the
    first time still plays each page's own entrance, but toggling back to one already seen never
@@ -106859,8 +106708,9 @@ function execStalledPanelHtml(){
 }
 window.setExecStalledMeasure = function(v){
   EXEC_STALLED_MEASURE = v;
-  if(swapPanel('panel-exec-stalled', execStalledPanelHtml())) applyGridAlignment('.exec-diag-grid');
-  else renderExecHome();
+  // D174/D175: no realign call - .exec-diag-grid's column re-levels on its own (live CSS flex
+  // rule), the same reasoning D98 already established for .exec-mix-row.
+  if(!swapPanel('panel-exec-stalled', execStalledPanelHtml())) renderExecHome();
 };
 /* D94: pulled out of the packed grid entirely — it is two numbers and a line of text, and
    CLAUDE.md §4's "metric strip, not a KPI-card grid" rule already answers what that belongs in.
@@ -106951,8 +106801,9 @@ function execMonthlyPanelHtml(){
 }
 window.setExecMonthlyView = function(v){
   EXEC_MONTHLY_VIEW = v;
-  if(swapPanel('panel-exec-monthly', execMonthlyPanelHtml())) applyGridAlignment('.exec-prod-grid');
-  else renderExecHome();
+  // D98: this card lives in its own full-width row (extracted from the packed grid entirely),
+  // not .exec-prod-grid - nothing to realign there or anywhere else.
+  if(!swapPanel('panel-exec-monthly', execMonthlyPanelHtml())) renderExecHome();
 };
 function execPipelineByStagePanelHtml(){
   const open = execFirmOpen();
@@ -107015,13 +106866,12 @@ function execSourcingPanelHtml(){
 }
 window.setExecSourcingView = function(v){
   EXEC_SOURCING_VIEW = v;
-  if(swapPanel('panel-exec-sourcing', execSourcingPanelHtml())) applyGridAlignment('.exec-prod-grid');
-  else renderExecHome();
+  // D174/D175: no realign call - .exec-prod-grid's column re-levels on its own.
+  if(!swapPanel('panel-exec-sourcing', execSourcingPanelHtml())) renderExecHome();
 };
 window.setExecSourcingMeasure = function(v){
   EXEC_SOURCING_MEASURE = v;
-  if(swapPanel('panel-exec-sourcing', execSourcingPanelHtml())) applyGridAlignment('.exec-prod-grid');
-  else renderExecHome();
+  if(!swapPanel('panel-exec-sourcing', execSourcingPanelHtml())) renderExecHome();
 };
 let EXEC_WONPRODUCT_MEASURE = 'count';
 function execClosedWonProductPanelHtml(){
@@ -107296,56 +107146,36 @@ function renderExecHome(){
     '</div>'+
     '<h2 class="exec-band-heading">Diagnostics</h2>'+
     execSlippageStripHtml()+
-    /* D94: insertion order chosen so the packer's shortest-column-first placement (packGrid())
-       pairs Stalled deals (the tallest remaining diagnostics card, ~400px) against Cycle time
-       first, letting the two mid-sized cards (Coverage, Underwriting) balance against Stage
-       conversion in the other column — reasoned by hand against packGrid()'s own algorithm using
-       each card's real rendered content, not guessed. Still not a general fix — see the D94 log
-       entry for the mechanism this doesn't solve. D166: this concatenation order is also now the
-       stamped `data-pack-order` priority (via `stampPackOrder`), so a resize-triggered repack
-       sorts back to this exact order instead of drifting to whatever column the previous pack
-       left each card in. */
+    /* D174/D175: fixed two-column grid, no packer, column bottoms level by construction. The
+       split below is the last one packGrid() itself produced (D94's own reasoning: Stalled deals,
+       the tallest diagnostics card, paired with Underwriting throughput against the three
+       mid/short cards on the other side) — frozen as the stated order rather than recomputed,
+       per Kevin's D145-pass ruling that this is a decision for him to confirm or reorder once he
+       sees the fixed-grid build in Chrome, not a reopening of D174/D175 itself. */
     '<div class="exec-diag-grid">'+
-      [execStalledPanelHtml(),execCycleTimePanelHtml(),execCoveragePanelHtml(),
-       execUnderwritingPanelHtml(),execStageConversionPanelHtml()]
-        .map(function(h,i){ return stampPackOrder(h,i); }).join('')+
+      '<div class="home-col">'+execStalledPanelHtml()+execUnderwritingPanelHtml()+'</div>'+
+      '<div class="home-col">'+execCycleTimePanelHtml()+execCoveragePanelHtml()+execStageConversionPanelHtml()+'</div>'+
     '</div>'+
     '<h2 class="exec-band-heading">Production</h2>'+
-    /* D97: Monthly volume extracted from the packed grid entirely — same reasoning that took
-       Slippage out in D94. It is the single heaviest visual on the page (180px dual-line chart),
-       structurally has no column-mate at that scale, and was the mechanism's second victim (D96)
-       after Slippage's first. Rendering it as its own full-width row removes it from the risk pool
-       outright, rather than managing its position by reorder — which only relocates the failure
-       (Kevin's instruction: "do not reorder again"). The remaining stretch-mechanism fix
-       (GRID_STRETCH_CAP_RATIO, above) still applies to whatever's left in the grid below. */
+    /* D97: Monthly volume stays extracted from the fixed grid entirely — same reasoning that took
+       Slippage out in D94: it is the single heaviest visual on the page (180px dual-line chart)
+       and structurally has no column-mate at that scale. Its own full-width row removes it from
+       the two-column layout outright rather than assigning it a column (Kevin's instruction: "do
+       not reorder again"). */
     execMonthlyPanelHtml()+
-    /* D98: only Volume by BDO and Sourcing remain in the packed grid — both are comparably tall
-       (8-row ranked list vs. two toggles plus a 344px-minimum chart body, ~550-575px each), so the
-       35% stretch cap (GRID_STRETCH_CAP_RATIO) is never even close to binding between them. The
-       three genuinely short cards that used to share this grid (Opportunities by stage, Closed-won
-       by product, Closed-lost intelligence — each under 300px) are NOT here any more; see the
-       .exec-mix-row below. This supersedes D94's insertion-order reasoning for this grid — that
-       comment managed WHICH short card absorbed the stretch; this removes the short cards from the
-       grid entirely, which is what actually made the mismatch stop happening. D166: this
-       concatenation order is also now the stamped `data-pack-order` priority, same as
-       .exec-diag-grid above. */
+    /* D174/D175: Volume by BDO and Sourcing, the only two cards left here, one per column - the
+       same split packGrid() already produced (D98: both are comparably tall, ~550-575px, so
+       there was never a stretch decision to make between them). */
     '<div class="exec-prod-grid">'+
-      [execAttainmentPanelHtml(),execSourcingPanelHtml()]
-        .map(function(h,i){ return stampPackOrder(h,i); }).join('')+
+      '<div class="home-col">'+execAttainmentPanelHtml()+'</div>'+
+      '<div class="home-col">'+execSourcingPanelHtml()+'</div>'+
     '</div>'+
-    /* D98: Opportunities by stage, Closed-won by product, and Closed-lost intelligence pulled out
-       of the packed grid into their own row — third extraction of this kind (Slippage D94, Monthly
-       volume D97), same underlying reason: these three sit in a ~190-300px natural-height cluster,
-       nowhere near the ~550-575px cluster Attainment/Sourcing occupy, and a packed masonry column
-       can't put one short card against one tall card without either stretching or gapping. A plain
-       CSS grid row sidesteps the whole question — see .exec-mix-row's own comment for why no JS
-       alignment is needed here at all. See PROJECT_STATE D98 for the broader pattern this is now
-       the third instance of. */
+    /* D98: Opportunities by stage, Closed-won by product, and Closed-lost intelligence sit in
+       their own plain CSS grid row, unaffected by this rebuild — see .exec-mix-row's own comment
+       for why no alignment mechanism is needed here at all. */
     '<div class="exec-mix-row">'+
       execPipelineByStagePanelHtml()+execClosedWonProductPanelHtml()+execClosedLostPanelHtml()+
     '</div>';
-  packExecDiagGrid();
-  packExecProdGrid();
   playHomeEntrance('exec');
 }
 
@@ -109254,17 +109084,6 @@ const OPP_SECTIONS = [
 ];
 let OPP_SECTION = 'details';
 let OPP_SECTION_FOR = null;
-/* Packed-grid state (D73), remembered per record so an edit-triggered re-render — renderOpp() runs
-   on every inline save via EF_RERENDER, not just on navigation — REPLAYS the last real packing
-   decision instead of re-measuring. Re-measuring on every render would call packGrid()'s
-   grid.innerHTML='' on every save, reintroducing the D34/D35 scroll-jump via a different trigger
-   than the one D35 already fixed. All reset together on a genuinely different record (renderOpp);
-   OPP_GRID_COLUMNS/CARD_KEY_SET also reset whenever the set of rendered cards itself changes (e.g.
-   Outcome appearing the moment a deal closes while its record is already open) — that's a
-   structural change, not routine editing, and earns a fresh pack (sectionDetailsHtml detects it). */
-let OPP_GRID_COLUMNS = null;       // [[cardKey,...], [cardKey,...]] from the last real pack
-let OPP_GRID_CARD_KEY_SET = null;  // card keys present at that pack, to detect the set changing
-let OPP_GRID_NEEDS_PACK = false;   // set by sectionDetailsHtml(), read by renderOpp() right after
 window.setOppSection = function(key){
   OPP_SECTION = key;
   if(OPP_SECTION_FOR) renderOpp(OPP_SECTION_FOR);
@@ -109420,135 +109239,24 @@ function sectionProductTermsCardHtml(o, recId){
     '</div></div><div class="panel-body">'+productFieldsHtml(recId)+'</div></div>';
 }
 
-const DETAILS_CARD_ORDER = ['nba','deal','signals','terms','borrower','underwriting','outcome'];
-/* Packed grid (D73), reusing packGrid() — not a hand-assigned two-column split. On a record's
-   first arrival at Details, or whenever the set of rendered cards changes (Outcome appearing the
-   moment a deal closes while its record is already open), this emits a FLAT card list — Next Best
-   Action first, so it anchors column one exactly like Home's action feed anchors its column one —
-   and sets OPP_GRID_NEEDS_PACK so renderOpp() calls packOppGrid() once the DOM exists to measure.
-   On every other render (an edit, re-rendering via EF_RERENDER) this REPLAYS the last real packing
-   decision instead of re-measuring — see the OPP_GRID_* state comment above for why re-measuring
-   here would reintroduce the D34/D35 scroll-jump. */
+/* Details tab (D174/D175): a fixed two-column grid, stated order, column bottoms level by
+   construction — no measurement, no JS. Left column: Next best action, Signals, Borrower
+   details. Right column: Deal, {Product Type} terms, Underwriting, then Outcome (closed deals
+   only — sectionOutcomeCardHtml() returns '' when the deal is still open, so the column's last
+   card is simply Underwriting on an open deal). Each column is a flex column (.home-col, CSS
+   above); its last card carries flex:1 1 auto, so whichever of Borrower details or
+   Underwriting/Outcome ends up last absorbs any leftover height as blank space at its own
+   bottom — the same emit-and-render call on every render (a fresh navigation or an
+   EF_RERENDER edit alike), since there is nothing measured to remember or replay. */
 function sectionDetailsHtml(o, recId, acct){
-  const cards = {
-    nba: sectionNextBestActionCardHtml(o, recId),
-    deal: sectionDealCardHtml(recId),
-    signals: sectionSignalsCardHtml(o),
-    terms: sectionProductTermsCardHtml(o, recId),
-    borrower: sectionBorrowerDetailsHtml(o, acct),
-    underwriting: sectionUnderwritingCardHtml(recId),
-    outcome: sectionOutcomeCardHtml(o, recId),
-  };
-  const presentKeys = DETAILS_CARD_ORDER.filter(k=>cards[k]);
-  // D166: stamp each card with its DETAILS_CARD_ORDER index so packGrid() sorts by this stable
-  // priority on every pack, including a resize-triggered repack of already-packed DOM.
-  presentKeys.forEach(k=>{ cards[k] = stampPackOrder(cards[k], DETAILS_CARD_ORDER.indexOf(k)); });
-  const sameCardSet = OPP_GRID_COLUMNS && OPP_GRID_CARD_KEY_SET &&
-    presentKeys.length===OPP_GRID_CARD_KEY_SET.length &&
-    presentKeys.every(k=>OPP_GRID_CARD_KEY_SET.includes(k));
-  OPP_GRID_NEEDS_PACK = !sameCardSet;
-  if(sameCardSet){
-    return '<div class="opp-details-grid">'+
-      OPP_GRID_COLUMNS.map(colKeys=>'<div class="home-col">'+colKeys.map(k=>cards[k]).join('')+'</div>').join('')+
-    '</div>';
-  }
-  return '<div class="opp-details-grid">'+presentKeys.map(k=>cards[k]).join('')+'</div>';
-}
-function captureOppGridColumns(){
-  const grid = document.querySelector('.opp-details-grid');
-  if(!grid) return;
-  OPP_GRID_COLUMNS = Array.from(grid.children).map(col=>
-    Array.from(col.children).filter(c=>c.classList && c.classList.contains('panel')).map(c=>c.dataset.card));
-  OPP_GRID_CARD_KEY_SET = [].concat(...OPP_GRID_COLUMNS);
-}
-function packOppGrid(){
-  packGrid('.opp-details-grid', HOME_BREAKPOINT, function(){ captureOppGridColumns(); alignGridColumns('.opp-details-grid'); });
-}
-
-/* Bottom alignment (D78, generalized to both grids D79) — computed ONCE per real pack, not a live
-   CSS relationship. D75 and D76 both froze the page using align-items:stretch + a :last-child
-   selector that grows whichever card is currently last while packGrid() is still appending more —
-   since "last child" changes with every appendChild, and stretch makes a column's height depend
-   on the OTHER column's, the quantity packGrid()'s own placement loop measures (offsetHeight, to
-   decide the next card's column) was being fed by a rule reacting to a DOM structure that hadn't
-   finished changing yet. That circular read is what D77 traces as the likely route to the exact
-   degenerate outcome packGrid()'s hidden-container retry exists to catch — see D77/D78 for the
-   full finding. This avoids it structurally: no CSS rule targets anything during placement,
-   nothing for an incremental offsetHeight read to depend on. `alignGridColumns(selector)` runs
-   only from a grid's own `packGrid()` `after` callback — after packing has fully finished
-   appending every card — takes ONE measurement of each column's finished height, and writes ONE
-   explicit pixel height to the column's chosen stretch target. No listener, no observer, nothing
-   left watching for the next reflow. Content renders at natural size at the top; the extra height
-   is blank space at the card's own bottom, inside its border — expected, per the brief, and not
-   filled with anything (D73's content-reveal approach was rejected on review and stays removed,
-   see D76/D78). Generalized the same way packGrid() itself was (D73): one shared pair of
-   functions, keyed by selector, rather than a second copy for Home (D79).
-
-   D97: the stretch TARGET is no longer always `lastElementChild`. That was the actual bug behind
-   three separate incidents (Slippage D94, Monthly volume D96, and whatever the next short card
-   to land last would have been) — the mechanism dumped the ENTIRE column deficit on whichever
-   card happened to be last, with no regard for whether that card had anywhere near enough natural
-   height to absorb it invisibly. Reordering cards (D94) only ever chose which card that was; it
-   never changed the rule, so a future card addition could reintroduce the exact symptom. See
-   GRID_STRETCH_CAP_RATIO below for the actual fix. */
-const GRID_LAST_CARD_EXTRA = {}; // selector -> [px of deficit per column], from that grid's last
-  // real pack — reapplied on every render that doesn't repack, including a replayed Opportunity
-  // edit and a Home toggle-card swap, so alignment survives without recomputing.
-function alignGridColumns(selector){
-  const grid = document.querySelector(selector);
-  if(!grid) return;
-  const cols = Array.from(grid.querySelectorAll(':scope > .home-col'));
-  // D97: reset EVERY card's explicit height (not just the last child) before remeasuring. The
-  // stretch target now varies pass to pass (see applyGridAlignment), so a stale height left on
-  // ANY card by a previous pass — not only the one that was last then — would corrupt this pass's
-  // "natural height" reading of it, and a resize-triggered repack can reparent a previously-
-  // stretched card into a different column entirely.
-  cols.forEach(col=>{ Array.from(col.children).forEach(c=>{ c.style.height = ''; }); });
-  if(cols.length < 2){ GRID_LAST_CARD_EXTRA[selector] = null; return; } // single column — nothing to align
-  const heights = cols.map(c=>c.offsetHeight);
-  const maxHeight = Math.max.apply(null, heights);
-  GRID_LAST_CARD_EXTRA[selector] = heights.map(h=>Math.max(0, maxHeight - h));
-  applyGridAlignment(selector);
-}
-
-/* D97: a card may be stretched at most this much beyond its own natural height before it is
-   disqualified as its column's stretch target. This is what protects against the exact failure
-   that hit Slippage (D94) and Monthly volume (D96): a short card landing last in its column and
-   absorbing the ENTIRE deficit regardless of how grotesque the result looked. 0.35 is a starting
-   point Kevin chose, not a derived constant — revisit it if a real card's stretch still reads
-   wrong at this cap, in either direction. */
-const GRID_STRETCH_CAP_RATIO = 0.35;
-function applyGridAlignment(selector){
-  const grid = document.querySelector(selector);
-  const extras = GRID_LAST_CARD_EXTRA[selector];
-  if(!grid || !extras) return;
-  const cols = Array.from(grid.querySelectorAll(':scope > .home-col'));
-  cols.forEach((col, i)=>{
-    const cards = Array.from(col.children);
-    if(!cards.length) return;
-    // Reset first, so the "natural height" reads below are never a stale, previously-stretched
-    // value. This has to run on every call, not only via alignGridColumns' own reset above — every
-    // toggle setter calls applyGridAlignment() directly, repeatedly, with no repack in between.
-    cards.forEach(c=>{ c.style.height = ''; });
-    const extra = extras[i] || 0;
-    if(extra <= 0) return;
-    // Search last-to-first for the first card whose stretch ratio stays under the cap, so the
-    // result matches the old "stretch the last card" shape whenever the last card genuinely has
-    // room for it, and only reaches further up the column when it doesn't — decoupling the
-    // outcome from insertion order, which is the actual fix (see the block comment above).
-    let target = null;
-    for(let j = cards.length - 1; j >= 0; j--){
-      const natural = cards[j].offsetHeight;
-      if(natural > 0 && extra / natural <= GRID_STRETCH_CAP_RATIO){ target = cards[j]; break; }
-    }
-    // D97: if no card qualifies, apply NO stretch — this column's bottom ends uneven for this
-    // render. THIS IS THE INTENDED FAILURE MODE, NOT A DEFECT. After three decision cycles
-    // (D77/D78/D80) forcing level bottoms, the mechanism is deliberately allowed to fail visibly
-    // rather than silently elect a bad victim. If a future session finds an uneven bottom here, do
-    // NOT "fix" it by raising the cap or reverting to always-stretch-last — that reintroduces the
-    // whole bug class this round closed. See PROJECT_STATE D97.
-    if(target) target.style.height = (target.offsetHeight + extra) + 'px';
-  });
+  const left = sectionNextBestActionCardHtml(o, recId)+sectionSignalsCardHtml(o)+
+    sectionBorrowerDetailsHtml(o, acct);
+  const right = sectionDealCardHtml(recId)+sectionProductTermsCardHtml(o, recId)+
+    sectionUnderwritingCardHtml(recId)+sectionOutcomeCardHtml(o, recId);
+  return '<div class="opp-details-grid">'+
+    '<div class="home-col">'+left+'</div>'+
+    '<div class="home-col">'+right+'</div>'+
+  '</div>';
 }
 function sectionNetworkHtml(o){
   return networkPanelHtml(o)+
@@ -109633,14 +109341,7 @@ function renderOpp(id, section, isNav){
   // first modal in the app where fields are actually editable inside it), refresh its body in
   // place too — otherwise a save made inside the modal would show stale data until it's reopened.
   EF_RERENDER = ()=>{ renderOpp(id); if(MODAL_OPEN_KEY) refreshModalIfOpen(MODAL_OPEN_KEY); };
-  // Packed-grid memory (D73) resets on a genuinely different record regardless of which section
-  // it lands on, since this is about the grid's own per-record state, not about section choice.
   const freshRecord = OPP_SECTION_FOR !== id;
-  if(freshRecord){
-    OPP_GRID_COLUMNS = null;
-    OPP_GRID_CARD_KEY_SET = null;
-    GRID_LAST_CARD_EXTRA['.opp-details-grid'] = null;
-  }
   // D106 part (a): an explicit `section` (a real navigation, via route() or the D129 return
   // bar/keyboard) always wins. Absent (an EF_RERENDER edit re-render) falls back to Details on a
   // fresh record (landing on the overview, not wherever a previous unrelated deal happened to
@@ -109687,19 +109388,6 @@ function renderOpp(id, section, isNav){
     oppMetricStripHtml(o, acct)+
     '<div class="record-main">'+navHtml+sectionBody+'</div>';
   if(!isNav) positionTabMarker();
-
-  /* Pack (and align) only when sectionDetailsHtml() actually emitted a flat, unpacked grid — a
-     record's first arrival at Details, or the rendered card set changing (Outcome appearing) —
-     never on a routine edit-triggered re-render, which replays the remembered layout instead
-     (OPP_GRID_NEEDS_PACK, set above). Repacking on every edit would reintroduce the D34/D35
-     scroll-jump (grid.innerHTML='' collapses the container for a frame) via a different trigger
-     than the one D35 already fixed. Resize is the only other trigger, wired separately below.
-     On the replay path, applyGridAlignment() still runs — it's a cheap reapply of an already
-     -computed number (D78), not a remeasure, so alignment survives an edit without recomputing. */
-  if(OPP_SECTION==='details'){
-    if(OPP_GRID_NEEDS_PACK) packOppGrid();
-    else applyGridAlignment('.opp-details-grid');
-  }
 }
 
 /* ================================================================
