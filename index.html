@@ -825,8 +825,11 @@ table.tbl{width:100%;border-collapse:collapse}
 .opp-header{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-l);padding:var(--s5);
   margin-bottom:var(--s5)}
 .opp-eyebrow{font-size:11px;color:var(--ink-3);display:flex;align-items:center;gap:var(--s2)}
-.opp-title{font-family:var(--ui);font-size:20px;letter-spacing:-.01em;color:var(--ink);margin-top:var(--s1)}
-.opp-hero{font-family:var(--ui);font-size:44px;font-weight:400;letter-spacing:-.03em;color:var(--ink);
+/* D145 commit 2: weight 500 (D111's default), closing the miss D159 found and deliberately left
+   here rather than fixed by a scoped override on Account 360's fork (.acct-title/.acct-hero,
+   already 500). Neither class ever set 500 before; .opp-hero set 400 explicitly. */
+.opp-title{font-family:var(--ui);font-size:20px;font-weight:500;letter-spacing:-.01em;color:var(--ink);margin-top:var(--s1)}
+.opp-hero{font-family:var(--ui);font-size:44px;font-weight:500;letter-spacing:-.03em;color:var(--ink);
   margin-top:var(--s3)}
 .opp-hero .cur,.opp-hero .un{font-size:.45em;font-weight:400;color:var(--ink-2)}
 .opp-hero-label{font-size:11px;font-weight:500;color:var(--ink-3);margin-top:var(--s1)}
@@ -922,10 +925,11 @@ table.tbl{width:100%;border-collapse:collapse}
    matched the mock's 500 and was missed in the original pass; a scoped override on the Opportunity
    record's own shared class is exactly what CLAUDE.md's don't-touch-the-Opportunity-record fence
    is for avoiding, so the type treatment is forked to .acct-title/.acct-hero instead, weight 500
-   set there, and the mismatch on .opp-title/.opp-hero is left as D145's own finding to fix on the
-   Opportunity record (not fixed here). The type pill also moves: the mock draws it as a sibling of
-   the name in a flex row, not a child of the title text, so it no longer inherits the title's
-   -0.01em tracking (D112 doesn't permit negative tracking on a pill). */
+   set there, and the mismatch on .opp-title/.opp-hero was left as D145's own finding to fix on the
+   Opportunity record, not fixed here. **Fixed, D145 commit 2: both now set weight 500 directly on
+   the shared class (see that CSS rule's own comment).** The type pill also moves: the mock draws
+   it as a sibling of the name in a flex row, not a child of the title text, so it no longer
+   inherits the title's -0.01em tracking (D112 doesn't permit negative tracking on a pill). */
 .acct-header-row{display:flex;justify-content:space-between;align-items:flex-start;gap:var(--s5)}
 .acct-header-left{flex:1 1 auto;min-width:0}
 .acct-title-row{display:flex;align-items:center;gap:var(--s2)}
@@ -107553,9 +107557,12 @@ window.openAccountRow = function(id){
    (Other/mocks/account-360-*.html) draw a genuinely different two-column header (name/pills/meta/
    actions on the left, the hero figure right-aligned opposite it), so per D151 ("the mock is the
    spec; reuse where identical, fork where not") the header now forks its own
-   .acct-header-row/-left/-hero/-meta/-actions classes for that geometry while still reusing
-   .opp-header (the surface), .opp-title, and .opp-hero verbatim for their own type treatment
-   (size, weight, tracking are genuinely identical). The strip
+   .acct-header-row/-left/-hero/-meta/-actions classes for that geometry, reusing only
+   .opp-header (the surface) verbatim. **Stale as of D159: this paragraph originally also named
+   .opp-title/.opp-hero as reused verbatim for their type treatment; D159 found they never
+   actually matched the mock (both rendered at weight 400) and forked .acct-title/.acct-hero
+   instead, at weight 500 (see that CSS comment). .opp-title/.opp-hero are not consumed here at
+   all any more.** The strip
    (.strip/.strip-4/.met/.met-label/.met-figure/.met-sub/.met-change, D115/D127) and the tab
    mechanics (.section-nav*, positionTabMarker(), D107/D120) are still reused verbatim: their
    rendered result IS identical to the mock, nothing to fork. listReturnBarHtml()/
@@ -109002,31 +109009,40 @@ function sectionSignalsCardHtml(o){
   const days = o.outcome==='open' ? currentDaysInStage(o) : null;
   const stale = days!=null && days >= (STAGE_P75[o.stage]||Infinity);
 
+  /* D145 commit 2: each signal line with a home routes there directly (setOppSection(), the same
+     mechanism the tabs themselves use), rather than one card-level control routing everything to
+     Intelligence regardless of which signal actually fired: the Delgado Supply Co finding
+     (trade ties only, landing on Intelligence where that signal doesn't live). Link text is the
+     existing signal copy, unchanged; .drill is the same class the Account 360 Summary panels'
+     own per-panel drills use, not a new link style. */
   const rows = [];
   if(hasSub) rows.push('<div class="band-line"><span class="band-glyph warn">&#9878;</span>'+
-    '<span>Subordinated lien on file</span></div>');
+    '<span class="drill" onclick="setOppSection(\'intelligence\')">Subordinated lien on file</span></div>');
   if(wonEdges.length) rows.push('<div class="band-line"><span class="band-glyph pos">&#8644;</span>'+
-    '<span>Trade ties to '+wonEdges.length+' Closed-Won account'+(wonEdges.length===1?'':'s')+'</span></div>');
+    '<span class="drill" onclick="setOppSection(\'network\')">Trade ties to '+wonEdges.length+' Closed-Won account'+(wonEdges.length===1?'':'s')+'</span></div>');
+  /* Days-in-stage stays plain text, deliberately: it has no tab of its own, the figure is already
+     the strip's Days in Stage, and linking it to some other tab would be a link to content that
+     isn't actually there. */
   if(stale) rows.push('<div class="band-line"><span class="band-glyph warn">&#9888;</span>'+
     '<span'+tipAttr(o.stage, days+' day'+(days===1?'':'s')+' in stage',
       'Beyond the '+Math.max(STAGE_P75[o.stage]||0,1)+'d typical for '+o.stage)+'>Longer in '+o.stage+' than most open deals</span></div>');
 
   /* Capped at 3 + a remainder count (Pipeline Snapshot's pattern) — not because today's 3
      possible signal types can ever exceed 3, but so a future 4th signal type doesn't need a
-     redesign. This is also why Signals gets a corner control even when every possible line is
-     shown: the full lien/network picture behind it always has more than these summary lines. */
+     redesign. */
   const MAX = 3;
   let body;
   if(!rows.length) body = '<div class="band-empty">No signals on this deal right now.</div>';
   else if(rows.length<=MAX) body = rows.join('');
   else body = rows.slice(0,MAX).join('')+'<div class="band-more">+'+(rows.length-MAX)+' more</div>';
 
+  /* No card-level corner control: per-line links above give every signal that has a home its own
+     route there, so a card-wide control would have no job. It was also already the one exception
+     to "the control renders only on a card that hides fields" (D71), since Signals hides nothing. */
   return '<div class="panel" data-card="signals"><div class="panel-header"><div class="panel-header-text">'+
       '<div class="panel-title">Signals</div>'+
       '<div class="panel-scope">Computed from liens, network, and stage history</div>'+
-    '</div></div><div class="panel-body">'+body+'</div>'+
-    '<button type="button" class="card-expand" title="See full Intelligence" onclick="setOppSection(\'intelligence\')">&#8599;</button>'+
-  '</div>';
+    '</div></div><div class="panel-body">'+body+'</div></div>';
 }
 
 function auditPanelHtml(o){
@@ -109191,8 +109207,12 @@ MODALS.oppDeal = function(){
 function sectionBorrowerDetailsHtml(o, acct){
   const openOpps = D.opportunities.filter(x=>x.accountId===o.accountId && x.outcome==='open');
   const openTotal = openOpps.reduce((s,x)=>s+x.facilitySize,0);
+  /* D145 commit 2: the account name itself is now the drill link (D65 Amendment 1's stated
+     condition, "Accounts is an inert stub," has lapsed since D54/D151-D173); "From" stays plain
+     text, only the name routes to #/account/<id>/summary. */
   return '<div class="panel" data-card="borrower"><div class="panel-header"><div class="panel-header-text">'+
-      '<div class="panel-title">Borrower details</div><div class="panel-scope">From Account</div>'+
+      '<div class="panel-title">Borrower details</div><div class="panel-scope">From '+
+      '<span class="drill" onclick="location.hash=\'#/account/'+o.accountId+'/summary\'">'+esc(acct.name)+'</span></div>'+
     '</div></div><div class="panel-body"><dl class="kv">'+
       '<div><dt>Legal Company Name</dt><dd>'+esc(acct.name)+'</dd></div>'+
       '<div><dt>DBA</dt><dd class="muted">Not on file</dd></div>'+
@@ -109373,7 +109393,8 @@ function renderOpp(id, section, isNav){
   document.getElementById('view-opp').innerHTML =
     listReturnBarHtml()+
     '<div class="opp-header">'+
-      '<div class="opp-eyebrow"><span>'+o.productType+'</span><span>·</span><span>'+esc(acct.name)+'</span></div>'+
+      '<div class="opp-eyebrow"><span>'+o.productType+'</span><span>·</span>'+
+        '<span class="drill" onclick="location.hash=\'#/account/'+o.accountId+'/summary\'">'+esc(acct.name)+'</span></div>'+
       '<div class="opp-title">'+efSpan(recId,DEF_INDEX['core.name'])+'</div>'+
       '<div class="opp-hero"><span class="ef-hero">'+efSpan(recId,DEF_INDEX['core.facilitySize'])+'</span></div>'+
       '<div class="opp-hero-label">Facility Size</div>'+
