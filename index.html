@@ -813,7 +813,7 @@ table.tbl{width:100%;border-collapse:collapse}
 .pipe-return-right{display:flex;align-items:center;gap:var(--s3);margin-left:auto}
 .pipe-return-pos{font-size:12px;color:var(--ink-3)}
 /* Its own small control family, sized and drawn independently of .btn (D125 governs buttons;
-   this is a compact icon control like .modal-close/.ef-btn, not a button). */
+   this is a compact icon control like .modal-close/.card-expand, not a button). */
 .pipe-return-arrow{all:unset;box-sizing:border-box;width:24px;height:24px;border:1px solid var(--line-2);
   border-radius:var(--r-s);color:var(--ink-2);display:inline-flex;align-items:center;justify-content:center;
   cursor:pointer;font-size:14px;line-height:1;transition:background var(--t-fast) var(--ease)}
@@ -1167,7 +1167,9 @@ table.tbl{width:100%;border-collapse:collapse}
 
 /* ---------- inline edit engine ---------- */
 /* At rest: no persistent marker. On hover: cell fill + a right-edge edit glyph.
-   Click anywhere in the cell to edit. One pattern, everywhere. */
+   Click anywhere in the cell to edit. One pattern, everywhere. D145 commit 3: edit mode is the
+   input alone, no save/cancel control - commit is Enter or blur, Escape reverts (CLAUDE.md §2a,
+   DESIGN_STANDARDS.md §11.8). */
 .ef{position:relative;display:block;cursor:pointer;border-radius:var(--r-s);
   padding:var(--s1) var(--s5) var(--s1) var(--s2);margin:calc(-1 * var(--s1)) calc(-1 * var(--s2));
   transition:background .12s var(--ease)}
@@ -1181,9 +1183,15 @@ table.tbl{width:100%;border-collapse:collapse}
 .ef-editing{display:inline-flex;align-items:center;gap:var(--s2);flex-wrap:wrap}
 .ef-input{height:var(--h);padding:0 var(--s3);border:1px solid var(--line-2);border-radius:var(--r-s);
   background:var(--paper);color:var(--ink);font-size:12.5px;min-width:140px}
+.ef-input:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
+/* D145 commit 3: validation runs at commit; on failure the outline turns --neg rather than
+   redrawing the border, so the standing focus treatment is what carries the failure state. */
+.ef-input.ef-invalid:focus-visible{outline-color:var(--neg)}
+.ef-error{display:block;font-size:11px;color:var(--neg-ink);margin-top:var(--s1)}
 .ef-checks{display:flex;flex-wrap:wrap;gap:var(--s3);align-items:center;min-height:var(--h)}
 .ef-check{display:inline-flex;align-items:center;gap:var(--s1);font-size:12px;color:var(--ink-2);cursor:pointer}
 .ef-check-input{position:absolute;opacity:0;width:1px;height:1px;overflow:hidden}
+.ef-check-input:focus-visible + .ef-check-box{outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
 .ef-check-box{width:var(--s4);height:var(--s4);flex:0 0 var(--s4);border:1px solid var(--line-2);border-radius:var(--r-s);
   background:var(--paper);display:inline-flex;align-items:center;justify-content:center;
   transition:background .12s var(--ease),border-color .12s var(--ease)}
@@ -1191,12 +1199,6 @@ table.tbl{width:100%;border-collapse:collapse}
 .ef-check-box::after{content:'';width:4px;height:7px;border:solid var(--paper);border-width:0 2px 2px 0;
   transform:rotate(45deg) translate(-1px,-1px);opacity:0}
 .ef-check-input:checked + .ef-check-box::after{opacity:1}
-.ef-actions{display:inline-flex;gap:var(--s1)}
-.ef-btn{height:var(--h);width:var(--h);flex:0 0 var(--h);display:inline-flex;align-items:center;justify-content:center;
-  border-radius:var(--r-s);border:1px solid var(--line-2);background:var(--paper);color:var(--ink-2);font-size:13px}
-.ef-btn:hover{border-color:var(--ink-3);color:var(--ink)}
-.ef-btn.save{background:var(--brand);border-color:var(--brand);color:var(--paper)}
-.ef-btn.save:hover{background:var(--brand-2);border-color:var(--brand-2)}
 .ef-hero{display:inline-flex;align-items:center;gap:var(--s3);flex-wrap:wrap}
 
 /* ---------- + New menu ---------- */
@@ -104359,6 +104361,17 @@ function controlValue(def, elId){
 const EF_STORE = {};
 let EF_SEQ = 0;
 let EF_RERENDER = null;
+/* D145 commit 3 (D181): auto-commit on Enter/blur, no save/cancel control. RESEARCH_03 §4 finding
+   applied - every modern reference checked (Attio, Notion, Airtable, Linear) auto-commits with no
+   per-cell save/cancel affordance, relying on undo plus history as the safety net; Salesforce's
+   explicit footer is the outlier. Escape behaviour, the save-confirmation fill, and skipping undo
+   confirmation UI are Kevin's own judgment calls, not researched.
+   EF_SAVE_HOLD_MS: how long the --pos-soft confirmation fill holds before fading on
+   var(--t-base) var(--ease) - a named constant, never an inline literal, so it lives in one place
+   to tune. 1000ms is Kevin's own judgment call; revisit if it reads wrong in Chrome. */
+const EF_SAVE_HOLD_MS = 1000;
+const EF_UNDO_MAX = 20;
+const EF_UNDO_STACK = []; // {recId, def, oldVal, newVal}, most recent last; redo is out of scope
 function registerRecord(recId, obj){ EF_STORE[recId]={obj}; return recId; }
 function efSpan(recId, def){
   const obj = EF_STORE[recId].obj;
@@ -104375,31 +104388,57 @@ function findDef(recId, key){
   if(key==='core.productType') return REVIEW_PRODUCT_TYPE_DEF;
   return DEF_INDEX[key];
 }
-function activateEdit(span){
-  if(!span || span.classList.contains('editing')) return;
-  const recId = span.dataset.rec, key = span.dataset.key;
-  const def = findDef(recId, key);
-  if(!def) return;
-  const obj = EF_STORE[recId].obj;
-  const val = def.get(obj);
-  const elId = 'efc_'+(++EF_SEQ);
-  span.classList.add('editing');
-  span.innerHTML = '<span class="ef-editing">'+controlHtml(def, elId, val)+
-    '<span class="ef-actions">'+
-      '<button type="button" class="ef-btn save" title="Save">&#10003;</button>'+
-      '<button type="button" class="ef-btn cancel" title="Cancel">&#10005;</button>'+
-    '</span></span>';
+/* Validation runs at commit, not at keystroke. Exactly two rules beyond "no rule at all" existed
+   before this commit: money fields must be a positive number, and D61's required-when-a-reason-
+   is-set explanation fields (Decline Explanation, Closed Lost Explanation) - previously only a
+   visible "Required" tag with nothing actually enforcing it, now a real commit-blocking rule.
+   Returns an error string, or null when the value is valid. */
+function efValidate(def, obj, val){
+  if(def.type==='money' && (val==null || val<=0)) return 'Enter a number greater than 0.';
+  if(def.key==='core.declineReasonDetail' && obj.declineReason && !String(val||'').trim())
+    return 'Explanation required.';
+  if(def.key==='core.closedLostReasonDetail' && obj.closedLostReason && !String(val||'').trim())
+    return 'Explanation required.';
+  return null;
+}
+function efShowError(elId, msg){
   const input = document.getElementById(elId);
-  const isField = input && input.tagName!=='DIV';
-  if(isField) input.focus();
-  span.querySelector('.ef-btn.save').addEventListener('click', ()=>commitEdit(recId, def, elId));
-  span.querySelector('.ef-btn.cancel').addEventListener('click', ()=>cancelEdit());
-  if(isField){
-    input.addEventListener('keydown', e=>{
-      if(e.key==='Enter'){ e.preventDefault(); commitEdit(recId, def, elId); }
-      if(e.key==='Escape'){ e.preventDefault(); cancelEdit(); }
-    });
-  }
+  const err = document.getElementById(elId+'_err');
+  if(input) input.classList.add('ef-invalid');
+  if(err){ err.textContent = msg; err.hidden = false; }
+  if(input) input.focus();
+}
+function efClearError(elId){
+  const input = document.getElementById(elId);
+  const err = document.getElementById(elId+'_err');
+  if(input) input.classList.remove('ef-invalid');
+  if(err && !err.hidden){ err.hidden = true; err.textContent = ''; }
+}
+/* D145 commit 3: the brief confirmation fill. element.animate() reads --pos-soft/--t-base/--ease
+   from :root at call time (the same pattern playHomeEntrance() already uses for --t-slow/--t-fast,
+   D118), so :root stays the only place any of those values are actually defined - never a second,
+   inline-literal copy. Skipped entirely under prefers-reduced-motion, checked in JS: CSS alone
+   cannot stop this from starting (§11.7's own two-layer rule), and there is no lingering DOM state
+   to clean up either way since element.animate() with no fill mode reverts to the underlying
+   (already correct, unfilled) computed style on its own once it finishes or is skipped. */
+function efFlashSaved(recId, key){
+  if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const span = document.querySelector('.ef[data-rec="'+recId+'"][data-key="'+key+'"]');
+  if(!span || typeof span.animate !== 'function') return;
+  const root = getComputedStyle(document.documentElement);
+  const baseMs = parseFloat(root.getPropertyValue('--t-base')) || 180;
+  const ease = root.getPropertyValue('--ease').trim() || 'ease';
+  const posSoft = root.getPropertyValue('--pos-soft').trim();
+  const total = EF_SAVE_HOLD_MS + baseMs;
+  span.animate([
+    { backgroundColor: posSoft, offset: 0 },
+    { backgroundColor: posSoft, offset: EF_SAVE_HOLD_MS/total, easing: ease },
+    { backgroundColor: 'transparent', offset: 1 },
+  ], { duration: total });
+}
+function efPushUndo(recId, def, oldVal, newVal){
+  EF_UNDO_STACK.push({recId, def, oldVal, newVal});
+  if(EF_UNDO_STACK.length > EF_UNDO_MAX) EF_UNDO_STACK.shift();
 }
 function auditFieldEdit(recId, def, oldVal, newVal){
   if(!OPPS[recId]) return;
@@ -104411,18 +104450,94 @@ function auditFieldEdit(recId, def, oldVal, newVal){
     changedBy: CURRENT_BDO_ID, changedAt: TODAY,
   });
 }
-function commitEdit(recId, def, elId){
+/* activateEdit() wires one edit session per cell. `settled` guards the exact ordering bug most
+   auto-commit implementations get wrong: pressing Escape can trigger a DOM teardown (EF_RERENDER)
+   that fires a blur/focusout on the input being removed, whose commit is deferred a tick (below) so
+   focus has actually moved before a blur-triggered commit reads it. Without a flag set SYNCHRONOUSLY
+   by revert/commit, that deferred callback would still fire and re-commit after Escape already
+   reverted. `settled` is checked, not DOM class state (span.classList), because the span itself may
+   already be detached from the document by the time the deferred callback runs. */
+function activateEdit(span){
+  if(!span || span.classList.contains('editing')) return;
+  const recId = span.dataset.rec, key = span.dataset.key;
+  const def = findDef(recId, key);
+  if(!def) return;
   const obj = EF_STORE[recId].obj;
-  const oldVal = def.get(obj);
-  const newVal = controlValue(def, elId);
-  def.set(obj, newVal);
-  auditFieldEdit(recId, def, oldVal, newVal);
-  if(EF_RERENDER) EF_RERENDER();
+  const val = def.get(obj);
+  const elId = 'efc_'+(++EF_SEQ);
+  span.classList.add('editing');
+  span.innerHTML = '<span class="ef-editing">'+controlHtml(def, elId, val)+'</span>'+
+    '<span class="ef-error" id="'+elId+'_err" hidden></span>';
+  const input = document.getElementById(elId);
+  const isField = input && input.tagName!=='DIV';
+  if(isField) input.focus();
+  const session = {settled:false};
+  function revert(){
+    if(session.settled) return;
+    session.settled = true;
+    if(EF_RERENDER) EF_RERENDER();
+  }
+  function commit(){
+    if(session.settled) return;
+    const newVal = controlValue(def, elId);
+    const error = efValidate(def, obj, newVal);
+    if(error){ efShowError(elId, error); return; } // stays in edit mode, nothing written
+    session.settled = true;
+    const oldVal = def.get(obj);
+    if(String(oldVal)===String(newVal)){ if(EF_RERENDER) EF_RERENDER(); return; } // no change: no write, no feedback
+    def.set(obj, newVal);
+    auditFieldEdit(recId, def, oldVal, newVal);
+    efPushUndo(recId, def, oldVal, newVal);
+    if(EF_RERENDER) EF_RERENDER();
+    efFlashSaved(recId, key);
+  }
+  if(isField){
+    input.addEventListener('keydown', e=>{
+      if(e.key==='Enter'){ e.preventDefault(); commit(); }
+      /* stopPropagation: a field editing inside the Deal modal sits under D34's own scrim
+         keydown listener, which also closes on Escape - reverting the cell must not also close
+         the modal around it, so the event never reaches that listener. */
+      else if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); revert(); }
+    });
+    input.addEventListener('input', ()=>efClearError(elId));
+    if(def.type==='select') input.addEventListener('change', commit);
+    input.addEventListener('focusout', ()=>{ setTimeout(commit, 0); });
+  } else {
+    // multiselect: `input` here is controlHtml()'s wrapping <div id=elId>, not itself focusable.
+    input.addEventListener('keydown', e=>{ if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); revert(); } });
+    input.addEventListener('change', commit);
+    input.addEventListener('focusout', ()=>{
+      setTimeout(()=>{
+        if(session.settled || input.contains(document.activeElement)) return;
+        commit();
+      }, 0);
+    });
+  }
 }
-function cancelEdit(){ if(EF_RERENDER) EF_RERENDER(); }
 document.addEventListener('click', function(e){
   const cell = e.target.closest('.ef');
   if(cell && !cell.classList.contains('editing')){ activateEdit(cell); }
+});
+/* Ctrl/Cmd+Z undoes the most recent commit, in-memory only (EF_UNDO_STACK), skipped while any
+   input/select/textarea/contenteditable has focus so the browser's own native text-undo inside a
+   field is never intercepted - the same guard shape the existing j/k list-navigation handler
+   already uses. No inline Undo affordance, no toast; the Audit trail (auditFieldEdit, called here
+   with the values swapped) is the record that both the edit and the reversal happened. Redo is out
+   of scope: the popped entry is not pushed back onto the stack. */
+document.addEventListener('keydown', function(e){
+  if(e.key!=='z' && e.key!=='Z') return;
+  if(!(e.metaKey||e.ctrlKey) || e.shiftKey || e.altKey) return;
+  const tag = e.target.tagName;
+  if(tag==='INPUT' || tag==='TEXTAREA' || tag==='SELECT' || e.target.isContentEditable) return;
+  if(!EF_UNDO_STACK.length) return;
+  e.preventDefault();
+  const entry = EF_UNDO_STACK.pop();
+  const obj = EF_STORE[entry.recId] && EF_STORE[entry.recId].obj;
+  if(!obj) return;
+  entry.def.set(obj, entry.oldVal);
+  auditFieldEdit(entry.recId, entry.def, entry.newVal, entry.oldVal);
+  if(EF_RERENDER) EF_RERENDER();
+  efFlashSaved(entry.recId, entry.def.key);
 });
 
 /* ---------- derived analytics (computed, never hardcoded) ---------- */
@@ -105195,8 +105310,8 @@ window.closeModal = function(){
   MODAL_RETURN_FOCUS = null;
 };
 window.addEventListener('hashchange', closeModal);
-/* Refreshes an open modal's body in place after an edit made inside it (commitEdit's
-   EF_RERENDER), without tearing down the scrim/focus-trap/scroll-lock the way a close+reopen
+/* Refreshes an open modal's body in place after an edit made inside it (activateEdit()'s commit
+   calling EF_RERENDER), without tearing down the scrim/focus-trap/scroll-lock the way a close+reopen
    would. A no-op when no modal is open, or a different one is. Existing modals are all read-only
    (Home's), so this had no caller before the Opportunity record's card modals made editing inside
    a modal possible for the first time. */
@@ -107408,7 +107523,7 @@ function restoreListTableState(tableSelector, ctx){
    which is already an approved, closed surface Kevin chose not to redraw. Renders nothing at all
    when LIST_RETURN_CTX is absent (a direct hash, a reload, a bookmark) rather than a disabled or
    empty bar, per D129's own ruling. The back-link reuses .drill verbatim, no new link style; the
-   arrows are their own small control family (like .modal-close/.ef-btn), never .btn, since D125
+   arrows are their own small control family (like .modal-close/.card-expand), never .btn, since D125
    governs .btn and this isn't one. The disabled-end arrow stays in the DOM with its space reserved
    (a native disabled <button>, not removed), so the bar's contents never shift. Shared by
    renderOpp() and renderAccount() alike: one bar, drawn once, not two near-identical copies. */
