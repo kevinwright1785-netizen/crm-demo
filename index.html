@@ -386,6 +386,29 @@ h1,h2,h3,p,dl,dd{margin:0}
 .exec-prod-grid > .home-col > .panel:last-child,
 .opp-details-grid > .home-col > .panel:last-child{flex:1 1 auto}
 
+/* D186: the Details tab's own stretched last card in each column (whichever card that is,
+   keyed to :last-child by position below, never to a card by name, since D187 shows that
+   position can change) distributes its field rows across the card's own available height,
+   rather than leaving a fixed-height field block sitting above a blank void. Scoped to
+   .opp-details-grid only, since the shared flex:1 rule just above still
+   stretches Exec Home's own last-child panels (.exec-diag-grid/.exec-prod-grid) exactly as
+   before; nothing here touches them. Title and scope line stay put (.panel-header keeps
+   flex:0 0 auto, its own default); only .panel-body and its one child, the field grid, take part
+   in the stretch, and align-content:space-between (a CSS Grid row-axis property, since the field
+   grid is already display:grid via .kv) spaces the rows out, the last one landing flush with the
+   card's own bottom padding, same as every unstretched card. No JS, no measurement, no
+   per-record logic. APPROVED DEVIATION from CLAUDE.md §4's 4pt spacing scale, same shape as
+   --r-full: the resulting row gap varies per record (whatever height the column's own content
+   difference produces), which is off-scale by definition. Approved by Kevin, 2026-09-15, scoped
+   exactly to this stretched last card on the Details tab. Not license to distribute rows on any
+   other card, any list, or any other page; see CLAUDE.md §4 and DESIGN_STANDARDS.md §3 for the
+   same "not for anything else" framing --r-full already carries. */
+.opp-details-grid > .home-col > .panel:last-child{display:flex;flex-direction:column}
+.opp-details-grid > .home-col > .panel:last-child > .panel-body{
+  flex:1 1 auto;display:flex;flex-direction:column}
+.opp-details-grid > .home-col > .panel:last-child > .panel-body > .kv{
+  flex:1 1 auto;align-content:space-between}
+
 /* ---------- BDO Home body: fixed grid (D104/D123) ----------
    Masonry is retired on Home: source order in the markup now equals visual order top to bottom,
    and the row shape is fixed rather than measured (BDO Home uses its own .home-row-feed/
@@ -1022,11 +1045,12 @@ table.tbl{width:100%;border-collapse:collapse}
    components, so it stops reading as a different app glued onto Home. min-width:0 on
    .record-main stops wide content (tables) from blowing past the viewport. */
 .record-main{min-width:0}
-/* Details tab (D174/D175): a fixed two-column grid, sharing the .exec-diag-grid/.exec-prod-grid
-   CSS above rather than a second copy — see that block's own comment for the mechanism. Next
-   Best Action anchors column one (left), exactly like the action feed anchors Home's, and the
-   two variable-content cards (Borrower details on the left, Underwriting or Outcome on the
-   right) are each their column's last card so they're the ones that absorb any leftover height. */
+/* Details tab (D174/D175, order D184/D187): a fixed two-column grid, sharing the
+   .exec-diag-grid/.exec-prod-grid CSS above rather than a second copy — see that block's own
+   comment for the mechanism. Borrower details anchors column one (left, D187, the most
+   important card on the tab, no longer held last just to give D175 a stretch target now that
+   D186 fills whichever card ends up last); {Product Type} terms and Underwriting-or-Outcome are
+   each their column's own last card, so they're the ones D186's fill applies to. */
 /* Compact single-line rows, reused by the Signals card. A small colored glyph (no icon box, no
    radius) plus text — deliberately not .feedrow/.feed-icon, whose zero-padding "static" variant
    combined with a "flush" panel body caused the icon-overlaps-the-edge bug (D69/D71); these rows
@@ -1039,9 +1063,6 @@ table.tbl{width:100%;border-collapse:collapse}
 .band-meta{font-size:11px;color:var(--ink-3)}
 .band-empty{font-size:12px;color:var(--ink-3)}
 .band-more{font-size:11px;color:var(--ink-3)}
-/* A field grid capped at two columns (vs. .kv's auto-fill, which would place 3-4 across a wide
-   card) — "room instead of cramming four across" for a field-dense card (Deal, D71). */
-.kv-2col{grid-template-columns:repeat(2,minmax(0,1fr))}
 /* Expand-to-modal corner control (D71): a card showing only some of its fields gets this in its
    bottom-right corner. A separate click target from inline editing by construction — clicking a
    field edits it in place (§2a, unchanged), clicking this opens the card's full content in the
@@ -1078,6 +1099,15 @@ table.tbl{width:100%;border-collapse:collapse}
 .kv dt{font-size:11px;font-weight:500;color:var(--ink-3)}
 .kv dd{font-size:13px;color:var(--ink);margin-top:var(--s1);font-weight:400}
 .kv dd.muted{color:var(--ink-3)}
+/* D183: the field grid used by every Details-tab card, capped at two columns (vs. .kv's own
+   auto-fill above, which places 3-4 across on a wide card). Declared AFTER .kv on purpose: both
+   are plain class selectors of equal specificity, so at equal specificity the LATER rule wins the
+   cascade for the property they share (grid-template-columns) at every card width, not just the
+   ones where auto-fill happens to already compute two columns on its own. Before this fix,
+   .kv-2col sat before .kv in this same stylesheet and was silently overridden by .kv's own
+   auto-fill at any card width >=558px (Known issue 10, closed by this reordering). Moving the
+   rule, not raising specificity, was sufficient and is the smaller, more legible fix. */
+.kv-2col{grid-template-columns:repeat(2,minmax(0,1fr))}
 
 .chips-inline{display:flex;flex-wrap:wrap;gap:var(--s2)}
 
@@ -108929,7 +108959,14 @@ window.moveOppStage = function(oppId, toStage){
   if(EF_RERENDER) EF_RERENDER();
 };
 
-function productFieldsHtml(recId){
+/* D183 gave this kv-2col unconditionally, matching every other Details-tab field card — but the
+   intake review draft's own product-terms card (New Opportunity flow) shares this one function
+   and sits in a much wider container, where two fixed columns read sparse (D185). `cls` lets each
+   call site state its own container's layout, same pattern as the Deal/acctFields modal variants
+   (one builder, a per-container class): the Details tab passes nothing and gets kv-2col by
+   default; the intake review passes plain 'kv' to go back to auto-fill, its own pre-D183 shape. */
+function productFieldsHtml(recId, cls){
+  cls = cls || 'kv kv-2col';
   const o = EF_STORE[recId].obj;
   const f = o.productFields||{};
   const rows=[];
@@ -108957,7 +108994,7 @@ function productFieldsHtml(recId){
     rows.push(['Secured Status', PDEF.securedStatus]);
     rows.push(['Call Protection', PDEF.callProtection]);
   }
-  return '<dl class="kv">'+rows.map(r=>'<div><dt>'+r[0]+'</dt><dd>'+efSpan(recId,r[1])+'</dd></div>').join('')+'</dl>';
+  return '<dl class="'+cls+'">'+rows.map(r=>'<div><dt>'+r[0]+'</dt><dd>'+efSpan(recId,r[1])+'</dd></div>').join('')+'</dl>';
 }
 
 let introRequested = {};
@@ -109325,10 +109362,13 @@ function sectionBorrowerDetailsHtml(o, acct){
   /* D145 commit 2: the account name itself is now the drill link (D65 Amendment 1's stated
      condition, "Accounts is an inert stub," has lapsed since D54/D151-D173); "From" stays plain
      text, only the name routes to #/account/<id>/summary. */
+  /* D182: kv-2col (the Deal card's own two-column field grid, only a grid-template-columns
+     override on top of .kv; every other .kv rule still applies unchanged) replaces .kv's
+     default auto-fill, per Kevin's ruling on the Halloway Supply Co finding. */
   return '<div class="panel" data-card="borrower"><div class="panel-header"><div class="panel-header-text">'+
       '<div class="panel-title">Borrower details</div><div class="panel-scope">From '+
       '<span class="drill" onclick="location.hash=\'#/account/'+o.accountId+'/summary\'">'+esc(acct.name)+'</span></div>'+
-    '</div></div><div class="panel-body"><dl class="kv">'+
+    '</div></div><div class="panel-body"><dl class="kv kv-2col">'+
       '<div><dt>Legal Company Name</dt><dd>'+esc(acct.name)+'</dd></div>'+
       '<div><dt>DBA</dt><dd class="muted">Not on file</dd></div>'+
       '<div><dt>Business Address</dt><dd>'+esc(acct.location)+'</dd></div>'+
@@ -109344,7 +109384,7 @@ function sectionUnderwritingCardHtml(recId){
   const obj = EF_STORE[recId].obj;
   return '<div class="panel" data-card="underwriting"><div class="panel-header"><div class="panel-header-text">'+
       '<div class="panel-title">Underwriting</div><div class="panel-scope">Credit team fields</div>'+
-    '</div></div><div class="panel-body"><dl class="kv">'+
+    '</div></div><div class="panel-body"><dl class="kv kv-2col">'+
       '<div><dt>Underwriter</dt><dd>'+efSpan(recId,DEF_INDEX['core.underwriterId'])+'</dd></div>'+
       '<div><dt>Risk Rating</dt><dd>'+efSpan(recId,DEF_INDEX['core.riskRating'])+'</dd></div>'+
       '<div><dt>Stipulations</dt><dd>'+efSpan(recId,DEF_INDEX['core.stipulations'])+'</dd></div>'+
@@ -109365,7 +109405,7 @@ function sectionOutcomeCardHtml(o, recId){
   }
   return '<div class="panel" data-card="outcome"><div class="panel-header"><div class="panel-header-text">'+
       '<div class="panel-title">Outcome</div><div class="panel-scope">Renders only when the deal is closed</div>'+
-    '</div></div><div class="panel-body"><dl class="kv">'+rows+'</dl></div></div>';
+    '</div></div><div class="panel-body"><dl class="kv kv-2col">'+rows+'</dl></div></div>';
 }
 
 function sectionProductTermsCardHtml(o, recId){
@@ -109374,19 +109414,25 @@ function sectionProductTermsCardHtml(o, recId){
     '</div></div><div class="panel-body">'+productFieldsHtml(recId)+'</div></div>';
 }
 
-/* Details tab (D174/D175): a fixed two-column grid, stated order, column bottoms level by
-   construction — no measurement, no JS. Left column: Next best action, Signals, Borrower
-   details. Right column: Deal, {Product Type} terms, Underwriting, then Outcome (closed deals
-   only — sectionOutcomeCardHtml() returns '' when the deal is still open, so the column's last
-   card is simply Underwriting on an open deal). Each column is a flex column (.home-col, CSS
-   above); its last card carries flex:1 1 auto, so whichever of Borrower details or
-   Underwriting/Outcome ends up last absorbs any leftover height as blank space at its own
-   bottom — the same emit-and-render call on every render (a fresh navigation or an
-   EF_RERENDER edit alike), since there is nothing measured to remember or replay. */
+/* Details tab (D174/D175, order amended D184, amended again D187): a fixed two-column grid,
+   stated order, column bottoms level by construction — no measurement, no JS. Left column:
+   Borrower details, Next best action, {Product Type} terms. Right column: Deal, Signals,
+   Underwriting, then Outcome (closed deals only — sectionOutcomeCardHtml() returns '' when the
+   deal is still open, so the column's last card is simply Underwriting on an open deal). D187
+   moves Borrower details to the top of the left column (Kevin's ruling: it's the most important
+   card on the tab, and only sat last because D175 needed a stretch target there; D186's own
+   fill (below) removes that reason, so order is read priority alone now). {Product Type} terms
+   is last-left instead, deliberately: it has a field grid, so D186's fill still applies to it;
+   Next best action last would reintroduce the band, since it's a placeholder line, not fields.
+   Each column is a flex column (.home-col, CSS above); its last card carries flex:1 1 auto, and
+   D186's own fill (a CSS Grid align-content rule keyed to :last-child, not to any card by name)
+   distributes that card's field rows across the available height rather than leaving blank space
+   — the same emit-and-render call on every render (a fresh navigation or an EF_RERENDER edit
+   alike), since there is nothing measured to remember or replay. */
 function sectionDetailsHtml(o, recId, acct){
-  const left = sectionNextBestActionCardHtml(o, recId)+sectionSignalsCardHtml(o)+
-    sectionBorrowerDetailsHtml(o, acct);
-  const right = sectionDealCardHtml(recId)+sectionProductTermsCardHtml(o, recId)+
+  const left = sectionBorrowerDetailsHtml(o, acct)+sectionNextBestActionCardHtml(o, recId)+
+    sectionProductTermsCardHtml(o, recId);
+  const right = sectionDealCardHtml(recId)+sectionSignalsCardHtml(o)+
     sectionUnderwritingCardHtml(recId)+sectionOutcomeCardHtml(o, recId);
   return '<div class="opp-details-grid">'+
     '<div class="home-col">'+left+'</div>'+
@@ -110054,7 +110100,7 @@ function drawIntake(){
       '</div></div><div class="panel-body">'+coreKvHtml+'</div></div>'+
       '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
         '<div class="panel-title">'+product+' terms</div><div class="panel-scope">Product-conditional fields — this is what changes by product type</div>'+
-      '</div></div><div class="panel-body">'+productFieldsHtml(recId)+'</div></div>'+
+      '</div></div><div class="panel-body">'+productFieldsHtml(recId,'kv')+'</div></div>'+
       (INTAKE_INTEL ? intelResultsPanelHtml(INTAKE_INTEL) : '')+
       '<div class="actions-end">'+
         '<button class="btn" onclick="startOverIntake()">Start over</button>'+
