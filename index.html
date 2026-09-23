@@ -104904,14 +104904,19 @@ let SECTION_NAV_MARKER_EL = null;
    tab clicks and the D129 return-bar/keyboard next-previous calls omit it, so the intended glide
    between tabs on an already-visible page is untouched. */
 function positionTabMarker(instant){
-  const freshMarker = document.getElementById('section-nav-marker');
+  /* D248: both lookups scoped to the visible view, the same fix D245 made for arrow-key focus.
+     #view-opp and #view-account both keep their last render (and both carry
+     id="section-nav-marker"), and #view-opp comes first in the DOM, so a document-wide lookup
+     on an Account reached after an Opportunity measured the hidden Opportunity's copies. */
+  const view = document.querySelector('.view.active');
+  const freshMarker = view && view.querySelector('#section-nav-marker');
   if(freshMarker && SECTION_NAV_MARKER_EL && freshMarker!==SECTION_NAV_MARKER_EL){
     freshMarker.replaceWith(SECTION_NAV_MARKER_EL);
   } else if(freshMarker){
     SECTION_NAV_MARKER_EL = freshMarker;
   }
   if(instant && SECTION_NAV_MARKER_EL) SECTION_NAV_MARKER_EL.style.transition = 'none';
-  positionSlidingMarker(SECTION_NAV_MARKER_EL, document.querySelector('.section-nav-item[aria-selected="true"]'), 'x');
+  positionSlidingMarker(SECTION_NAV_MARKER_EL, view && view.querySelector('.section-nav-item[aria-selected="true"]'), 'x');
   if(instant && SECTION_NAV_MARKER_EL){
     void SECTION_NAV_MARKER_EL.offsetWidth; // force the 'none' transition to actually apply first
     SECTION_NAV_MARKER_EL.style.transition = '';
