@@ -104919,6 +104919,26 @@ function positionTabMarker(instant){
    tab marker's own one-time case: the very first paint measured labels in the fallback font
    before Inter Tight arrived, so its initial size/position would otherwise be wrong until the
    next click or resize. */
+/* D246 (Known issue 12): a section-tab switch re-renders the whole record, and a shorter tab body
+   used to shrink the page, so the browser clamped scrollY down to the new maximum. The tab body
+   area (.record-main) keeps a min-height equal to the tallest one rendered so far on this same
+   record. Measured from the outgoing render just before it is replaced (it is visible then; a
+   route() render isn't, #view-* is still display:none), so no tab is ever pre-rendered or given
+   a fixed height. Any real navigation (isNav) or a different record starts over with no hold,
+   so a newly opened record lands at its natural height. Inline-edit re-renders on the same
+   record keep the hold too, since they go through the same render functions. */
+let TAB_BODY_HOLD = {key:null, h:0};
+function tabBodyHoldBefore(viewId, recId, isNav){
+  const key = viewId+':'+recId;
+  if(isNav || TAB_BODY_HOLD.key!==key){ TAB_BODY_HOLD = {key:key, h:0}; return; }
+  const cur = document.querySelector('#'+viewId+' .record-main');
+  // unrounded height: offsetHeight rounds, which grew the page 1px on the first switch
+  if(cur) TAB_BODY_HOLD.h = Math.max(TAB_BODY_HOLD.h, cur.getBoundingClientRect().height);
+}
+function tabBodyHoldAfter(viewId){
+  const el = document.querySelector('#'+viewId+' .record-main');
+  if(el && TAB_BODY_HOLD.h) el.style.minHeight = TAB_BODY_HOLD.h+'px';
+}
 window.addEventListener('resize', function(){ positionTabMarker(); });
 if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ positionTabMarker(); });
 
@@ -105014,7 +105034,9 @@ function route(){
        rather than left stranded on a control that belonged to the record just replaced. */
     if(LIST_KEYBOARD_STEP_PENDING){
       LIST_KEYBOARD_STEP_PENDING = false;
-      const tab = document.querySelector('.section-nav-item[aria-selected="true"]');
+      /* D245: scoped to this view; #view-opp and #view-account both keep their last render, so an
+         unscoped query can return the hidden record's tab. */
+      const tab = document.querySelector('#view-opp .section-nav-item[aria-selected="true"]');
       if(tab) tab.focus();
     }
   }
@@ -105031,7 +105053,7 @@ function route(){
     positionTabMarker(true);
     if(LIST_KEYBOARD_STEP_PENDING){
       LIST_KEYBOARD_STEP_PENDING = false;
-      const tab = document.querySelector('.section-nav-item[aria-selected="true"]');
+      const tab = document.querySelector('#view-account .section-nav-item[aria-selected="true"]'); // D245
       if(tab) tab.focus();
     }
   }
@@ -109050,6 +109072,7 @@ function renderAccount(id, section, isNav){
      Fix commit (D159): .opp-title/.opp-hero are no longer reused (see the .acct-title/.acct-hero
      CSS comment); the pill also moves out of the title element into its own row, a sibling of the
      name, matching the mock's markup. .opp-header itself is still reused verbatim (unaffected). */
+  tabBodyHoldBefore('view-account', id, isNav); // D246
   document.getElementById('view-account').innerHTML =
     listReturnBarHtml()+
     '<div class="opp-header">'+
@@ -109072,6 +109095,7 @@ function renderAccount(id, section, isNav){
     acctStripHtml(cfg)+
     acctBandHtml(cfg)+
     '<div class="record-main">'+navHtml+sectionBody+'</div>';
+  tabBodyHoldAfter('view-account'); // D246
   if(!isNav) positionTabMarker();
 }
 window.setAccountSection = function(key){
@@ -109538,10 +109562,14 @@ document.addEventListener('keydown', function(e){
   const idx = items.indexOf(btn);
   const nextKey = items[e.key==='ArrowRight' ? (idx+1)%items.length : (idx-1+items.length)%items.length].dataset.key;
   e.preventDefault();
+  /* D245: the view container survives the re-render (only its innerHTML is replaced), so it is
+     captured here and the fresh tab is looked up inside it, never document-wide: the hidden
+     record view keeps its own last-rendered tab bar, which an unscoped query can return first. */
+  const view = btn.closest('.view');
   if(btn.closest('#view-account')) setAccountSection(nextKey);
   else setOppSection(nextKey);
   requestAnimationFrame(()=>{
-    const fresh = document.querySelector('.section-nav-item[aria-selected="true"]');
+    const fresh = view.querySelector('.section-nav-item[aria-selected="true"]');
     if(fresh) fresh.focus();
   });
 });
@@ -109817,6 +109845,7 @@ function renderOpp(id, section, isNav){
         esc(s.label)+countHtml+'</button>';
     }).join('')+'</div>';
 
+  tabBodyHoldBefore('view-opp', id, isNav); // D246
   document.getElementById('view-opp').innerHTML =
     listReturnBarHtml()+
     '<div class="opp-header">'+
@@ -109835,6 +109864,7 @@ function renderOpp(id, section, isNav){
 
     oppMetricStripHtml(o, acct)+
     '<div class="record-main">'+navHtml+sectionBody+'</div>';
+  tabBodyHoldAfter('view-opp'); // D246
   if(!isNav) positionTabMarker();
 }
 
