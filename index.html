@@ -133,35 +133,44 @@ h1,h2,h3,p,dl,dd{margin:0}
 
 /* ---------- shell ---------- */
 .app{display:flex;min-height:100vh}
-.rail{width:228px;flex:0 0 228px;background:var(--rail);border-right:1px solid var(--line);
+/* D240: icon-over-label rail, 84px (was 228px, text). Kevin approved "option 2, icon + label,"
+   measured on a copy of the live app; the 144px saved goes to content width (D241), not margins.
+   The old sliding .rail-marker (D120) and its positionRailMarker() JS are retired with it: the
+   active state is now a filled pill on the item itself (background/color/box-shadow below), not
+   a separate marker element sliding to match an active row's own offset. positionSlidingMarker()
+   itself is untouched, still shared by the record page's own section-tab marker
+   (SECTION_NAV_MARKER_EL, positionTabMarker()), a completely different marker this rail never
+   touched. */
+.rail{width:84px;flex:0 0 84px;background:var(--rail);border-right:1px solid var(--line);
   position:sticky;top:0;height:100vh;display:flex;flex-direction:column}
-.rail-header{display:flex;align-items:center;gap:var(--s2);padding:var(--s4) var(--s4) var(--s3)}
+.rail-header{display:flex;align-items:center;justify-content:center;padding:16px 0 12px}
 .rail-mark{width:26px;height:26px;border-radius:var(--r-s);background:var(--brand);color:var(--paper);
-  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex:0 0 26px}
+  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex:0 0 26px;
+  cursor:default}
 .rail-mark.neutral{background:var(--sunken);color:var(--ink-2)}
-.rail-id{min-width:0}
-.rail-name{font-size:14px;font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.rail-codename{font-size:11px;color:var(--ink-3)}
 .rail-nav{position:relative;flex:1;padding:var(--s3) 0;overflow-y:auto}
-/* D120: sliding active marker. position:absolute with top:0 set explicitly, its static
-   position would otherwise place it after its last sibling in the flow, throwing translateY
-   off by the whole list's height. Recomputed on route change, resize, and font load; see
-   positionRailMarker(). Replaces the old background-fill position cue on .rail-item.active
-   below; the text colour/weight change on the active item stays. */
-.rail-marker{position:absolute;top:0;left:0;width:2px;background:var(--brand);
-  transition:transform var(--t-base) var(--ease),height var(--t-base) var(--ease)}
-.rail-group-label{font-size:11px;font-weight:500;color:var(--ink-3);padding:var(--s3) var(--s4) var(--s1)}
-.rail-item{display:flex;align-items:center;gap:var(--s2);height:34px;padding:0 var(--s4);font-size:13px;
-  color:var(--ink-2);cursor:pointer;transition:background .12s var(--ease),color .12s var(--ease)}
+/* D240: real <a href="#/route"> elements, not <div onclick>, so the rail is keyboard-reachable
+   (Tab reaches every item, Enter follows the href, both for free from the element itself, no
+   extra JS) and each route's own fragment link works with copy/open-in-new-tab too. Padding
+   10px/6px, margin 2px/8px, gap 4px: Kevin's own explicit spec for this rail, off the 4pt scale
+   on the first two, the same shape as every other explicitly-approved deviation this session
+   (D186, the 6px stage-mini-track, the 10px snap-row padding) - not a license to use these
+   numbers anywhere else. */
+.rail-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--s1);
+  padding:10px 6px;margin:2px 8px;border-radius:var(--r-m);color:var(--ink-2);text-decoration:none;
+  cursor:pointer;transition:background .12s var(--ease),color .12s var(--ease)}
 .rail-item:hover{background:var(--hover);color:var(--ink)}
-.rail-item.active{color:var(--ink);font-weight:500}
+.rail-item.active{background:var(--paper);color:var(--brand);box-shadow:0 0 0 1px var(--line)}
 .rail-item.inert{color:var(--ink-3)}
 .rail-item.inert:hover{background:var(--hover);color:var(--ink-2)}
-.rail-item .spacer{margin-left:auto}
-.rail-item .tag{font-size:11px;color:var(--ink-3)}
-.rail-footer{border-top:1px solid var(--line);padding:var(--s3) var(--s4);display:flex;align-items:center;gap:var(--s2)}
-.rail-footer-name{font-size:12px;font-weight:500;color:var(--ink)}
-.rail-footer-role{font-size:11px;color:var(--ink-3)}
+/* D240: -2px inset, not CLAUDE.md's standard +2px offset (--focus-offset) - an outset ring on an
+   84px-wide item with only 8px of side margin would clip against the rail's own edge or the
+   neighbouring item. Still built from the standard tokens (calc, not a raw literal), never a
+   fourth focus treatment invented from scratch. */
+.rail-item:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:calc(var(--focus-offset) * -1)}
+.rail-icon-svg{width:18px;height:18px}
+.rail-label{font-size:11px;line-height:1.2;color:inherit;text-align:center}
+.rail-footer{border-top:1px solid var(--line);padding:12px 0;display:flex;align-items:center;justify-content:center}
 
 .main{flex:1;min-width:0;display:flex;flex-direction:column}
 .topbar{height:57px;flex:0 0 57px;position:sticky;top:0;z-index:5;display:flex;align-items:center;
@@ -210,7 +219,10 @@ h1,h2,h3,p,dl,dd{margin:0}
 .btn.ghost{border-color:transparent}
 .btn[disabled]{opacity:.5;pointer-events:none}
 
-.viewport{padding:var(--s5);max-width:1360px;width:100%;margin:0 auto}
+/* D241: 1504px, up from 1360px, the exact 144px the rail's own 228px-to-84px cut (D240) frees.
+   Kevin's own explicit choice ("2B, wider cards"): the saved width goes to content, not to
+   wider margins around the same card widths. */
+.viewport{padding:var(--s5);max-width:1504px;width:100%;margin:0 auto}
 .view{display:none}
 .view.active{display:block}
 /* D216: font-weight:500 declared explicitly. This is the only <h1> in the app (12 call sites,
@@ -1459,35 +1471,46 @@ table.tbl{width:100%;border-collapse:collapse}
 </style>
 
 <div class="app">
+  <!-- D240: icon-over-label rail. Icon paths share D226's exact technique (24x24 viewBox, fill
+       none, stroke currentColor, stroke-width 1.75, round caps/joins) so the rail and the feed
+       read as one icon language; "Network" reuses the feed's own three-connected-nodes path
+       verbatim (D151: reuse only where the rendered result is genuinely identical), not a second
+       hand-drawn network glyph. Written as static markup, not a JS-generated railIconSvg(): unlike
+       the feed (data-driven, a variable set of rows built by JS), the rail is exactly six fixed
+       routes that never change per record or per BDO, so there is nothing here for a JS layer to
+       parameterize. -->
   <nav class="rail">
     <div class="rail-header">
-      <div class="rail-mark">K</div>
-      <div class="rail-id">
-        <div class="rail-name">Ridgemark Capital</div>
-        <div class="rail-codename">Keystone</div>
-      </div>
+      <div class="rail-mark" title="Ridgemark Capital, Keystone">K</div>
     </div>
     <div class="rail-nav" id="rail-nav">
-      <div class="rail-marker" id="rail-marker"></div>
-      <div class="rail-item" data-route="home" onclick="location.hash='#/home'">Home</div>
-      <div class="rail-item" data-route="pipeline" onclick="location.hash='#/pipeline'">Opportunities</div>
-      <div class="rail-item" data-route="accounts" onclick="location.hash='#/accounts'">Accounts</div>
-      <div class="rail-item inert" data-route="network" onclick="location.hash='#/network'">
-        <span>Network</span><span class="spacer"></span><span class="tag">soon</span>
-      </div>
-      <div class="rail-item inert" data-route="bdoperf" onclick="location.hash='#/bdoperf'">
-        <span>BDO Performance</span><span class="spacer"></span><span class="tag">exec</span>
-      </div>
-      <div class="rail-item inert" data-route="benchmarking" onclick="location.hash='#/benchmarking'">
-        <span>Benchmarking</span><span class="spacer"></span><span class="tag">phase 2</span>
-      </div>
+      <a class="rail-item" href="#/home" data-route="home">
+        <svg class="rail-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5a1 1 0 0 0 1 1H10v-6h4v6h3.5a1 1 0 0 0 1-1V10"/></svg>
+        <span class="rail-label">Home</span>
+      </a>
+      <a class="rail-item" href="#/pipeline" data-route="pipeline">
+        <svg class="rail-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16"/><path d="M7 12h10"/><path d="M10 18h4"/></svg>
+        <span class="rail-label">Opportunities</span>
+      </a>
+      <a class="rail-item" href="#/accounts" data-route="accounts">
+        <svg class="rail-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v17"/><path d="M12 21v-8a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v8"/><path d="M4 21h16"/><path d="M7 7h1"/><path d="M7 11h1"/><path d="M7 15h1"/><path d="M15 13h1"/><path d="M15 17h1"/></svg>
+        <span class="rail-label">Accounts</span>
+      </a>
+      <a class="rail-item inert" href="#/network" data-route="network" title="Network · soon" aria-label="Network · soon">
+        <svg class="rail-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.3 11l7.4-4"/><path d="M8.3 13l7.4 4"/></svg>
+        <span class="rail-label">Network</span>
+      </a>
+      <a class="rail-item inert" href="#/bdoperf" data-route="bdoperf" title="BDO Performance · exec" aria-label="BDO Performance · exec">
+        <svg class="rail-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V13"/><path d="M11 21V7"/><path d="M18 21v-9"/><path d="M3 21h18"/></svg>
+        <span class="rail-label">BDO Performance</span>
+      </a>
+      <a class="rail-item inert" href="#/benchmarking" data-route="benchmarking" title="Benchmarking · phase 2" aria-label="Benchmarking · phase 2">
+        <svg class="rail-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 16a8 8 0 0 1 16 0"/><path d="M12 16 15.5 9.5"/><circle cx="12" cy="16" r="1.2"/></svg>
+        <span class="rail-label">Benchmarking</span>
+      </a>
     </div>
     <div class="rail-footer">
-      <div class="rail-mark neutral" id="rail-avatar">PW</div>
-      <div>
-        <div class="rail-footer-name" id="rail-username">Priscilla Whitfield</div>
-        <div class="rail-footer-role">Business Development Officer</div>
-      </div>
+      <div class="rail-mark neutral" id="rail-avatar"></div>
     </div>
   </nav>
 
@@ -104806,13 +104829,15 @@ function positionSlidingMarker(marker, activeEl, axis){
     marker.style.height = activeEl.offsetHeight+'px';
   }
 }
-function positionRailMarker(){
-  positionSlidingMarker(document.getElementById('rail-marker'), document.querySelector('.rail-item.active'), 'y');
-}
-/* The rail marker above never needs this: route() only toggles .active on the existing
-   .rail-item elements, it never rewrites #rail-nav's innerHTML, so the same marker node lives
-   for the app's whole lifetime and the CSS transition always has something real to animate
-   from. The tab marker doesn't get that for free: renderOpp() rebuilds #view-opp's entire
+/* D240 retired positionRailMarker() (the rail no longer has a sliding marker element to
+   position; the active state is a filled pill on the item itself). positionSlidingMarker()
+   itself stays: the record page's own section-tab marker below still uses it, and still needs
+   the persistent-node handling this comment explains, unrelated to anything the rail ever did.
+   That marker never needed the same handling the tab marker needs below: route() only toggled
+   .active on the existing .rail-item elements, it never rewrote #rail-nav's innerHTML, so the
+   same marker node lived for the app's whole lifetime and the CSS transition always had
+   something real to animate from. The tab marker doesn't get that for free: renderOpp() rebuilds
+   #view-opp's entire
    innerHTML (header, strip, nav, body) on every section switch, so the markup above would
    hand it a BRAND NEW <div> each time, with no prior on-screen position to glide from. A fresh
    node's first style write is never a transition (nothing rendered it yet to transition away
@@ -104849,12 +104874,12 @@ function positionTabMarker(instant){
     SECTION_NAV_MARKER_EL.style.transition = '';
   }
 }
-/* Resize covers both markers at once (window width can reflow either the rail or the tab row);
-   font load covers the one-time case where the very first paint measured labels in the
-   fallback font before Inter Tight arrived, so the marker's initial size/position would
-   otherwise be wrong until the next click or resize. */
-window.addEventListener('resize', function(){ positionRailMarker(); positionTabMarker(); });
-if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ positionRailMarker(); positionTabMarker(); });
+/* D240: rail side retired (no marker element left to reposition). Font load still covers the
+   tab marker's own one-time case: the very first paint measured labels in the fallback font
+   before Inter Tight arrived, so its initial size/position would otherwise be wrong until the
+   next click or resize. */
+window.addEventListener('resize', function(){ positionTabMarker(); });
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ positionTabMarker(); });
 
 /* ---------- routing ---------- */
 function route(){
@@ -104863,10 +104888,13 @@ function route(){
   const view = parts[0] || 'home';
   const id = parts[1];
 
+  /* D240: aria-current="page" alongside .active, kept in sync here since this is the one place
+     the active route is ever decided. */
   document.querySelectorAll('.rail-item').forEach(el=>{
-    el.classList.toggle('active', el.dataset.route===view);
+    const isActive = el.dataset.route===view;
+    el.classList.toggle('active', isActive);
+    if(isActive) el.setAttribute('aria-current','page'); else el.removeAttribute('aria-current');
   });
-  positionRailMarker();
   document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
 
   const titles = {
@@ -110568,8 +110596,15 @@ function renderStub(viewId, title, note){
 }
 
 /* ---------- init ---------- */
-document.getElementById('rail-avatar').textContent = initials(BDOS[CURRENT_BDO_ID].name);
-document.getElementById('rail-username').textContent = BDOS[CURRENT_BDO_ID].name;
+/* D240: the footer now shows only the avatar (name/role labels removed from the rail entirely),
+   so what the old #rail-username/.rail-footer-role divs held in text now lives in the avatar's
+   own title attribute instead - read from BDOS[CURRENT_BDO_ID].title, not the literal string
+   "Business Development Officer" the old markup hardcoded (every BDO in the dataset happens to
+   share that title today, confirmed, but reading it from data is strictly more correct and costs
+   nothing extra since this line was already being rewritten). */
+const railAvatarEl = document.getElementById('rail-avatar');
+railAvatarEl.textContent = initials(BDOS[CURRENT_BDO_ID].name);
+railAvatarEl.title = BDOS[CURRENT_BDO_ID].name+', '+BDOS[CURRENT_BDO_ID].title;
 route();
 
 })();
