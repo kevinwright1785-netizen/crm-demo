@@ -316,12 +316,21 @@ h1,h2,h3,p,dl,dd{margin:0}
 @media (max-width:1140px){.two-col{grid-template-columns:minmax(0,1fr)}}
 
 /* ---------- list / feed panel ---------- */
-.feedrow{display:flex;align-items:flex-start;gap:var(--s3);padding:var(--s3) var(--s5);cursor:pointer;
+/* Audit fix pass (R3): horizontal padding moved off the row (it used to supply its own, putting
+   its divider - the box-shadow below - at the row's own card-edge-to-card-edge box, 24px
+   further out than the mock's inset divider) onto the two real feeds' own flush body instead
+   (.panel.feed-panel > .panel-body.flush, below). Content position is unchanged: the container
+   now supplies the same 24px the row used to supply itself. .feedrow.static (the Opportunity
+   record's own Network-tab reuse) already zeroed its own horizontal padding before this pass,
+   for a different reason (its container was never flush to begin with), so it needed no change
+   here and keeps rendering exactly as before. */
+.feedrow{display:flex;align-items:flex-start;gap:var(--s3);padding:var(--s3) 0;cursor:pointer;
   transition:background .12s var(--ease);box-shadow:inset 0 1px 0 var(--row-sep)}
 .feedrow:first-child{box-shadow:none}
 .feedrow:hover{background:var(--hover)}
-.feedrow.static{cursor:default;padding-left:0;padding-right:0}
+.feedrow.static{cursor:default}
 .feedrow.static:hover{background:transparent}
+.panel.feed-panel > .panel-body.flush{padding:0 var(--s5)}
 .panel-body.pad-top{padding-top:var(--s5)}
 .pipe-toolbar{display:flex;align-items:center;justify-content:space-between;gap:var(--s4);flex-wrap:wrap;margin-bottom:var(--s2)}
 .chipbar.tight{margin-bottom:0}
@@ -374,9 +383,14 @@ h1,h2,h3,p,dl,dd{margin:0}
    Spans the full 7:00-19:00 working day (see buildAgenda()'s filler slots), so the card's
    internal scroll is structural — always there, at any scroll position — rather than depending
    on whether today's demo data happens to be tall enough to overflow. */
-.agenda-row{display:flex;align-items:flex-start;gap:var(--s3);padding:var(--s3) var(--s5);
+/* Audit fix pass (R3): horizontal padding moved off the row onto its own card's flush body
+   (.home-calendar-panel > .panel-body.flush, below), the same fix and the same reason as
+   .feedrow above - the row's own padding put its divider 24px outside the mock's inset
+   position. Content position is unchanged. */
+.agenda-row{display:flex;align-items:flex-start;gap:var(--s3);padding:var(--s3) 0;
   box-shadow:inset 0 1px 0 var(--row-sep)}
 .agenda-row:first-child{box-shadow:none}
+.home-calendar-panel > .panel-body.flush{padding:0 var(--s5)}
 .agenda-time{font-family:var(--ui);font-size:11px;color:var(--ink-3);padding-top:var(--s1);
   flex:0 0 calc(var(--s7) + var(--s4));white-space:nowrap}
 .agenda-row.past{opacity:.55}
@@ -408,9 +422,12 @@ h1,h2,h3,p,dl,dd{margin:0}
 /* Correction pass, 2026-09-22: 10px vertical, off the 4pt scale, is the mock's own literal value
    for this row (confirmed by reading its CSS directly) and Kevin's own explicit fix instruction
    for this element, matching the approved mock pixel for pixel. Not a license to use 10px
-   elsewhere. Horizontal padding stays --s5, since this row (unlike the mock's) carries its own
-   horizontal inset rather than relying on a single padding source on the card body. */
-.snap-row{display:flex;align-items:center;gap:var(--s3);padding:10px var(--s5);cursor:pointer;
+   elsewhere. Horizontal padding moved to the card's own flush body (audit fix pass, R3): this
+   row's own horizontal padding put its divider (the box-shadow below) at the row's own
+   card-edge-to-card-edge box, 24px further out than the mock's inset divider. Content position
+   is unchanged, since the container now supplies the exact same 24px this row used to supply
+   itself; only the divider's own position moved. */
+.snap-row{display:flex;align-items:center;gap:var(--s3);padding:10px 0;cursor:pointer;
   transition:background .12s var(--ease);box-shadow:inset 0 1px 0 var(--row-sep)}
 .snap-row:first-child{box-shadow:none}
 .snap-row:hover{background:var(--hover)}
@@ -470,7 +487,7 @@ h1,h2,h3,p,dl,dd{margin:0}
 .toggle-seg-wrap{padding:0 var(--s5)}
 /* D234-D239: the ID-scoped 2px override this comment used to describe (#panel-partners
    .panel-scope,#panel-loss .panel-scope{margin-top:2px}) is superseded by the shared
-   .toggle-scope class above, now applied by toggleCardHeaderHtml() itself, so Exec Sourcing
+   .toggle-scope class above, now applied by panelHeaderHtml() itself, so Exec Sourcing
    (D231) gets the same 2px without its own ID rule. Removed here rather than left dead. */
 
 /* ---------- toggle-card stable height (standing rule — CLAUDE.md §4) ----------
@@ -506,10 +523,24 @@ h1,h2,h3,p,dl,dd{margin:0}
    bleeding and none needed this rule. **min-height raised to 224px (200 plus this rule's own
    24px bottom padding), scoped to this same selector, so the height-stability floor still means
    the same thing it always did: room for 5 rows plus one card's worth of bottom padding.**
-   Left at the base rule's own 200px for every other `.toggle-rows` consumer (Exec Sourcing's
-   "By channel" view, whose content already exceeds either floor on its own, per the check
-   below, so the number was never binding there regardless). */
+   Left at the base rule's own 200px for every other `.toggle-rows` consumer at the time, on the
+   belief that Exec Sourcing's "By channel" view already exceeded either floor on its own -
+   **wrong, corrected in the audit fix pass (R5): "By channel" measured exactly 200px (hitting
+   the floor, not exceeding it), 64px short of "By partner"'s own natural 264px, which is why the
+   two views rendered at different card heights (an R5 violation) until the ID-scoped fix
+   below.** */
 .panel-body.flush.toggle-rows{padding:0 var(--s5) var(--s5);min-height:224px}
+/* Audit fix pass (R5): Exec Sourcing's own two views render fundamentally different chart
+   shapes (a 6-row hbar list vs. a single stacked bar, per execSourcingPanelHtml()'s own D93/D94
+   reasoning), with no shared row-count rule like Partners/Loss's D227 to keep them naturally the
+   same height. ID-scoped, both branches: raises "By channel"'s own floor from the base rule's
+   200px to 264px, matching "By partner"'s own measured natural height exactly (6 rows never
+   varies, per execSourcingRows(view,6,measure)'s own hardcoded limit, so this is a stable number
+   to calibrate to, the same shape as D227's own 5-row calibration). "By partner" already renders
+   at 264px on its own content, so this is a no-op for that view; "By channel" gains the 64px of
+   reserved slack below its own shorter content, sanctioned per the toggle-card stable-height
+   rule, not a bug. */
+#panel-exec-sourcing .toggle-rows{min-height:264px}
 /* Reserves layout space for a conditionally-shown element (e.g. the loss card's "Lost to"-only
    attribution footer) without painting it — visibility:hidden, not omitting the element, so a
    view without that content doesn't lose its height too. General-purpose, not loss-card-specific. */
@@ -616,18 +647,17 @@ h1,h2,h3,p,dl,dd{margin:0}
    consumer, not a fork of pipelineByStageHtml() (Exec Home's own segbar/legend), whose rendered
    shape is genuinely different (a four-column mini-card row, not a proportional segmented bar
    plus a legend list), so per D151 this is a new function, not a forced reuse. */
-/* Correction pass, 2026-09-22: the stage-mini row sat inside Snapshot's flush (0-padding)
-   body with no horizontal padding of its own, so it rendered flush with the card's outer edge
-   instead of the card's own 24px content inset every other element (the title, the drill link,
-   the snapshot rows) already sits at. Root cause confirmed by measuring both the mock and the
-   built page (Playwright-equivalent, headless Chrome): mock's title/rows/mini all sit 25px from
-   the card edge; the built mini sat 1px from it. Fixed by giving --s5 back on this element
-   specifically, the same "card content padding" every other child needs, matching the mock's
-   own single-padding-source model (--s5 padding lives on .panel itself there, not split
-   piecemeal across children). This is that same 24px reapplied to the one child that never got
-   it, not a redesign of the padding model app-wide. */
+/* Audit fix pass (R3, card layout rules): superseded the first correction pass's own per-child
+   fix (giving .stage-mini its own --s5 horizontal padding) with the mock's actual single-source
+   model this comment already named as the target: padding now lives on the Snapshot card's own
+   flush body (.panel.snapshot-panel > .panel-body.flush, below), not split across .stage-mini
+   and .snap-row individually. That per-child fix corrected content position (confirmed 25px
+   inset) but left each row's own DIVIDER (a box-shadow/border on the row's own, still
+   card-edge-to-card-edge box) rendering 24px further out than the mock's, exactly the R3 finding
+   this pass fixes. Both children are the container's only consumers (checked directly, not
+   assumed), so consolidating here is safe. */
 .stage-mini{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--s3);
-  padding:0 var(--s5) var(--s3);margin-bottom:var(--s3);border-bottom:1px solid var(--row-sep)}
+  padding:0 0 var(--s3);margin-bottom:var(--s3);border-bottom:1px solid var(--row-sep)}
 .stage-mini-item.clickable{cursor:pointer}
 .stage-mini-item.clickable:hover{background:var(--hover)}
 .stage-mini-k{font-size:11px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -645,6 +675,13 @@ h1,h2,h3,p,dl,dd{margin:0}
    line with a thin blank band between them. Suppressed here, keyed to the adjacency itself
    rather than :first-child, so it holds regardless of what else might precede a snap-row. */
 .stage-mini + .snap-row{box-shadow:none}
+/* Audit fix pass (R3): the one horizontal padding source for Pipeline Snapshot's flush body,
+   replacing the per-child padding both .stage-mini and .snap-row carried individually. Scoped
+   to this card's own class (added to its markup alongside .panel) so no other .panel-body.flush
+   consumer app-wide - Partners, Where we're losing, and Exec Sourcing all have their own,
+   separately-scoped .panel-body.flush.toggle-rows rule; the Opportunity record's static
+   Network-tab panel and Exec Home's own feed keep their own fixes below - is affected. */
+.panel.snapshot-panel > .panel-body.flush{padding:0 var(--s5)}
 
 /* ---------- expandable cards + modal (v7 tier 3: scrim + --lift-hi) ---------- */
 .panel.expandable{cursor:pointer;transition:border-color .12s var(--ease)}
@@ -105673,20 +105710,29 @@ function viewToggleHtml(views, current, setterName){
     v.label+'</button>').join('')+'</div>';
 }
 
-/* D234-D239 (CLAUDE.md §4, "card layout rules"): the shared toggle-card header. One function so
-   Partners, Where we're losing, and Exec Sourcing (the three cards that share both viewToggleHtml()
-   AND the hbar-row/hbar-fill bar markup, D231) get identical header geometry (R1) and can't drift
-   apart independently. Title and the drill link share the top row; the scope line is a full-width
+/* D234-D239 (CLAUDE.md §4, "card layout rules"): the shared full-width panel header. Built as
+   toggleCardHeaderHtml() for Partners, Where we're losing, and Exec Sourcing (the three cards
+   that share both viewToggleHtml() AND the hbar-row/hbar-fill bar markup, D231); renamed and
+   generalized in the audit fix pass once the same structural fix turned out to be exactly what
+   every other R2-flagged card needed too, toggle or not - the function was never actually
+   toggle-specific (it takes no view-toggle state, just a title and a scope string), only its
+   name and its first three callers were. Title and an optional top-right element (the drill
+   link, a verdict badge, both, or neither) share the top row; the scope line is a full-width
    block sibling below it (R2), always one line (`.toggle-scope`'s own nowrap/ellipsis), with the
-   full text also carried as a `title` attribute so a truncated line stays readable on hover. Other
-   Exec Home cards with their own segmented control (Stalled deals, Monthly volume, Won by product,
-   Lost intelligence) are NOT this component: they don't share the hbar-row/toggle-rows shape this
-   header was built for, so they keep their existing header markup, unedited, and are left for the
-   audit script to flag on their own terms if they violate R1/R2. */
-function toggleCardHeaderHtml(title, scope){
+   full text also carried as a `title` attribute so a truncated line stays readable on hover.
+   `topRight` defaults to the standard "Expand ›" drill link so the three original callers, and
+   every other expandable card that just wants that, don't need to pass it explicitly; a card
+   with different link text, a verdict badge, both, or no top-right element at all passes its own
+   HTML (or `''`) instead. The CSS classes below (`.panel-header.stacked`, `.toggle-header-top`,
+   `.toggle-scope`) keep their original names rather than a matching rename: they describe the
+   STRUCTURE (a stacked block header, a flexed top row), which was never toggle-specific either,
+   and a class rename across every call site was judged not worth the extra risk for a purely
+   cosmetic gain the function rename already delivers where it matters (the code a reader calls). */
+function panelHeaderHtml(title, scope, topRight){
+  if(topRight===undefined) topRight = '<span class="drill">Expand &rsaquo;</span>';
   return '<div class="panel-header stacked"><div class="toggle-header-top">'+
       '<div class="panel-title">'+title+'</div>'+
-      '<span class="drill">Expand &rsaquo;</span>'+
+      topRight+
     '</div><div class="panel-scope toggle-scope" title="'+esc(scope)+'">'+scope+'</div></div>';
 }
 
@@ -105825,7 +105871,7 @@ function partnersPanelHtml(stats){
   }).join('');
 
   return '<div class="panel expandable" id="panel-partners" onclick="openModal(\'partners\', \''+view+'\')">'+
-    toggleCardHeaderHtml('Partners', scope)+
+    panelHeaderHtml('Partners', scope)+
     '<div class="toggle-seg-wrap">'+
       viewToggleHtml(PARTNER_VIEWS, view, 'setPartnerView')+
     '</div>'+
@@ -105941,7 +105987,7 @@ function lossPanelHtml(bdoId){
   }).join('');
 
   return '<div class="panel expandable" id="panel-loss" onclick="openModal(\'loss\', \''+view+'\')">'+
-    toggleCardHeaderHtml('Where we\'re losing', d.scope)+
+    panelHeaderHtml('Where we\'re losing', d.scope)+
     '<div class="toggle-seg-wrap">'+
       viewToggleHtml(LOSS_VIEWS, view, 'setLossView')+
     '</div>'+
@@ -106311,11 +106357,9 @@ function renderHome(){
       '</div>'+
 
       '<div class="home-col home-col-4">'+
-        '<div class="panel">'+
-          '<div class="panel-header"><div class="panel-header-text">'+
-            '<div class="panel-title">Pipeline snapshot</div>'+
-            '<div class="panel-scope">Top 5 by facility size · active opportunities</div>'+
-          '</div><span class="drill" onclick="location.hash=\'#/pipeline\'">Opportunities &rsaquo;</span></div>'+
+        '<div class="panel snapshot-panel">'+
+          panelHeaderHtml('Pipeline snapshot', 'Top 5 by facility size · active opportunities',
+            '<span class="drill" onclick="location.hash=\'#/pipeline\'">Opportunities &rsaquo;</span>')+
           '<div class="panel-body flush">'+stageMiniHtml(myOpen)+pipelineSnapshotHtml(myOpen)+'</div>'+
         '</div>'+
 
@@ -107016,10 +107060,8 @@ function execCoveragePanelHtml(){
       tipAttr(b.stage, b.count+' deal'+(b.count===1?'':'s'), moneyShort(b.weighted)+' weighted')+'>'+
       '<span class="k">'+b.stage+'</span><span class="v">'+moneyShort(b.weighted)+'</span></div>').join('');
   return '<div class="panel" id="panel-exec-coverage">'+
-    '<div class="panel-header"><div class="panel-header-text">'+
-      '<div class="panel-title">Pipeline coverage</div>'+
-      '<div class="panel-scope">Weighted open pipeline vs. remaining annual goal, firm-wide</div>'+
-    '</div><span class="tag '+verdict.cls+'">'+verdict.label+'</span></div>'+
+    panelHeaderHtml('Pipeline coverage', 'Weighted open pipeline vs. remaining annual goal, firm-wide',
+      '<span class="tag '+verdict.cls+'">'+verdict.label+'</span>')+
     '<div class="panel-body">'+
       '<div class="exec-ratio">'+cov.ratio.toFixed(2)+'<span class="un">x</span></div>'+
       '<div class="segbar cov-segbar">'+segs+
@@ -107052,10 +107094,7 @@ function execCycleTimePanelHtml(){
   const c = execCycleTime();
   const median = c.days.length ? c.days[Math.floor(c.days.length/2)] : 0;
   return '<div class="panel" id="panel-exec-cycle">'+
-    '<div class="panel-header"><div class="panel-header-text">'+
-      '<div class="panel-title">Cycle time</div>'+
-      '<div class="panel-scope">Application to funding, '+c.count+' closed-won deals, trailing 12 months</div>'+
-    '</div></div>'+
+    panelHeaderHtml('Cycle time', 'Application to funding, '+c.count+' closed-won deals, trailing 12 months', '')+
     '<div class="panel-body">'+
       '<div class="exec-ratio">'+median+'<span class="un">d median</span></div>'+
       (c.days.length ? rangeStripSvg(c.days,'d') : '<div class="empty">No funded deals yet.</div>')+
@@ -107065,10 +107104,8 @@ function execCycleTimePanelHtml(){
 function execUnderwritingPanelHtml(){
   const uw = execUnderwritingThroughput();
   return '<div class="panel expandable" id="panel-exec-uw" onclick="openModal(\'execUnderwriting\')">'+
-    '<div class="panel-header"><div class="panel-header-text">'+
-      '<div class="panel-title">Underwriting throughput</div>'+
-      '<div class="panel-scope">Queue depth now; turnaround year to date. Throughput only, not decision quality</div>'+
-    '</div><span class="expand-hint">Expand &rsaquo;</span></div>'+
+    panelHeaderHtml('Underwriting throughput', 'Queue depth now; turnaround year to date. Throughput only, not decision quality',
+      '<span class="expand-hint">Expand &rsaquo;</span>')+
     '<div class="panel-body">'+
       '<div class="modal-strip">'+
         '<div><div class="modal-lab">In queue</div><div class="modal-fig">'+uw.deals.length+'</div></div>'+
@@ -107086,10 +107123,8 @@ function execStalledPanelHtml(){
   const rows = execMeasureRows(s.byStage.map(b=>({label:esc(b.stage), count:b.count, value:b.value})), measure)
     .map(r=>({...r, tip:tipAttr(r.label, r.count+' deal'+(r.count===1?'':'s'), moneyShort(r.dollars))}));
   return '<div class="panel expandable" id="panel-exec-stalled" onclick="openModal(\'execStalled\')">'+
-    '<div class="panel-header"><div class="panel-header-text">'+
-      '<div class="panel-title">Stalled deals</div>'+
-      '<div class="panel-scope">No activity in '+EXEC_STALE_DAYS+'+ days, firm-wide</div>'+
-    '</div><span class="expand-hint">Expand &rsaquo;</span></div>'+
+    panelHeaderHtml('Stalled deals', 'No activity in '+EXEC_STALE_DAYS+'+ days, firm-wide',
+      '<span class="expand-hint">Expand &rsaquo;</span>')+
     '<div class="panel-body">'+
       '<div class="exec-ratio">'+s.count+'</div>'+
       '<div class="chart-note">'+moneyShort(s.value)+' in facility size</div>'+
@@ -107180,10 +107215,7 @@ function execMonthlyPanelHtml(){
   const scope = (view==='created' ? total+' opportunities created' : total+' deals funded')+
     ' · '+moneyShort(totalVal)+' · trailing '+series.length+' months';
   return '<div class="panel expandable" id="panel-exec-monthly" onclick="openModal(\'execMonthly\', \''+view+'\')">'+
-    '<div class="panel-header"><div class="panel-header-text">'+
-      '<div class="panel-title">Monthly volume</div>'+
-      '<div class="panel-scope">'+scope+'</div>'+
-    '</div><span class="expand-hint">Expand &rsaquo;</span></div>'+
+    panelHeaderHtml('Monthly volume', scope, '<span class="expand-hint">Expand &rsaquo;</span>')+
     '<div class="panel-body pad-top">'+viewToggleHtml(EXEC_MONTHLY_VIEWS, view, 'setExecMonthlyView')+'</div>'+
     '<div class="panel-body flush">'+
       '<div class="execchart-wrap">'+execMonthlyLineChart(series)+'</div>'+
@@ -107211,10 +107243,7 @@ function execPipelineByStagePanelHtml(){
 function execAttainmentPanelHtml(){
   const rows = execBdoAttainment();
   return '<div class="panel" id="panel-exec-attainment">'+
-    '<div class="panel-header"><div class="panel-header-text">'+
-      '<div class="panel-title">Volume by BDO</div>'+
-      '<div class="panel-scope">Attainment distribution, year to date, highest to lowest</div>'+
-    '</div></div>'+
+    panelHeaderHtml('Volume by BDO', 'Attainment distribution, year to date, highest to lowest', '')+
     '<div class="panel-body">'+attainmentChartHtml(rows,100)+'</div>'+
   '</div>';
 }
@@ -107249,7 +107278,7 @@ function execSourcingPanelHtml(){
     : stackedBarHtml(execSourcingRows(view,6,measure), {narrow:true});
   const bodyCls = view==='partners' ? 'panel-body flush toggle-rows' : 'panel-body toggle-rows';
   return '<div class="panel expandable" id="panel-exec-sourcing" onclick="openModal(\'execSourcing\', \''+view+'\')">'+
-    toggleCardHeaderHtml('Sourcing', scope)+
+    panelHeaderHtml('Sourcing', scope)+
     '<div class="panel-body pad-top">'+viewToggleHtml(EXEC_SOURCING_VIEWS, view, 'setExecSourcingView')+'</div>'+
     '<div class="panel-body pad-top">'+viewToggleHtml(EXEC_MEASURE_VIEWS, measure, 'setExecSourcingMeasure')+'</div>'+
     '<div class="'+bodyCls+'">'+chart+'</div>'+
@@ -107528,7 +107557,7 @@ function execHeroHtml(){
 function renderExecHome(){
   document.getElementById('view-home').innerHTML =
     execHeroHtml()+
-    '<div class="panel">'+
+    '<div class="panel feed-panel">'+
       '<div class="panel-header"><div class="panel-header-text">'+
         '<div class="panel-title">Firm-wide signals</div>'+
         '<div class="panel-scope">Patterns worth a decision, ranked by materiality</div>'+
@@ -108705,14 +108734,12 @@ function acctOpportunitiesSummaryHtml(a){
       '<span class="r">'+moneyPlain(o.facilitySize)+'</span>'+
     '</div>').join('');
   const candidate = crossSellCandidate(a);
+  const scope = opps.length+' total'+(parts.length?'. '+parts.join(', '):'')+
+    '. Rep entry, stage from audit trail.';
   return '<div class="panel">'+
-    '<div class="panel-header"><div class="panel-header-text">'+
-      '<div class="panel-title">Opportunities</div>'+
-      '<div class="panel-scope">'+opps.length+' total'+(parts.length?'. '+parts.join(', '):'')+
-        '. Rep entry, stage from audit trail.</div>'+
-    '</div>'+panelVerdictHtml(candidate?'Cross-sell: '+candidate.product:'', 'brand')+
-    (opps.length ? '<div class="drill" onclick="setAccountSection(\'opportunities\')">View all '+opps.length+'</div>' : '')+
-    '</div>'+
+    panelHeaderHtml('Opportunities', scope,
+      panelVerdictHtml(candidate?'Cross-sell: '+candidate.product:'', 'brand')+
+      (opps.length ? '<div class="drill" onclick="setAccountSection(\'opportunities\')">View all '+opps.length+'</div>' : ''))+
     '<div class="panel-body">'+
       (rows || '<div class="empty">No opportunities on record for this account.</div>')+
       (candidate ? '<div class="note">'+esc(candidate.reason)+'</div>' : '')+
@@ -108744,10 +108771,8 @@ function acctKeyContactsSummaryHtml(a){
     ? n+' contact'+(n===1?'':'s')+'. Decision makers first. Rep entry.'
     : Math.min(4,n)+' of '+n+'. Decision makers first. Rep entry.';
   return '<div class="panel">'+
-    '<div class="panel-header"><div class="panel-header-text">'+
-      '<div class="panel-title">Key contacts</div>'+
-      '<div class="panel-scope">'+scope+'</div>'+
-    '</div>'+(n ? '<div class="drill" onclick="setAccountSection(\'contacts\')">View all '+n+'</div>' : '')+'</div>'+
+    panelHeaderHtml('Key contacts', scope,
+      n ? '<div class="drill" onclick="setAccountSection(\'contacts\')">View all '+n+'</div>' : '')+
     '<div class="panel-body">'+(rows || '<div class="empty">No contacts on record for this account.</div>')+'</div>'+
   '</div>';
 }
@@ -108778,10 +108803,8 @@ function acctLiensOnFileSummaryHtml(a){
      "search run" event); an honest real count + provenance line stands in for it rather than
      inventing that date, per CLAUDE.md §2b. */
   return '<div class="panel">'+
-    '<div class="panel-header"><div class="panel-header-text">'+
-      '<div class="panel-title">Liens on file</div>'+
-      '<div class="panel-scope">'+liens.length+' filing'+(liens.length===1?'':'s')+' on record &middot; from Account</div>'+
-    '</div>'+panelVerdictHtml(triggers?'Expect longer underwriting':'', 'warn')+'</div>'+
+    panelHeaderHtml('Liens on file', liens.length+' filing'+(liens.length===1?'':'s')+' on record · from Account',
+      panelVerdictHtml(triggers?'Expect longer underwriting':'', 'warn'))+
     '<div class="panel-body">'+
       (rows || '<div class="empty">No liens on record for this account.</div>')+
       (liens.length ? '<div class="note">'+lienVelocityLine(hasSub)+'</div>' : '')+
@@ -108818,14 +108841,14 @@ function acctTradeRelationshipsHtml(a){
   const sells = withOther.filter(x=>x.rel==='sells');
 
   const verdict = warm.count>0 ? panelVerdictHtml(warm.count+' warm path'+(warm.count===1?'':'s'), 'brand') : '';
-  const scope = 'Buys from '+buys.length+' &middot; sells to '+sells.length+' &middot; from Account';
+  /* Literal middot, not the &middot; entity: this string now also feeds panelHeaderHtml()'s own
+     esc() call for the scope's title attribute, which would otherwise double-escape the entity's
+     own "&" into visible "&amp;middot;" text in the tooltip. */
+  const scope = 'Buys from '+buys.length+' · sells to '+sells.length+' · from Account';
 
   if(!withOther.length){
     return '<div class="panel">'+
-      '<div class="panel-header"><div class="panel-header-text">'+
-        '<div class="panel-title">Trade relationships</div>'+
-        '<div class="panel-scope">'+scope+'</div>'+
-      '</div></div>'+
+      panelHeaderHtml('Trade relationships', scope, '')+
       '<div class="panel-body"><div class="empty">No trade relationships on record for this account.</div></div>'+
     '</div>';
   }
@@ -108861,10 +108884,7 @@ function acctTradeRelationshipsHtml(a){
     : '';
 
   return '<div class="panel">'+
-    '<div class="panel-header"><div class="panel-header-text">'+
-      '<div class="panel-title">Trade relationships</div>'+
-      '<div class="panel-scope">'+scope+'</div>'+
-    '</div>'+verdict+'</div>'+
+    panelHeaderHtml('Trade relationships', scope, verdict)+
     '<div class="panel-body">'+
       '<svg class="acct-graph" viewBox="0 0 '+W+' '+H+'" aria-hidden="true">'+
         lines.join('')+acctGraphNodeHtml(centerX, centerY, a.name, false, true)+nodes.join('')+captions+
