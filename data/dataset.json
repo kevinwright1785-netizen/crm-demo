@@ -22395,7 +22395,8 @@
         "callProtection": "1% Yr1 stepdown"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 8.83
     },
     {
       "id": "opp_0002",
@@ -22427,7 +22428,8 @@
         "debtorConcentrationPct": 17
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 12.77
     },
     {
       "id": "opp_0003",
@@ -22463,7 +22465,8 @@
         "primaryCovenant": "FCCR >= 1.19x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 10.7
     },
     {
       "id": "opp_0004",
@@ -22494,7 +22497,8 @@
         "debtorConcentrationPct": 44
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 13
     },
     {
       "id": "opp_0005",
@@ -22530,7 +22534,8 @@
         "callProtection": "1% Yr1 stepdown"
       },
       "lostToCompetitor": "PNC Business Credit",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitorEvidence": "UCC filing",
+      "yieldPct": 9.71
     },
     {
       "id": "opp_0006",
@@ -22565,7 +22570,8 @@
         "primaryCovenant": "FCCR >= 1.22x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.21
     },
     {
       "id": "opp_0007",
@@ -22594,7 +22600,8 @@
         "debtorConcentrationPct": 20
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 14.07
     },
     {
       "id": "opp_0008",
@@ -22626,7 +22633,8 @@
         "primaryCovenant": "FCCR >= 1.09x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 10.35
     },
     {
       "id": "opp_0009",
@@ -22660,7 +22668,8 @@
         "callProtection": "1% Yr1 stepdown"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 7.74
     },
     {
       "id": "opp_0010",
@@ -22697,7 +22706,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.46
     },
     {
       "id": "opp_0011",
@@ -22731,7 +22741,8 @@
         "callProtection": "None"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 7.45
     },
     {
       "id": "opp_0012",
@@ -22766,7 +22777,8 @@
         "primaryCovenant": "FCCR >= 1.1x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 10.22
     },
     {
       "id": "opp_0013",
@@ -22798,7 +22810,8 @@
         "callProtection": "1% Yr1 stepdown"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 8.5
     },
     {
       "id": "opp_0014",
@@ -22830,7 +22843,8 @@
         "debtorConcentrationPct": 48
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 15.04
     },
     {
       "id": "opp_0015",
@@ -22863,7 +22877,8 @@
         "primaryCovenant": "FCCR >= 1.1x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.41
     },
     {
       "id": "opp_0016",
@@ -22897,7 +22912,8 @@
         "callProtection": "1% Yr1 stepdown"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.48
     },
     {
       "id": "opp_0017",
@@ -22928,7 +22944,8 @@
         "debtorConcentrationPct": 22
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 14.35
     },
     {
       "id": "opp_0018",
@@ -22959,7 +22976,8 @@
         "debtorConcentrationPct": 27
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 12.29
     },
     {
       "id": "opp_0019",
@@ -22993,7 +23011,8 @@
         "callProtection": "1% Yr1 stepdown"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 7.11
     },
     {
       "id": "opp_0020",
@@ -23028,7 +23047,8 @@
         "primaryCovenant": "FCCR >= 1.08x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.07
     },
     {
       "id": "opp_0021",
@@ -23057,7 +23077,8 @@
         "debtorConcentrationPct": 41
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 14.99
     },
     {
       "id": "opp_0022",
@@ -23086,7 +23107,8 @@
         "debtorConcentrationPct": 21
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 14.73
     },
     {
       "id": "opp_0023",
@@ -23120,7 +23142,8 @@
         "callProtection": "2yr soft call"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 7.74
     },
     {
       "id": "opp_0024",
@@ -23156,7 +23179,8 @@
         "primaryCovenant": "FCCR >= 1.1x"
       },
       "lostToCompetitor": "White Oak Commercial Finance",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitorEvidence": "UCC filing",
+      "yieldPct": 9.06
     },
     {
       "id": "opp_0025",
@@ -23191,7 +23215,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 7.3
     },
     {
       "id": "opp_0026",
@@ -23225,7 +23250,8 @@
         "debtorConcentrationPct": 44
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 12.53
     },
     {
       "id": "opp_0027",
@@ -23260,7 +23286,8 @@
         "primaryCovenant": "FCCR >= 1.18x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.64
     },
     {
       "id": "opp_0028",
@@ -23294,7 +23321,8 @@
         "callProtection": "None"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 8.68
     },
     {
       "id": "opp_0029",
@@ -23325,7 +23353,8 @@
         "debtorConcentrationPct": 54
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 14.14
     },
     {
       "id": "opp_0030",
@@ -23361,7 +23390,8 @@
         "primaryCovenant": "FCCR >= 1.07x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.98
     },
     {
       "id": "opp_0031",
@@ -23395,7 +23425,8 @@
         "debtorConcentrationPct": 38
       },
       "lostToCompetitor": "Bank of America Business Capital",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitorEvidence": "UCC filing",
+      "yieldPct": 12.69
     },
     {
       "id": "opp_0032",
@@ -23427,7 +23458,8 @@
         "callProtection": "2yr soft call"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 8.34
     },
     {
       "id": "opp_0033",
@@ -23458,7 +23490,8 @@
         "debtorConcentrationPct": 23
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 15.81
     },
     {
       "id": "opp_0034",
@@ -23490,7 +23523,8 @@
         "callProtection": "None"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 7.17
     },
     {
       "id": "opp_0035",
@@ -23526,7 +23560,8 @@
         "primaryCovenant": "FCCR >= 1.23x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.37
     },
     {
       "id": "opp_0036",
@@ -23563,7 +23598,8 @@
         "primaryCovenant": "FCCR >= 1.2x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.66
     },
     {
       "id": "opp_0037",
@@ -23597,7 +23633,8 @@
         "primaryCovenant": "FCCR >= 1.18x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 10.35
     },
     {
       "id": "opp_0038",
@@ -23626,7 +23663,8 @@
         "debtorConcentrationPct": 38
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 15.16
     },
     {
       "id": "opp_0039",
@@ -23661,7 +23699,8 @@
         "primaryCovenant": "FCCR >= 1.2x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.98
     },
     {
       "id": "opp_0040",
@@ -23690,7 +23729,8 @@
         "debtorConcentrationPct": 15
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 15.03
     },
     {
       "id": "opp_0041",
@@ -23724,7 +23764,8 @@
         "callProtection": "1% Yr1 stepdown"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.18
     },
     {
       "id": "opp_0042",
@@ -23757,7 +23798,8 @@
         "primaryCovenant": "FCCR >= 1.06x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.92
     },
     {
       "id": "opp_0043",
@@ -23789,7 +23831,8 @@
         "debtorConcentrationPct": 18
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 12.1
     },
     {
       "id": "opp_0044",
@@ -23821,7 +23864,8 @@
         "callProtection": "2yr soft call"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 10
     },
     {
       "id": "opp_0045",
@@ -23856,7 +23900,8 @@
         "primaryCovenant": "FCCR >= 1.14x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 10.02
     },
     {
       "id": "opp_0046",
@@ -23890,7 +23935,8 @@
         "debtorConcentrationPct": 46
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 15.19
     },
     {
       "id": "opp_0047",
@@ -23926,7 +23972,8 @@
         "primaryCovenant": "FCCR >= 1.24x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.03
     },
     {
       "id": "opp_0048",
@@ -23957,7 +24004,8 @@
         "debtorConcentrationPct": 40
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 14.79
     },
     {
       "id": "opp_0049",
@@ -23993,7 +24041,8 @@
         "callProtection": "None"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 7.63
     },
     {
       "id": "opp_0050",
@@ -24024,7 +24073,8 @@
         "debtorConcentrationPct": 44
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 15.04
     },
     {
       "id": "opp_0051",
@@ -24061,7 +24111,8 @@
         "primaryCovenant": "FCCR >= 1.22x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.89
     },
     {
       "id": "opp_0052",
@@ -24095,7 +24146,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 8.96
     },
     {
       "id": "opp_0053",
@@ -24124,7 +24176,8 @@
         "debtorConcentrationPct": 16
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 12.65
     },
     {
       "id": "opp_0054",
@@ -24159,7 +24212,8 @@
         "callProtection": "2yr soft call"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.82
     },
     {
       "id": "opp_0055",
@@ -24196,7 +24250,8 @@
         "primaryCovenant": "FCCR >= 1.23x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 10.6
     },
     {
       "id": "opp_0056",
@@ -24230,7 +24285,8 @@
         "callProtection": "None"
       },
       "lostToCompetitor": "Bank of America Business Capital",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitorEvidence": "UCC filing",
+      "yieldPct": 7.94
     },
     {
       "id": "opp_0057",
@@ -24259,7 +24315,8 @@
         "debtorConcentrationPct": 21
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 13.45
     },
     {
       "id": "opp_0058",
@@ -24293,7 +24350,8 @@
         "callProtection": "2yr soft call"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.42
     },
     {
       "id": "opp_0059",
@@ -24327,7 +24385,8 @@
         "callProtection": "2yr soft call"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 7.33
     },
     {
       "id": "opp_0060",
@@ -24361,7 +24420,8 @@
         "callProtection": "2yr soft call"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.68
     },
     {
       "id": "opp_0061",
@@ -24395,7 +24455,8 @@
         "debtorConcentrationPct": 53
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 12.38
     },
     {
       "id": "opp_0062",
@@ -24431,7 +24492,8 @@
         "primaryCovenant": "FCCR >= 1.12x"
       },
       "lostToCompetitor": "White Oak Commercial Finance",
-      "lostToCompetitorEvidence": "Reported by borrower"
+      "lostToCompetitorEvidence": "Reported by borrower",
+      "yieldPct": 9.35
     },
     {
       "id": "opp_0063",
@@ -24465,7 +24527,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.54
     },
     {
       "id": "opp_0064",
@@ -24498,7 +24561,8 @@
         "debtorConcentrationPct": 18
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 12.49
     },
     {
       "id": "opp_0065",
@@ -24532,7 +24596,8 @@
         "callProtection": "1% Yr1 stepdown"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 7.83
     },
     {
       "id": "opp_0066",
@@ -24563,7 +24628,8 @@
         "debtorConcentrationPct": 15
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 15.19
     },
     {
       "id": "opp_0067",
@@ -24597,7 +24663,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 7.24
     },
     {
       "id": "opp_0068",
@@ -24629,7 +24696,8 @@
         "debtorConcentrationPct": 45
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 12.09
     },
     {
       "id": "opp_0069",
@@ -24663,7 +24731,8 @@
         "callProtection": "2yr soft call"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.28
     },
     {
       "id": "opp_0070",
@@ -24698,7 +24767,8 @@
         "callProtection": "None"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 8.2
     },
     {
       "id": "opp_0071",
@@ -24733,7 +24803,8 @@
         "primaryCovenant": "FCCR >= 1.18x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.78
     },
     {
       "id": "opp_0072",
@@ -24767,7 +24838,8 @@
         "debtorConcentrationPct": 25
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 12.41
     },
     {
       "id": "opp_0073",
@@ -24804,7 +24876,8 @@
         "primaryCovenant": "FCCR >= 1.14x"
       },
       "lostToCompetitor": "White Oak Commercial Finance",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitorEvidence": "UCC filing",
+      "yieldPct": 11.47
     },
     {
       "id": "opp_0074",
@@ -24839,7 +24912,8 @@
         "callProtection": "1% Yr1 stepdown"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 7.73
     },
     {
       "id": "opp_0075",
@@ -24876,7 +24950,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 8.61
     },
     {
       "id": "opp_0076",
@@ -24910,7 +24985,8 @@
         "primaryCovenant": "FCCR >= 1.12x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.03
     },
     {
       "id": "opp_0077",
@@ -24944,7 +25020,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": "Wells Fargo Capital Finance",
-      "lostToCompetitorEvidence": "Reported by borrower"
+      "lostToCompetitorEvidence": "Reported by borrower",
+      "yieldPct": 8.21
     },
     {
       "id": "opp_0078",
@@ -24976,7 +25053,8 @@
         "debtorConcentrationPct": 44
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 14.19
     },
     {
       "id": "opp_0079",
@@ -25014,7 +25092,8 @@
         "primaryCovenant": "FCCR >= 1.12x"
       },
       "lostToCompetitor": "Bank of America Business Capital",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitorEvidence": "UCC filing",
+      "yieldPct": 9.45
     },
     {
       "id": "opp_0080",
@@ -25047,7 +25126,8 @@
         "debtorConcentrationPct": 41
       },
       "lostToCompetitor": "JPMorgan Chase",
-      "lostToCompetitorEvidence": "Reported by borrower"
+      "lostToCompetitorEvidence": "Reported by borrower",
+      "yieldPct": 15.53
     },
     {
       "id": "opp_0081",
@@ -25081,7 +25161,8 @@
         "callProtection": "None"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 7.87
     },
     {
       "id": "opp_0082",
@@ -25113,7 +25194,8 @@
         "callProtection": "None"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.22
     },
     {
       "id": "opp_0083",
@@ -25146,7 +25228,8 @@
         "primaryCovenant": "FCCR >= 1.13x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.04
     },
     {
       "id": "opp_0084",
@@ -25175,7 +25258,8 @@
         "debtorConcentrationPct": 27
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 14.61
     },
     {
       "id": "opp_0085",
@@ -25211,7 +25295,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": "Bank of America Business Capital",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitorEvidence": "UCC filing",
+      "yieldPct": 9.21
     },
     {
       "id": "opp_0086",
@@ -25246,7 +25331,8 @@
         "primaryCovenant": "FCCR >= 1.22x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 10.94
     },
     {
       "id": "opp_0087",
@@ -25275,7 +25361,8 @@
         "debtorConcentrationPct": 30
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 12.07
     },
     {
       "id": "opp_0088",
@@ -25306,7 +25393,8 @@
         "debtorConcentrationPct": 50
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 15.27
     },
     {
       "id": "opp_0089",
@@ -25343,7 +25431,8 @@
         "callProtection": "None"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 8.66
     },
     {
       "id": "opp_0090",
@@ -25380,7 +25469,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": "PNC Business Credit",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitorEvidence": "UCC filing",
+      "yieldPct": 7.58
     },
     {
       "id": "opp_0091",
@@ -25412,7 +25502,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 8.54
     },
     {
       "id": "opp_0092",
@@ -25444,7 +25535,8 @@
         "primaryCovenant": "FCCR >= 1.17x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 10.88
     },
     {
       "id": "opp_0093",
@@ -25478,7 +25570,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 8.13
     },
     {
       "id": "opp_0094",
@@ -25510,7 +25603,8 @@
         "debtorConcentrationPct": 18
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 15.37
     },
     {
       "id": "opp_0095",
@@ -25547,7 +25641,8 @@
         "primaryCovenant": "FCCR >= 1.1x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 10.83
     },
     {
       "id": "opp_0096",
@@ -25579,7 +25674,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 7.2
     },
     {
       "id": "opp_0097",
@@ -25610,7 +25706,8 @@
         "debtorConcentrationPct": 16
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 15.01
     },
     {
       "id": "opp_0098",
@@ -25645,7 +25742,8 @@
         "callProtection": "None"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 7.81
     },
     {
       "id": "opp_0099",
@@ -25678,7 +25776,8 @@
         "primaryCovenant": "FCCR >= 1.16x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.85
     },
     {
       "id": "opp_0100",
@@ -25712,7 +25811,8 @@
         "debtorConcentrationPct": 43
       },
       "lostToCompetitor": "JPMorgan Chase",
-      "lostToCompetitorEvidence": "Reported by borrower"
+      "lostToCompetitorEvidence": "Reported by borrower",
+      "yieldPct": 14.49
     },
     {
       "id": "opp_0101",
@@ -25746,7 +25846,8 @@
         "primaryCovenant": "FCCR >= 1.15x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.7
     },
     {
       "id": "opp_0102",
@@ -25781,7 +25882,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 8.14
     },
     {
       "id": "opp_0103",
@@ -25813,7 +25915,8 @@
         "debtorConcentrationPct": 55
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 15.47
     },
     {
       "id": "opp_0104",
@@ -25850,7 +25953,8 @@
         "callProtection": "None"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.66
     },
     {
       "id": "opp_0105",
@@ -25885,7 +25989,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.76
     },
     {
       "id": "opp_0106",
@@ -25918,7 +26023,8 @@
         "primaryCovenant": "FCCR >= 1.08x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.5
     },
     {
       "id": "opp_0107",
@@ -25949,7 +26055,8 @@
         "debtorConcentrationPct": 55
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 14.43
     },
     {
       "id": "opp_0108",
@@ -25984,7 +26091,8 @@
         "primaryCovenant": "FCCR >= 1.19x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 10.32
     },
     {
       "id": "opp_0109",
@@ -26015,7 +26123,8 @@
         "debtorConcentrationPct": 44
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 12.26
     },
     {
       "id": "opp_0110",
@@ -26049,7 +26158,8 @@
         "primaryCovenant": "FCCR >= 1.11x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 10.54
     },
     {
       "id": "opp_0111",
@@ -26081,7 +26191,8 @@
         "callProtection": "None"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.69
     },
     {
       "id": "opp_0112",
@@ -26116,7 +26227,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 8.02
     },
     {
       "id": "opp_0113",
@@ -26148,7 +26260,8 @@
         "debtorConcentrationPct": 42
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 14.25
     },
     {
       "id": "opp_0114",
@@ -26182,7 +26295,8 @@
         "primaryCovenant": "FCCR >= 1.12x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 10.1
     },
     {
       "id": "opp_0115",
@@ -26219,7 +26333,8 @@
         "primaryCovenant": "FCCR >= 1.08x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.5
     },
     {
       "id": "opp_0116",
@@ -26254,7 +26369,8 @@
         "primaryCovenant": "FCCR >= 1.24x"
       },
       "lostToCompetitor": "Bank of America Business Capital",
-      "lostToCompetitorEvidence": "Reported by borrower"
+      "lostToCompetitorEvidence": "Reported by borrower",
+      "yieldPct": 9.42
     },
     {
       "id": "opp_0117",
@@ -26286,7 +26402,8 @@
         "debtorConcentrationPct": 28
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 12.93
     },
     {
       "id": "opp_0118",
@@ -26318,7 +26435,8 @@
         "callProtection": "None"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.52
     },
     {
       "id": "opp_0119",
@@ -26354,7 +26472,8 @@
         "primaryCovenant": "FCCR >= 1.15x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.94
     },
     {
       "id": "opp_0120",
@@ -26386,7 +26505,8 @@
         "callProtection": "2yr soft call"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.23
     },
     {
       "id": "opp_0121",
@@ -26421,7 +26541,8 @@
         "callProtection": "1% Yr1 stepdown"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 8.86
     },
     {
       "id": "opp_0122",
@@ -26456,7 +26577,8 @@
         "primaryCovenant": "FCCR >= 1.07x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.62
     },
     {
       "id": "opp_0123",
@@ -26488,7 +26610,8 @@
         "callProtection": "1% Yr1 stepdown"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.9
     },
     {
       "id": "opp_0124",
@@ -26522,7 +26645,8 @@
         "debtorConcentrationPct": 60
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 15.8
     },
     {
       "id": "opp_0125",
@@ -26553,7 +26677,8 @@
         "debtorConcentrationPct": 25
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 12.45
     },
     {
       "id": "opp_0126",
@@ -26588,7 +26713,8 @@
         "primaryCovenant": "FCCR >= 1.22x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.08
     },
     {
       "id": "opp_0127",
@@ -26619,7 +26745,8 @@
         "debtorConcentrationPct": 43
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 15.02
     },
     {
       "id": "opp_0128",
@@ -26656,7 +26783,8 @@
         "callProtection": "None"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 7.75
     },
     {
       "id": "opp_0129",
@@ -26691,7 +26819,8 @@
         "primaryCovenant": "FCCR >= 1.07x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.01
     },
     {
       "id": "opp_0130",
@@ -26722,7 +26851,8 @@
         "debtorConcentrationPct": 57
       },
       "lostToCompetitor": "JPMorgan Chase",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitorEvidence": "UCC filing",
+      "yieldPct": 12.53
     },
     {
       "id": "opp_0131",
@@ -26756,7 +26886,8 @@
         "primaryCovenant": "FCCR >= 1.06x"
       },
       "lostToCompetitor": "Wells Fargo Capital Finance",
-      "lostToCompetitorEvidence": "Reported by borrower"
+      "lostToCompetitorEvidence": "Reported by borrower",
+      "yieldPct": 10.99
     },
     {
       "id": "opp_0132",
@@ -26792,7 +26923,8 @@
         "callProtection": "None"
       },
       "lostToCompetitor": "Wells Fargo Capital Finance",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitorEvidence": "UCC filing",
+      "yieldPct": 9.54
     },
     {
       "id": "opp_0133",
@@ -26826,7 +26958,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 8.65
     },
     {
       "id": "opp_0134",
@@ -26862,7 +26995,8 @@
         "primaryCovenant": "FCCR >= 1.1x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 10.73
     },
     {
       "id": "opp_0135",
@@ -26893,7 +27027,8 @@
         "debtorConcentrationPct": 34
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 15.42
     },
     {
       "id": "opp_0136",
@@ -26925,7 +27060,8 @@
         "callProtection": "None"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 7.81
     },
     {
       "id": "opp_0137",
@@ -26958,7 +27094,8 @@
         "debtorConcentrationPct": 37
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 12.08
     },
     {
       "id": "opp_0138",
@@ -26994,7 +27131,8 @@
         "primaryCovenant": "FCCR >= 1.25x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.8
     },
     {
       "id": "opp_0139",
@@ -27031,7 +27169,8 @@
         "primaryCovenant": "FCCR >= 1.08x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 10.12
     },
     {
       "id": "opp_0140",
@@ -27063,7 +27202,8 @@
         "debtorConcentrationPct": 24
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 15.37
     },
     {
       "id": "opp_0141",
@@ -27095,7 +27235,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 7.38
     },
     {
       "id": "opp_0142",
@@ -27129,7 +27270,8 @@
         "callProtection": "1% Yr1 stepdown"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.82
     },
     {
       "id": "opp_0143",
@@ -27160,7 +27302,8 @@
         "debtorConcentrationPct": 46
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 13.5
     },
     {
       "id": "opp_0144",
@@ -27195,7 +27338,8 @@
         "primaryCovenant": "FCCR >= 1.2x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.32
     },
     {
       "id": "opp_0145",
@@ -27227,7 +27371,8 @@
         "debtorConcentrationPct": 26
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 13.76
     },
     {
       "id": "opp_0146",
@@ -27265,7 +27410,8 @@
         "primaryCovenant": "FCCR >= 1.2x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.61
     },
     {
       "id": "opp_0147",
@@ -27297,7 +27443,8 @@
         "callProtection": "None"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.5
     },
     {
       "id": "opp_0148",
@@ -27329,7 +27476,8 @@
         "primaryCovenant": "FCCR >= 1.13x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.46
     },
     {
       "id": "opp_0149",
@@ -27365,7 +27513,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 8.83
     },
     {
       "id": "opp_0150",
@@ -27400,7 +27549,8 @@
         "primaryCovenant": "FCCR >= 1.14x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.35
     },
     {
       "id": "opp_0151",
@@ -27432,7 +27582,8 @@
         "debtorConcentrationPct": 40
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 12.04
     },
     {
       "id": "opp_0152",
@@ -27469,7 +27620,8 @@
         "primaryCovenant": "FCCR >= 1.08x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.09
     },
     {
       "id": "opp_0153",
@@ -27498,7 +27650,8 @@
         "debtorConcentrationPct": 37
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 14.41
     },
     {
       "id": "opp_0154",
@@ -27530,7 +27683,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.01
     },
     {
       "id": "opp_0155",
@@ -27564,7 +27718,8 @@
         "primaryCovenant": "FCCR >= 1.18x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 10.71
     },
     {
       "id": "opp_0156",
@@ -27596,7 +27751,8 @@
         "debtorConcentrationPct": 45
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 13.84
     },
     {
       "id": "opp_0157",
@@ -27631,7 +27787,8 @@
         "primaryCovenant": "FCCR >= 1.16x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 10.77
     },
     {
       "id": "opp_0158",
@@ -27668,7 +27825,8 @@
         "callProtection": "2yr soft call"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.77
     },
     {
       "id": "opp_0159",
@@ -27702,7 +27860,8 @@
         "callProtection": "2yr soft call"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 7.78
     },
     {
       "id": "opp_0160",
@@ -27733,7 +27892,8 @@
         "debtorConcentrationPct": 29
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 14.5
     },
     {
       "id": "opp_0161",
@@ -27768,7 +27928,8 @@
         "primaryCovenant": "FCCR >= 1.14x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.99
     },
     {
       "id": "opp_0162",
@@ -27803,7 +27964,8 @@
         "callProtection": "None"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.58
     },
     {
       "id": "opp_0163",
@@ -27835,7 +27997,8 @@
         "debtorConcentrationPct": 34
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 14.42
     },
     {
       "id": "opp_0164",
@@ -27870,7 +28033,8 @@
         "callProtection": "None"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.59
     },
     {
       "id": "opp_0165",
@@ -27906,7 +28070,8 @@
         "callProtection": "None"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.53
     },
     {
       "id": "opp_0166",
@@ -27938,7 +28103,8 @@
         "callProtection": "2yr soft call"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 7.51
     },
     {
       "id": "opp_0167",
@@ -27969,7 +28135,8 @@
         "debtorConcentrationPct": 18
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 14.1
     },
     {
       "id": "opp_0168",
@@ -28003,7 +28170,8 @@
         "primaryCovenant": "FCCR >= 1.16x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.01
     },
     {
       "id": "opp_0169",
@@ -28039,7 +28207,8 @@
         "primaryCovenant": "FCCR >= 1.14x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 10.4
     },
     {
       "id": "opp_0170",
@@ -28074,7 +28243,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 8.3
     },
     {
       "id": "opp_0171",
@@ -28110,7 +28280,8 @@
         "primaryCovenant": "FCCR >= 1.16x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 10.74
     },
     {
       "id": "opp_0172",
@@ -28141,7 +28312,8 @@
         "debtorConcentrationPct": 51
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 12.32
     },
     {
       "id": "opp_0173",
@@ -28176,7 +28348,8 @@
         "primaryCovenant": "FCCR >= 1.18x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 10.11
     },
     {
       "id": "opp_0174",
@@ -28213,7 +28386,8 @@
         "primaryCovenant": "FCCR >= 1.23x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 10.19
     },
     {
       "id": "opp_0175",
@@ -28247,7 +28421,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 8.41
     },
     {
       "id": "opp_0176",
@@ -28282,7 +28457,8 @@
         "primaryCovenant": "FCCR >= 1.2x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.65
     },
     {
       "id": "opp_0177",
@@ -28314,7 +28490,8 @@
         "debtorConcentrationPct": 40
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 12.9
     },
     {
       "id": "opp_0178",
@@ -28346,7 +28523,8 @@
         "debtorConcentrationPct": 22
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 12.58
     },
     {
       "id": "opp_0179",
@@ -28375,7 +28553,8 @@
         "debtorConcentrationPct": 23
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 15.04
     },
     {
       "id": "opp_0180",
@@ -28408,7 +28587,8 @@
         "primaryCovenant": "FCCR >= 1.12x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 10.15
     },
     {
       "id": "opp_0181",
@@ -28441,7 +28621,8 @@
         "primaryCovenant": "FCCR >= 1.08x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.19
     },
     {
       "id": "opp_0182",
@@ -28476,7 +28657,8 @@
         "callProtection": "1% Yr1 stepdown"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 7.19
     },
     {
       "id": "opp_0183",
@@ -28513,7 +28695,8 @@
         "callProtection": "1% Yr1 stepdown"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 7.33
     },
     {
       "id": "opp_0184",
@@ -28545,7 +28728,8 @@
         "debtorConcentrationPct": 23
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 15.02
     },
     {
       "id": "opp_0185",
@@ -28578,7 +28762,8 @@
         "primaryCovenant": "FCCR >= 1.23x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.5
     },
     {
       "id": "opp_0186",
@@ -28613,7 +28798,8 @@
         "callProtection": "2yr soft call"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 8.8
     },
     {
       "id": "opp_0187",
@@ -28645,7 +28831,8 @@
         "primaryCovenant": "FCCR >= 1.21x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.4
     },
     {
       "id": "opp_0188",
@@ -28679,7 +28866,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 7.37
     },
     {
       "id": "opp_0189",
@@ -28714,7 +28902,8 @@
         "primaryCovenant": "FCCR >= 1.22x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 10.88
     },
     {
       "id": "opp_0190",
@@ -28743,7 +28932,8 @@
         "debtorConcentrationPct": 20
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 15.5
     },
     {
       "id": "opp_0191",
@@ -28777,7 +28967,8 @@
         "callProtection": "None"
       },
       "lostToCompetitor": "PNC Business Credit",
-      "lostToCompetitorEvidence": "Reported by borrower"
+      "lostToCompetitorEvidence": "Reported by borrower",
+      "yieldPct": 7.45
     },
     {
       "id": "opp_0192",
@@ -28809,7 +29000,8 @@
         "debtorConcentrationPct": 40
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 15.8
     },
     {
       "id": "opp_0193",
@@ -28845,7 +29037,8 @@
         "primaryCovenant": "FCCR >= 1.09x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.36
     },
     {
       "id": "opp_0194",
@@ -28877,7 +29070,8 @@
         "debtorConcentrationPct": 42
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 13.25
     },
     {
       "id": "opp_0195",
@@ -28911,7 +29105,8 @@
         "callProtection": "1% Yr1 stepdown"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.4
     },
     {
       "id": "opp_0196",
@@ -28945,7 +29140,8 @@
         "callProtection": "None"
       },
       "lostToCompetitor": "Wells Fargo Capital Finance",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitorEvidence": "UCC filing",
+      "yieldPct": 7.6
     },
     {
       "id": "opp_0197",
@@ -28981,7 +29177,8 @@
         "primaryCovenant": "FCCR >= 1.24x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.89
     },
     {
       "id": "opp_0198",
@@ -29013,7 +29210,8 @@
         "callProtection": "1% Yr1 stepdown"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 7.57
     },
     {
       "id": "opp_0199",
@@ -29047,7 +29245,8 @@
         "primaryCovenant": "FCCR >= 1.18x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 10.27
     },
     {
       "id": "opp_0200",
@@ -29083,7 +29282,8 @@
         "primaryCovenant": "FCCR >= 1.24x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.56
     },
     {
       "id": "opp_0201",
@@ -29117,7 +29317,8 @@
         "callProtection": "None"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 7.7
     },
     {
       "id": "opp_0202",
@@ -29149,7 +29350,8 @@
         "debtorConcentrationPct": 48
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 14.49
     },
     {
       "id": "opp_0203",
@@ -29183,7 +29385,8 @@
         "debtorConcentrationPct": 22
       },
       "lostToCompetitor": "Ares Capital",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitorEvidence": "UCC filing",
+      "yieldPct": 15.13
     },
     {
       "id": "opp_0204",
@@ -29217,7 +29420,8 @@
         "callProtection": "2yr soft call"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.75
     },
     {
       "id": "opp_0205",
@@ -29251,7 +29455,8 @@
         "debtorConcentrationPct": 53
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 14.57
     },
     {
       "id": "opp_0206",
@@ -29287,7 +29492,8 @@
         "callProtection": "1% Yr1 stepdown"
       },
       "lostToCompetitor": "JPMorgan Chase",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitorEvidence": "UCC filing",
+      "yieldPct": 9
     },
     {
       "id": "opp_0207",
@@ -29316,7 +29522,8 @@
         "debtorConcentrationPct": 19
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 13.43
     },
     {
       "id": "opp_0208",
@@ -29349,7 +29556,8 @@
         "primaryCovenant": "FCCR >= 1.16x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 10.19
     },
     {
       "id": "opp_0209",
@@ -29381,7 +29589,8 @@
         "primaryCovenant": "FCCR >= 1.08x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.85
     },
     {
       "id": "opp_0210",
@@ -29413,7 +29622,8 @@
         "debtorConcentrationPct": 56
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 15.14
     },
     {
       "id": "opp_0211",
@@ -29445,7 +29655,8 @@
         "callProtection": "1% Yr1 stepdown"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.64
     },
     {
       "id": "opp_0212",
@@ -29474,7 +29685,8 @@
         "debtorConcentrationPct": 56
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 12.51
     },
     {
       "id": "opp_0213",
@@ -29508,7 +29720,8 @@
         "primaryCovenant": "FCCR >= 1.13x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 10.56
     },
     {
       "id": "opp_0214",
@@ -29540,7 +29753,8 @@
         "debtorConcentrationPct": 29
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 15.75
     },
     {
       "id": "opp_0215",
@@ -29577,7 +29791,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 7.09
     },
     {
       "id": "opp_0216",
@@ -29611,7 +29826,8 @@
         "primaryCovenant": "FCCR >= 1.22x"
       },
       "lostToCompetitor": "Bank of America Business Capital",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitorEvidence": "UCC filing",
+      "yieldPct": 10.06
     },
     {
       "id": "opp_0217",
@@ -29642,7 +29858,8 @@
         "debtorConcentrationPct": 44
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 14.61
     },
     {
       "id": "opp_0218",
@@ -29677,7 +29894,8 @@
         "callProtection": "None"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 7.17
     },
     {
       "id": "opp_0219",
@@ -29714,7 +29932,8 @@
         "primaryCovenant": "FCCR >= 1.06x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.08
     },
     {
       "id": "opp_0220",
@@ -29746,7 +29965,8 @@
         "primaryCovenant": "FCCR >= 1.15x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.91
     },
     {
       "id": "opp_0221",
@@ -29775,7 +29995,8 @@
         "debtorConcentrationPct": 58
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 15.97
     },
     {
       "id": "opp_0222",
@@ -29812,7 +30033,8 @@
         "primaryCovenant": "FCCR >= 1.17x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 10.45
     },
     {
       "id": "opp_0223",
@@ -29846,7 +30068,8 @@
         "callProtection": "None"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 7.05
     },
     {
       "id": "opp_0224",
@@ -29878,7 +30101,8 @@
         "debtorConcentrationPct": 51
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 15.08
     },
     {
       "id": "opp_0225",
@@ -29914,7 +30138,8 @@
         "primaryCovenant": "FCCR >= 1.08x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.75
     },
     {
       "id": "opp_0226",
@@ -29943,7 +30168,8 @@
         "debtorConcentrationPct": 23
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 12.6
     },
     {
       "id": "opp_0227",
@@ -29978,7 +30204,8 @@
         "primaryCovenant": "FCCR >= 1.07x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.55
     },
     {
       "id": "opp_0228",
@@ -30015,7 +30242,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 8.2
     },
     {
       "id": "opp_0229",
@@ -30046,7 +30274,8 @@
         "debtorConcentrationPct": 20
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 12.13
     },
     {
       "id": "opp_0230",
@@ -30081,7 +30310,8 @@
         "primaryCovenant": "FCCR >= 1.19x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.98
     },
     {
       "id": "opp_0231",
@@ -30115,7 +30345,8 @@
         "callProtection": "None"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.3
     },
     {
       "id": "opp_0232",
@@ -30146,7 +30377,8 @@
         "debtorConcentrationPct": 44
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 14.26
     },
     {
       "id": "opp_0233",
@@ -30181,7 +30413,8 @@
         "callProtection": "None"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.93
     },
     {
       "id": "opp_0234",
@@ -30218,7 +30451,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 8.06
     },
     {
       "id": "opp_0235",
@@ -30255,7 +30489,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 7.05
     },
     {
       "id": "opp_0236",
@@ -30287,7 +30522,8 @@
         "debtorConcentrationPct": 42
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 15.65
     },
     {
       "id": "opp_0237",
@@ -30321,7 +30557,8 @@
         "primaryCovenant": "FCCR >= 1.09x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.95
     },
     {
       "id": "opp_0238",
@@ -30352,7 +30589,8 @@
         "debtorConcentrationPct": 59
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 12.41
     },
     {
       "id": "opp_0239",
@@ -30381,7 +30619,8 @@
         "debtorConcentrationPct": 50
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 14.35
     },
     {
       "id": "opp_0240",
@@ -30419,7 +30658,8 @@
         "primaryCovenant": "FCCR >= 1.16x"
       },
       "lostToCompetitor": "Bank of America Business Capital",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitorEvidence": "UCC filing",
+      "yieldPct": 11.86
     },
     {
       "id": "opp_0241",
@@ -30454,7 +30694,8 @@
         "callProtection": "1% Yr1 stepdown"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 8.76
     },
     {
       "id": "opp_0242",
@@ -30483,7 +30724,8 @@
         "debtorConcentrationPct": 38
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 15.08
     },
     {
       "id": "opp_0243",
@@ -30520,7 +30762,8 @@
         "primaryCovenant": "FCCR >= 1.07x"
       },
       "lostToCompetitor": "Bank of America Business Capital",
-      "lostToCompetitorEvidence": "Reported by borrower"
+      "lostToCompetitorEvidence": "Reported by borrower",
+      "yieldPct": 9.55
     },
     {
       "id": "opp_0244",
@@ -30549,7 +30792,8 @@
         "debtorConcentrationPct": 16
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 13.56
     },
     {
       "id": "opp_0245",
@@ -30580,7 +30824,8 @@
         "debtorConcentrationPct": 44
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 14.46
     },
     {
       "id": "opp_0246",
@@ -30614,7 +30859,8 @@
         "callProtection": "2yr soft call"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 8.84
     },
     {
       "id": "opp_0247",
@@ -30646,7 +30892,8 @@
         "primaryCovenant": "FCCR >= 1.05x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 10.14
     },
     {
       "id": "opp_0248",
@@ -30681,7 +30928,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 8.43
     },
     {
       "id": "opp_0249",
@@ -30713,7 +30961,8 @@
         "primaryCovenant": "FCCR >= 1.06x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.91
     },
     {
       "id": "opp_0250",
@@ -30747,7 +30996,8 @@
         "callProtection": "1% Yr1 stepdown"
       },
       "lostToCompetitor": "Golub Capital",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitorEvidence": "UCC filing",
+      "yieldPct": 8.97
     },
     {
       "id": "opp_0251",
@@ -30781,7 +31031,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.07
     },
     {
       "id": "opp_0252",
@@ -30817,7 +31068,8 @@
         "primaryCovenant": "FCCR >= 1.09x"
       },
       "lostToCompetitor": "Wells Fargo Capital Finance",
-      "lostToCompetitorEvidence": "Reported by borrower"
+      "lostToCompetitorEvidence": "Reported by borrower",
+      "yieldPct": 11.26
     },
     {
       "id": "opp_0253",
@@ -30854,7 +31106,8 @@
         "callProtection": "None"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 8.03
     },
     {
       "id": "opp_0254",
@@ -30887,7 +31140,8 @@
         "debtorConcentrationPct": 49
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 14.86
     },
     {
       "id": "opp_0255",
@@ -30922,7 +31176,8 @@
         "primaryCovenant": "FCCR >= 1.08x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.3
     },
     {
       "id": "opp_0256",
@@ -30958,7 +31213,8 @@
         "primaryCovenant": "FCCR >= 1.24x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 10.94
     },
     {
       "id": "opp_0257",
@@ -30992,7 +31248,8 @@
         "debtorConcentrationPct": 38
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 15.73
     },
     {
       "id": "opp_0258",
@@ -31026,7 +31283,8 @@
         "debtorConcentrationPct": 46
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 13.41
     },
     {
       "id": "opp_0259",
@@ -31063,7 +31321,8 @@
         "primaryCovenant": "FCCR >= 1.24x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.81
     },
     {
       "id": "opp_0260",
@@ -31100,7 +31359,8 @@
         "callProtection": "1% Yr1 stepdown"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 7.75
     },
     {
       "id": "opp_0261",
@@ -31137,7 +31397,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 8.97
     },
     {
       "id": "opp_0262",
@@ -31168,7 +31429,8 @@
         "debtorConcentrationPct": 58
       },
       "lostToCompetitor": "Wells Fargo Capital Finance",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitorEvidence": "UCC filing",
+      "yieldPct": 13.25
     },
     {
       "id": "opp_0263",
@@ -31201,7 +31463,8 @@
         "debtorConcentrationPct": 31
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 12.17
     },
     {
       "id": "opp_0264",
@@ -31235,7 +31498,8 @@
         "debtorConcentrationPct": 25
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 14.59
     },
     {
       "id": "opp_0265",
@@ -31272,7 +31536,8 @@
         "primaryCovenant": "FCCR >= 1.14x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.86
     },
     {
       "id": "opp_0266",
@@ -31303,7 +31568,8 @@
         "debtorConcentrationPct": 54
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 15.27
     },
     {
       "id": "opp_0267",
@@ -31337,7 +31603,8 @@
         "callProtection": "None"
       },
       "lostToCompetitor": "PNC Business Credit",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitorEvidence": "UCC filing",
+      "yieldPct": 8.7
     },
     {
       "id": "opp_0268",
@@ -31374,7 +31641,8 @@
         "primaryCovenant": "FCCR >= 1.05x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.55
     },
     {
       "id": "opp_0269",
@@ -31408,7 +31676,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.48
     },
     {
       "id": "opp_0270",
@@ -31442,7 +31711,8 @@
         "primaryCovenant": "FCCR >= 1.22x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 10.71
     },
     {
       "id": "opp_0271",
@@ -31479,7 +31749,8 @@
         "primaryCovenant": "FCCR >= 1.14x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 12
     },
     {
       "id": "opp_0272",
@@ -31510,7 +31781,8 @@
         "debtorConcentrationPct": 38
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 12.95
     },
     {
       "id": "opp_0273",
@@ -31541,7 +31813,8 @@
         "debtorConcentrationPct": 17
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 13.54
     },
     {
       "id": "opp_0274",
@@ -31572,7 +31845,8 @@
         "debtorConcentrationPct": 41
       },
       "lostToCompetitor": "Golub Capital",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitorEvidence": "UCC filing",
+      "yieldPct": 14.74
     },
     {
       "id": "opp_0275",
@@ -31609,7 +31883,8 @@
         "primaryCovenant": "FCCR >= 1.11x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.63
     },
     {
       "id": "opp_0276",
@@ -31646,7 +31921,8 @@
         "primaryCovenant": "FCCR >= 1.19x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 10.14
     },
     {
       "id": "opp_0277",
@@ -31677,7 +31953,8 @@
         "debtorConcentrationPct": 31
       },
       "lostToCompetitor": "JPMorgan Chase",
-      "lostToCompetitorEvidence": "Reported by borrower"
+      "lostToCompetitorEvidence": "Reported by borrower",
+      "yieldPct": 14.15
     },
     {
       "id": "opp_0278",
@@ -31714,7 +31991,8 @@
         "primaryCovenant": "FCCR >= 1.24x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.04
     },
     {
       "id": "opp_0279",
@@ -31750,7 +32028,8 @@
         "primaryCovenant": "FCCR >= 1.18x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.78
     },
     {
       "id": "opp_0280",
@@ -31783,7 +32062,8 @@
         "debtorConcentrationPct": 21
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 14.73
     },
     {
       "id": "opp_0281",
@@ -31819,7 +32099,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": "Wells Fargo Capital Finance",
-      "lostToCompetitorEvidence": "Reported by borrower"
+      "lostToCompetitorEvidence": "Reported by borrower",
+      "yieldPct": 7.1
     },
     {
       "id": "opp_0282",
@@ -31853,7 +32134,8 @@
         "debtorConcentrationPct": 47
       },
       "lostToCompetitor": "PNC Business Credit",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitorEvidence": "UCC filing",
+      "yieldPct": 13.73
     },
     {
       "id": "opp_0283",
@@ -31886,7 +32168,8 @@
         "debtorConcentrationPct": 16
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 13.8
     },
     {
       "id": "opp_0284",
@@ -31920,7 +32203,8 @@
         "callProtection": "2yr soft call"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.72
     },
     {
       "id": "opp_0285",
@@ -31954,7 +32238,8 @@
         "debtorConcentrationPct": 26
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 13.57
     },
     {
       "id": "opp_0286",
@@ -31992,7 +32277,8 @@
         "primaryCovenant": "FCCR >= 1.24x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.27
     },
     {
       "id": "opp_0287",
@@ -32029,7 +32315,8 @@
         "primaryCovenant": "FCCR >= 1.13x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.79
     },
     {
       "id": "opp_0288",
@@ -32060,7 +32347,8 @@
         "debtorConcentrationPct": 44
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 12.42
     },
     {
       "id": "opp_0289",
@@ -32096,7 +32384,8 @@
         "primaryCovenant": "FCCR >= 1.21x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.87
     },
     {
       "id": "opp_0290",
@@ -32130,7 +32419,8 @@
         "debtorConcentrationPct": 16
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 13.72
     },
     {
       "id": "opp_0291",
@@ -32164,7 +32454,8 @@
         "callProtection": "2yr soft call"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.36
     },
     {
       "id": "opp_0292",
@@ -32202,7 +32493,8 @@
         "primaryCovenant": "FCCR >= 1.06x"
       },
       "lostToCompetitor": "White Oak Commercial Finance",
-      "lostToCompetitorEvidence": "Reported by borrower"
+      "lostToCompetitorEvidence": "Reported by borrower",
+      "yieldPct": 11.75
     },
     {
       "id": "opp_0293",
@@ -32236,7 +32528,8 @@
         "debtorConcentrationPct": 37
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 13.93
     },
     {
       "id": "opp_0294",
@@ -32273,7 +32566,8 @@
         "primaryCovenant": "FCCR >= 1.15x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.33
     },
     {
       "id": "opp_0295",
@@ -32310,7 +32604,8 @@
         "primaryCovenant": "FCCR >= 1.11x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.4
     },
     {
       "id": "opp_0296",
@@ -32344,7 +32639,8 @@
         "primaryCovenant": "FCCR >= 1.19x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.19
     },
     {
       "id": "opp_0297",
@@ -32378,7 +32674,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.06
     },
     {
       "id": "opp_0298",
@@ -32413,7 +32710,8 @@
         "primaryCovenant": "FCCR >= 1.08x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.83
     },
     {
       "id": "opp_0299",
@@ -32444,7 +32742,8 @@
         "debtorConcentrationPct": 44
       },
       "lostToCompetitor": "Bank of America Business Capital",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitorEvidence": "UCC filing",
+      "yieldPct": 13.11
     },
     {
       "id": "opp_0300",
@@ -32479,7 +32778,8 @@
         "primaryCovenant": "FCCR >= 1.17x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.27
     },
     {
       "id": "opp_0301",
@@ -32513,7 +32813,8 @@
         "debtorConcentrationPct": 38
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 12.4
     },
     {
       "id": "opp_0302",
@@ -32550,7 +32851,8 @@
         "primaryCovenant": "FCCR >= 1.2x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.29
     },
     {
       "id": "opp_0303",
@@ -32584,7 +32886,8 @@
         "debtorConcentrationPct": 47
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 14.91
     },
     {
       "id": "opp_0304",
@@ -32621,7 +32924,8 @@
         "primaryCovenant": "FCCR >= 1.08x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.67
     },
     {
       "id": "opp_0305",
@@ -32657,7 +32961,8 @@
         "callProtection": "1% Yr1 stepdown"
       },
       "lostToCompetitor": "Wells Fargo Capital Finance",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitorEvidence": "UCC filing",
+      "yieldPct": 8.96
     },
     {
       "id": "opp_0306",
@@ -32695,7 +33000,8 @@
         "primaryCovenant": "FCCR >= 1.1x"
       },
       "lostToCompetitor": "White Oak Commercial Finance",
-      "lostToCompetitorEvidence": "Reported by borrower"
+      "lostToCompetitorEvidence": "Reported by borrower",
+      "yieldPct": 11.57
     },
     {
       "id": "opp_0307",
@@ -32731,7 +33037,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 7.22
     },
     {
       "id": "opp_0308",
@@ -32769,7 +33076,8 @@
         "primaryCovenant": "FCCR >= 1.17x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.32
     },
     {
       "id": "opp_0309",
@@ -32806,7 +33114,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 7.22
     },
     {
       "id": "opp_0310",
@@ -32837,7 +33146,8 @@
         "debtorConcentrationPct": 45
       },
       "lostToCompetitor": "JPMorgan Chase",
-      "lostToCompetitorEvidence": "Reported by borrower"
+      "lostToCompetitorEvidence": "Reported by borrower",
+      "yieldPct": 15.87
     },
     {
       "id": "opp_0311",
@@ -32874,7 +33184,8 @@
         "primaryCovenant": "FCCR >= 1.14x"
       },
       "lostToCompetitor": "Bank of America Business Capital",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitorEvidence": "UCC filing",
+      "yieldPct": 9.13
     },
     {
       "id": "opp_0312",
@@ -32910,7 +33221,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 8.73
     },
     {
       "id": "opp_0313",
@@ -32947,7 +33259,8 @@
         "callProtection": "None"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 8.37
     },
     {
       "id": "opp_0314",
@@ -32984,7 +33297,8 @@
         "callProtection": "2yr soft call"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 7.24
     },
     {
       "id": "opp_0315",
@@ -33018,7 +33332,8 @@
         "debtorConcentrationPct": 60
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 12.8
     },
     {
       "id": "opp_0316",
@@ -33052,7 +33367,8 @@
         "primaryCovenant": "FCCR >= 1.08x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.3
     },
     {
       "id": "opp_0317",
@@ -33088,7 +33404,8 @@
         "primaryCovenant": "FCCR >= 1.16x"
       },
       "lostToCompetitor": "PNC Business Credit",
-      "lostToCompetitorEvidence": "Reported by borrower"
+      "lostToCompetitorEvidence": "Reported by borrower",
+      "yieldPct": 11.04
     },
     {
       "id": "opp_0318",
@@ -33122,7 +33439,8 @@
         "primaryCovenant": "FCCR >= 1.15x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.22
     },
     {
       "id": "opp_0319",
@@ -33155,7 +33473,8 @@
         "debtorConcentrationPct": 29
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 14.34
     },
     {
       "id": "opp_0320",
@@ -33186,7 +33505,8 @@
         "debtorConcentrationPct": 29
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 15.21
     },
     {
       "id": "opp_0321",
@@ -33217,7 +33537,8 @@
         "debtorConcentrationPct": 49
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 13.83
     },
     {
       "id": "opp_0322",
@@ -33251,7 +33572,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 8.04
     },
     {
       "id": "opp_0323",
@@ -33282,7 +33604,8 @@
         "debtorConcentrationPct": 58
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 13.83
     },
     {
       "id": "opp_0324",
@@ -33316,7 +33639,8 @@
         "debtorConcentrationPct": 51
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 12.1
     },
     {
       "id": "opp_0325",
@@ -33349,7 +33673,8 @@
         "debtorConcentrationPct": 49
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 14.01
     },
     {
       "id": "opp_0326",
@@ -33386,7 +33711,8 @@
         "callProtection": "2yr soft call"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 8.31
     },
     {
       "id": "opp_0327",
@@ -33421,7 +33747,8 @@
         "primaryCovenant": "FCCR >= 1.08x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 10.47
     },
     {
       "id": "opp_0328",
@@ -33458,7 +33785,8 @@
         "callProtection": "1% Yr1 stepdown"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.85
     },
     {
       "id": "opp_0329",
@@ -33495,7 +33823,8 @@
         "primaryCovenant": "FCCR >= 1.17x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.6
     },
     {
       "id": "opp_0330",
@@ -33531,7 +33860,8 @@
         "primaryCovenant": "FCCR >= 1.22x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 10.92
     },
     {
       "id": "opp_0331",
@@ -33565,7 +33895,8 @@
         "debtorConcentrationPct": 28
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 14.86
     },
     {
       "id": "opp_0332",
@@ -33599,7 +33930,8 @@
         "primaryCovenant": "FCCR >= 1.17x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 10.08
     },
     {
       "id": "opp_0333",
@@ -33633,7 +33965,8 @@
         "debtorConcentrationPct": 43
       },
       "lostToCompetitor": "JPMorgan Chase",
-      "lostToCompetitorEvidence": "Reported by borrower"
+      "lostToCompetitorEvidence": "Reported by borrower",
+      "yieldPct": 12.79
     },
     {
       "id": "opp_0334",
@@ -33667,7 +34000,8 @@
         "debtorConcentrationPct": 29
       },
       "lostToCompetitor": "JPMorgan Chase",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitorEvidence": "UCC filing",
+      "yieldPct": 13.17
     },
     {
       "id": "opp_0335",
@@ -33701,7 +34035,8 @@
         "debtorConcentrationPct": 41
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 13.69
     },
     {
       "id": "opp_0336",
@@ -33737,7 +34072,8 @@
         "primaryCovenant": "FCCR >= 1.17x"
       },
       "lostToCompetitor": "White Oak Commercial Finance",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitorEvidence": "UCC filing",
+      "yieldPct": 10.79
     },
     {
       "id": "opp_0337",
@@ -33775,7 +34111,8 @@
         "primaryCovenant": "FCCR >= 1.19x"
       },
       "lostToCompetitor": "Golub Capital",
-      "lostToCompetitorEvidence": "Reported by borrower"
+      "lostToCompetitorEvidence": "Reported by borrower",
+      "yieldPct": 11.68
     },
     {
       "id": "opp_0338",
@@ -33809,7 +34146,8 @@
         "debtorConcentrationPct": 29
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 12.18
     },
     {
       "id": "opp_0339",
@@ -33840,7 +34178,8 @@
         "debtorConcentrationPct": 54
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 15.45
     },
     {
       "id": "opp_0340",
@@ -33871,7 +34210,8 @@
         "debtorConcentrationPct": 18
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 15.34
     },
     {
       "id": "opp_0341",
@@ -33905,7 +34245,8 @@
         "debtorConcentrationPct": 19
       },
       "lostToCompetitor": "Ares Capital",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitorEvidence": "UCC filing",
+      "yieldPct": 13.98
     },
     {
       "id": "opp_0342",
@@ -33941,7 +34282,8 @@
         "callProtection": "2yr soft call"
       },
       "lostToCompetitor": "JPMorgan Chase",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitorEvidence": "UCC filing",
+      "yieldPct": 9.38
     },
     {
       "id": "opp_0343",
@@ -33974,7 +34316,8 @@
         "debtorConcentrationPct": 20
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 14.2
     },
     {
       "id": "opp_0344",
@@ -34005,7 +34348,8 @@
         "debtorConcentrationPct": 25
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 12.74
     },
     {
       "id": "opp_0345",
@@ -34039,7 +34383,8 @@
         "primaryCovenant": "FCCR >= 1.11x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 10.82
     },
     {
       "id": "opp_0346",
@@ -34075,7 +34420,8 @@
         "callProtection": "1% Yr1 stepdown"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.26
     },
     {
       "id": "opp_0347",
@@ -34106,7 +34452,8 @@
         "debtorConcentrationPct": 40
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 14.8
     },
     {
       "id": "opp_0348",
@@ -34140,7 +34487,8 @@
         "primaryCovenant": "FCCR >= 1.19x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.92
     },
     {
       "id": "opp_0349",
@@ -34174,7 +34522,8 @@
         "primaryCovenant": "FCCR >= 1.11x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.21
     },
     {
       "id": "opp_0350",
@@ -34208,7 +34557,8 @@
         "primaryCovenant": "FCCR >= 1.12x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.41
     },
     {
       "id": "opp_0351",
@@ -34242,7 +34592,8 @@
         "callProtection": "1% Yr1 stepdown"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 8.95
     },
     {
       "id": "opp_0352",
@@ -34273,7 +34624,8 @@
         "debtorConcentrationPct": 52
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 14.29
     },
     {
       "id": "opp_0353",
@@ -34310,7 +34662,8 @@
         "primaryCovenant": "FCCR >= 1.12x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 10.49
     },
     {
       "id": "opp_0354",
@@ -34343,7 +34696,8 @@
         "debtorConcentrationPct": 20
       },
       "lostToCompetitor": "PNC Business Credit",
-      "lostToCompetitorEvidence": "Reported by borrower"
+      "lostToCompetitorEvidence": "Reported by borrower",
+      "yieldPct": 15.51
     },
     {
       "id": "opp_0355",
@@ -34374,7 +34728,8 @@
         "debtorConcentrationPct": 33
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 14.68
     },
     {
       "id": "opp_0356",
@@ -34408,7 +34763,8 @@
         "primaryCovenant": "FCCR >= 1.16x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.75
     },
     {
       "id": "opp_0357",
@@ -34439,7 +34795,8 @@
         "debtorConcentrationPct": 48
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 15.77
     },
     {
       "id": "opp_0358",
@@ -34475,7 +34832,8 @@
         "callProtection": "2yr soft call"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.74
     },
     {
       "id": "opp_0359",
@@ -34509,7 +34867,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 8.86
     },
     {
       "id": "opp_0360",
@@ -34546,7 +34905,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 8.38
     },
     {
       "id": "opp_0361",
@@ -34583,7 +34943,8 @@
         "callProtection": "1% Yr1 stepdown"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.83
     },
     {
       "id": "opp_0362",
@@ -34614,7 +34975,8 @@
         "debtorConcentrationPct": 37
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 13.59
     },
     {
       "id": "opp_0363",
@@ -34650,7 +35012,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 8.74
     },
     {
       "id": "opp_0364",
@@ -34687,7 +35050,8 @@
         "callProtection": "1% Yr1 stepdown"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.32
     },
     {
       "id": "opp_0365",
@@ -34724,7 +35088,8 @@
         "primaryCovenant": "FCCR >= 1.14x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.54
     },
     {
       "id": "opp_0366",
@@ -34760,7 +35125,8 @@
         "callProtection": "None"
       },
       "lostToCompetitor": "JPMorgan Chase",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitorEvidence": "UCC filing",
+      "yieldPct": 9.24
     },
     {
       "id": "opp_0367",
@@ -34798,7 +35164,8 @@
         "primaryCovenant": "FCCR >= 1.2x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.04
     },
     {
       "id": "opp_0368",
@@ -34829,7 +35196,8 @@
         "debtorConcentrationPct": 26
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 13.15
     },
     {
       "id": "opp_0369",
@@ -34866,7 +35234,8 @@
         "primaryCovenant": "FCCR >= 1.11x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.48
     },
     {
       "id": "opp_0370",
@@ -34899,7 +35268,8 @@
         "debtorConcentrationPct": 29
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 13.35
     },
     {
       "id": "opp_0371",
@@ -34933,7 +35303,8 @@
         "callProtection": "2yr soft call"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 7.05
     },
     {
       "id": "opp_0372",
@@ -34970,7 +35341,8 @@
         "callProtection": "None"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 8.64
     },
     {
       "id": "opp_0373",
@@ -35007,7 +35379,8 @@
         "primaryCovenant": "FCCR >= 1.12x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.14
     },
     {
       "id": "opp_0374",
@@ -35044,7 +35417,8 @@
         "primaryCovenant": "FCCR >= 1.15x"
       },
       "lostToCompetitor": "JPMorgan Chase",
-      "lostToCompetitorEvidence": "Reported by borrower"
+      "lostToCompetitorEvidence": "Reported by borrower",
+      "yieldPct": 9.89
     },
     {
       "id": "opp_0375",
@@ -35078,7 +35452,8 @@
         "callProtection": "None"
       },
       "lostToCompetitor": "Bank of America Business Capital",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitorEvidence": "UCC filing",
+      "yieldPct": 8.69
     },
     {
       "id": "opp_0376",
@@ -35112,7 +35487,8 @@
         "debtorConcentrationPct": 59
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 15.68
     },
     {
       "id": "opp_0377",
@@ -35146,7 +35522,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.11
     },
     {
       "id": "opp_0378",
@@ -35182,7 +35559,8 @@
         "callProtection": "1% Yr1 stepdown"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 8.52
     },
     {
       "id": "opp_0379",
@@ -35218,7 +35596,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 8.22
     },
     {
       "id": "opp_0380",
@@ -35249,7 +35628,8 @@
         "debtorConcentrationPct": 35
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 14.7
     },
     {
       "id": "opp_0381",
@@ -35280,7 +35660,8 @@
         "debtorConcentrationPct": 22
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 13.02
     },
     {
       "id": "opp_0382",
@@ -35317,7 +35698,8 @@
         "callProtection": "None"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 8.07
     },
     {
       "id": "opp_0383",
@@ -35354,7 +35736,8 @@
         "callProtection": "2yr soft call"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 7.3
     },
     {
       "id": "opp_0384",
@@ -35391,7 +35774,8 @@
         "callProtection": "2yr soft call"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 8.98
     },
     {
       "id": "opp_0385",
@@ -35427,7 +35811,8 @@
         "callProtection": "None"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 7.38
     },
     {
       "id": "opp_0386",
@@ -35464,7 +35849,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 7.43
     },
     {
       "id": "opp_0387",
@@ -35498,7 +35884,8 @@
         "callProtection": "None"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.54
     },
     {
       "id": "opp_0388",
@@ -35534,7 +35921,8 @@
         "primaryCovenant": "FCCR >= 1.2x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.6
     },
     {
       "id": "opp_0389",
@@ -35571,7 +35959,8 @@
         "callProtection": "None"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 7.78
     },
     {
       "id": "opp_0390",
@@ -35604,7 +35993,8 @@
         "debtorConcentrationPct": 36
       },
       "lostToCompetitor": "PNC Business Credit",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitorEvidence": "UCC filing",
+      "yieldPct": 12.04
     },
     {
       "id": "opp_0391",
@@ -35638,7 +36028,8 @@
         "debtorConcentrationPct": 37
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 15.06
     },
     {
       "id": "opp_0392",
@@ -35675,7 +36066,8 @@
         "primaryCovenant": "FCCR >= 1.15x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 10.91
     },
     {
       "id": "opp_0393",
@@ -35710,7 +36102,8 @@
         "primaryCovenant": "FCCR >= 1.2x"
       },
       "lostToCompetitor": "Ares Capital",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitorEvidence": "UCC filing",
+      "yieldPct": 10.68
     },
     {
       "id": "opp_0394",
@@ -35744,7 +36137,8 @@
         "debtorConcentrationPct": 26
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 13.1
     },
     {
       "id": "opp_0395",
@@ -35778,7 +36172,8 @@
         "callProtection": "1% Yr1 stepdown"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 7.71
     },
     {
       "id": "opp_0396",
@@ -35812,7 +36207,8 @@
         "callProtection": "2yr soft call"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 7.8
     },
     {
       "id": "opp_0397",
@@ -35846,7 +36242,8 @@
         "debtorConcentrationPct": 20
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 14.89
     },
     {
       "id": "opp_0398",
@@ -35882,7 +36279,8 @@
         "primaryCovenant": "FCCR >= 1.16x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.4
     },
     {
       "id": "opp_0399",
@@ -35913,7 +36311,8 @@
         "debtorConcentrationPct": 43
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 13.6
     },
     {
       "id": "opp_0400",
@@ -35947,7 +36346,8 @@
         "callProtection": "None"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.11
     },
     {
       "id": "opp_0401",
@@ -35980,7 +36380,8 @@
         "debtorConcentrationPct": 56
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 12.65
     },
     {
       "id": "opp_0402",
@@ -36016,7 +36417,8 @@
         "callProtection": "None"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.48
     },
     {
       "id": "opp_0403",
@@ -36050,7 +36452,8 @@
         "debtorConcentrationPct": 49
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 14.9
     },
     {
       "id": "opp_0404",
@@ -36084,7 +36487,8 @@
         "primaryCovenant": "FCCR >= 1.2x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.23
     },
     {
       "id": "opp_0405",
@@ -36117,7 +36521,8 @@
         "debtorConcentrationPct": 31
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 12.1
     },
     {
       "id": "opp_0406",
@@ -36153,7 +36558,8 @@
         "callProtection": "None"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 8.35
     },
     {
       "id": "opp_0407",
@@ -36187,7 +36593,8 @@
         "primaryCovenant": "FCCR >= 1.07x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.12
     },
     {
       "id": "opp_0408",
@@ -36221,7 +36628,8 @@
         "debtorConcentrationPct": 18
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 12.56
     },
     {
       "id": "opp_0409",
@@ -36254,7 +36662,8 @@
         "debtorConcentrationPct": 42
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 13.95
     },
     {
       "id": "opp_0410",
@@ -36291,7 +36700,8 @@
         "primaryCovenant": "FCCR >= 1.17x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 10.21
     },
     {
       "id": "opp_0411",
@@ -36324,7 +36734,8 @@
         "debtorConcentrationPct": 26
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 12.02
     },
     {
       "id": "opp_0412",
@@ -36362,7 +36773,8 @@
         "primaryCovenant": "FCCR >= 1.23x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 10.81
     },
     {
       "id": "opp_0413",
@@ -36397,7 +36809,8 @@
         "primaryCovenant": "FCCR >= 1.25x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.62
     },
     {
       "id": "opp_0414",
@@ -36431,7 +36844,8 @@
         "callProtection": "2yr soft call"
       },
       "lostToCompetitor": "Wells Fargo Capital Finance",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitorEvidence": "UCC filing",
+      "yieldPct": 9.8
     },
     {
       "id": "opp_0415",
@@ -36464,7 +36878,8 @@
         "debtorConcentrationPct": 58
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 15.8
     },
     {
       "id": "opp_0416",
@@ -36500,7 +36915,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": "JPMorgan Chase",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitorEvidence": "UCC filing",
+      "yieldPct": 7.57
     },
     {
       "id": "opp_0417",
@@ -36533,7 +36949,8 @@
         "debtorConcentrationPct": 23
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 15.29
     },
     {
       "id": "opp_0418",
@@ -36567,7 +36984,8 @@
         "debtorConcentrationPct": 47
       },
       "lostToCompetitor": "Wells Fargo Capital Finance",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitorEvidence": "UCC filing",
+      "yieldPct": 13.36
     },
     {
       "id": "opp_0419",
@@ -36604,7 +37022,8 @@
         "primaryCovenant": "FCCR >= 1.06x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.69
     },
     {
       "id": "opp_0420",
@@ -36640,7 +37059,8 @@
         "callProtection": "2yr soft call"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 7.22
     },
     {
       "id": "opp_0421",
@@ -36678,7 +37098,8 @@
         "primaryCovenant": "FCCR >= 1.07x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.33
     },
     {
       "id": "opp_0422",
@@ -36714,7 +37135,8 @@
         "primaryCovenant": "FCCR >= 1.08x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.13
     },
     {
       "id": "opp_0423",
@@ -36748,7 +37170,8 @@
         "callProtection": "None"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 8.09
     },
     {
       "id": "opp_0424",
@@ -36779,7 +37202,8 @@
         "debtorConcentrationPct": 47
       },
       "lostToCompetitor": "JPMorgan Chase",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitorEvidence": "UCC filing",
+      "yieldPct": 14.9
     },
     {
       "id": "opp_0425",
@@ -36813,7 +37237,8 @@
         "callProtection": "1% Yr1 stepdown"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 7.51
     },
     {
       "id": "opp_0426",
@@ -36850,7 +37275,8 @@
         "primaryCovenant": "FCCR >= 1.15x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.43
     },
     {
       "id": "opp_0427",
@@ -36883,7 +37309,8 @@
         "debtorConcentrationPct": 27
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 13.94
     },
     {
       "id": "opp_0428",
@@ -36919,7 +37346,8 @@
         "callProtection": "1% Yr1 stepdown"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.62
     },
     {
       "id": "opp_0429",
@@ -36956,7 +37384,8 @@
         "primaryCovenant": "FCCR >= 1.19x"
       },
       "lostToCompetitor": "JPMorgan Chase",
-      "lostToCompetitorEvidence": "Reported by borrower"
+      "lostToCompetitorEvidence": "Reported by borrower",
+      "yieldPct": 10.97
     },
     {
       "id": "opp_0430",
@@ -36992,7 +37421,8 @@
         "primaryCovenant": "FCCR >= 1.19x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.63
     },
     {
       "id": "opp_0431",
@@ -37029,7 +37459,8 @@
         "primaryCovenant": "FCCR >= 1.12x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.98
     },
     {
       "id": "opp_0432",
@@ -37065,7 +37496,8 @@
         "callProtection": "Non-call 1yr"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.21
     },
     {
       "id": "opp_0433",
@@ -37099,7 +37531,8 @@
         "debtorConcentrationPct": 19
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 15.23
     },
     {
       "id": "opp_0434",
@@ -37133,7 +37566,8 @@
         "debtorConcentrationPct": 52
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 12.86
     },
     {
       "id": "opp_0435",
@@ -37164,7 +37598,8 @@
         "debtorConcentrationPct": 30
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 14.43
     },
     {
       "id": "opp_0436",
@@ -37198,7 +37633,8 @@
         "debtorConcentrationPct": 42
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 15.56
     },
     {
       "id": "opp_0437",
@@ -37229,7 +37665,8 @@
         "debtorConcentrationPct": 27
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 14.42
     },
     {
       "id": "opp_0438",
@@ -37262,7 +37699,8 @@
         "debtorConcentrationPct": 40
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 14.4
     },
     {
       "id": "opp_0439",
@@ -37300,7 +37738,8 @@
         "primaryCovenant": "FCCR >= 1.06x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.41
     },
     {
       "id": "opp_0440",
@@ -37333,7 +37772,8 @@
         "debtorConcentrationPct": 59
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 15.87
     },
     {
       "id": "opp_0441",
@@ -37364,7 +37804,8 @@
         "debtorConcentrationPct": 33
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 12.14
     },
     {
       "id": "opp_0442",
@@ -37402,7 +37843,8 @@
         "primaryCovenant": "FCCR >= 1.09x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.83
     },
     {
       "id": "opp_0443",
@@ -37440,7 +37882,8 @@
         "primaryCovenant": "FCCR >= 1.06x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.15
     },
     {
       "id": "opp_0444",
@@ -37478,7 +37921,8 @@
         "primaryCovenant": "FCCR >= 1.19x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.05
     },
     {
       "id": "opp_0445",
@@ -37509,7 +37953,8 @@
         "debtorConcentrationPct": 19
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 14.2
     },
     {
       "id": "opp_0446",
@@ -37543,7 +37988,8 @@
         "callProtection": "None"
       },
       "lostToCompetitor": "PNC Business Credit",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitorEvidence": "UCC filing",
+      "yieldPct": 7.05
     },
     {
       "id": "opp_0447",
@@ -37577,7 +38023,8 @@
         "debtorConcentrationPct": 37
       },
       "lostToCompetitor": "JPMorgan Chase",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitorEvidence": "UCC filing",
+      "yieldPct": 15.61
     },
     {
       "id": "opp_0448",
@@ -37608,7 +38055,8 @@
         "debtorConcentrationPct": 26
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 13.33
     },
     {
       "id": "opp_0449",
@@ -37645,7 +38093,8 @@
         "callProtection": "None"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.95
     },
     {
       "id": "opp_0450",
@@ -37682,7 +38131,8 @@
         "primaryCovenant": "FCCR >= 1.21x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 10.68
     },
     {
       "id": "opp_0451",
@@ -37716,7 +38166,8 @@
         "primaryCovenant": "FCCR >= 1.2x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 9.35
     },
     {
       "id": "opp_0452",
@@ -37754,7 +38205,8 @@
         "primaryCovenant": "FCCR >= 1.15x"
       },
       "lostToCompetitor": "Ares Capital",
-      "lostToCompetitorEvidence": "UCC filing"
+      "lostToCompetitorEvidence": "UCC filing",
+      "yieldPct": 10.37
     },
     {
       "id": "opp_0453",
@@ -37785,7 +38237,8 @@
         "debtorConcentrationPct": 47
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 15.08
     },
     {
       "id": "opp_0454",
@@ -37818,7 +38271,8 @@
         "debtorConcentrationPct": 23
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 14.8
     },
     {
       "id": "opp_0455",
@@ -37849,7 +38303,8 @@
         "debtorConcentrationPct": 31
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 12.56
     },
     {
       "id": "opp_0456",
@@ -37883,7 +38338,8 @@
         "primaryCovenant": "FCCR >= 1.2x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.16
     },
     {
       "id": "opp_0457",
@@ -37916,7 +38372,8 @@
         "debtorConcentrationPct": 29
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 12.77
     },
     {
       "id": "opp_0458",
@@ -37950,7 +38407,8 @@
         "primaryCovenant": "FCCR >= 1.18x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 10.37
     },
     {
       "id": "opp_0459",
@@ -37985,7 +38443,8 @@
         "primaryCovenant": "FCCR >= 1.23x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.95
     },
     {
       "id": "opp_0460",
@@ -38020,7 +38479,8 @@
         "primaryCovenant": "FCCR >= 1.06x"
       },
       "lostToCompetitor": null,
-      "lostToCompetitorEvidence": null
+      "lostToCompetitorEvidence": null,
+      "yieldPct": 11.63
     },
     {
       "id": "opp_0461",
@@ -38049,7 +38509,8 @@
         "discountFeePct": 3.32,
         "estMonthlyARVolume": 492000,
         "debtorConcentrationPct": 21
-      }
+      },
+      "yieldPct": 12.03
     },
     {
       "id": "opp_0462",
@@ -38083,7 +38544,8 @@
         "rateSpreadBps": 532,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.12x"
-      }
+      },
+      "yieldPct": 10.28
     },
     {
       "id": "opp_0463",
@@ -38118,7 +38580,8 @@
         "rateSpreadBps": 355,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.06x"
-      }
+      },
+      "yieldPct": 10.91
     },
     {
       "id": "opp_0464",
@@ -38150,7 +38613,8 @@
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "yieldPct": 8.26
     },
     {
       "id": "opp_0465",
@@ -38183,7 +38647,8 @@
         "rateSpreadBps": 644,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.11x"
-      }
+      },
+      "yieldPct": 10.76
     },
     {
       "id": "opp_0466",
@@ -38215,7 +38680,8 @@
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "yieldPct": 8.18
     },
     {
       "id": "opp_0467",
@@ -38244,7 +38710,8 @@
         "discountFeePct": 2.51,
         "estMonthlyARVolume": 2146000,
         "debtorConcentrationPct": 50
-      }
+      },
+      "yieldPct": 13
     },
     {
       "id": "opp_0468",
@@ -38273,7 +38740,8 @@
         "discountFeePct": 1.25,
         "estMonthlyARVolume": 1876000,
         "debtorConcentrationPct": 19
-      }
+      },
+      "yieldPct": 15.97
     },
     {
       "id": "opp_0469",
@@ -38305,7 +38773,8 @@
         "discountFeePct": 2.25,
         "estMonthlyARVolume": 1365000,
         "debtorConcentrationPct": 17
-      }
+      },
+      "yieldPct": 12.78
     },
     {
       "id": "opp_0470",
@@ -38337,7 +38806,8 @@
         "rateSpreadBps": 410,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.24x"
-      }
+      },
+      "yieldPct": 9.04
     },
     {
       "id": "opp_0471",
@@ -38372,7 +38842,8 @@
         "rateSpreadBps": 590,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.1x"
-      }
+      },
+      "yieldPct": 9.78
     },
     {
       "id": "opp_0472",
@@ -38404,7 +38875,8 @@
         "discountFeePct": 1.95,
         "estMonthlyARVolume": 785000,
         "debtorConcentrationPct": 48
-      }
+      },
+      "yieldPct": 13.96
     },
     {
       "id": "opp_0473",
@@ -38439,7 +38911,8 @@
         "rateSpreadBps": 538,
         "fieldExamStatus": "Complete",
         "primaryCovenant": "FCCR >= 1.12x"
-      }
+      },
+      "yieldPct": 11.11
     },
     {
       "id": "opp_0474",
@@ -38471,7 +38944,8 @@
         "rateSpreadBps": 486,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.06x"
-      }
+      },
+      "yieldPct": 10.21
     },
     {
       "id": "opp_0475",
@@ -38502,7 +38976,8 @@
         "discountFeePct": 1.32,
         "estMonthlyARVolume": 834000,
         "debtorConcentrationPct": 55
-      }
+      },
+      "yieldPct": 14.06
     },
     {
       "id": "opp_0476",
@@ -38537,7 +39012,8 @@
         "rateSpreadBps": 392,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.13x"
-      }
+      },
+      "yieldPct": 11.24
     },
     {
       "id": "opp_0477",
@@ -38571,7 +39047,8 @@
         "rateSpreadBps": 568,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.06x"
-      }
+      },
+      "yieldPct": 11.72
     },
     {
       "id": "opp_0478",
@@ -38603,7 +39080,8 @@
         "discountFeePct": 1.3,
         "estMonthlyARVolume": 2011000,
         "debtorConcentrationPct": 36
-      }
+      },
+      "yieldPct": 12.53
     },
     {
       "id": "opp_0479",
@@ -38636,7 +39114,8 @@
         "rateSpreadBps": 594,
         "fieldExamStatus": "Complete",
         "primaryCovenant": "FCCR >= 1.13x"
-      }
+      },
+      "yieldPct": 10.82
     },
     {
       "id": "opp_0480",
@@ -38668,7 +39147,8 @@
         "rateSpreadBps": 492,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.12x"
-      }
+      },
+      "yieldPct": 11.9
     },
     {
       "id": "opp_0481",
@@ -38702,7 +39182,8 @@
         "rateSpreadBps": 574,
         "fieldExamStatus": "Complete",
         "primaryCovenant": "FCCR >= 1.09x"
-      }
+      },
+      "yieldPct": 11.2
     },
     {
       "id": "opp_0482",
@@ -38737,7 +39218,8 @@
         "rateSpreadBps": 594,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.23x"
-      }
+      },
+      "yieldPct": 11.59
     },
     {
       "id": "opp_0483",
@@ -38770,7 +39252,8 @@
         "rateSpreadBps": 626,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.24x"
-      }
+      },
+      "yieldPct": 9.18
     },
     {
       "id": "opp_0484",
@@ -38806,7 +39289,8 @@
         "rateSpreadBps": 518,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.1x"
-      }
+      },
+      "yieldPct": 9.79
     },
     {
       "id": "opp_0485",
@@ -38838,7 +39322,8 @@
         "rateSpreadBps": 442,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.15x"
-      }
+      },
+      "yieldPct": 9.72
     },
     {
       "id": "opp_0486",
@@ -38869,7 +39354,8 @@
         "discountFeePct": 2.31,
         "estMonthlyARVolume": 1597000,
         "debtorConcentrationPct": 59
-      }
+      },
+      "yieldPct": 14.92
     },
     {
       "id": "opp_0487",
@@ -38904,7 +39390,8 @@
         "rateSpreadBps": 541,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.23x"
-      }
+      },
+      "yieldPct": 11.74
     },
     {
       "id": "opp_0488",
@@ -38940,7 +39427,8 @@
         "rateSpreadBps": 633,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.05x"
-      }
+      },
+      "yieldPct": 10.96
     },
     {
       "id": "opp_0489",
@@ -38975,7 +39463,8 @@
         "rateSpreadBps": 363,
         "fieldExamStatus": "Complete",
         "primaryCovenant": "FCCR >= 1.22x"
-      }
+      },
+      "yieldPct": 10.78
     },
     {
       "id": "opp_0490",
@@ -39009,7 +39498,8 @@
         "rateSpreadBps": 573,
         "fieldExamStatus": "Complete",
         "primaryCovenant": "FCCR >= 1.25x"
-      }
+      },
+      "yieldPct": 9.37
     },
     {
       "id": "opp_0491",
@@ -39043,7 +39533,8 @@
         "seniority": "Subordinated",
         "securedStatus": "Unsecured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "yieldPct": 7.89
     },
     {
       "id": "opp_0492",
@@ -39077,7 +39568,8 @@
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "2yr soft call"
-      }
+      },
+      "yieldPct": 7.13
     },
     {
       "id": "opp_0493",
@@ -39109,7 +39601,8 @@
         "discountFeePct": 2.19,
         "estMonthlyARVolume": 389000,
         "debtorConcentrationPct": 38
-      }
+      },
+      "yieldPct": 12.93
     },
     {
       "id": "opp_0494",
@@ -39144,7 +39637,8 @@
         "rateSpreadBps": 589,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.08x"
-      }
+      },
+      "yieldPct": 11.58
     },
     {
       "id": "opp_0495",
@@ -39176,7 +39670,8 @@
         "seniority": "Unitranche",
         "securedStatus": "Unsecured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "yieldPct": 8.05
     },
     {
       "id": "opp_0496",
@@ -39210,7 +39705,8 @@
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "1% Yr1 stepdown"
-      }
+      },
+      "yieldPct": 9.18
     },
     {
       "id": "opp_0497",
@@ -39244,7 +39740,8 @@
         "seniority": "Subordinated",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "yieldPct": 9.45
     },
     {
       "id": "opp_0498",
@@ -39273,7 +39770,8 @@
         "discountFeePct": 1.49,
         "estMonthlyARVolume": 3264000,
         "debtorConcentrationPct": 59
-      }
+      },
+      "yieldPct": 12.25
     },
     {
       "id": "opp_0499",
@@ -39308,7 +39806,8 @@
         "seniority": "Unitranche",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "yieldPct": 7.91
     },
     {
       "id": "opp_0500",
@@ -39341,7 +39840,8 @@
         "rateSpreadBps": 534,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.25x"
-      }
+      },
+      "yieldPct": 9.68
     },
     {
       "id": "opp_0501",
@@ -39373,7 +39873,8 @@
         "rateSpreadBps": 567,
         "fieldExamStatus": "In Progress",
         "primaryCovenant": "FCCR >= 1.22x"
-      }
+      },
+      "yieldPct": 10.85
     },
     {
       "id": "opp_0502",
@@ -39402,7 +39903,8 @@
         "discountFeePct": 3.56,
         "estMonthlyARVolume": 2303000,
         "debtorConcentrationPct": 42
-      }
+      },
+      "yieldPct": 15.25
     },
     {
       "id": "opp_0503",
@@ -39437,7 +39939,8 @@
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "yieldPct": 8.49
     },
     {
       "id": "opp_0504",
@@ -39469,7 +39972,8 @@
         "discountFeePct": 2.18,
         "estMonthlyARVolume": 698000,
         "debtorConcentrationPct": 54
-      }
+      },
+      "yieldPct": 14.33
     },
     {
       "id": "opp_0505",
@@ -39505,7 +40009,8 @@
         "rateSpreadBps": 606,
         "fieldExamStatus": "Scheduled",
         "primaryCovenant": "FCCR >= 1.23x"
-      }
+      },
+      "yieldPct": 9.31
     },
     {
       "id": "opp_0506",
@@ -39538,7 +40043,8 @@
         "rateSpreadBps": 538,
         "fieldExamStatus": "Not Started",
         "primaryCovenant": "FCCR >= 1.23x"
-      }
+      },
+      "yieldPct": 10.53
     },
     {
       "id": "opp_0507",
@@ -39570,7 +40076,8 @@
         "seniority": "Senior",
         "securedStatus": "Secured",
         "callProtection": "Non-call 1yr"
-      }
+      },
+      "yieldPct": 8.64
     },
     {
       "id": "opp_0508",
@@ -39601,7 +40108,8 @@
         "discountFeePct": 1.32,
         "estMonthlyARVolume": 2987000,
         "debtorConcentrationPct": 30
-      }
+      },
+      "yieldPct": 15.14
     },
     {
       "id": "opp_0509",
@@ -39630,7 +40138,8 @@
         "discountFeePct": 1.5,
         "estMonthlyARVolume": 2396000,
         "debtorConcentrationPct": 23
-      }
+      },
+      "yieldPct": 12.77
     },
     {
       "id": "opp_0510",
@@ -39659,7 +40168,8 @@
         "discountFeePct": 1.34,
         "estMonthlyARVolume": 5174000,
         "debtorConcentrationPct": 39
-      }
+      },
+      "yieldPct": 13.98
     }
   ],
   "stageHistory": {
