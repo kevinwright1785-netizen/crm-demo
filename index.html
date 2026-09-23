@@ -112,8 +112,14 @@ body.scroll-locked{position:fixed;left:0;right:0;width:100%;overflow:hidden}
    default; the approved mock never set it, and Kevin's side-by-side comparison found removing
    it, alone, closed the visible weight/darkness gap against the mock. Judgment call, no
    research section behind it. */
+/* D219: font-weight:500 set as the body default, wiring D111 ("weight 500 is the default for
+   all UI text and titles") as an actual default for the first time. D111 was ratified
+   2026-09-02 but never set anywhere; every element with no font-weight of its own has been
+   rendering at the browser's 400 the whole time. Every element that already declares its own
+   weight (500, or a named 600/400 exception) is unaffected; only elements with no declaration
+   move from an inherited 400 to an inherited 500. No line-height change. */
 body{background:var(--page);color:var(--ink);font-family:var(--ui);font-size:14px;line-height:1.45;
-  font-variant-numeric:tabular-nums}
+  font-weight:500;font-variant-numeric:tabular-nums}
 a{color:inherit;text-decoration:none}
 button,input,select{font-family:inherit;font-size:inherit;color:inherit}
 button{cursor:pointer}
@@ -298,7 +304,11 @@ h1,h2,h3,p,dl,dd{margin:0}
 .feed-icon.brand{background:var(--brand-soft);color:var(--brand-ink)}
 .feed-main{flex:1;min-width:0}
 .feed-title{font-size:12.5px;font-weight:500;color:var(--ink)}
-.feed-sub{font-size:12px;color:var(--ink-3);margin-top:var(--s1)}
+/* D220: builds D217 (ruled, not built) for this class. Reason lines move from --ink-3 to
+   --ink-2, the next tier up: at --ink-3, even the WCAG-passing value D215 shipped, a reason
+   line read as too faint against its own row. No line-height change (D219's own instruction
+   carried forward). */
+.feed-sub{font-size:12px;color:var(--ink-2);margin-top:var(--s1)}
 .feed-time{font-family:var(--ui);font-size:11px;color:var(--ink-3);flex:0 0 auto;white-space:nowrap;
   padding-top:var(--s1)}
 /* right-aligned action label on an action-feed card — what you'd do about this signal */
@@ -330,7 +340,8 @@ h1,h2,h3,p,dl,dd{margin:0}
 .agenda-row.empty .agenda-time{padding-top:0}
 .agenda-main{flex:1;min-width:0}
 .agenda-title{font-size:12px;font-weight:500;color:var(--ink)}
-.agenda-sub{font-size:11px;color:var(--ink-3);margin-top:var(--s1)}
+/* D220: builds D217. Meta line moves --ink-3 to --ink-2, same reasoning as .feed-sub above. */
+.agenda-sub{font-size:11px;color:var(--ink-2);margin-top:var(--s1)}
 .agenda-tag{font-size:11px;font-weight:500;color:var(--brand-ink);flex:0 0 auto;padding-top:var(--s1)}
 
 /* ---------- charts (v7: brand ink, 3–4 gridlines, dashed reference, tint ramp, no gradients) ----------
@@ -357,7 +368,8 @@ h1,h2,h3,p,dl,dd{margin:0}
 .snap-main{flex:1;min-width:0}
 .snap-name-line{display:flex;align-items:center;gap:var(--s2)}
 .snap-name{font-size:12.5px;font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.snap-sub{font-size:11px;color:var(--ink-3);margin-top:var(--s1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* D220: builds D217. Meta line moves --ink-3 to --ink-2, same reasoning as .feed-sub above. */
+.snap-sub{font-size:11px;color:var(--ink-2);margin-top:var(--s1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .snap-size{font-family:var(--ui);font-size:12px;font-weight:500;color:var(--ink);flex:0 0 auto}
 .tag.fig{font-family:var(--ui);flex:0 0 auto}
 .panel-header-count{flex:0 0 auto;font-size:11px;color:var(--ink-3);white-space:nowrap}
