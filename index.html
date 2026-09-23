@@ -161,8 +161,10 @@ h1,h2,h3,p,dl,dd{margin:0}
   cursor:pointer;transition:background .12s var(--ease),color .12s var(--ease)}
 .rail-item:hover{background:var(--hover);color:var(--ink)}
 .rail-item.active{background:var(--paper);color:var(--brand);box-shadow:0 0 0 1px var(--line)}
-.rail-item.inert{color:var(--ink-3)}
-.rail-item.inert:hover{background:var(--hover);color:var(--ink-2)}
+/* D243: --ink-2, not --ink-3 (4.27:1 on --rail, under 4.5:1). Hover steps to --ink so it still
+   reads as a change. */
+.rail-item.inert{color:var(--ink-2)}
+.rail-item.inert:hover{background:var(--hover);color:var(--ink)}
 /* D240: -2px inset, not CLAUDE.md's standard +2px offset (--focus-offset) - an outset ring on an
    84px-wide item with only 8px of side margin would clip against the rail's own edge or the
    neighbouring item. Still built from the standard tokens (calc, not a raw literal), never a
@@ -193,9 +195,10 @@ h1,h2,h3,p,dl,dd{margin:0}
    button.active}, not still exactly one. */
 .roletoggle{display:flex;align-items:center;height:var(--h);padding:var(--s1);gap:var(--s1);
   box-sizing:border-box;background:var(--brand-soft);border-radius:var(--r-s)}
+/* D243: inactive label on --ink-2, not --ink-3 (4.23:1 on --brand-soft, under 4.5:1). */
 .roletoggle button{display:inline-flex;align-items:center;justify-content:center;height:24px;
   padding:0 var(--s2);border:none;border-radius:var(--r-s);background:none;font-size:11px;
-  font-weight:500;color:var(--ink-3);
+  font-weight:500;color:var(--ink-2);
   transition:background var(--t-fast) var(--ease),color var(--t-fast) var(--ease),box-shadow var(--t-fast) var(--ease)}
 .roletoggle button:hover:not(.active){color:var(--ink)}
 .roletoggle button:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
@@ -1296,8 +1299,9 @@ table.tbl{width:100%;border-collapse:collapse}
    field edits it in place (§2a, unchanged), clicking this opens the card's full content in the
    existing D34 modal. Only rendered on a card that actually hides fields on its face; a card
    already showing everything gets no control (its presence IS the "there's more here" signal). */
+/* D243: --ink-2, not --ink-3 (4.12:1 on --sunken, under 4.5:1). */
 .card-expand{position:absolute;right:var(--s3);bottom:var(--s3);width:22px;height:22px;
-  border:none;border-radius:var(--r-s);background:var(--sunken);color:var(--ink-3);font-size:11px;
+  border:none;border-radius:var(--r-s);background:var(--sunken);color:var(--ink-2);font-size:11px;
   line-height:1;cursor:pointer;transition:background var(--t-fast) var(--ease),color var(--t-fast) var(--ease)}
 .card-expand:hover{background:var(--hover);color:var(--ink)}
 /* D107: tabs, not a segmented control. This switcher navigates to DIFFERENT content per
