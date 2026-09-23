@@ -900,9 +900,11 @@ h1,h2,h3,p,dl,dd{margin:0}
    untouched. */
 .viewtoggle{display:inline-flex;flex:none;align-items:center;height:var(--h);padding:var(--s1);gap:var(--s1);
   box-sizing:border-box;background:var(--brand-soft);border-radius:var(--r-s)}
+/* D247: inactive label on --ink-2, not --ink-3 (4.23:1 on --brand-soft, under 4.5:1), same as
+   .roletoggle button (D243). */
 .viewtoggle button{display:inline-flex;align-items:center;justify-content:center;height:24px;
   padding:0 var(--s2);border:none;border-radius:var(--r-s);background:none;font-size:11px;
-  font-weight:500;color:var(--ink-3);
+  font-weight:500;color:var(--ink-2);
   transition:background var(--t-fast) var(--ease),color var(--t-fast) var(--ease),box-shadow var(--t-fast) var(--ease)}
 .viewtoggle button:hover:not(.active){color:var(--ink)}
 .viewtoggle button:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
