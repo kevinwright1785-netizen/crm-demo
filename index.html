@@ -271,7 +271,13 @@ h1,h2,h3,p,dl,dd{margin:0}
 .panel-body.flush{padding:0}
 .panel-footer{border-top:1px solid var(--line);padding:var(--s3) var(--s5);font-size:12px;color:var(--ink-3);
   display:flex;align-items:center}
-.drill{color:var(--brand);font-weight:500;cursor:pointer}
+/* Correction pass, 2026-09-22: 12px, per the mock. Never set explicitly before, so every .drill
+   silently inherited whatever its container's own font-size happened to be, 12px already in
+   most contexts (e.g. inside .panel-footer, itself 12px), but 14px (body's own size) inside a
+   plain .panel-header, which is exactly where this read wrong on the Snapshot card. Setting it
+   here makes the class correct on its own terms everywhere, not just where it happened to
+   already inherit the right number. */
+.drill{font-size:12px;color:var(--brand);font-weight:500;cursor:pointer}
 .panel-footer .drill{margin-left:auto}
 /* minmax(0,...) on both tracks: without it a wide child (a table, a long unbroken title) can
    blow a grid track past the viewport. Same fix the record layout needed in round 2. */
@@ -302,6 +308,15 @@ h1,h2,h3,p,dl,dd{margin:0}
 .feed-icon.neg{background:var(--neg-soft);color:var(--neg-ink)}
 .feed-icon.pos{background:var(--pos-soft);color:var(--pos-ink)}
 .feed-icon.brand{background:var(--brand-soft);color:var(--brand-ink)}
+/* D226: 32px tinted box, a 16px inline outline icon, replacing the prior Unicode glyph, per the
+   approved mock. Scoped to ".feedrow:not(.static)" rather than the base .feed-icon rule above:
+   `.feed-icon` is also reused, unrelated, by the Opportunity record's own static Network-tab
+   relationship rows (`.feedrow.static`), a page this pass is not scoped to touch (the gate: no
+   change to a page other than BDO Home or Exec Home). The two real feeds, BDO Home's own and
+   Exec Home's firm-wide signals, both render plain `.feedrow` (no `.static`), so this selector
+   reaches exactly those two and nothing else. */
+.feedrow:not(.static) .feed-icon{width:32px;height:32px;flex:0 0 32px;font-size:16px}
+.feedrow:not(.static) .feed-icon svg{width:16px;height:16px}
 .feed-main{flex:1;min-width:0}
 .feed-title{font-size:12.5px;font-weight:500;color:var(--ink)}
 /* D220: builds D217 (ruled, not built) for this class. Reason lines move from --ink-3 to
@@ -336,8 +351,6 @@ h1,h2,h3,p,dl,dd{margin:0}
 .agenda-row.past{opacity:.55}
 .agenda-row.next{background:var(--brand-a05)}
 .agenda-row.next .agenda-time{color:var(--brand-ink)}
-.agenda-row.empty{padding:var(--s1) var(--s5);opacity:.4}
-.agenda-row.empty .agenda-time{padding-top:0}
 .agenda-main{flex:1;min-width:0}
 .agenda-title{font-size:12px;font-weight:500;color:var(--ink)}
 /* D220: builds D217. Meta line moves --ink-3 to --ink-2, same reasoning as .feed-sub above. */
@@ -361,7 +374,12 @@ h1,h2,h3,p,dl,dd{margin:0}
 .tip-s{color:var(--ink-3)}
 
 /* ---------- pipeline snapshot (ranked deal list — a list stays a list, per the chart rule) ---------- */
-.snap-row{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s5);cursor:pointer;
+/* Correction pass, 2026-09-22: 10px vertical, off the 4pt scale, is the mock's own literal value
+   for this row (confirmed by reading its CSS directly) and Kevin's own explicit fix instruction
+   for this element, matching the approved mock pixel for pixel. Not a license to use 10px
+   elsewhere. Horizontal padding stays --s5, since this row (unlike the mock's) carries its own
+   horizontal inset rather than relying on a single padding source on the card body. */
+.snap-row{display:flex;align-items:center;gap:var(--s3);padding:10px var(--s5);cursor:pointer;
   transition:background .12s var(--ease);box-shadow:inset 0 1px 0 var(--row-sep)}
 .snap-row:first-child{box-shadow:none}
 .snap-row:hover{background:var(--hover)}
@@ -369,35 +387,99 @@ h1,h2,h3,p,dl,dd{margin:0}
 .snap-name-line{display:flex;align-items:center;gap:var(--s2)}
 .snap-name{font-size:12.5px;font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* D220: builds D217. Meta line moves --ink-3 to --ink-2, same reasoning as .feed-sub above. */
-.snap-sub{font-size:11px;color:var(--ink-2);margin-top:var(--s1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.snap-size{font-family:var(--ui);font-size:12px;font-weight:500;color:var(--ink);flex:0 0 auto}
+/* D228: product/stage tags plus the stale chip when it fires, replacing the plain grey meta
+   line this class used to hold. display:flex instead of the old single-line truncation, since
+   the content is now a short row of fixed-width tag pills, not prose that needs an ellipsis. */
+.snap-sub{display:flex;align-items:center;gap:var(--s1);margin-top:var(--s1);flex-wrap:wrap}
+.snap-size{font-family:var(--ui);font-size:13px;font-weight:500;color:var(--ink);flex:0 0 auto}
 .tag.fig{font-family:var(--ui);flex:0 0 auto}
+/* Correction pass, 2026-09-22: the mock's own generic .tag (padding:1px 6px, no fixed height)
+   does not match this app's real, pre-existing .tag component (height:20px, padding:0 8px,
+   D103's own shared anatomy for stage pills and product tags everywhere else in the app). Per
+   D151 (reuse only where the rendered result is identical) and D232 (scope, don't mutate a
+   shared component to fit one caller), this is a scoped override for Snapshot's own tag row
+   specifically, not a change to .tag itself. Every other .tag consumer app-wide (Pipeline,
+   Account 360, the stage track) is unaffected. */
+.snap-sub .tag{height:auto;padding:1px 6px}
 .panel-header-count{flex:0 0 auto;font-size:11px;color:var(--ink-3);white-space:nowrap}
 
-/* ---------- horizontal ranked bars (partners) ---------- */
-.hbar-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--s3);align-items:center;
-  padding:var(--s2) var(--s5)}
-.hbar-name{font-size:12px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hbar-val{font-family:var(--ui);font-size:11px;color:var(--ink-2)}
+/* ---------- horizontal ranked bars (Partners, Where we're losing, every Exec Home consumer
+   of hbarListHtml()) ---------- D221: single line, the bar drawn as a background element behind
+   the label rather than a separate track row beneath it; value right-aligned on the same line.
+   One hue (--brand tint) for the default fill; a genuine threshold state (e.g. a dormant
+   partner) gets the warn tint AND its own text tag (.tag.warn, appended to the name), never
+   colour alone. Shared component (D231): every consumer of these classes changes together,
+   Exec Home's own ranked-list cards included. */
+.hbar-row{position:relative;height:36px;margin-bottom:var(--s1);display:flex;align-items:center;
+  justify-content:space-between;gap:var(--s2);padding:0 var(--s2)}
+.hbar-fill{position:absolute;left:0;top:0;bottom:0;background:var(--brand-a07);border-radius:var(--r-s);
+  transition:background var(--t-fast) var(--ease)}
+.hbar-fill.warn{background:var(--warn-a15)}
+.hbar-fill.muted{background:var(--brand-a07)}
+.hbar-name{position:relative;font-size:12px;color:var(--ink);overflow:hidden;text-overflow:ellipsis;
+  white-space:nowrap;min-width:0}
+.hbar-val{position:relative;font-family:var(--ui);font-size:12px;color:var(--ink);white-space:nowrap;
+  flex:0 0 auto}
 .hbar-row.warnrow .hbar-val{color:var(--warn-ink)}
-.hbar-track{grid-column:1 / -1;height:var(--s2);background:var(--sunken);border-radius:var(--r-s);
-  overflow:hidden;margin-top:var(--s1)}
-.hbar-fill{height:100%;background:var(--brand);transition:background .12s var(--ease)}
-.hbar-fill.warn{background:var(--warn)}
-.hbar-fill.muted{background:var(--brand-a30)}
-.hbar-row:hover .hbar-fill{background:var(--brand-2)}
-.hbar-row:hover .hbar-fill.warn{background:var(--warn-ink)}
+.hbar-row:hover .hbar-fill{background:var(--brand-a15)}
+.hbar-row:hover .hbar-fill.warn{background:var(--warn-a30)}
+
+/* Correction pass, 2026-09-22, Partners and Where we're losing only: subtitle-to-control and
+   control-to-rows spacing measured 36px each against the mock's 12px and 16px. Root cause: the
+   segmented control sat in a `.panel-body.pad-top` wrapper, whose base `.panel-body` rule
+   already carries its own --s5 (24px) BOTTOM padding (meant for a body that is the last thing
+   in a card); `.pad-top` only adds a top value on top of that, so a wrapper used in the MIDDLE
+   of a card, not at the end, was contributing a 24px gap after the control that nothing asked
+   for, compounding with the next block's own 12px top-margin into a measured 36px. A new,
+   narrower wrapper replaces it here, carrying only the card's own horizontal inset and no
+   vertical padding of its own, so the real gaps come entirely from .panel-header's existing
+   12px bottom padding (subtitle-to-control) and .toggle-rows' own margin-top below (control-to-
+   rows), not from this wrapper. Scoped to these two cards' own markup; .panel-body.pad-top
+   itself is untouched and still serves every other card that uses it as intended. */
+.toggle-seg-wrap{padding:0 var(--s5)}
+/* Correction pass, 2026-09-22, Partners and Where we're losing only: 2px, per the mock, not the
+   shared .panel-scope rule's own standing 4px (used correctly everywhere else in the app).
+   Scoped by ID rather than changing .panel-scope itself, which would move the title-to-scope
+   gap on every other panel in the app that was never reported as wrong. */
+#panel-partners .panel-scope,#panel-loss .panel-scope{margin-top:2px}
 
 /* ---------- toggle-card stable height (standing rule — CLAUDE.md §4) ----------
    A card with an internal view-toggle must not change its own height when the view switches —
    the Partners card (Dormancy/Volume/Quality) and the loss-analysis card (by stage/by reason/
-   lost-to) both swap their row COUNT by view (4 rows for by-stage vs. up to 6 for the others),
-   and swapPanel() deliberately does not re-pack the masonry grid on a view toggle — so a height
-   change here reflows every card below it. Reserve the tallest view's height up front: measured
-   at 6 * the shared .hbar-row height (57.390625px), so 344px (6*57.39, on the 4pt scale). A view
-   with fewer rows leaves minor slack at the bottom of this box — sanctioned, not a bug — rather
-   than the card resizing and shoving its neighbors. */
-.toggle-rows{min-height:344px}
+   lost-to) both swap their row COUNT by view (4 rows for by-stage vs. up to 5 for the others,
+   D227), and swapPanel() deliberately does not re-pack the masonry grid on a view toggle, so a
+   height change here reflows every card below it. Reserve the tallest view's height up front:
+   5 rows at the shared .hbar-row height (36px) plus its own margin-bottom (--s1, 4px), the exact
+   5*40px the approved mock's own .rows{min-height:calc(5 * 40px)} reserves. A view with fewer
+   rows leaves minor slack at the bottom of this box, sanctioned, not a bug, rather than the
+   card resizing and shoving its neighbors. Slack lands here because this element is a plain
+   block box, not a flex container distributing space between its own children. The last row
+   is the last thing in normal flow, so any extra height below min-height's floor collects below
+   it, never between the header/control/rows chain above (confirmed by measurement, not assumed;
+   see the correction-pass note on .toggle-seg-wrap below for why that chain needed its own fix,
+   separate from this one). */
+.toggle-rows{min-height:200px;margin-top:var(--s4)}
+/* Correction pass, 2026-09-22 (second pass): Partners and Where we're losing render their rows
+   inside a `.panel-body.flush toggle-rows` container, and `.flush` zeroes that body's own side
+   padding for these two cards. `.hbar-fill` is `position:absolute;left:0`, which resolves
+   against its nearest positioned ancestor's padding box (`.hbar-row`, not this container), so an
+   unpadded rows container let every fill bleed to the card's outer edge (measured 1px inset)
+   instead of the card's own 24px content inset the title and header link both sit at. Missed by
+   the first correction pass, which fixed the header/control chain above this container but not
+   the container's own missing padding. Scoped to the exact class combination so it cannot affect
+   `.panel-body.flush` alone (Pipeline Snapshot's body, whose children carry their own insets) or
+   `.toggle-rows` alone (Exec Sourcing's "By channel" view, `panel-body toggle-rows` with no
+   `.flush`, which already inherits the base `.panel-body` padding below and needs no override).
+   Checked every other `.hbar-fill` consumer app-wide: Exec Home's Stalled deals and Volume-by-BDO
+   cards use a plain, non-flush `.panel-body` already, and every modal that renders `.hbar-row`
+   uses `.modal-body`, which carries its own standing padding too, so none of them were ever
+   bleeding and none needed this rule. **min-height raised to 224px (200 plus this rule's own
+   24px bottom padding), scoped to this same selector, so the height-stability floor still means
+   the same thing it always did: room for 5 rows plus one card's worth of bottom padding.**
+   Left at the base rule's own 200px for every other `.toggle-rows` consumer (Exec Sourcing's
+   "By channel" view, whose content already exceeds either floor on its own, per the check
+   below, so the number was never binding there regardless). */
+.panel-body.flush.toggle-rows{padding:0 var(--s5) var(--s5);min-height:224px}
 /* Reserves layout space for a conditionally-shown element (e.g. the loss card's "Lost to"-only
    attribution footer) without painting it — visibility:hidden, not omitting the element, so a
    view without that content doesn't lose its height too. General-purpose, not loss-card-specific. */
@@ -412,15 +494,6 @@ h1,h2,h3,p,dl,dd{margin:0}
    there. A one-line view leaves minor slack at the header's bottom, sanctioned, not a bug. */
 #panel-loss .panel-scope{min-height:34.8px}
 
-/* ---------- segmented control (reuses the .viewtoggle idiom, full-width in a rail) ---------- */
-.viewtoggle.seg{width:100%}
-.viewtoggle.seg button{flex:1}
-
-/* ---------- calendar: fills home-calendar-panel's flexed remainder, scrolls only past that ----------
-   No fixed height any more (D104/D123 retired the pair-row fixed-562px mechanism). See the
-   .home-row-feed block below for how Calendar's height is now derived. overflow only engages if
-   the calendar's real entries still run longer than the space it's given. */
-.agenda-scroll{overflow-y:auto}
 
 /* ---------- fixed two-column grids: Exec Home's diagnostics/production bands and the
    Opportunity Details tab (D104 applied to record pages, D174/D175) ----------
@@ -430,7 +503,7 @@ h1,h2,h3,p,dl,dd{margin:0}
    its last card (:last-child) takes the remaining height via flex:1 1 auto, so a column's own
    variable-content card (never a short, fixed-field one) is what absorbs the difference — pure
    CSS, no offsetHeight read, nothing written back by JS. Below 1140px (the same breakpoint
-   value .home-row-feed above uses, D104) the grid collapses to a single column and every card
+   value .home-grid above uses, D104) the grid collapses to a single column and every card
    renders at its own natural height, in DOM order — no JS breakpoint check anywhere, no JS
    constant to keep in sync with the CSS literal. */
 .exec-diag-grid,.exec-prod-grid,.opp-details-grid{display:grid;
@@ -467,63 +540,82 @@ h1,h2,h3,p,dl,dd{margin:0}
 .opp-details-grid > .home-col > .panel:last-child > .panel-body > .kv{
   flex:1 1 auto;align-content:space-between}
 
-/* ---------- BDO Home body: fixed grid (D104/D123) ----------
-   Masonry is retired on Home: source order in the markup now equals visual order top to bottom,
-   and the row shape is fixed rather than measured (BDO Home uses its own .home-row-feed/
-   .home-col-right shape below, not the .home-col above — that one is now shared by the three
-   still-two-column record/Exec Home grids, D174/D175). D123
-   chose this specific arrangement from an inline mockup of two options. The rejected alternative
-   paired Snapshot alone beside the feed and Calendar with Partners on row 2, which left a void
-   under the (shorter) Snapshot, the same bug family as the old masonry dead-void cases this
-   whole mechanism exists to avoid, just in a fixed layout instead of a packed one. */
-/* Explicit gap between the three rows, rather than relying on each row's last panel's own
-   margin-bottom to bleed through. That would double up wherever a row's last visible element
-   already carries one (e.g. Partners/Loss, D115) and vanish wherever it's been suppressed for a
-   height calculation (e.g. feed-panel, below), giving inconsistent row-to-row spacing either way. */
-.home-fixed-grid{display:flex;flex-direction:column;gap:var(--s5)}
-.home-row-feed{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:var(--s5);
-  align-items:stretch}
-@media (max-width:1140px){.home-row-feed{grid-template-columns:minmax(0,1fr)}}
-/* The feed never stretches beyond its own content; it's the row's height driver by design (it's
-   consistently the tallest card here), so align-self:start keeps it from ever being pulled taller
-   by a right column that briefly outgrows it (e.g. a near-empty feed on a quiet day). margin-bottom
-   is suppressed for the same reason .home-col-right's last card suppresses its own below: a grid
-   item's margin counts toward the row's auto-height just as much as its content does, and the
-   outer .home-fixed-grid gap above already supplies the space to the next row. Left unsuppressed,
-   the row would resolve to the feed's height plus its own margin, silently pushing the right column
-   24px past the feed it's supposed to match. */
-.home-row-feed > .feed-panel{align-self:start;margin-bottom:0}
-.home-col-right{display:flex;flex-direction:column;min-width:0}
-/* No trailing margin on the column's last card: nothing sits below it inside home-col-right, and
-   an unsuppressed margin there would count toward the column's own natural height (see below) for
-   no visual benefit. */
-.home-col-right > .panel:last-child{margin-bottom:0}
-/* Calendar absorbs whatever height the feed leaves on the table, instead of the two panels sharing
-   a stretch-to-tallest row directly (that was tried and rejected once already, D34/§13n: Calendar's
-   own uncapped content, a full 7am-7pm day, became the tallest thing in the row and dragged
-   Snapshot's fixed top-5 up with it, reintroducing the dead-void bug on Snapshot instead).
-   flex-basis is a definite length, NOT auto: an auto basis measures the item at its own content
-   size first, and a flex column's own intrinsic height (what .home-row-feed's stretch measures
-   home-col-right against) is the SUM of its children's content sizes, so an auto-basis Calendar
-   would still contribute its full uncapped agenda height upward and could out-grow the feed, the
-   exact bug this replaces. A definite basis makes Calendar's contribution exactly this many pixels
-   regardless of its content, so home-col-right's own natural height stays small (Snapshot's real
-   height plus this), the feed wins as the row's height driver in the common case, and grid stretch
-   then hands Calendar's flex:1 whatever extra height that leaves: the "absorbs the difference"
-   behavior. 160px is a CSS fallback (header plus roughly a row and a half), not tuned against the
-   dataset. Checked against today's real render (bdo_05: feed 660px vs. Snapshot+this floor
-   634px, so the feed wins and Calendar stretches well past this floor in practice) but not a
-   guarantee against every possible future regeneration of the dataset. If a future render ever
-   makes the floor win when it shouldn't, that's a dataset question to flag, not a bigger floor to
-   pad in; a bigger floor only narrows the margin further. */
+/* ---------- BDO Home body: 12-column grid (D222/D223, supersedes D104/D123's row shape) ----------
+   One 12-column grid, 24px gap: the left stack spans 8 (the action feed, then Partners and Where
+   we're losing side by side, 4 and 4 of the SAME 12 columns, not a separately-scaled nested grid,
+   so every card's left/right edge falls on a column line the right stack's own edges already sit
+   on); the right stack spans 4 (Pipeline Snapshot, then Today). Below HOME_BREAKPOINT (1140px,
+   unchanged, shared with Exec/Opp) every card collapses to one column in DOM order (feed,
+   Snapshot, Today, Partners, Where we're losing), CSS only, no JS breakpoint check. */
+.home-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:var(--s5)}
+@media (max-width:1140px){.home-grid{grid-template-columns:minmax(0,1fr)}}
+.home-grid > .home-col{min-width:0;display:flex;flex-direction:column;gap:var(--s5)}
+/* The gap above supplies all spacing inside a stack; each panel's own default margin-bottom
+   would otherwise double it up, the same reasoning D104/D123's own row rules already used. */
+.home-grid > .home-col > .panel{margin-bottom:0}
+.home-col-8{grid-column:span 8}
+.home-col-4{grid-column:span 4}
+@media (max-width:1140px){.home-col-8,.home-col-4{grid-column:span 1}}
+/* D223: each stack's own last item stretches to close the height gap between the two stacks, so
+   both stacks end level with no ragged page edge. Scoped per stack by class, not a generic
+   :last-child selector, so it can never out-specificity .home-calendar-panel's own flex-basis
+   rule below, the same per-grid scoping .exec-diag-grid/.exec-prod-grid/.opp-details-grid
+   already use for their own last-child rule, rather than one shared global one. */
+.home-grid > .home-col-8 > .home-row-secondary{flex:1 1 auto}
+
+/* Partners + Where we're losing, 4 and 4 under the feed (D222). Unchanged from the prior
+   row-2 shape (D104/D123): still the exact same 2-column, 24px-gap grid, just nested one level
+   deeper now, inside .home-col-8 rather than as its own top-level row (D151 reuse: the rendered
+   result is identical, so the class is unchanged). */
+.home-row-secondary{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--s5)}
+@media (max-width:1140px){.home-row-secondary{grid-template-columns:minmax(0,1fr)}}
+.home-row-secondary > .panel{margin-bottom:0}
+
+/* Calendar/Today absorbs whatever height Pipeline Snapshot leaves on the table (unchanged
+   mechanism from D104/D123; D224 rebuilds this card's own CONTENT, not this stretch role).
+   flex-basis is a definite length, not auto, for the same reason as before: an auto basis would
+   let the card's own content size inflate .home-col-4's natural height ahead of the grid's
+   stretch pass. 160px is a floor, not tuned against the dataset. */
 .home-calendar-panel{display:flex;flex-direction:column;flex:1 1 160px;min-height:160px}
 .home-calendar-panel > .panel-header{flex:0 0 auto}
 .home-calendar-panel > .panel-body{flex:1 1 auto;min-height:0}
-.home-row-secondary{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--s5)}
-@media (max-width:1140px){.home-row-secondary{grid-template-columns:minmax(0,1fr)}}
-/* Same margin-suppression reasoning as .feed-panel above: the outer .home-fixed-grid gap already
-   supplies the space to row 3, so each card's own margin-bottom would otherwise double it up. */
-.home-row-secondary > .panel{margin-bottom:0}
+
+/* ---------- Pipeline Snapshot's stage-mini row (D225): four columns, stage name / count+$ /
+   a thin single-hue bar sized by dollars relative to the largest stage, each clickable to the
+   same #/pipeline/stage/X route the retired standalone Pipeline-by-stage card used
+   (goToPipelineStage(), unchanged). Replaces that standalone card entirely; this is Home's own
+   consumer, not a fork of pipelineByStageHtml() (Exec Home's own segbar/legend), whose rendered
+   shape is genuinely different (a four-column mini-card row, not a proportional segmented bar
+   plus a legend list), so per D151 this is a new function, not a forced reuse. */
+/* Correction pass, 2026-09-22: the stage-mini row sat inside Snapshot's flush (0-padding)
+   body with no horizontal padding of its own, so it rendered flush with the card's outer edge
+   instead of the card's own 24px content inset every other element (the title, the drill link,
+   the snapshot rows) already sits at. Root cause confirmed by measuring both the mock and the
+   built page (Playwright-equivalent, headless Chrome): mock's title/rows/mini all sit 25px from
+   the card edge; the built mini sat 1px from it. Fixed by giving --s5 back on this element
+   specifically, the same "card content padding" every other child needs, matching the mock's
+   own single-padding-source model (--s5 padding lives on .panel itself there, not split
+   piecemeal across children). This is that same 24px reapplied to the one child that never got
+   it, not a redesign of the padding model app-wide. */
+.stage-mini{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--s3);
+  padding:0 var(--s5) var(--s3);margin-bottom:var(--s3);border-bottom:1px solid var(--row-sep)}
+.stage-mini-item.clickable{cursor:pointer}
+.stage-mini-item.clickable:hover{background:var(--hover)}
+.stage-mini-k{font-size:11px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stage-mini-v{font-size:11px;color:var(--ink-2);margin-top:var(--s1)}
+.stage-mini-v b{font-family:var(--ui);font-size:13px;color:var(--ink);font-weight:500;margin-right:2px}
+/* 6px, off the 4pt scale: the mock's own literal value for this specific track, confirmed by
+   measuring it directly (not var(--s2)=8px, which is what this read before the correction).
+   Kevin's own explicit fix instruction, matching the approved mock pixel for pixel; not a
+   license to use 6px anywhere else. */
+.stage-mini-track{height:3px;background:var(--sunken);border-radius:2px;margin-top:6px;overflow:hidden}
+.stage-mini-fill{display:block;height:100%;background:var(--brand)}
+/* The stage-mini row is always first inside Snapshot's body, so the first real .snap-row below
+   it is never actually :first-child (that's .stage-mini): its own top divider (box-shadow)
+   was rendering anyway, stacked right under stage-mini's own border-bottom: a visible double
+   line with a thin blank band between them. Suppressed here, keyed to the adjacency itself
+   rather than :first-child, so it holds regardless of what else might precede a snap-row. */
+.stage-mini + .snap-row{box-shadow:none}
 
 /* ---------- expandable cards + modal (v7 tier 3: scrim + --lift-hi) ---------- */
 .panel.expandable{cursor:pointer;transition:border-color .12s var(--ease)}
@@ -729,7 +821,15 @@ h1,h2,h3,p,dl,dd{margin:0}
    border for the thumb's shadow to sit alongside). --lift-thumb is control-level, not an
    elevation tier, and has exactly one consumer (asserted in a test the same shape as the
    --r-full single-consumer test). */
-.viewtoggle{display:flex;align-items:center;height:var(--h);padding:var(--s1);gap:var(--s1);
+/* D221: sized to its own labels, not full width, per the approved mock. display:flex is a
+   block-level box (auto width = its parent's width) unless overridden, so the fix is
+   display:inline-flex plus flex:none (defends against a flex/grid parent trying to stretch it)
+   on the base rule itself, rather than a separate .seg-only override: every viewToggleHtml()
+   call site already carries both "viewtoggle" and "seg" together (there is no bare .viewtoggle
+   consumer), so one rule covers every consumer, Exec Home's own toggle cards included (D231,
+   shared component). D107/D113 semantics (aria-pressed, the soft-fill lifted thumb) below are
+   untouched. */
+.viewtoggle{display:inline-flex;flex:none;align-items:center;height:var(--h);padding:var(--s1);gap:var(--s1);
   box-sizing:border-box;background:var(--brand-soft);border-radius:var(--r-s)}
 .viewtoggle button{display:inline-flex;align-items:center;justify-content:center;height:24px;
   padding:0 var(--s2);border:none;border-radius:var(--r-s);background:none;font-size:11px;
@@ -104924,6 +105024,21 @@ function lastActivityDays(oppId){
   return daysBetween(acts.reduce((m,a)=>a.date>m?a.date:m, acts[0].date), TODAY);
 }
 
+/* D226: one outline icon family, one stroke weight (1.75), replacing the feed's prior Unicode
+   glyphs, per the approved mock's own icon set. Inline SVG, no external icon library: each path
+   set is a plain string, wrapped in one shared 24x24 viewBox by feedIconSvg(). */
+const FEED_ICON_PATHS = {
+  net: '<circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.3 11l7.4-4"/><path d="M8.3 13l7.4 4"/>',
+  alert: '<path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9 2.4 17.5a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/>',
+  bank: '<path d="M3 21h18"/><path d="M3 10h18"/><path d="M5 6l7-3 7 3"/><path d="M4 10v11"/><path d="M20 10v11"/><path d="M8 14v3"/><path d="M12 14v3"/><path d="M16 14v3"/>',
+  clock: '<circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/>',
+  pulse: '<path d="M3 12h4l3 8 4-16 3 8h4"/>'
+};
+function feedIconSvg(key){
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" '+
+    'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+FEED_ICON_PATHS[key]+'</svg>';
+}
+
 function buildFeed(bdoId){
   const myOpps = Object.values(OPPS).filter(o=>o.bdoId===bdoId);
   const myOpen = myOpps.filter(o=>o.outcome==='open');
@@ -104949,7 +105064,7 @@ function buildFeed(bdoId){
     const acct=getAccount(o.accountId), other=getAccount(otherId);
     cand.push({
       type:'warm', score: 58 + sizeW(o) + (edge.goldenPath?6:0), oppId:o.id, section:'network',
-      icon:'brand', glyph:'⇄', action:'Request intro',
+      icon:'brand', glyph:feedIconSvg('net'), action:'Request intro',
       title:'Warm intro available into '+esc(acct.name),
       sub:(edge.relationship==='buys_from'?'Buys from ':'Sells to ')+esc(other.name)+
           ' · Closed-Won account · '+moneyPlain(o.facilitySize)+' facility'
@@ -104967,7 +105082,7 @@ function buildFeed(bdoId){
     const over=days/thresh;
     cand.push({
       type:'stall', score: 54 + sizeW(o) + Math.min(20,(over-1)*18), oppId:o.id,
-      icon:'warn', glyph:'⚠', action:'Nudge deal',
+      icon:'warn', glyph:feedIconSvg('alert'), action:'Nudge deal',
       title:esc(getAccount(o.accountId).name)+' stalled in '+o.stage,
       sub:days+' days in stage vs '+thresh+' typical · '+moneyPlain(o.facilitySize)+' facility'
     });
@@ -104990,7 +105105,7 @@ function buildFeed(bdoId){
       type:'lien', section:'intelligence',
       score: 46 + (l.subordinated?8:0) + Math.max(0,14-days/4) + (beatUs?10:0) + (stillOpen?4:0),
       oppId: (beatUs && stillOpen) ? myOpen.find(o=>o.accountId===l.accountId).id : (rel?rel.id:null),
-      icon:'neg', glyph:'⚖', action: beatUs ? 'See who won' : 'Review lien',
+      icon:'neg', glyph:feedIconSvg('bank'), action: beatUs ? 'See who won' : 'Review lien',
       title: beatUs
         ? esc(l.securedParty)+' filed on '+esc(getAccount(l.accountId).name)
         : 'New lien filed against '+esc(getAccount(l.accountId).name),
@@ -105008,7 +105123,7 @@ function buildFeed(bdoId){
     if(days==null || days<=10) return;
     cand.push({
       type:'followup', section:'activity', score: 38 + Math.min(26,(days-10)*0.8), oppId:o.id,
-      icon:'', glyph:'⏱', action:'Log follow-up',
+      icon:'', glyph:feedIconSvg('clock'), action:'Log follow-up',
       title:'Follow up with '+esc(getAccount(o.accountId).name),
       sub:'No activity logged in '+days+' days · '+o.stage+' · '+moneyPlain(o.facilitySize)
     });
@@ -105029,7 +105144,7 @@ function buildFeed(bdoId){
     cand.push({
       type:'dormant', score: 32 + (days!=null?Math.min(24,(days-90)/8):24),
       href: '#/account/'+p.id+'/summary',
-      icon:'warn', glyph:'○', action:'Re-engage',
+      icon:'warn', glyph:feedIconSvg('pulse'), action:'Re-engage',
       title:esc(p.name)+' has gone quiet',
       sub:(days!=null?'No referral in '+days+' days':'No referral on record')+
           ' · '+p.referralCount+' over the full relationship · last was '+esc(getAccount(o.accountId).name)
@@ -105075,13 +105190,13 @@ function hhmm12(t){
   const h12 = h%12 === 0 ? 12 : h%12;
   return h12+':'+String(m).padStart(2,'0')+' '+ap;
 }
-/* The calendar spans a full working day (7:00–19:00), not just the hours that happen to have a
-   fake event on them — a card whose scrollable range depends on how much demo data exists isn't
-   a real day-view, it's a list that occasionally scrolls. Half-hour slots not covered by a real
-   AGENDA_SLOTS entry render as quiet, compact "nothing scheduled" ticks so the timeline reads as
-   continuous, and the card's internal scroll is guaranteed structurally — always there, at any
-   scroll position, regardless of the demo data. */
-const AGENDA_DAY_START_H = 7, AGENDA_DAY_END_H = 19;
+/* D224: a compact agenda of today's real events only, no hour grid. Every AGENDA_SLOTS entry
+   renders (all of today's events, not a windowed subset); nothing between them is invented, no
+   empty half-hour ticks, no internal scroll (the card is short enough not to need one), and no
+   next-day content, since neither the app nor the dataset has any concept of a next day
+   (confirmed by the 2026-09-22 inventory: no calendar/event structure exists beyond
+   firm.today). Superseded: the old AGENDA_DAY_START_H/AGENDA_DAY_END_H full-day-grid fill,
+   removed with this comment rather than left as dead constants. */
 function buildAgenda(bdoId){
   const open = Object.values(OPPS).filter(o=>o.bdoId===bdoId && o.outcome==='open')
     .slice().sort((a,b)=>b.facilitySize-a.facilitySize);
@@ -105090,19 +105205,11 @@ function buildAgenda(bdoId){
     if(s.kind==='Internal') return {time:s.time, title:s.title, sub:s.sub, tag:''};
     const o = open[oi++ % Math.max(1,open.length)];
     if(!o) return {time:s.time, title:s.title, sub:'No deal attached', tag:''};
-    return {time:s.time, title:s.kind+' — '+getAccount(o.accountId).name,
+    return {time:s.time, title:s.kind+', '+getAccount(o.accountId).name,
       sub:s.title+' · '+o.stage+' · '+moneyShort(o.facilitySize), oppId:o.id, tag:s.kind};
   });
-  const covered = new Set(rows.map(r=>r.time));
-  for(let h=AGENDA_DAY_START_H; h<=AGENDA_DAY_END_H; h++){
-    for(const m of [0,30]){
-      if(h===AGENDA_DAY_END_H && m===30) continue;
-      const t = String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
-      if(!covered.has(t)) rows.push({time:t, empty:true});
-    }
-  }
   rows.sort((a,b)=>a.time.localeCompare(b.time));
-  const nextIdx = rows.findIndex(r=>!r.empty && r.time>NOW_HHMM);
+  const nextIdx = rows.findIndex(r=>r.time>NOW_HHMM);
   rows.forEach((r,i)=>{ r.past = r.time<=NOW_HHMM; r.next = i===nextIdx; });
   return rows;
 }
@@ -105157,32 +105264,52 @@ function pipelineSnapshotHtml(myOpen){
     const days = currentDaysInStage(o);
     const stale = days >= Math.max(STAGE_P75[o.stage]||0,1);
     const acct = getAccount(o.accountId);
-    const owner = BDOS[o.bdoId];
+    /* D228: product and stage as tags (the existing D103 colour layer, via productTagHtml()/
+       stageTagHtml(), reused verbatim), plus the stale chip only when it actually fires,
+       replacing the old grey "stage · product · owner" meta line. The owner name is dropped:
+       every row on this personal, single-BDO page is already this BDO's own. */
     return '<div class="snap-row" onclick="location.hash=\'#/opp/'+o.id+'\'">'+
       '<div class="snap-main">'+
         '<div class="snap-name-line">'+
           '<span class="snap-name">'+esc(acct.name)+'</span>'+
-          '<span class="tag fig'+(stale?' warn':' neutral')+'"'+
-            tipAttr(o.stage, days+' day'+(days===1?'':'s')+' in stage',
-              stale ? 'Stale · beyond the '+Math.max(STAGE_P75[o.stage]||0,1)+'d typical for '+o.stage
-                    : 'Within the '+Math.max(STAGE_P75[o.stage]||0,1)+'d typical for '+o.stage)+
-            '>'+days+'d</span>'+
         '</div>'+
-        '<div class="snap-sub">'+o.stage+' · '+productLabel(o.productType)+' · '+esc(owner.name)+'</div>'+
+        '<div class="snap-sub">'+
+          productTagHtml(o.productType)+stageTagHtml(o)+
+          (stale ? '<span class="tag fig warn"'+
+            tipAttr(o.stage, days+' day'+(days===1?'':'s')+' in stage',
+              'Stale · beyond the '+Math.max(STAGE_P75[o.stage]||0,1)+'d typical for '+o.stage)+
+            '>'+days+'d</span>' : '')+
+        '</div>'+
       '</div>'+
       '<div class="snap-size">'+moneyPlain(o.facilitySize)+'</div>'+
     '</div>';
   }).join('');
 }
 
-/* Stage-mix footer summary, ranked by count (most-populated stage first) so it reads like a
-   quick "where's my book sitting" line rather than the fixed funnel order. */
-function stageMixSummary(myOpen){
-  const counts = {};
-  myOpen.forEach(o=>{ counts[o.stage] = (counts[o.stage]||0)+1; });
-  return Object.keys(counts)
-    .sort((a,b)=> counts[b]-counts[a] || TRACK_STAGES.indexOf(a)-TRACK_STAGES.indexOf(b))
-    .map(s=> counts[s]+' '+s).join(' · ');
+/* D225: the stage breakdown lives at the top of Pipeline Snapshot now, a four-column mini-row
+   (stage name, count, dollars, a thin single-hue bar sized by dollars relative to the largest
+   stage), replacing both the retired standalone Pipeline-by-stage card and the footer's
+   stage-mix summary line (stageMixSummary(), removed as this function's only caller). Each
+   column routes through the same goToPipelineStage() every other stage-click site already
+   uses. Not a fork of pipelineByStageHtml() (Exec Home's own proportional segbar plus legend,
+   untouched): the rendered shapes genuinely differ, so per D151 this is its own function. */
+function stageMiniHtml(myOpen){
+  const byStage = TRACK_STAGES.map(s=>{
+    const g = myOpen.filter(o=>o.stage===s);
+    return {stage:s, count:g.length, value:g.reduce((t,o)=>t+o.facilitySize,0)};
+  });
+  const max = Math.max(1, ...byStage.map(b=>b.value));
+  return '<div class="stage-mini">'+byStage.map(b=>
+    '<div class="stage-mini-item'+(b.count?' clickable':'')+'"'+
+      (b.count?' onclick="goToPipelineStage(\''+b.stage+'\')"':'')+
+      tipAttr(b.stage, b.count+' deal'+(b.count===1?'':'s')+' · '+moneyShort(b.value),
+        b.count?'click to view':'')+'>'+
+      '<div class="stage-mini-k">'+b.stage+'</div>'+
+      '<div class="stage-mini-v"><b>'+b.count+'</b> '+moneyShort(b.value)+'</div>'+
+      '<div class="stage-mini-track"><div class="stage-mini-fill" style="width:'+
+        ((b.value/max)*100).toFixed(1)+'%"></div></div>'+
+    '</div>'
+  ).join('')+'</div>';
 }
 
 /* ================================================================
@@ -105587,11 +105714,11 @@ function partnersPanelHtml(stats){
   const view = PARTNER_VIEW;
   const vd = partnerViewRows(stats, view);
   const scope = vd.scope;
-  const rows = vd.rows.slice(0,6);
+  const rows = vd.rows.slice(0,5);
   const max = view==='quality' ? 1 : Math.max(1,...rows.map(r=>view==='volume'?r.mine:r.days));
 
   const body = rows.map(r=>{
-    let width, val, cls='', rowCls='', tip;
+    let width, val, cls='', rowCls='', tip, dormantTag='';
     if(view==='volume'){
       width = (r.mine/max)*100; val = r.mine+'';
       tip = tipAttr(r.p.name, r.mine+' referral'+(r.mine===1?'':'s')+' to you, year to date',
@@ -105615,15 +105742,17 @@ function partnersPanelHtml(stats){
       width = (r.days/max)*100; val = r.days+'d';
       cls = r.p.isDormant ? 'warn' : '';
       rowCls = r.p.isDormant ? ' warnrow' : '';
+      /* D221: a threshold state is never colour alone, so the warn tint above is joined by this
+         text tag, whose own tooltip states the 90-day definition directly. */
+      dormantTag = r.p.isDormant ? ' <span class="tag warn" title="No referral in over 90 days">Dormant</span>' : '';
       tip = tipAttr(r.p.name, r.days+' days since last referral',
         (r.p.isDormant?'Dormant, no referral in 90+ days · ':'Active · ')+
         r.p.referralCount+' referred over the full relationship');
     }
     return '<div class="hbar-row'+rowCls+'"'+tip+'>'+
-      '<div class="hbar-name">'+esc(r.p.name)+'</div>'+
+      '<div class="hbar-fill '+cls+'" style="width:'+Math.max(2,width).toFixed(1)+'%"></div>'+
+      '<div class="hbar-name">'+esc(r.p.name)+dormantTag+'</div>'+
       '<div class="hbar-val">'+val+'</div>'+
-      '<div class="hbar-track"><div class="'+('hbar-fill '+cls).trim()+'" style="width:'+
-        Math.max(2,width).toFixed(1)+'%"></div></div>'+
     '</div>';
   }).join('');
 
@@ -105631,11 +105760,11 @@ function partnersPanelHtml(stats){
     '<div class="panel-header"><div class="panel-header-text">'+
       '<div class="panel-title">Partners</div>'+
       '<div class="panel-scope">'+scope+'</div>'+
-    '</div><span class="expand-hint">Expand &rsaquo;</span></div>'+
-    '<div class="panel-body pad-top">'+
+    '</div><span class="drill">Expand &rsaquo;</span></div>'+
+    '<div class="toggle-seg-wrap">'+
       viewToggleHtml(PARTNER_VIEWS, view, 'setPartnerView')+
     '</div>'+
-    '<div class="panel-body flush mt-3 toggle-rows">'+
+    '<div class="panel-body flush toggle-rows">'+
       (rows.length ? body : '<div class="empty">No partner-sourced deals yet.</div>')+
     '</div>'+
   '</div>';
@@ -105721,19 +105850,21 @@ function lossViewData(bdoId, view, limit){
 
 function lossPanelHtml(bdoId){
   const view = LOSS_VIEW;
-  const d = lossViewData(bdoId, view, 6);
+  const d = lossViewData(bdoId, view, 5);
   const max = Math.max(1, ...d.rows.map(r=>r.n));
   const body = d.rows.map(r=>{
     const sub = view==='competitor'
       ? (r.ucc ? r.ucc+' confirmed by a UCC filing' : 'Reported by the borrower')
       : (r.n ? pct(r.n/Math.max(1,d.total))+' of these losses · '+moneyShort(r.val) : 'No losses here');
     const isMax = r.n===max && r.n>0;
+    /* Correction pass, 2026-09-22: value format matches the mock's own "N · P%" (count and
+       share together in one cell), not the count alone. */
     return '<div class="hbar-row'+(d.tone==='warn'?' warnrow':'')+'"'+
       tipAttr(r.label, r.n+' lost · '+moneyShort(r.val), sub)+'>'+
+      '<div class="hbar-fill '+(d.tone==='warn'?'warn':(isMax?'':'muted'))+'" style="width:'+
+        Math.max(r.n?3:0,(r.n/max)*100).toFixed(1)+'%"></div>'+
       '<div class="hbar-name">'+esc(r.label)+'</div>'+
-      '<div class="hbar-val">'+r.n+'</div>'+
-      '<div class="hbar-track"><div class="'+('hbar-fill '+(d.tone==='warn'?'warn':(isMax?'':'muted'))).trim()+
-        '" style="width:'+Math.max(r.n?3:0,(r.n/max)*100).toFixed(1)+'%"></div></div>'+
+      '<div class="hbar-val">'+r.n+' · '+pct(r.n/Math.max(1,d.total))+'</div>'+
     '</div>';
   }).join('');
 
@@ -105741,11 +105872,11 @@ function lossPanelHtml(bdoId){
     '<div class="panel-header"><div class="panel-header-text">'+
       '<div class="panel-title">Where we\'re losing</div>'+
       '<div class="panel-scope">'+d.scope+'</div>'+
-    '</div><span class="expand-hint">Expand &rsaquo;</span></div>'+
-    '<div class="panel-body pad-top">'+
+    '</div><span class="drill">Expand &rsaquo;</span></div>'+
+    '<div class="toggle-seg-wrap">'+
       viewToggleHtml(LOSS_VIEWS, view, 'setLossView')+
     '</div>'+
-    '<div class="panel-body flush mt-3 toggle-rows">'+
+    '<div class="panel-body flush toggle-rows">'+
       (d.rows.length ? body : '<div class="empty">Nothing lost yet.</div>')+
     '</div>'+
     /* The attribution footer only means something in the "Lost to" view, but it must still
@@ -105756,7 +105887,7 @@ function lossPanelHtml(bdoId){
        what happened on the first pass at this fix (still short by about a line). visibility:
        hidden, not omitting the element, keeps the box's height without painting anything. */
     '<div class="panel-footer'+(view==='competitor'?'':' invisible')+'">'+
-      'Attribution comes from the borrower or a competitor&#39;s UCC filing after the loss — not every loss reveals a winner.'+
+      'Attribution comes from the borrower or a competitor&#39;s UCC filing after the loss. Not every loss reveals a winner.'+
     '</div>'+
   '</div>';
 }
@@ -106068,29 +106199,21 @@ function renderHome(){
         '<span class="met-view">View</span></div>'+
     '</div>'+
 
-    /* Pipeline by stage sits directly under the metric strip — the highest-altitude "shape of
-       my book" read, right where the strip leaves off. The fixed grid (D104/D123) follows below
-       it; source order here is visual order top to bottom, per D104. Nothing below reorders it. */
-    '<div class="panel">'+
-      '<div class="panel-header"><div class="panel-header-text">'+
-        '<div class="panel-title">Pipeline by stage</div>'+
-        '<div class="panel-scope">'+myOpen.length+' open deal'+(myOpen.length===1?'':'s')+' · '+moneyShort(pipelineValue)+' total</div>'+
-      '</div></div>'+
-      '<div class="panel-body">'+pipelineByStageHtml(myOpen)+'</div>'+
-    '</div>'+
+    /* D222/D223/D225: one 12-column grid, replacing D104/D123's two-row shape. Left stack
+       (.home-col-8): the action feed, then Partners/Where we're losing side by side (4 and 4).
+       Right stack (.home-col-4): Pipeline Snapshot (now carrying the stage breakdown at its own
+       top, D225, the standalone Pipeline-by-stage card retired), then Today. Each stack's
+       own last item stretches to close the gap between the two stacks (D223, CSS only). Source
+       order here is visual order top to bottom and, below HOME_BREAKPOINT, single-column order
+       too, nothing reorders it. */
+    '<div class="home-grid">'+
 
-    '<div class="home-fixed-grid">'+
-
-      /* Row 1 (D123): the action feed is the hero, wide left column. The right column stacks
-         Pipeline Snapshot above Calendar; Calendar absorbs whatever height the feed leaves on the
-         table (see .home-calendar-panel in CSS) so the right column matches the feed's height with
-         no dead void under either card. */
-      '<div class="home-row-feed">'+
+      '<div class="home-col home-col-8">'+
         '<div class="panel feed-panel">'+
           '<div class="panel-header"><div class="panel-header-text">'+
-            '<div class="panel-title">Today</div>'+
+            '<div class="panel-title">Needs your attention</div>'+
             '<div class="panel-scope">'+feed.length+
-              ' signals across your book, ranked by urgency — most pressing first</div>'+
+              ' signals across your book, ranked by urgency, most pressing first</div>'+
           '</div></div>'+
           '<div class="panel-body flush">'+
             (feed.length ? feed.map(c=>
@@ -106112,67 +106235,44 @@ function renderHome(){
           '</div>'+
         '</div>'+
 
-        '<div class="home-col-right">'+
-          '<div class="panel">'+
-            '<div class="panel-header"><div class="panel-header-text">'+
-              '<div class="panel-title">Pipeline Snapshot</div>'+
-              '<div class="panel-scope">Top 5 by facility size · active opportunities</div>'+
-            '</div><span class="panel-header-count">'+myOpen.length+' total deal'+(myOpen.length===1?'':'s')+'</span></div>'+
-            '<div class="panel-body flush">'+pipelineSnapshotHtml(myOpen)+'</div>'+
-            '<div class="panel-footer"><span>'+stageMixSummary(myOpen)+'</span>'+
-              '<span class="drill" onclick="location.hash=\'#/pipeline\'">Opportunities &rsaquo;</span></div>'+
-          '</div>'+
+        '<div class="home-row-secondary">'+
+          partnersPanelHtml(partners)+
+          lossPanelHtml(CURRENT_BDO_ID)+
+        '</div>'+
+      '</div>'+
 
-          '<div class="panel home-calendar-panel">'+
-            '<div class="panel-header"><div class="panel-header-text">'+
-              '<div class="panel-title">Calendar</div>'+
-              '<div class="panel-scope">'+agenda.filter(r=>!r.past && !r.empty).length+' left today · demo calendar</div>'+
-            '</div></div>'+
-            '<div class="panel-body flush agenda-scroll" id="calendar-scroll">'+
-              agenda.map(r=>
-                r.empty
-                  ? '<div class="agenda-row empty"><div class="agenda-time">'+hhmm12(r.time)+'</div></div>'
-                  : '<div class="agenda-row'+(r.past?' past':'')+(r.next?' next':'')+'"'+
-                    (r.oppId?(' onclick="location.hash=\'#/opp/'+r.oppId+'\'"'):'')+'>'+
-                    '<div class="agenda-time">'+hhmm12(r.time)+'</div>'+
-                    '<div class="agenda-main">'+
-                      '<div class="agenda-title">'+esc(r.title)+'</div>'+
-                      '<div class="agenda-sub">'+esc(r.sub)+'</div>'+
-                    '</div>'+
-                    (r.next?'<div class="agenda-tag">Next</div>':'')+
-                  '</div>').join('')+
-            '</div>'+
+      '<div class="home-col home-col-4">'+
+        '<div class="panel">'+
+          '<div class="panel-header"><div class="panel-header-text">'+
+            '<div class="panel-title">Pipeline snapshot</div>'+
+            '<div class="panel-scope">Top 5 by facility size · active opportunities</div>'+
+          '</div><span class="drill" onclick="location.hash=\'#/pipeline\'">Opportunities &rsaquo;</span></div>'+
+          '<div class="panel-body flush">'+stageMiniHtml(myOpen)+pipelineSnapshotHtml(myOpen)+'</div>'+
+        '</div>'+
+
+        '<div class="panel home-calendar-panel">'+
+          '<div class="panel-header"><div class="panel-header-text">'+
+            '<div class="panel-title">Today</div>'+
+            '<div class="panel-scope">'+agenda.filter(r=>!r.past).length+' left today · demo calendar</div>'+
+          '</div></div>'+
+          /* D224: every real event renders, no empty half-hour ticks, no internal scroll (the
+             card is short enough not to need one). */
+          '<div class="panel-body flush">'+
+            agenda.map(r=>
+              '<div class="agenda-row'+(r.past?' past':'')+(r.next?' next':'')+'"'+
+                (r.oppId?(' onclick="location.hash=\'#/opp/'+r.oppId+'\'"'):'')+'>'+
+                '<div class="agenda-time">'+hhmm12(r.time)+'</div>'+
+                '<div class="agenda-main">'+
+                  '<div class="agenda-title">'+esc(r.title)+'</div>'+
+                  '<div class="agenda-sub">'+esc(r.sub)+'</div>'+
+                '</div>'+
+                (r.next?'<div class="agenda-tag">Next</div>':'')+
+              '</div>').join('')+
           '</div>'+
         '</div>'+
       '</div>'+
 
-      /* Row 2 (D123, now the last row per D128): Partners and Where we're losing, one card each.
-         D128 removed row 3 (Recent activity, full width) from BDO Home; the page ends here. */
-      '<div class="home-row-secondary">'+
-        partnersPanelHtml(partners)+
-        lossPanelHtml(CURRENT_BDO_ID)+
-      '</div>'+
-
     '</div>';
-  /* Default scroll window: near working hours / the next thing on the clock, not the very top
-     of the 7am day-start. Mirrors how a real calendar app opens — scrolled to "now," with a
-     little past context still visible above, not to the literal beginning of the day.
-     getBoundingClientRect() math, not .offsetTop: #calendar-scroll has no positioned ancestor of
-     its own, so raw .offsetTop resolves against whatever positioned ancestor is further up the
-     tree — not this container — and silently gives the wrong number. Deferred to document.fonts.
-     ready: setting scrollTop one requestAnimationFrame after mount raced the web font still
-     loading, so the position was computed against a shorter, pre-font-swap layout and never
-     corrected once the real font came in and rows grew taller. */
-  const positionCalendarScroll = () => {
-    const cal = document.getElementById('calendar-scroll');
-    if(!cal) return;
-    const anchor = cal.querySelector('.agenda-row.next') || cal.querySelector('.agenda-row:not(.past):not(.empty)');
-    if(!anchor) return;
-    const offset = anchor.getBoundingClientRect().top - cal.getBoundingClientRect().top + cal.scrollTop;
-    cal.scrollTop = Math.max(0, offset - 80);
-  };
-  if(document.fonts && document.fonts.ready) document.fonts.ready.then(positionCalendarScroll);
-  else requestAnimationFrame(positionCalendarScroll);
 
   playHomeEntrance('bdo');
 }
@@ -106449,7 +106549,9 @@ function execClosedLostBuckets(pool){
 
 /* Generalizes the ad hoc hbar-row markup already used by Partners/loss (BDO Home) into one
    shared function for every NEW ranked list this page needs — reuses the exact .hbar-row/
-   .hbar-track/.hbar-fill CSS, no new classes. rows: [{label, value, display, tip, cls, onclick}] */
+   .hbar-fill CSS, no new classes. D221 (single line, bar behind the label, value right-
+   aligned) is a change to that shared CSS/markup shape, not to this function's own contract;
+   every caller below is unaffected. rows: [{label, value, display, tip, cls, onclick}] */
 function hbarListHtml(rows, opts){
   opts = opts || {};
   const max = opts.max!=null ? opts.max : Math.max(1, ...rows.map(r=>r.value));
@@ -106457,9 +106559,9 @@ function hbarListHtml(rows, opts){
     const width = Math.max(r.value>0?2:0, (r.value/max)*100);
     return '<div class="hbar-row'+(r.rowCls?(' '+r.rowCls):'')+'"'+(r.onclick?' onclick="'+r.onclick+'"':'')+
       (r.tip||'')+(r.onclick?' style="cursor:pointer"':'')+'>'+
+      '<div class="hbar-fill '+(r.fillCls||'')+'" style="width:'+width.toFixed(1)+'%"></div>'+
       '<div class="hbar-name">'+r.label+'</div>'+
       '<div class="hbar-val">'+r.display+'</div>'+
-      '<div class="hbar-track"><div class="'+('hbar-fill '+(r.fillCls||'')).trim()+'" style="width:'+width.toFixed(1)+'%"></div></div>'+
     '</div>';
   }).join('');
 }
@@ -107074,7 +107176,7 @@ function execSourcingPanelHtml(){
   const chart = view==='partners'
     ? hbarListHtml(execSourcingRows(view,6,measure))
     : stackedBarHtml(execSourcingRows(view,6,measure), {narrow:true});
-  const bodyCls = view==='partners' ? 'panel-body flush mt-3 toggle-rows' : 'panel-body mt-3 toggle-rows';
+  const bodyCls = view==='partners' ? 'panel-body flush toggle-rows' : 'panel-body toggle-rows';
   return '<div class="panel expandable" id="panel-exec-sourcing" onclick="openModal(\'execSourcing\', \''+view+'\')">'+
     '<div class="panel-header"><div class="panel-header-text">'+
       '<div class="panel-title">Sourcing</div>'+
