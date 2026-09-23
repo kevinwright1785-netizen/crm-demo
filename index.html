@@ -267,6 +267,25 @@ h1,h2,h3,p,dl,dd{margin:0}
 .panel-header-text{flex:1;min-width:0}
 .panel-title{font-size:13.5px;font-weight:500;letter-spacing:-.01em;color:var(--ink)}
 .panel-scope{font-size:12px;color:var(--ink-3);margin-top:var(--s1)}
+/* D234-D239 (CLAUDE.md §4, "card layout rules"): the shared toggle-card header. Base
+   .panel-header is a flexed ROW (the title+scope block, then the drill link, side by side) -
+   correct for a plain card, but it constrains the scope line's own width to whatever's left
+   after the drill's width and gap, not the card's full content width. The approved mock's own
+   toggle-card header (.ph.stacked) never has this problem: title and link share a `.top` row,
+   and the scope line is a separate block-level sibling below it, so it's as wide as the header
+   itself. `.stacked` switches this header to a block box; `.toggle-header-top` recreates just
+   the title+link row inside it (the mock's own `.top`), so the scope line below is a normal
+   full-width block sibling, constrained only by the header's own side padding, same as every
+   other child in the card (R2). Scoped to the shared toggle-card header function below, not the
+   base `.panel-header` rule every other panel in the app still uses unchanged. */
+.panel-header.stacked{display:block}
+.toggle-header-top{display:flex;justify-content:space-between;align-items:baseline;gap:var(--s3)}
+/* R2: always one line. A scope line that would wrap is a copy problem, not a layout one - fix
+   the words, never add a second line or a height reservation (that's what made #panel-loss's
+   old min-height:34.8px hack necessary, now removed along with the copy that required it).
+   2px margin-top, per the approved mock's own .ps, replaces the toggle-only ID-scoped override
+   this shared class now makes unnecessary. */
+.toggle-scope{margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .panel-body{padding:0 var(--s5) var(--s5)}
 .panel-body.flush{padding:0}
 .panel-footer{border-top:1px solid var(--line);padding:var(--s3) var(--s5);font-size:12px;color:var(--ink-3);
@@ -437,11 +456,10 @@ h1,h2,h3,p,dl,dd{margin:0}
    rows), not from this wrapper. Scoped to these two cards' own markup; .panel-body.pad-top
    itself is untouched and still serves every other card that uses it as intended. */
 .toggle-seg-wrap{padding:0 var(--s5)}
-/* Correction pass, 2026-09-22, Partners and Where we're losing only: 2px, per the mock, not the
-   shared .panel-scope rule's own standing 4px (used correctly everywhere else in the app).
-   Scoped by ID rather than changing .panel-scope itself, which would move the title-to-scope
-   gap on every other panel in the app that was never reported as wrong. */
-#panel-partners .panel-scope,#panel-loss .panel-scope{margin-top:2px}
+/* D234-D239: the ID-scoped 2px override this comment used to describe (#panel-partners
+   .panel-scope,#panel-loss .panel-scope{margin-top:2px}) is superseded by the shared
+   .toggle-scope class above, now applied by toggleCardHeaderHtml() itself, so Exec Sourcing
+   (D231) gets the same 2px without its own ID rule. Removed here rather than left dead. */
 
 /* ---------- toggle-card stable height (standing rule — CLAUDE.md §4) ----------
    A card with an internal view-toggle must not change its own height when the view switches —
@@ -484,15 +502,14 @@ h1,h2,h3,p,dl,dd{margin:0}
    attribution footer) without painting it — visibility:hidden, not omitting the element, so a
    view without that content doesn't lose its height too. General-purpose, not loss-card-specific. */
 .invisible{visibility:hidden}
-/* Toggle-card stable height (CLAUDE.md), a second axis of the same rule the two fixes above
-   handle: the loss card's own .panel-scope sentence is a genuinely different length per view
-   ("By stage"/"By reason" wrap to 2 lines; "Lost to" fits 1), so the HEADER was still resizing
-   even after row count (.toggle-rows) and the footer were both already reserved. Measured, not
-   guessed: .panel-scope is 12px/1.45 line-height, 2 lines is 34.8px (2 * 17.4). Scoped to
-   #panel-loss specifically. Partners' three scope sentences are all naturally one line
-   already (checked directly, not assumed), so this reservation would only add unneeded slack
-   there. A one-line view leaves minor slack at the header's bottom, sanctioned, not a bug. */
-#panel-loss .panel-scope{min-height:34.8px}
+/* D234-D239: the loss card's scope sentence used to wrap to 2 lines on "By stage"/"By reason"
+   ("Your book, N closed-lost deals, trailing 12 months. Small sample, read the shape loosely,
+   where in the funnel they died"), which needed a min-height:34.8px reservation (2 lines at
+   12px/1.45) so the header didn't resize when it fit on 1 line in "Lost to." R2 forbids exactly
+   this shape: a scope line that wraps is a copy problem, fixed with shorter copy (see
+   lossViewData()), never a second line or a height reservation. `.toggle-scope`'s own
+   nowrap/ellipsis now guarantees one line unconditionally, so the reservation is dead and
+   removed rather than left in place unused. */
 
 
 /* ---------- fixed two-column grids: Exec Home's diagnostics/production bands and the
@@ -105628,6 +105645,23 @@ function viewToggleHtml(views, current, setterName){
     v.label+'</button>').join('')+'</div>';
 }
 
+/* D234-D239 (CLAUDE.md §4, "card layout rules"): the shared toggle-card header. One function so
+   Partners, Where we're losing, and Exec Sourcing (the three cards that share both viewToggleHtml()
+   AND the hbar-row/hbar-fill bar markup, D231) get identical header geometry (R1) and can't drift
+   apart independently. Title and the drill link share the top row; the scope line is a full-width
+   block sibling below it (R2), always one line (`.toggle-scope`'s own nowrap/ellipsis), with the
+   full text also carried as a `title` attribute so a truncated line stays readable on hover. Other
+   Exec Home cards with their own segmented control (Stalled deals, Monthly volume, Won by product,
+   Lost intelligence) are NOT this component: they don't share the hbar-row/toggle-rows shape this
+   header was built for, so they keep their existing header markup, unedited, and are left for the
+   audit script to flag on their own terms if they violate R1/R2. */
+function toggleCardHeaderHtml(title, scope){
+  return '<div class="panel-header stacked"><div class="toggle-header-top">'+
+      '<div class="panel-title">'+title+'</div>'+
+      '<span class="drill">Expand &rsaquo;</span>'+
+    '</div><div class="panel-scope toggle-scope" title="'+esc(scope)+'">'+scope+'</div></div>';
+}
+
 /* ---------- partners: one dataset, three views ----------
    Dormancy is the default because it is the only one of the three that is time-critical — a
    decaying referral source is a thing to act on today, which is what this screen is for.
@@ -105701,9 +105735,11 @@ function partnerViewRows(stats, view){
        the real per-partner sample sizes in this business (2-6 closed referrals is normal, not a
        data problem — PROJECT_STATE D100), MOST rows in this view will show counts, not a rate.
        That is the correct, honest state of this view, not a bug to work around. */
+    /* D234-D239: "Win rate on their referrals," not "Closed-won rate on all their referrals,"
+       matching the shorter scope-copy style every card's scope line now uses (R2, one line). */
     return { rows: stats.filter(r=>r.winRate!=null)
       .sort((a,b)=>b.winRate-a.winRate || a.p.name.localeCompare(b.p.name)),
-      scope: 'Closed-won rate on all their referrals, trailing 12 months' };
+      scope: 'Win rate on their referrals, trailing 12 months' };
   }
   return { rows: stats.filter(r=>r.days!=null)
     .sort((a,b)=>b.days-a.days || a.p.name.localeCompare(b.p.name)),
@@ -105718,7 +105754,7 @@ function partnersPanelHtml(stats){
   const max = view==='quality' ? 1 : Math.max(1,...rows.map(r=>view==='volume'?r.mine:r.days));
 
   const body = rows.map(r=>{
-    let width, val, cls='', rowCls='', tip, dormantTag='';
+    let width, val, cls='', rowCls='', tip, dormantTag='', noFill=false;
     if(view==='volume'){
       width = (r.mine/max)*100; val = r.mine+'';
       tip = tipAttr(r.p.name, r.mine+' referral'+(r.mine===1?'':'s')+' to you, year to date',
@@ -105734,7 +105770,11 @@ function partnersPanelHtml(stats){
         tip = tipAttr(r.p.name, pct(r.winRate)+' closed-won, trailing 12 months',
           r.won+' won / '+r.lost+' lost of '+r.firmTotal+' referred over the full relationship');
       } else {
-        width = 0; val = r.won+'W / '+r.lost+'L'; cls = 'muted';
+        /* D234-D239, Part 3c: a rate this unreliable renders no fill at all, not a 2%-floor
+           sliver that looks like a real, if small, measurement. noFill bypasses the floor
+           below; the 2% minimum still applies to every row that DOES have a value (this
+           view's reliable rows, and every row in Volume/Dormancy). */
+        width = 0; val = r.won+'W / '+r.lost+'L'; cls = 'muted'; noFill = true;
         tip = tipAttr(r.p.name, 'Too few closed deals to rate',
           r.won+' won / '+r.lost+' lost, trailing 12 months, of '+r.firmTotal+' referred over the full relationship');
       }
@@ -105750,17 +105790,14 @@ function partnersPanelHtml(stats){
         r.p.referralCount+' referred over the full relationship');
     }
     return '<div class="hbar-row'+rowCls+'"'+tip+'>'+
-      '<div class="hbar-fill '+cls+'" style="width:'+Math.max(2,width).toFixed(1)+'%"></div>'+
+      '<div class="hbar-fill '+cls+'" style="width:'+(noFill?0:Math.max(2,width)).toFixed(1)+'%"></div>'+
       '<div class="hbar-name">'+esc(r.p.name)+dormantTag+'</div>'+
       '<div class="hbar-val">'+val+'</div>'+
     '</div>';
   }).join('');
 
   return '<div class="panel expandable" id="panel-partners" onclick="openModal(\'partners\', \''+view+'\')">'+
-    '<div class="panel-header"><div class="panel-header-text">'+
-      '<div class="panel-title">Partners</div>'+
-      '<div class="panel-scope">'+scope+'</div>'+
-    '</div><span class="drill">Expand &rsaquo;</span></div>'+
+    toggleCardHeaderHtml('Partners', scope)+
     '<div class="toggle-seg-wrap">'+
       viewToggleHtml(PARTNER_VIEWS, view, 'setPartnerView')+
     '</div>'+
@@ -105820,9 +105857,12 @@ function lossViewData(bdoId, view, limit){
       const g = myLost.filter(o=>o.lostAtStage===st);
       return {label:st, n:g.length, val:g.reduce((t,o)=>t+o.facilitySize,0)};
     });
-    const thin = !rateReliable(myLost.length);
-    return {rows, scope:'Your book, '+myLost.length+' closed-lost deals, trailing 12 months'+
-        (thin ? '. Small sample, read the shape loosely' : '')+', where in the funnel they died',
+    /* D234-D239, Part 3b: R2 (one line, always) forbids the old copy's conditional second
+       sentence ("Small sample, read the shape loosely") and its "Your book," prefix, which
+       together were exactly what pushed this line to 2 lines on a thin book. Stage never
+       falls back to firm-wide (D100, above), so there is no source to name either. The
+       count stays data-driven; the words around it are now fixed, always-one-line copy. */
+    return {rows, scope: myLost.length+' closed-lost deals by stage, trailing 12 months',
       total:myLost.length, tone:'', firm:false};
   }
 
@@ -105832,9 +105872,13 @@ function lossViewData(bdoId, view, limit){
     const t = lossTally(pool, o=>o.closedLostReason);
     const rows = Object.entries(t).sort((a,b)=>b[1].n-a[1].n).slice(0,limit)
       .map(([k,v])=>({label:k, n:v.n, val:v.val}));
+    /* D234-D239, Part 3b: the personal-book case (the default, expected one) states no source
+       at all, since naming it would be stating the unmarked case; only the firm-wide FALLBACK,
+       the exception, gets named, inline rather than as a leading qualifier that risked the old
+       2-line wrap. The old "Your own book is too small to read" caveat is dropped, same as
+       stage's, per the same R2 always-one-line requirement. */
     return {rows, total:pool.length, tone:'', firm:usingFirm,
-      scope:(usingFirm?'Firm-wide':'Your book')+', '+pool.length+
-        ' losses by controlled reason, trailing 12 months'+(usingFirm?'. Your own book is too small to read':'')};
+      scope: pool.length+' closed-lost deals by reason'+(usingFirm?', firm-wide':'')+', trailing 12 months'};
   }
 
   const mineAttr = myLost.filter(o=>o.lostToCompetitor);
@@ -105843,9 +105887,9 @@ function lossViewData(bdoId, view, limit){
   const t = lossTally(pool, o=>o.lostToCompetitor);
   const rows = Object.entries(t).sort((a,b)=>b[1].n-a[1].n).slice(0,limit)
     .map(([k,v])=>({label:k, n:v.n, val:v.val, ucc:v.ucc}));
+  /* D234-D239, Part 3b: same firm-wide-only-when-it's-the-fallback pattern as "reason" above. */
   return {rows, total:pool.length, tone:'warn', firm:usingFirm,
-    scope:(usingFirm?'Firm-wide':'Your book')+', '+pool.length+
-      ' losses where the winner was identified, trailing 12 months'};
+    scope: pool.length+' losses with a known winner'+(usingFirm?', firm-wide':'')+', 12mo'};
 }
 
 function lossPanelHtml(bdoId){
@@ -105869,10 +105913,7 @@ function lossPanelHtml(bdoId){
   }).join('');
 
   return '<div class="panel expandable" id="panel-loss" onclick="openModal(\'loss\', \''+view+'\')">'+
-    '<div class="panel-header"><div class="panel-header-text">'+
-      '<div class="panel-title">Where we\'re losing</div>'+
-      '<div class="panel-scope">'+d.scope+'</div>'+
-    '</div><span class="drill">Expand &rsaquo;</span></div>'+
+    toggleCardHeaderHtml('Where we\'re losing', d.scope)+
     '<div class="toggle-seg-wrap">'+
       viewToggleHtml(LOSS_VIEWS, view, 'setLossView')+
     '</div>'+
@@ -107164,12 +107205,14 @@ function execSourcingPanelHtml(){
   /* "By partner" is a ranking (stays a horizontal-bar list, §4's "a genuine list stays a list");
      "By channel" is a part-to-whole mix question, so it gets the single stacked bar (D93) instead
      of a second ranked-bar list — same card, two different questions, two different forms.
-     D94 fix: .hbar-row self-pads (its own left/right padding), which is why this container was
-     built `flush` — but .segbar/.stackedbar-legend do NOT self-pad, so the same flush container
-     let "By channel"'s stacked bar render edge-to-edge against the card border. The container's
-     padding is now conditional on which view is active, matching the ALREADY-correct pattern
-     Closed-won by product and Closed-lost intelligence already use (a plain, padded .panel-body)
-     for the exact same stackedBarHtml() output — not a new padding rule invented for this card.
+     D94 fix, corrected by the 2026-09-22 correction pass (8ce6601): the container needs its own
+     padding for BOTH views, not just "By channel": .hbar-fill is position:absolute against
+     .hbar-row's own padding box, not this container's, so a flush container lets bar fills bleed
+     edge-to-edge regardless of view. `.panel-body.flush.toggle-rows` (the "By partner" branch)
+     now carries its own padding via that shared rule; "By channel" keeps the plain, padded
+     `.panel-body` it always used. The container's class is still conditional on view because the
+     two views need different STRUCTURAL classes (`toggle-rows`'s min-height doesn't apply to a
+     single stacked bar), not because either one is unpadded.
      D94: this card also carries a SECOND control (count/size measure) alongside the dimension
      toggle above — the only card with two independent toggles, since it's the only one where
      both "which dimension" and "which measure" are separately real questions. */
@@ -107178,10 +107221,7 @@ function execSourcingPanelHtml(){
     : stackedBarHtml(execSourcingRows(view,6,measure), {narrow:true});
   const bodyCls = view==='partners' ? 'panel-body flush toggle-rows' : 'panel-body toggle-rows';
   return '<div class="panel expandable" id="panel-exec-sourcing" onclick="openModal(\'execSourcing\', \''+view+'\')">'+
-    '<div class="panel-header"><div class="panel-header-text">'+
-      '<div class="panel-title">Sourcing</div>'+
-      '<div class="panel-scope">'+scope+'</div>'+
-    '</div><span class="expand-hint">Expand &rsaquo;</span></div>'+
+    toggleCardHeaderHtml('Sourcing', scope)+
     '<div class="panel-body pad-top">'+viewToggleHtml(EXEC_SOURCING_VIEWS, view, 'setExecSourcingView')+'</div>'+
     '<div class="panel-body pad-top">'+viewToggleHtml(EXEC_MEASURE_VIEWS, measure, 'setExecSourcingMeasure')+'</div>'+
     '<div class="'+bodyCls+'">'+chart+'</div>'+
