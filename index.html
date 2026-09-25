@@ -55,7 +55,7 @@
   --scrim:rgba(20,22,20,.32); /* tier-3 modal backdrop — the rules always specified a scrim, this names it */
   --lift:0 1px 1px rgba(20,22,20,.03),0 8px 28px -12px rgba(20,22,20,.14);
   --lift-hi:0 2px 4px rgba(20,22,20,.04),0 24px 56px -20px rgba(20,22,20,.20);
-  --lift-thumb:0 1px 2px var(--brand-a15); /* D113: segmented-control thumb ONLY */
+  --lift-thumb:0 1px 2px var(--brand-a15); /* D113, D260: the segmented-control .seg-thumb ONLY */
   --h:32px;
   --ease:cubic-bezier(.2,.7,.3,1);
   /* D109: one sans, everywhere. --mono and --display are retired. */
@@ -76,6 +76,18 @@
   /* D257: APPROVED DEVIATION, same shape as --r-full. Exactly one consumer, the inline-save
      confirmation line's sweep (efConfirmSaved). Not a fourth general duration. */
   --t-sweep:400ms;
+  /* D261: APPROVED DEVIATION from "one curve", same shape as --r-full and --t-sweep. The one
+     spring: a closed-form damped spring, bounce 0.15, sampled to 49 points, peak overshoot 0.6%
+     (Other/mocks/springs-mock-v1.html, row C). Sliding markers ONLY (.section-nav-marker,
+     .seg-thumb), always on --t-base, and only inside @supports (transition-timing-function:
+     linear(0,1)): a custom property holding linear() fails only where it is used, so the --ease
+     base rule is what an unsupporting browser keeps. Not a general second easing. */
+  --spring:linear(0.0000, 0.0130, 0.0472, 0.0965, 0.1559, 0.2214, 0.2898,
+    0.3587, 0.4264, 0.4913, 0.5526, 0.6097, 0.6622, 0.7100, 0.7530, 0.7914,
+    0.8254, 0.8552, 0.8812, 0.9036, 0.9228, 0.9391, 0.9529, 0.9644, 0.9739,
+    0.9816, 0.9879, 0.9929, 0.9969, 0.9999, 1.0022, 1.0038, 1.0050, 1.0057,
+    1.0061, 1.0063, 1.0062, 1.0061, 1.0058, 1.0054, 1.0050, 1.0046, 1.0041,
+    1.0037, 1.0033, 1.0029, 1.0025, 1.0022, 1.0000);
 }
 
 /* D214: Inter Tight, embedded. --ui named it since D109 but nothing ever loaded it (no <link>,
@@ -193,19 +205,18 @@ h1,h2,h3,p,dl,dd{margin:0}
    identical spec, track/segments/thumb/transitions all the same values. Kept as its own
    selector rather than reusing .viewtoggle's class directly so the topbar's persona switch
    stays a distinct component identity from the in-card view toggles, even sharing the same
-   drawing. This makes --lift-thumb a two-consumer token; the single-consumer check from D113
-   is updated to assert the consumers are exactly {.viewtoggle button.active, .roletoggle
-   button.active}, not still exactly one. */
-.roletoggle{display:flex;align-items:center;height:var(--h);padding:var(--s1);gap:var(--s1);
+   drawing. D260: the lifted fill is no longer drawn by the active button but by one sliding
+   .seg-thumb per control (rule with .viewtoggle's below), so --lift-thumb's one consumer is
+   .seg-thumb, shared by both controls. */
+.roletoggle{position:relative;display:flex;align-items:center;height:var(--h);padding:var(--s1);gap:var(--s1);
   box-sizing:border-box;background:var(--brand-soft);border-radius:var(--r-s)}
 /* D243: inactive label on --ink-2, not --ink-3 (4.23:1 on --brand-soft, under 4.5:1). */
-.roletoggle button{display:inline-flex;align-items:center;justify-content:center;height:24px;
+.roletoggle button{position:relative;display:inline-flex;align-items:center;justify-content:center;height:24px;
   padding:0 var(--s2);border:none;border-radius:var(--r-s);background:none;font-size:11px;
-  font-weight:500;color:var(--ink-2);
-  transition:background var(--t-fast) var(--ease),color var(--t-fast) var(--ease),box-shadow var(--t-fast) var(--ease)}
+  font-weight:500;color:var(--ink-2);transition:color var(--t-fast) var(--ease)}
 .roletoggle button:hover:not(.active){color:var(--ink)}
 .roletoggle button:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
-.roletoggle button.active{background:var(--paper);color:var(--ink);box-shadow:var(--lift-thumb)}
+.roletoggle button.active{color:var(--ink)}
 
 /* D125: button hierarchy. .btn with no modifier IS the secondary style, the default for every
    button in the app except the shell's single "+ New" (ratified as the shell's own primary, a
@@ -813,8 +824,9 @@ a.stage-link{text-decoration:none;color:inherit;cursor:pointer}
    is a soft brand wash with no border; the selected segment is a lifted --paper thumb, never a
    border, so this never collides with the border-and-shadow rule (the track itself has no
    border for the thumb's shadow to sit alongside). --lift-thumb is control-level, not an
-   elevation tier, and has exactly one consumer (asserted in a test the same shape as the
-   --r-full single-consumer test). */
+   elevation tier, and has exactly one consumer: since D260, the sliding .seg-thumb below (it was
+   the active button until then). No automated single-consumer test exists in the repo; this
+   comment and the :root one are the record. */
 /* D221: sized to its own labels, not full width, per the approved mock. display:flex is a
    block-level box (auto width = its parent's width) unless overridden, so the fix is
    display:inline-flex plus flex:none (defends against a flex/grid parent trying to stretch it)
@@ -823,17 +835,26 @@ a.stage-link{text-decoration:none;color:inherit;cursor:pointer}
    consumer), so one rule covers every consumer, Exec Home's own toggle cards included (D231,
    shared component). D107/D113 semantics (aria-pressed, the soft-fill lifted thumb) below are
    untouched. */
-.viewtoggle{display:inline-flex;flex:none;align-items:center;height:var(--h);padding:var(--s1);gap:var(--s1);
+.viewtoggle{position:relative;display:inline-flex;flex:none;align-items:center;height:var(--h);padding:var(--s1);gap:var(--s1);
   box-sizing:border-box;background:var(--brand-soft);border-radius:var(--r-s)}
 /* D247: inactive label on --ink-2, not --ink-3 (4.23:1 on --brand-soft, under 4.5:1), same as
    .roletoggle button (D243). */
-.viewtoggle button{display:inline-flex;align-items:center;justify-content:center;height:24px;
+.viewtoggle button{position:relative;display:inline-flex;align-items:center;justify-content:center;height:24px;
   padding:0 var(--s2);border:none;border-radius:var(--r-s);background:none;font-size:11px;
-  font-weight:500;color:var(--ink-2);
-  transition:background var(--t-fast) var(--ease),color var(--t-fast) var(--ease),box-shadow var(--t-fast) var(--ease)}
+  font-weight:500;color:var(--ink-2);transition:color var(--t-fast) var(--ease)}
 .viewtoggle button:hover:not(.active){color:var(--ink)}
 .viewtoggle button:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
-.viewtoggle button.active{background:var(--paper);color:var(--ink);box-shadow:var(--lift-thumb)}
+.viewtoggle button.active{color:var(--ink)}
+/* D260: the sliding thumb (Other/mocks/springs-mock-v1.html, row C), one per .viewtoggle and
+   .roletoggle, the control's first child. Absolutely positioned behind the buttons (they are
+   position:relative and later in the DOM, so they paint above it with no z-index), so it never
+   changes the control's size, a card's height, or where content sits (R5, stable height).
+   segThumbMove() sets its translateX and width from the active button, as positionSlidingMarker()
+   does for the tab marker. Colour stays on the buttons (active --ink, inactive --ink-2, D247); the
+   focus outline stays on the button too. */
+.seg-thumb{position:absolute;top:var(--s1);left:0;height:24px;background:var(--paper);border-radius:var(--r-s);
+  box-shadow:var(--lift-thumb);pointer-events:none;
+  transition:transform var(--t-base) var(--ease),width var(--t-base) var(--ease)}
 
 /* ---------- kanban ---------- */
 .kanban{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(248px,1fr);gap:var(--s4);
@@ -1234,6 +1255,14 @@ table.tbl{width:100%;border-collapse:collapse}
    click, resize, and font load; see positionTabMarker(). */
 .section-nav-marker{position:absolute;bottom:0;left:0;height:2px;background:var(--brand);
   transition:transform var(--t-base) var(--ease),width var(--t-base) var(--ease)}
+/* D259, D261: the one spring, for sliding markers only (the tab marker above, the segmented
+   .seg-thumb). Inside @supports because --spring holds linear(): a browser without it would
+   drop the whole declaration at use, not fall back to an earlier one, so the --ease rules above
+   stay as the base and this only overrides where linear() works. The global reduced-motion rule
+   still collapses the duration, so reduced motion lands instantly either way. */
+@supports (transition-timing-function:linear(0,1)){
+  .section-nav-marker,.seg-thumb{transition:transform var(--t-base) var(--spring),width var(--t-base) var(--spring)}
+}
 .section-nav-item{all:unset;height:var(--h);padding:0 var(--s4);display:inline-flex;align-items:center;
   gap:var(--s1);font-size:12px;font-weight:500;color:var(--ink-3);
   white-space:nowrap;cursor:pointer;flex:0 0 auto;box-sizing:border-box;
@@ -1490,7 +1519,8 @@ table.tbl{width:100%;border-collapse:collapse}
         <span aria-hidden="true">&#8981;</span>
         <input type="text" placeholder="Search accounts, deals, contacts&hellip;">
       </div>
-      <div class="roletoggle">
+      <div class="roletoggle" data-seg="setRole">
+        <span class="seg-thumb" aria-hidden="true"></span>
         <button id="role-bdo" class="active" onclick="setRole('bdo')">BDO</button>
         <button id="role-exec" onclick="setRole('exec')">Exec</button>
       </div>
@@ -105478,6 +105508,94 @@ function tabBodyHoldAfter(viewId){
 window.addEventListener('resize', function(){ positionTabMarker(); });
 if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ positionTabMarker(); });
 
+/* D260: the segmented control's sliding thumb. Every consumer re-renders its control on a switch
+   (swapPanel() replaces the whole card, renderPipeline()/renderAccounts() rebuild the view, a
+   modal refresh rewrites its body), so the node that should slide is new and has no painted
+   position to transition from, the problem D120 solved for the tab marker. D120 kept one
+   persistent node and spliced it into each render; that needs a hook in every render path, and
+   these controls are rendered from nine call sites. This uses D120's other option instead: a
+   capture-phase click listener records the thumb's on-screen position (mid-slide included) just
+   before the button's own onclick re-renders, keyed by the control's data-seg (its setter's
+   name, unique per control); a MutationObserver then sees the new control, before paint, and
+   starts its thumb from the recorded position, so it slides. A control that is new with no
+   recorded click (first render, a navigation, an inline-edit rebuild) places its thumb with no
+   motion (D118). A control that stays in place and only changes its active class (.roletoggle,
+   whose setRole() toggles classes) slides on the same node. A ResizeObserver re-places a thumb
+   instantly when its control changes size (rendered while its view was hidden, then shown;
+   webfont arrival), which is when offsets measured earlier go stale. Reduced motion needs no JS
+   check: nothing here is timed in JS, and the global CSS rule collapses the transition. */
+const SEG_THUMB_HTML = '<span class="seg-thumb" aria-hidden="true"></span>';
+const SEG_SEL = '.viewtoggle, .roletoggle';
+const SEG_FROM = new Map();      // data-seg -> {x, w}, captured on click, consumed by the re-render
+const SEG_SIZE = new WeakMap();  // control -> "w x h" last seen, so ResizeObserver acts on real changes only
+function segThumbMove(ctl, from){
+  const thumb = ctl.querySelector(':scope > .seg-thumb');
+  const active = ctl.querySelector(':scope > button.active');
+  if(!thumb || !active) return;
+  // sub-pixel, from the rects: offsetLeft/offsetWidth round, which left the thumb up to 0.5px off
+  const c = ctl.getBoundingClientRect(), r = active.getBoundingClientRect();
+  const to = {x: r.left - c.left - ctl.clientLeft, w: r.width};
+  if(from !== 'slide'){ // 'instant', or a captured start point to slide from
+    const start = from && from !== 'instant' ? from : to;
+    thumb.style.transition = 'none';
+    thumb.style.transform = 'translateX('+start.x+'px)';
+    thumb.style.width = start.w+'px';
+    void thumb.offsetWidth; // commit the start position before the transition is restored
+    thumb.style.transition = '';
+  }
+  thumb.style.transform = 'translateX('+to.x+'px)';
+  thumb.style.width = to.w+'px';
+}
+const SEG_RESIZE = typeof ResizeObserver === 'function' ? new ResizeObserver(function(entries){
+  entries.forEach(function(en){
+    const r = en.target.getBoundingClientRect(), size = r.width+'x'+r.height;
+    if(SEG_SIZE.get(en.target) === size) return;
+    SEG_SIZE.set(en.target, size);
+    segThumbMove(en.target, 'instant');
+  });
+}) : null;
+function segWatch(ctl){
+  if(SEG_SIZE.has(ctl)) return;
+  const r = ctl.getBoundingClientRect();
+  SEG_SIZE.set(ctl, r.width+'x'+r.height);
+  if(SEG_RESIZE) SEG_RESIZE.observe(ctl);
+}
+document.addEventListener('click', function(e){
+  const btn = e.target.closest && e.target.closest('.viewtoggle > button, .roletoggle > button');
+  if(!btn) return;
+  const ctl = btn.parentElement, key = ctl.dataset.seg;
+  const thumb = ctl.querySelector(':scope > .seg-thumb');
+  if(!key || !thumb) return;
+  const c = ctl.getBoundingClientRect(), t = thumb.getBoundingClientRect();
+  SEG_FROM.set(key, {x: t.left - c.left - ctl.clientLeft, w: t.width});
+  setTimeout(function(){ SEG_FROM.delete(key); }, 0); // a click that re-renders nothing leaves no stale start
+}, true);
+new MutationObserver(function(muts){
+  const added = new Set(), changed = new Set();
+  muts.forEach(function(m){
+    if(m.type === 'childList'){
+      m.addedNodes.forEach(function(n){
+        if(n.nodeType !== 1) return;
+        if(n.matches(SEG_SEL)) added.add(n);
+        n.querySelectorAll(SEG_SEL).forEach(function(c){ added.add(c); });
+      });
+    } else if(m.target.parentElement && m.target.parentElement.matches(SEG_SEL)){
+      changed.add(m.target.parentElement);
+    }
+  });
+  added.forEach(function(ctl){
+    if(!ctl.isConnected) return;
+    segWatch(ctl);
+    const from = SEG_FROM.get(ctl.dataset.seg);
+    if(from) SEG_FROM.delete(ctl.dataset.seg);
+    segThumbMove(ctl, from || 'instant');
+  });
+  changed.forEach(function(ctl){
+    if(!added.has(ctl) && ctl.isConnected){ SEG_FROM.delete(ctl.dataset.seg); segThumbMove(ctl, 'slide'); }
+  });
+}).observe(document.body, {childList:true, subtree:true, attributes:true, attributeFilter:['class']});
+document.querySelectorAll(SEG_SEL).forEach(function(ctl){ segWatch(ctl); segThumbMove(ctl, 'instant'); });
+
 /* ---------- routing ---------- */
 function route(){
   const hash = location.hash || '#/home';
@@ -106243,7 +106361,7 @@ function quotaStats(bdoId){
    Real <button>s already; aria-pressed now reflects which view is showing. The track-and-thumb
    DRAWING is D113, next commit; this is structure and semantics only. */
 function viewToggleHtml(views, current, setterName){
-  return '<div class="viewtoggle seg" onclick="event.stopPropagation()">'+views.map(v=>
+  return '<div class="viewtoggle seg" data-seg="'+setterName+'" onclick="event.stopPropagation()">'+SEG_THUMB_HTML+views.map(v=>
     '<button class="'+(current===v.key?'active':'')+'" aria-pressed="'+(current===v.key)+'" onclick="'+setterName+'(\''+v.key+'\')">'+
     v.label+'</button>').join('')+'</div>';
 }
@@ -107584,7 +107702,7 @@ function renderPipeline(){
       '<div class="chipbar tight">'+
         SEGMENTS.map(s=>'<button class="chip'+(s.key===PIPE_SEGMENT?' active':'')+'" onclick="setPipeSegment(\''+s.key+'\')">'+s.label+'</button>').join('')+
       '</div>'+
-      '<div class="viewtoggle">'+
+      '<div class="viewtoggle" data-seg="setPipeView">'+SEG_THUMB_HTML+
         '<button class="'+(PIPE_VIEW==='list'?'active':'')+'" aria-pressed="'+(PIPE_VIEW==='list')+'" onclick="setPipeView(\'list\')">List</button>'+
         '<button class="'+(PIPE_VIEW==='kanban'?'active':'')+'" aria-pressed="'+(PIPE_VIEW==='kanban')+'" onclick="setPipeView(\'kanban\')">Board</button>'+
       '</div>'+
@@ -107803,7 +107921,7 @@ function renderAccounts(){
     '<h1 class="page-heading">Accounts</h1>'+
     '<div class="page-sub">'+filtered.length+' account'+(filtered.length===1?'':'s')+'</div>'+
     '<div class="pipe-toolbar">'+
-      '<div class="viewtoggle">'+
+      '<div class="viewtoggle" data-seg="setAcctTypeFilter">'+SEG_THUMB_HTML+
         '<button class="'+(ACCT_TYPE_FILTER==='all'?'active':'')+'" aria-pressed="'+(ACCT_TYPE_FILTER==='all')+'" onclick="setAcctTypeFilter(\'all\')">All</button>'+
         '<button class="'+(ACCT_TYPE_FILTER==='prospects'?'active':'')+'" aria-pressed="'+(ACCT_TYPE_FILTER==='prospects')+'" onclick="setAcctTypeFilter(\'prospects\')">Prospects</button>'+
         '<button class="'+(ACCT_TYPE_FILTER==='partners'?'active':'')+'" aria-pressed="'+(ACCT_TYPE_FILTER==='partners')+'" onclick="setAcctTypeFilter(\'partners\')">Partners</button>'+
