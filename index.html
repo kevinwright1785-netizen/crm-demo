@@ -752,6 +752,9 @@ a.stage-link{text-decoration:none;color:inherit;cursor:pointer}
    license to use 6px anywhere else. */
 .stage-mini-track{height:3px;background:var(--sunken);border-radius:2px;margin-top:6px;overflow:hidden}
 .stage-mini-fill{display:block;height:100%;background:var(--brand)}
+/* D265: every home-page bar grows from its left edge on first landing (playHomeEntrance()). No
+   effect at rest: nothing else transforms these. */
+.hbar-fill,.bullet-bar,.att-fill,.wfill,.stage-mini-fill{transform-origin:left center}
 /* The stage-mini row is always first inside Snapshot's body, so the first real .snap-row below
    it is never actually :first-child (that's .stage-mini): its own top divider (box-shadow)
    was rendering anyway, stacked right under stage-mini's own border-bottom: a visible double
@@ -1035,6 +1038,15 @@ table.tbl{width:100%;border-collapse:collapse}
 .opp-hero{font-family:var(--ui);font-size:44px;font-weight:500;letter-spacing:-.03em;color:var(--ink);
   margin-top:var(--s3)}
 .opp-hero .cur,.opp-hero .un{font-size:.45em;font-weight:400;color:var(--ink-2)}
+/* D264: rolling digits (figRoll()). A changed character sits in an inline-block cell, the new one
+   in flow and the old one stacked over it, absolutely, so the cell keeps the new character's width
+   and baseline. clip-path on the figure clips the travelling characters to its own box without
+   changing its size (overflow:hidden would move an inline-block's baseline and make a scroll
+   container). Everything here exists only while a roll runs. */
+.fig-rolling{clip-path:inset(0)}
+.fig-roll{position:relative;display:inline-block}
+.fig-roll-new{display:inline-block}
+.fig-roll-old{position:absolute;left:0;bottom:0;display:inline-block}
 .opp-hero-label{font-size:11px;font-weight:500;color:var(--ink-3);margin-top:var(--s1)}
 .opp-meta{display:flex;gap:var(--s5);margin-top:var(--s4);flex-wrap:wrap}
 .opp-meta-item{font-size:12px;color:var(--ink-2)}
@@ -106939,6 +106951,7 @@ window.setModalLossView = function(v){ MODAL_VIEW.loss = v; refreshModalIfOpen('
    stagger step are still read from --t-slow/--t-fast at call time (via getComputedStyle on
    :root), not hardcoded, so :root stays the only place those numbers are actually defined. */
 const ENTRANCE_SEEN = {bdo:false, exec:false};
+const HOME_BAR_SEL = '.hbar-fill, .bullet-bar, .att-fill, .wfill, .stage-mini-fill'; // D265
 function playHomeEntrance(seenKey){
   if(ENTRANCE_SEEN[seenKey]) return;
   ENTRANCE_SEEN[seenKey] = true;
@@ -106954,6 +106967,17 @@ function playHomeEntrance(seenKey){
       [{opacity:0, transform:'translateY(8px)'}, {opacity:1, transform:'translateY(0)'}],
       {duration:durationMs, delay:i*stepMs, easing:easing, fill:'both'}
     ));
+    /* D265 (§27c.5, figures-charts-mock-v1.html part 2, option B): on this same first landing, and
+       only here, each card's bars grow from their left edge as the card fades in, with the card's
+       own delay. Transform only (scaleX), never width; HOME_BAR_SEL's transform-origin puts the
+       growth at the left. Pace and goal lines, the Wins and losses dollar ticks and text are not
+       in HOME_BAR_SEL. Everything that can re-render a home card afterwards (a view switch, the
+       crossfade, the persona toggle, a return visit) never reaches this function again for that
+       page, since ENTRANCE_SEEN gates it, so bars never re-grow. Reduced motion returned above. */
+    cards.forEach((c,i)=>c.querySelectorAll(HOME_BAR_SEL).forEach(bar=>anims.push(bar.animate(
+      [{transform:'scaleX(0)'}, {transform:'scaleX(1)'}],
+      {duration:durationMs, delay:i*stepMs, easing:easing, fill:'both'}
+    ))));
     /* Safety net for the "never leave a card stuck invisible" requirement: fill:'both' already
        holds each animation's end state once it finishes on its own, but a pathological case (the
        tab was backgrounded through the whole sequence, a browser quirk stalls one) could still
@@ -109839,6 +109863,103 @@ function sectionDocumentsHtml(docs, scopeNoun){
    (see positionTabMarker()'s own comment). setOppSection() and EF_RERENDER both call renderOpp()
    with the container already visible, where the internal call is correct and, for setOppSection(),
    the intended animated glide. */
+/* D264 (§27c.4 ruled C, Other/mocks/figures-charts-mock-v1.html part 1, option C): rolling digits
+   on the Opportunity record's own figures, the hero Facility size and the four metric-strip
+   .met-figure values, and nowhere else. renderOpp() rebuilds the whole record on every edit, undo
+   and stage move, so the old figure is gone by the time the new one exists: each render records
+   the displayed text of those five figures (FIG_ROLL_LAST), and the next render of the SAME record
+   that is not a navigation compares against it. A figure whose text changed rolls: compared
+   right-aligned, character by character, only the characters that differ move; the old one leaves
+   by 100% of its own height and fades, the new one enters from the other side, on --t-base and
+   --ease. Up when the value rose, down when it fell; a change that is not a number (a date, an
+   owner) rolls as rising. The roll starts in a microtask, after the synchronous render and the
+   D256 save confirmation that follows it, so efFitConfirm() measures the plain final value, never
+   the rolling copies. While rolling, the figure is clipped to its own box (clip-path, which
+   changes no size, baseline or scroll behaviour); the old characters are aria-hidden and, with
+   every per-character wrapper, removed at the end, leaving the figure's DOM exactly as rendered.
+   Reduced motion is checked in JS (element.animate() is outside the CSS rule, §11.7): no roll. */
+let FIG_ROLL_LAST = null; // {id, texts:[hero, strip 1..4]}
+function figRollEls(){
+  const v = document.getElementById('view-opp');
+  return [v.querySelector('.opp-hero .ef')].concat(Array.from(v.querySelectorAll('.strip .met-figure')));
+}
+function figText(el){ return el ? (el.textContent || '').trim() : ''; }
+function figNumber(t){
+  const m = /^\$?(-?[\d,]*\.?\d+)\s*([KMB]|d)?$/.exec(t.replace(/\s+/g,''));
+  if(!m) return null;
+  return parseFloat(m[1].replace(/,/g,'')) * ({K:1e3, M:1e6, B:1e9}[m[2]] || 1);
+}
+function figRollAfterRender(id, isNav){
+  const els = figRollEls(), texts = els.map(figText);
+  const last = FIG_ROLL_LAST;
+  FIG_ROLL_LAST = {id, texts};
+  if(isNav || !last || last.id !== id) return;
+  if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  els.forEach((el, i)=>{
+    if(el && last.texts[i] !== texts[i]) queueMicrotask(()=>figRoll(el, last.texts[i], texts[i]));
+  });
+}
+function figRoll(el, oldT, newT){
+  if(!el.isConnected || typeof el.animate !== 'function') return;
+  const a = figNumber(oldT), b = figNumber(newT);
+  const sgn = (a!=null && b!=null && b<a) ? -1 : 1; // -1 falling, 1 rising
+  // every rendered character of the new figure, in order, with the text node holding it
+  const chars = [];
+  const walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, {acceptNode: n=>
+    n.parentElement.closest('.ef-sweep, .ef-ok') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT});
+  for(let n = walk.nextNode(); n; n = walk.nextNode()){
+    for(let k=0; k<n.data.length; k++) chars.push({node:n, k});
+  }
+  // text as trimmed by figText(): drop leading/trailing whitespace characters from the map
+  while(chars.length && /\s/.test(chars[0].node.data[chars[0].k])) chars.shift();
+  while(chars.length && /\s/.test(chars[chars.length-1].node.data[chars[chars.length-1].k])) chars.pop();
+  const off = chars.length - oldT.length; // right-aligned: new index i pairs with old index i-off
+  const changed = [];
+  chars.forEach((c, i)=>{
+    const oc = oldT[i - off], nc = c.node.data[c.k];
+    if(oc !== nc) changed.push({c, oc: oc === undefined ? '' : oc, nc});
+  });
+  if(!changed.length) return;
+  const root = getComputedStyle(document.documentElement);
+  const opts = {duration: parseFloat(root.getPropertyValue('--t-base')) || 180,
+    easing: root.getPropertyValue('--ease').trim() || 'ease'};
+  // split each changed character out of its text node, right to left so offsets stay valid
+  const cells = [];
+  changed.slice().reverse().forEach(({c, oc, nc})=>{
+    const after = c.node.splitText(c.k);
+    after.splitText(1);
+    const cell = document.createElement('span');
+    cell.className = 'fig-roll';
+    const nw = document.createElement('span');
+    nw.className = 'fig-roll-new';
+    nw.textContent = nc;
+    cell.appendChild(nw);
+    if(oc && oc.trim()){
+      const od = document.createElement('span');
+      od.className = 'fig-roll-old';
+      od.setAttribute('aria-hidden', 'true');
+      od.textContent = oc;
+      cell.appendChild(od);
+    }
+    after.replaceWith(cell);
+    cells.push(cell);
+  });
+  el.classList.add('fig-rolling');
+  const anims = [];
+  cells.forEach(cell=>{
+    const od = cell.querySelector('.fig-roll-old'), nw = cell.querySelector('.fig-roll-new');
+    if(od) anims.push(od.animate([{transform:'translateY(0)', opacity:1},
+      {transform:'translateY('+(-sgn*100)+'%)', opacity:0}], Object.assign({fill:'forwards'}, opts)));
+    anims.push(nw.animate([{transform:'translateY('+(sgn*100)+'%)', opacity:0},
+      {transform:'translateY(0)', opacity:1}], opts));
+  });
+  Promise.all(anims.map(x=>x.finished)).then(()=>{
+    if(!el.isConnected) return;
+    cells.forEach(cell=>{ if(cell.isConnected) cell.replaceWith(document.createTextNode(cell.querySelector('.fig-roll-new').textContent)); });
+    el.normalize();
+    el.classList.remove('fig-rolling');
+  }).catch(()=>{});
+}
 function renderOpp(id, section, isNav){
   const o = getOpp(id);
   if(!o){
@@ -109917,6 +110038,7 @@ function renderOpp(id, section, isNav){
     '<div class="record-main">'+navHtml+sectionBody+'</div>';
   tabBodyHoldAfter('view-opp'); // D246
   if(!isNav) positionTabMarker();
+  figRollAfterRender(o.id, isNav); // D264
 }
 
 /* ================================================================
