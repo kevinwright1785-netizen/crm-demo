@@ -72,6 +72,7 @@
      PROJECT_STATE §1) but is added anyway, matching what's already ratified. */
   --focus:2px; --focus-offset:2px;
   --z-sticky:100; --z-topbar:200; --z-scrim:300; --z-modal:400; --z-tip:500;
+  --z-toast:450; /* D270: toasts, over an open modal, under tooltips */
   --t-fast:120ms; --t-base:180ms; --t-slow:280ms;
   /* D257: APPROVED DEVIATION, same shape as --r-full. Exactly one consumer, the inline-save
      confirmation line's sweep (efConfirmSaved). Not a fourth general duration. */
@@ -442,12 +443,40 @@ button.drill:focus-visible{outline:var(--focus) solid var(--brand);outline-offse
    One shared element, delegated off [data-tip]. Every chart mark app-wide carries a data-tip,
    so no chart is dead on hover (CLAUDE.md chart rules). No shadow: the strip already spends
    this view's single tier-2 elevation, and a dark fill on warm paper reads without one. */
-.tip{position:fixed;z-index:60;pointer-events:none;display:none;max-width:260px;
+.tip{position:fixed;z-index:var(--z-tip);pointer-events:none;display:none;max-width:260px;
   background:var(--ink);color:var(--paper);border-radius:var(--r-s);
   padding:var(--s2) var(--s3);font-size:11px;line-height:1.45}
 .tip-t{font-weight:500}
 .tip-v{font-family:var(--ui);color:var(--paper)}
 .tip-s{color:var(--ink-3)}
+/* D267-D270: toasts (toastShow()), Other/mocks/toasts-mock-v1.html, "Floating". One region,
+   fixed bottom-right, present from page load with a polite live region beside it. A toast is the
+   one element outside a modal allowed --lift-hi (D269; dark surface, D271; the same transient-overlay tier as a
+   modal, not a second tier-2 shadow). Up to three stack, newest in front; JS sets each toast's
+   transform and opacity (stacked, or fanned out while hovered or focused) and the region's height.
+   At rest only the newest shows (D272). Transitions are transform and opacity on --t-base and --ease; the global reduced-motion rule
+   makes every change instant, so nothing moves. */
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.toaster{position:fixed;right:var(--s5);bottom:var(--s5);width:360px;max-width:calc(100vw - 2 * var(--s4));
+  z-index:var(--z-toast)}
+.toast{position:absolute;right:0;bottom:0;width:100%;display:grid;grid-template-columns:auto minmax(0,1fr) auto;
+  align-items:center;gap:var(--s3);padding:var(--s3) var(--s4);background:var(--ink);border-radius:var(--r-m);
+  box-shadow:var(--lift-hi);transform-origin:bottom center;
+  transition:transform var(--t-base) var(--ease),opacity var(--t-base) var(--ease)}
+/* D271: toasts sit on a dark surface (--ink) so they separate from the white cards they land on.
+   Existing tokens only: title --paper, line --line-2, action --brand-soft (hover --paper), icons
+   --pos-soft, and inside a toast the focus outline is --brand-soft, --brand being too faint on --ink. */
+.toast-icon{width:16px;height:16px;display:grid;place-items:center;color:var(--pos-soft)}
+.toast-icon svg{width:16px;height:16px}
+/* the running state: the processing ring (§11.4's one working-state graphic) at 16px, its own
+   .proc-ring-svg spin and dash, the stroke thickened to the icon family's weight */
+.toast-icon .proc-ring-track,.toast-icon .proc-ring-arc{stroke-width:11}
+.toast-icon .proc-ring-arc{stroke:var(--pos-soft)}
+.toast-title{font-size:13px;font-weight:500;color:var(--paper)}
+.toast-line{font-size:12px;color:var(--line-2)}
+.toast-act{border:0;background:none;padding:0;font-size:12px;font-weight:500;color:var(--brand-soft)}
+.toast-act:hover{color:var(--paper)}
+.toast-act:focus-visible{outline:var(--focus) solid var(--brand-soft);outline-offset:var(--focus-offset)}
 
 /* ---------- pipeline snapshot (ranked deal list — a list stays a list, per the chart rule) ---------- */
 /* Correction pass, 2026-09-22: 10px vertical, off the 4pt scale, is the mock's own literal value
@@ -1580,6 +1609,8 @@ table.tbl{width:100%;border-collapse:collapse}
     </div>
   </div>
 </div>
+<div class="toaster" id="toaster" role="region" aria-label="Notifications"></div>
+<div class="sr-only" id="toast-live" role="status" aria-live="polite"></div>
 
 <script>
 const DATASET = {
@@ -105891,7 +105922,9 @@ const FEED_ICON_PATHS = {
      technique as the five above. */
   check: '<circle cx="12" cy="12" r="8"/><path d="m8.5 12 2.5 2.5 4.5-5"/>',
   trend: '<path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/>',
-  plus: '<circle cx="12" cy="12" r="8"/><path d="M12 8v8"/><path d="M8 12h8"/>'
+  plus: '<circle cx="12" cy="12" r="8"/><path d="M12 8v8"/><path d="M8 12h8"/>',
+  /* D267: the stage-moved toast's icon, same family and stroke */
+  arrow: '<path d="M4 12h14"/><path d="m13 7 5 5-5 5"/>'
 };
 function feedIconSvg(key){
   return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" '+
@@ -106398,6 +106431,166 @@ window.closeModal = function(){
   MODAL_RETURN_FOCUS = null;
 };
 window.addEventListener('hashchange', closeModal);
+
+/* ---------- toasts (D267-D270) ----------
+   For exactly three moments (D267): a stage moved from the track (with Undo), a deal created, and an
+   intelligence run that finishes after its screen was left. Never for inline saves: the D256 line
+   and check stay the only save feedback. Timers are named constants (D268): TOAST_MS, and
+   TOAST_UNDO_MS for a toast carrying Undo; each pauses while the pointer is over the region, while
+   focus is inside it, and while the tab is hidden, and resumes with the time it had left. Esc
+   dismisses the newest toast only when no modal is open and no inline edit is active (a capture
+   listener, so it sees the modal before the modal's own Escape closes it). Every toast's title and
+   line go to the polite live region, emptied first so a repeat is still announced. */
+const TOAST_MS = 3000;
+const TOAST_UNDO_MS = 5000;
+const TOAST_MAX = 3;
+const TOAST_GAP = 12; // fanned column gap
+const TOAST_ENTER_Y = 16, TOAST_EXIT_Y = 8;
+let TOASTS = [];           // newest first
+let TOAST_SEQ = 0;
+const TOAST_LEAVING = new Set(); // dismissed, fading out, still in the DOM
+const TOAST_HOLD = {hover:false, hidden:false}; // focus is read live: see toastHeld()
+function toastIconHtml(icon){
+  if(icon==='run') return '<svg class="proc-ring-svg" viewBox="0 0 100 100" aria-hidden="true">'+
+    '<circle class="proc-ring-track" cx="50" cy="50" r="44"></circle><circle class="proc-ring-arc" cx="50" cy="50" r="44"></circle></svg>';
+  return feedIconSvg(icon);
+}
+function toastRegion(){ return document.getElementById('toaster'); }
+function toastAnnounce(t){
+  const live = document.getElementById('toast-live');
+  if(!live) return;
+  live.textContent = '';
+  setTimeout(()=>{ live.textContent = t.title+(t.line ? '. '+t.line : ''); }, 50);
+}
+function toastLayout(){
+  const region = toastRegion();
+  const open = TOAST_HOLD.hover || toastFocusInside();
+  let y = 0;
+  TOASTS.forEach((t,i)=>{
+    // layout height (unscaled, unrounded), so the fanned gaps are exactly TOAST_GAP
+    if(open){ t.el.inert = false; t.el.style.transform = 'translateY('+(-y)+'px)'; t.el.style.opacity = '1'; y += parseFloat(getComputedStyle(t.el).height) + TOAST_GAP; }
+    else {
+      /* D272: at rest only the newest shows. Older ones sit exactly behind it, fully transparent and
+         inert (no pointer, no focus, no space), so no edge of them shows until hover or focus. */
+      t.el.inert = i > 0;
+      t.el.style.transform = 'translateY(0)';
+      t.el.style.opacity = i === 0 ? '1' : '0';
+    }
+  });
+  region.style.height = (open ? Math.max(y - TOAST_GAP, 0) : (TOASTS[0] ? parseFloat(getComputedStyle(TOASTS[0].el).height) : 0))+'px';
+}
+/* Read live, not tracked from focusin/focusout: a focused button inside a toast that is rewritten
+   or removed fires no focusout, so a flag could stay set and hold every timer forever. */
+function toastFocusInside(){ const r = toastRegion(); return !!(r && r.contains(document.activeElement) && document.activeElement !== document.body); }
+function toastHeld(){ return TOAST_HOLD.hover || TOAST_HOLD.hidden || toastFocusInside(); }
+function toastArm(t){
+  clearTimeout(t.timer); t.timer = null;
+  if(t.sticky || toastHeld()) return;
+  t.started = performance.now();
+  t.timer = setTimeout(()=>toastDismiss(t), t.left);
+}
+function toastHoldChanged(){
+  TOASTS.forEach(t=>{
+    if(toastHeld()){ if(t.timer){ clearTimeout(t.timer); t.timer = null; t.left = Math.max(0, t.left - (performance.now() - t.started)); } }
+    else if(!t.timer) toastArm(t);
+  });
+  toastLayout();
+}
+function toastFill(t){
+  const hadFocus = t.el.contains(document.activeElement);
+  t.el.innerHTML = '<span class="toast-icon" aria-hidden="true">'+toastIconHtml(t.icon)+'</span>'+
+    '<div><div class="toast-title">'+esc(t.title)+'</div>'+(t.line ? '<div class="toast-line">'+esc(t.line)+'</div>' : '')+'</div>'+
+    (t.action ? '<button type="button" class="toast-act">'+esc(t.action)+'</button>' : '<span></span>');
+  const btn = t.el.querySelector('.toast-act');
+  if(btn) btn.addEventListener('click', ()=>{ if(t.onAction) t.onAction(t); });
+  if(hadFocus && btn) btn.focus(); // keep focus on the rewritten toast's own action, if it has one
+}
+window.toastShow = function(o){
+  const region = toastRegion();
+  if(!region) return null;
+  const t = {icon:o.icon, title:o.title, line:o.line||'', action:o.action||null, onAction:o.onAction||null,
+    sticky:!!o.sticky, left:o.ms||TOAST_MS, timer:null, started:0, seq:++TOAST_SEQ, el:document.createElement('div')};
+  t.el.className = 'toast';
+  toastFill(t);
+  region.appendChild(t.el);
+  t.el.style.transition = 'none';
+  t.el.style.opacity = '0';
+  t.el.style.transform = 'translateY('+TOAST_ENTER_Y+'px)';
+  void t.el.offsetWidth;
+  t.el.style.transition = '';
+  TOASTS.unshift(t);
+  while(TOASTS.length > TOAST_MAX) toastDismiss(TOASTS[TOASTS.length-1]);
+  toastLayout();
+  toastArm(t);
+  toastAnnounce(t);
+  return t;
+};
+/* Replace a toast's content in place (Undo's result, a run that finished), with a fresh timer. */
+function toastUpdate(t, o){
+  if(!TOASTS.includes(t)) return toastShow(o);
+  Object.assign(t, {icon:o.icon, title:o.title, line:o.line||'', action:o.action||null, onAction:o.onAction||null,
+    sticky:!!o.sticky, left:o.ms||TOAST_MS});
+  toastFill(t);
+  toastArm(t);
+  toastHoldChanged(); // focus may have left with the old content: re-evaluate every toast's hold
+  toastAnnounce(t);
+  return t;
+}
+function toastDismiss(t){
+  if(!t || !TOASTS.includes(t)) return;
+  clearTimeout(t.timer); t.timer = null;
+  TOASTS = TOASTS.filter(x=>x!==t);
+  const el = t.el;
+  el.style.pointerEvents = 'none';
+  el.style.opacity = '0';
+  el.style.transform = (el.style.transform || '')+' translateY('+TOAST_EXIT_Y+'px)';
+  TOAST_LEAVING.add(t);
+  t.done = ()=>{ if(!TOAST_LEAVING.has(t)) return; TOAST_LEAVING.delete(t); el.remove(); };
+  el.addEventListener('transitionend', t.done, {once:true});
+  t.doneTimer = setTimeout(t.done, (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--t-base')) || 180) + 50);
+  if(el.contains(document.activeElement)) document.activeElement.blur(); // never leave focus on a leaving toast
+  toastHoldChanged();
+}
+/* D272: a toast whose timer ran out an instant before the pointer or focus arrived was still fading
+   out, and finished vanishing under the pointer (the disappearance Kevin saw). When a hold begins,
+   any toast still leaving comes back with the time it had left (none), so nothing disappears while
+   the stack is held; it goes as soon as the hold ends. */
+function toastRescue(){
+  TOAST_LEAVING.forEach(t=>{
+    TOAST_LEAVING.delete(t);
+    if(!t.el.isConnected || TOASTS.length >= TOAST_MAX) return; // never above three
+    clearTimeout(t.doneTimer);
+    t.el.removeEventListener('transitionend', t.done);
+    t.el.style.pointerEvents = '';
+    t.left = 0;
+    TOASTS.push(t);
+  });
+  TOASTS.sort((a,b)=>b.seq - a.seq);
+}
+(function(){
+  const region = toastRegion();
+  if(!region) return;
+  region.addEventListener('mouseenter', ()=>{ TOAST_HOLD.hover = true; toastRescue(); toastHoldChanged(); });
+  region.addEventListener('mouseleave', ()=>{ TOAST_HOLD.hover = false; toastHoldChanged(); });
+  region.addEventListener('focusin', ()=>{ toastRescue(); toastHoldChanged(); });
+  region.addEventListener('focusout', ()=>setTimeout(toastHoldChanged, 0)); // after focus has actually moved
+  document.addEventListener('visibilitychange', ()=>{ TOAST_HOLD.hidden = document.hidden; toastHoldChanged(); });
+  document.addEventListener('keydown', e=>{
+    if(e.key!=='Escape' || !TOASTS.length) return;
+    if(document.querySelector('.modal') || document.querySelector('.ef.editing')) return; // Esc keeps its meaning
+    toastDismiss(TOASTS[0]);
+  }, true);
+})();
+/* D267, moment 2: every create path lands here. "Open" only when the new deal is not already on
+   screen; both current paths navigate to the new record, so today it never shows. */
+function toastDealCreated(opp){
+  const acct = getAccount(opp.accountId);
+  const onScreen = (location.hash||'').indexOf('#/opp/'+opp.id) === 0;
+  toastShow({icon:'check', title:'Deal created',
+    line:(acct?acct.name:'')+', '+productLabel(opp.productType)+', '+opp.stage,
+    action: onScreen ? null : 'Open', ms:TOAST_MS,
+    onAction: t=>{ toastDismiss(t); location.hash = '#/opp/'+opp.id; }});
+}
 /* Refreshes an open modal's body in place after an edit made inside it (activateEdit()'s commit
    calling EF_RERENDER), without tearing down the scrim/focus-trap/scroll-lock the way a close+reopen
    would. A no-op when no modal is open, or a different one is. Existing modals are all read-only
@@ -109296,7 +109489,7 @@ function renderStageTrackHtml(o){
    through at zero days so the history stays contiguous; a backward move does not — a regression
    is a single jump back, not a reverse tour, and the forward history it came from is left
    standing so the stage shows up twice and the round trip stays visible. */
-window.moveOppStage = function(oppId, toStage){
+window.moveOppStage = function(oppId, toStage, via){
   const o = OPPS[oppId];
   if(!o || o.outcome!=='open') return;
   const from = TRACK_STAGES.indexOf(o.stage);
@@ -109323,7 +109516,20 @@ window.moveOppStage = function(oppId, toStage){
   const travelFrom = stageTravelFrom(from); // D266: read before the re-render replaces the track
   if(EF_RERENDER) EF_RERENDER();
   stageTravel(from, to, travelFrom);
+  if(via !== 'undo') toastStageMoved(oppId, prevStage, toStage); // D267, moment 1
 };
+/* D267, moment 1: a move made from the stage track. Undo is the existing move back (so Audit records
+   the regression and the history keeps both, as for any move), and only while the deal still sits
+   where this toast moved it; if it has moved again since, Undo just closes the toast. */
+function toastStageMoved(oppId, fromStage, toStage){
+  const o = OPPS[oppId], acct = o && getAccount(o.accountId), name = acct ? acct.name : '';
+  toastShow({icon:'arrow', title:'Moved to '+toStage, line:name+', from '+fromStage, action:'Undo', ms:TOAST_UNDO_MS,
+    onAction: t=>{
+      if(!o || o.outcome!=='open' || o.stage!==toStage){ toastDismiss(t); return; }
+      moveOppStage(oppId, fromStage, 'undo');
+      toastUpdate(t, {icon:'check', title:'Stage move undone', line:name+' is back in '+fromStage, ms:TOAST_MS});
+    }});
+}
 /* D266 (§27c.6, Other/mocks/stage-track-mock-v1.html option B): a stage move made from the track
    draws itself. One --brand line, from the track's left edge at the segments' height, travels from
    where progress stood to the new stage's node centre, growing on an advance and pulling back on a
@@ -110334,8 +110540,21 @@ let INTAKE_DRAFT = null;    // editable draft opportunity, set on entering 'revi
 let INTAKE_INTEL = null;    // intelligenceResults() output, set on entering 'intelligence'; stays
                              // null on Skip — its presence is what gates the review-step panel
 let INTAKE_TIMER = null;
+/* D267, moment 3: the intelligence run in flight. `id` is bumped by renderIntake(), so a run whose
+   screen was re-entered (which resets the flow to Drop) is abandoned: its timer chain stops rather
+   than jumping the new flow to Review later, and its toast closes. A run that finishes while the
+   intake screen has been left turns its "Running intelligence" toast into "Intelligence finished",
+   with a line taken only from that run's own results (CLAUDE.md §2b). */
+let INTAKE_RUN = {id:0, toast:null, acct:'', results:null, done:true};
+function intakeOnScreen(){ return (location.hash||'').indexOf('#/intake') === 0; }
+window.addEventListener('hashchange', function(){
+  if(INTAKE_STATE==='intelligence' && !INTAKE_RUN.done && !INTAKE_RUN.toast && !intakeOnScreen()){
+    INTAKE_RUN.toast = toastShow({icon:'run', title:'Running intelligence', line:INTAKE_RUN.acct, sticky:true});
+  }
+});
 
 function renderIntake(mode){
+  if(!INTAKE_RUN.done){ INTAKE_RUN.done = true; INTAKE_RUN.id++; toastDismiss(INTAKE_RUN.toast); INTAKE_RUN.toast = null; }
   INTAKE_MODE = mode==='simulated' ? 'simulated' : 'hero';
   INTAKE_STATE = 'drop';
   INTAKE_CTX = null;
@@ -110565,6 +110784,8 @@ function drawIntake(){
        dataset-real result — just slowed roughly 3x (was 500ms/450ms, now 1500ms/1350ms) so each
        step reads as real work rather than flashing past. */
     const results = intelligenceResults(INTAKE_CTX.account);
+    const runId = ++INTAKE_RUN.id;
+    INTAKE_RUN = {id:runId, toast:null, acct:INTAKE_CTX.account.name, results, done:false};
     INTAKE_INTEL = results; // lift into intake state — deterministic, so persisting it here
                              // (rather than only when the animation finishes) reports nothing
                              // the run hasn't already actually computed
@@ -110596,8 +110817,18 @@ function drawIntake(){
     setProcCount('intel-count', 0, 'of '+results.length+' sources');
     let step=0;
     const advance=()=>{
+      if(INTAKE_RUN.id !== runId) return; // abandoned (the flow was restarted)
       if(step>=results.length){
-        INTAKE_TIMER=setTimeout(()=>{ INTAKE_STATE='review'; drawIntake(); }, 500);
+        INTAKE_TIMER=setTimeout(()=>{
+          if(INTAKE_RUN.id !== runId) return;
+          INTAKE_RUN.done = true;
+          INTAKE_STATE='review'; drawIntake();
+          if(INTAKE_RUN.toast){
+            const lienNet = [results[2], results[3]].filter(Boolean).map(r=>r.result.split(' · ')[0]).join(', ');
+            toastUpdate(INTAKE_RUN.toast, {icon:'check', title:'Intelligence finished', line:INTAKE_RUN.acct+': '+lienNet, ms:TOAST_MS});
+            INTAKE_RUN.toast = null;
+          }
+        }, 500);
         return;
       }
       const statusEl=document.getElementById('intel-status-'+step);
@@ -110689,6 +110920,7 @@ window.completeIntake = function(){
   const opp = commitDraftOpportunity(draft);
   INTAKE_DRAFT = null;
   location.hash = '#/opp/'+opp.id;
+  toastDealCreated(opp); // D267, moment 2
 };
 
 /* ================================================================
@@ -110886,6 +111118,7 @@ window.submitQuickCreate = function(){
   ];
   closeModal();
   location.hash = '#/opp/'+opp.id;
+  toastDealCreated(opp); // D267, moment 2
 };
 
 /* ================================================================
