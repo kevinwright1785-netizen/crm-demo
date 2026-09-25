@@ -241,6 +241,7 @@ h1,h2,h3,p,dl,dd{margin:0}
    Kevin's own explicit choice ("2B, wider cards"): the saved width goes to content, not to
    wider margins around the same card widths. */
 .viewport{padding:var(--s5);max-width:1504px;width:100%;margin:0 auto}
+#view-intake{position:relative} /* D274: holds the step crossfade's layer */
 .view{display:none}
 .view.active{display:block}
 /* D216: font-weight:500 declared explicitly. This is the only <h1> in the app (12 call sites,
@@ -110516,7 +110517,7 @@ function intelResultsPanelHtml(results){
   return '<div class="panel intel-panel">'+
     '<div class="panel-header"><div class="panel-header-text">'+
       '<div class="panel-title">Intelligence</div>'+
-      '<div class="panel-scope">Premium intelligence layer — D&amp;B, ZoomInfo, lien search, network mapping</div>'+
+      '<div class="panel-scope">Premium intelligence layer: D&amp;B, ZoomInfo, lien search, network mapping</div>'+
     '</div></div>'+
     '<div class="panel-body pad-top">'+
       results.map(r=>
@@ -110557,6 +110558,7 @@ function renderIntake(mode){
   if(!INTAKE_RUN.done){ INTAKE_RUN.done = true; INTAKE_RUN.id++; toastDismiss(INTAKE_RUN.toast); INTAKE_RUN.toast = null; }
   INTAKE_MODE = mode==='simulated' ? 'simulated' : 'hero';
   INTAKE_STATE = 'drop';
+  INTAKE_DRAWN = null; // a fresh visit: its first render is not a step change (D118)
   INTAKE_CTX = null;
   INTAKE_DRAFT = null;
   INTAKE_INTEL = null;
@@ -110572,7 +110574,7 @@ function wizardBarHtml(step){
 function demoOnlyBannerHtml(){
   if(INTAKE_MODE!=='simulated') return '';
   return '<div class="chipbar tight">'+
-    '<span class="tag warn">Demo prop — not a shipping feature</span>'+
+    '<span class="tag warn">Demo prop, not a shipping feature</span>'+
     '<span class="tag neutral">The real product reads your dropped files; this runs a scripted scenario</span>'+
   '</div>';
 }
@@ -110649,14 +110651,71 @@ function pickCyclePhrases(labels, count){
   return picked.map(l => (DOC_PHRASES[l] || ('Reading '+l.toLowerCase()))+'…');
 }
 
+/* D274 (§27c.7, Other/mocks/intake-mock-v1.html "Proposed"): intake choreography. drawIntake()
+   wraps the per-step renderer and knows the step it last drew (INTAKE_DRAWN), so it can tell a step
+   change from a redraw of the same step.
+   - Step change (drop, extracting, ready, intelligence, review, and back to drop on Start over):
+     a copy of the old screen is taken before the new one replaces it, laid over it in one
+     aria-hidden, pointer-events:none .xfade-layer, and faded out while the new screen fades in,
+     --t-base, --ease, opacity only, the view-switch crossfade's approach (D263).
+   - Arrival at review from the gate (Skip) or the intelligence run: every value in the Extracted
+     fields and terms cards, and every row of the Intelligence results panel, fades up from 4px low,
+     INTAKE_FILL_STAGGER_MS apart in reading order, starting INTAKE_FILL_START_MS into the
+     crossfade. Labels, the match banner and the buttons show and work at once.
+   - Same-step redraws (an inline edit through EF_RERENDER, undo, the product-type regeneration)
+     and the first render of a visit (renderIntake() resets INTAKE_DRAWN) do neither (D118), nor a
+     step drawn while the intake screen is hidden (a run finishing after it was left).
+   Reduced motion is checked in JS first (§11.7): steps swap instantly, nothing fills. */
+let INTAKE_DRAWN = null;
+const INTAKE_FILL_STAGGER_MS = 45;
+const INTAKE_FILL_START_MS = 120;
+const INTAKE_FILL_RISE_PX = 4;
 function drawIntake(){
+  const view = document.getElementById('view-intake');
+  const prev = INTAKE_DRAWN, next = INTAKE_STATE;
+  const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const stepChange = !!view && prev !== null && prev !== next && view.classList.contains('active') &&
+    !reduced && typeof view.animate === 'function';
+  let copy = null, h0 = 0;
+  if(view) view.querySelectorAll(':scope > .xfade-layer').forEach(l=>l.remove());
+  if(stepChange){
+    copy = document.createElement('div');
+    Array.from(view.childNodes).forEach(n=>copy.appendChild(n.cloneNode(true)));
+    copy.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id'));
+    copy.style.left = '0'; copy.style.top = '0'; copy.style.width = '100%';
+    h0 = view.getBoundingClientRect().height;
+  }
+  drawIntakeStep();
+  INTAKE_DRAWN = next;
+  if(!stepChange) return;
+  const root = getComputedStyle(document.documentElement);
+  const base = parseFloat(root.getPropertyValue('--t-base')) || 180;
+  const easing = root.getPropertyValue('--ease').trim() || 'ease';
+  const fresh = Array.from(view.children);
+  const layer = document.createElement('div');
+  layer.className = 'xfade-layer';
+  layer.setAttribute('aria-hidden', 'true');
+  layer.style.height = Math.max(h0, view.getBoundingClientRect().height)+'px'; // the old screen may be the taller
+  layer.appendChild(copy);
+  view.appendChild(layer);
+  layer.animate([{opacity:1}, {opacity:0}], {duration:base, easing, fill:'forwards'})
+    .finished.then(()=>layer.remove()).catch(()=>{});
+  fresh.forEach(c=>c.animate([{opacity:0}, {opacity:1}], {duration:base, easing}));
+  if(next==='review' && (prev==='ready' || prev==='intelligence')){
+    const marks = Array.from(view.querySelectorAll(':scope > .panel .kv > div > dd, :scope > .intel-panel .intel-row'));
+    marks.forEach((m,i)=>m.animate(
+      [{opacity:0, transform:'translateY('+INTAKE_FILL_RISE_PX+'px)'}, {opacity:1, transform:'translateY(0)'}],
+      {duration:base, easing, delay:INTAKE_FILL_START_MS + i*INTAKE_FILL_STAGGER_MS, fill:'backwards'}));
+  }
+}
+function drawIntakeStep(){
   const el = document.getElementById('view-intake');
 
   if(INTAKE_STATE==='drop'){
     if(INTAKE_MODE==='simulated'){
       el.innerHTML =
-        '<h1 class="page-heading">New Opportunity — Simulated Demo</h1>'+
-        '<div class="page-sub">Pick a scripted scenario — product type drives which fields extract</div>'+
+        '<h1 class="page-heading">New Opportunity: Simulated Demo</h1>'+
+        '<div class="page-sub">Pick a scripted scenario: product type drives which fields extract</div>'+
         wizardBarHtml(0)+
         demoOnlyBannerHtml()+
         '<div class="scenario-grid">'+
@@ -110679,7 +110738,7 @@ function drawIntake(){
       '<div class="dropzone" id="dropzone" onclick="document.getElementById(\'filepick\').click()">'+
         '<div class="dropzone-icon">&#8681;</div>'+
         '<div class="dropzone-title">Drop AP/AR aging, financials, or formation docs</div>'+
-        '<div class="dropzone-sub">Or click to browse — any file starts extraction</div>'+
+        '<div class="dropzone-sub">Or click to browse. Any file starts extraction</div>'+
         '<input type="file" id="filepick" onchange="startHeroExtraction()">'+
       '</div>';
     const dz = document.getElementById('dropzone');
@@ -110709,16 +110768,20 @@ function drawIntake(){
       demoOnlyBannerHtml()+
       '<div class="panel">'+processRingHtml('extract', 'Reading your documents')+'</div>';
     startPhraseCycle('extract-center', phrases, 2200);
+    /* D274: the count is paced to the ring's own run, so it reaches its total as the ring does,
+       for any document count (it used to tick every COUNT_TICK_MS and finish early). The ring's
+       run, and so the wall-clock time, is unchanged. */
     const COUNT_TICK_MS = 220, MIN_TOTAL_MS = 5200;
+    const RING_RUN_MS = Math.max(MIN_TOTAL_MS, total*COUNT_TICK_MS);
+    const COUNT_PACE_MS = RING_RUN_MS / total;
     let n = 0;
     const countTimer = setInterval(function(){
       if(!document.getElementById('extract-count')){ clearInterval(countTimer); return; }
       n++;
       setProcCount('extract-count', n, 'of '+total+' document'+(total===1?'':'s'));
       if(n>=total) clearInterval(countTimer);
-    }, COUNT_TICK_MS);
-    INTAKE_TIMER = setTimeout(function(){ INTAKE_STATE='ready'; drawIntake(); },
-      Math.max(MIN_TOTAL_MS, total*COUNT_TICK_MS) + 500);
+    }, COUNT_PACE_MS);
+    INTAKE_TIMER = setTimeout(function(){ INTAKE_STATE='ready'; drawIntake(); }, RING_RUN_MS + 500);
     return;
   }
 
@@ -110763,10 +110826,10 @@ function drawIntake(){
           ).join('')+
         '</div>'+
         '<div class="panel-footer intel-gate-footer">'+
-          '<span>Premium intelligence layer &mdash; part of your plan\'s intelligence tier, not bundled into the base CRM.</span>'+
+          '<span>Premium intelligence layer: part of your plan\'s intelligence tier, not bundled into the base CRM.</span>'+
           '<div class="intel-gate-buttons">'+
-            '<button class="btn" onclick="skipIntelligence()">Skip &mdash; create without intelligence</button>'+
-            '<button class="btn primary" onclick="runIntelligence()">Run Intelligence</button>'+
+            '<button class="btn" onclick="skipIntelligence()">Skip, create without intelligence</button>'+
+            '<button class="btn primary" onclick="runIntelligence()">Run intelligence</button>'+
           '</div>'+
         '</div>'+
       '</div>';
@@ -110798,7 +110861,7 @@ function drawIntake(){
       '<div class="panel intel-panel">'+
         '<div class="panel-header"><div class="panel-header-text">'+
           '<div class="panel-title">Intelligence run</div>'+
-          '<div class="panel-scope">Premium intelligence layer — D&amp;B, ZoomInfo, lien search, network mapping</div>'+
+          '<div class="panel-scope">Premium intelligence layer: D&amp;B, ZoomInfo, lien search, network mapping</div>'+
         '</div></div>'+
         processRingHtml('intel', 'Running intelligence')+
         '<div class="panel-body pad-top">'+
@@ -110867,23 +110930,23 @@ function drawIntake(){
 
     el.innerHTML =
       '<h1 class="page-heading">New Opportunity</h1>'+
-      '<div class="page-sub">Review the extracted deal — every field below is overridable before you create it</div>'+
+      '<div class="page-sub">Review the extracted deal. Every field below is overridable before you create it</div>'+
       wizardBarHtml(3)+
       demoOnlyBannerHtml()+
       '<div class="match-banner">'+
         '<div class="match-banner-title">Matched to existing account: '+esc(acct.name)+'</div>'+
-        '<div class="match-banner-sub">'+esc(acct.industryName)+' · '+esc(acct.location)+' · Account already on file — this will be a new '+product+' opportunity on it</div>'+
+        '<div class="match-banner-sub">'+esc(acct.industryName)+' · '+esc(acct.location)+' · Account already on file. This will be a new '+product+' opportunity on it</div>'+
       '</div>'+
       '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
         '<div class="panel-title">Extracted fields</div><div class="panel-scope">Product Type detected: '+productLabel(product)+' · click any value to override</div>'+
       '</div></div><div class="panel-body">'+coreKvHtml+'</div></div>'+
       '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
-        '<div class="panel-title">'+product+' terms</div><div class="panel-scope">Product-conditional fields — this is what changes by product type</div>'+
+        '<div class="panel-title">'+product+' terms</div><div class="panel-scope">Product-conditional fields: this is what changes by product type</div>'+
       '</div></div><div class="panel-body">'+productFieldsHtml(recId,'kv')+'</div></div>'+
       (INTAKE_INTEL ? intelResultsPanelHtml(INTAKE_INTEL) : '')+
       '<div class="actions-end">'+
         '<button class="btn" onclick="startOverIntake()">Start over</button>'+
-        '<button class="btn primary" onclick="completeIntake()">Create Opportunity</button>'+
+        '<button class="btn primary" onclick="completeIntake()">Create opportunity</button>'+
       '</div>';
   }
 }
