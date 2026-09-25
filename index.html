@@ -73,6 +73,9 @@
   --focus:2px; --focus-offset:2px;
   --z-sticky:100; --z-topbar:200; --z-scrim:300; --z-modal:400; --z-tip:500;
   --t-fast:120ms; --t-base:180ms; --t-slow:280ms;
+  /* D257: APPROVED DEVIATION, same shape as --r-full. Exactly one consumer, the inline-save
+     confirmation line's sweep (efConfirmSaved). Not a fourth general duration. */
+  --t-sweep:400ms;
 }
 
 /* D214: Inter Tight, embedded. --ui named it since D109 but nothing ever loaded it (no <link>,
@@ -316,6 +319,17 @@ h1,h2,h3,p,dl,dd{margin:0}
    already inherit the right number. */
 .drill{font-size:12px;color:var(--brand);font-weight:500;cursor:pointer}
 .panel-footer .drill{margin-left:auto}
+/* D258: .drill was written for spans. A <button class="drill"> (the Deal card's "View all N
+   fields", kept a button so it is keyboard-reachable) otherwise keeps the browser's button chrome
+   (grey fill, 2px outset border, 1px 6px padding, 21px tall), which also pushed the Deal card's
+   scope line 1.4px off Borrower details' (R1). This strips it so the button renders like the
+   Account 360 band's span link. Font inherited property by property, not the font shorthand: the
+   shorthand would out-rank .drill's own 12px/500. line-height inherits the same 1.45 the span link
+   resolves to; font-variant-numeric inherits body's tabular-nums, which the browser's own button
+   font reset otherwise drops (3.5px narrower on "View all 15 fields"). */
+button.drill{background:none;border:0;padding:0;margin:0;font-family:inherit;font-variant-numeric:inherit;
+  line-height:inherit}
+button.drill:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
 /* minmax(0,...) on both tracks: without it a wide child (a table, a long unbroken title) can
    blow a grid track past the viewport. Same fix the record layout needed in round 2. */
 .two-col{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:var(--s5)}
@@ -976,7 +990,7 @@ table.tbl{width:100%;border-collapse:collapse}
 .pipe-return-right{display:flex;align-items:center;gap:var(--s3);margin-left:auto}
 .pipe-return-pos{font-size:12px;color:var(--ink-3)}
 /* Its own small control family, sized and drawn independently of .btn (D125 governs buttons;
-   this is a compact icon control like .modal-close/.card-expand, not a button). */
+   this is a compact icon control like .modal-close, not a button). */
 .pipe-return-arrow{all:unset;box-sizing:border-box;width:24px;height:24px;border:1px solid var(--line-2);
   border-radius:var(--r-s);color:var(--ink-2);display:inline-flex;align-items:center;justify-content:center;
   cursor:pointer;font-size:14px;line-height:1;transition:background var(--t-fast) var(--ease)}
@@ -1206,16 +1220,6 @@ table.tbl{width:100%;border-collapse:collapse}
 .band-meta{font-size:11px;color:var(--ink-3)}
 .band-empty{font-size:12px;color:var(--ink-3)}
 .band-more{font-size:11px;color:var(--ink-3)}
-/* Expand-to-modal corner control (D71): a card showing only some of its fields gets this in its
-   bottom-right corner. A separate click target from inline editing by construction — clicking a
-   field edits it in place (§2a, unchanged), clicking this opens the card's full content in the
-   existing D34 modal. Only rendered on a card that actually hides fields on its face; a card
-   already showing everything gets no control (its presence IS the "there's more here" signal). */
-/* D243: --ink-2, not --ink-3 (4.12:1 on --sunken, under 4.5:1). */
-.card-expand{position:absolute;right:var(--s3);bottom:var(--s3);width:22px;height:22px;
-  border:none;border-radius:var(--r-s);background:var(--sunken);color:var(--ink-2);font-size:11px;
-  line-height:1;cursor:pointer;transition:background var(--t-fast) var(--ease),color var(--t-fast) var(--ease)}
-.card-expand:hover{background:var(--hover);color:var(--ink)}
 /* D107: tabs, not a segmented control. This switcher navigates to DIFFERENT content per
    section, the segmented control below is reserved for same-data view toggles. Real <button>s
    (all:unset, same reset pattern .th-sort already uses), a roving tabindex (only the active
@@ -1351,6 +1355,17 @@ table.tbl{width:100%;border-collapse:collapse}
 .ef::after{content:'\270E';position:absolute;right:var(--s2);top:50%;transform:translateY(-50%);
   font-size:11px;color:var(--ink-3);opacity:0;transition:opacity .12s var(--ease)}
 .ef:hover::after{opacity:1}
+/* D256, amended by D258 (Other/mocks/save-feedback-mock-v3.html): the inline-save confirmation
+   (efConfirmSaved). Both children are added only while it runs and are absolutely positioned, so
+   the cell's size and text position never change. The line starts at the text's left edge (--s2);
+   its width, and the check box's left edge just after it, are set per save in JS from the value's
+   measured width. The pencil stays hidden, hover included, for as long as the confirmation runs. */
+.ef.ef-confirming::after,.ef.ef-confirming:hover::after{opacity:0}
+.ef-sweep{position:absolute;left:var(--s2);bottom:3px;height:2px;background:var(--brand);
+  transform:scaleX(0);transform-origin:left center;opacity:0;pointer-events:none}
+.ef-ok{position:absolute;top:50%;width:14px;height:14px;transform:translateY(-50%);pointer-events:none}
+.ef-ok svg{display:block;width:14px;height:14px;opacity:0;
+  fill:none;stroke:var(--pos);stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
 .ef.editing{cursor:default;background:transparent;padding:0;margin:0}
 .ef.editing::after{content:none}
 .ef.ef-empty{color:var(--ink-3)}
@@ -105072,12 +105087,17 @@ let EF_RERENDER = null;
 /* D145 commit 3 (D181): auto-commit on Enter/blur, no save/cancel control. RESEARCH_03 §4 finding
    applied - every modern reference checked (Attio, Notion, Airtable, Linear) auto-commits with no
    per-cell save/cancel affordance, relying on undo plus history as the safety net; Salesforce's
-   explicit footer is the outlier. Escape behaviour, the save-confirmation fill, and skipping undo
-   confirmation UI are Kevin's own judgment calls, not researched.
-   EF_SAVE_HOLD_MS: how long the --pos-soft confirmation fill holds before fading on
-   var(--t-base) var(--ease) - a named constant, never an inline literal, so it lives in one place
-   to tune. 1000ms is Kevin's own judgment call; revisit if it reads wrong in Chrome. */
-const EF_SAVE_HOLD_MS = 1000;
+   explicit footer is the outlier. Escape behaviour and skipping undo confirmation UI are Kevin's
+   own judgment calls, not researched. The save confirmation (D256) is Kevin's judgment too.
+   EF_SAVE_HOLD_MS: how long the confirmation's line and check hold at full visibility before
+   fading (D256: 800ms). EF_SAVE_CHECK_IN_MS: the check's opacity ramp as it starts drawing (D256:
+   60ms, a JS constant only, not a token). Both named, never inline literals, so each lives in one
+   place to tune. */
+const EF_SAVE_HOLD_MS = 800;
+const EF_SAVE_CHECK_IN_MS = 60;
+/* D258: the gap between the line's right end and the check's 14px box, from the approved mock
+   (save-feedback-mock-v3.html). A JS constant, set inline per save with the line's width. */
+const EF_SAVE_CHECK_GAP_PX = 6;
 const EF_UNDO_MAX = 20;
 const EF_UNDO_STACK = []; // {recId, def, oldVal, newVal}, most recent last; redo is out of scope
 function registerRecord(recId, obj){ EF_STORE[recId]={obj}; return recId; }
@@ -105122,27 +105142,111 @@ function efClearError(elId){
   if(input) input.classList.remove('ef-invalid');
   if(err && !err.hidden){ err.hidden = true; err.textContent = ''; }
 }
-/* D145 commit 3: the brief confirmation fill. element.animate() reads --pos-soft/--t-base/--ease
-   from :root at call time (the same pattern playHomeEntrance() already uses for --t-slow/--t-fast,
-   D118), so :root stays the only place any of those values are actually defined - never a second,
-   inline-literal copy. Skipped entirely under prefers-reduced-motion, checked in JS: CSS alone
-   cannot stop this from starting (§11.7's own two-layer rule), and there is no lingering DOM state
-   to clean up either way since element.animate() with no fill mode reverts to the underlying
-   (already correct, unfilled) computed style on its own once it finishes or is skipped. */
-function efFlashSaved(recId, key){
-  if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const span = document.querySelector('.ef[data-rec="'+recId+'"][data-key="'+key+'"]');
+/* D256, amended by D258: the inline-save confirmation, the "Proposed" card of
+   Other/mocks/save-feedback-mock-v3.html (D256's own spec was card D of -v2.html). A --brand line
+   sweeps left to right under the value over --t-sweep, then a --pos check draws just after the
+   line's end over --t-base, both hold EF_SAVE_HOLD_MS, then both fade over --t-base. Every
+   segment is linear (Kevin's ruling, matching the mock); --ease is not used here. Drawn with
+   element.animate(), reading the durations from :root at call time (the playHomeEntrance() pattern,
+   D118), so :root stays the only place they are defined. Reduced motion is checked in JS before
+   anything starts (§11.7): the line shows at full width and the check fully drawn, both hold
+   EF_SAVE_HOLD_MS, then both disappear at once.
+   Called after EF_RERENDER, so it finds the fresh cell by record and key, never the detached one.
+   `inModal` picks the modal's copy or the page's when a field renders in both (the Deal modal
+   repeats the Deal card's fields over the record). One confirmation per card: starting one cancels
+   any still running in the same card, and any whose cell has since left the document.
+   D258, fit to the value: before anything is appended, a Range over the cell's own contents
+   (nested markup included, e.g. the hero's currency suffix) gives the value's rendered width. The
+   line is that wide, clamped to at least --s3 (so an empty or dash value still shows one) and at
+   most the cell's content width (width minus both paddings); a value that wraps onto a second line
+   takes the full content width, the line sitting under the last line as before. The check's 14px
+   box starts EF_SAVE_CHECK_GAP_PX after the line's end, vertically centred in the cell. */
+function efFitConfirm(span){
+  const cs = getComputedStyle(span);
+  const padL = parseFloat(cs.paddingLeft) || 0, padR = parseFloat(cs.paddingRight) || 0;
+  const contentW = span.clientWidth - padL - padR;
+  const minW = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--s3')) || 12;
+  const range = document.createRange();
+  range.selectNodeContents(span);
+  /* Wrapped means a second line box: some rect starts below the bottom of the ones before it.
+     Comparing tops alone would misread mixed sizes on one line (the hero's "$" and "M"). */
+  const rects = Array.from(range.getClientRects()).filter(r=>r.width>0 && r.height>0)
+    .sort((x,y)=>x.top-y.top);
+  let lineBottom = -Infinity, lines = 0;
+  rects.forEach(r=>{ if(r.top >= lineBottom - 1){ lines++; lineBottom = r.bottom; } else lineBottom = Math.max(lineBottom, r.bottom); });
+  const wraps = lines > 1;
+  const valueW = wraps ? contentW : range.getBoundingClientRect().width;
+  const w = Math.min(Math.max(valueW, minW), contentW);
+  return {w, left: padL, checkLeft: padL + w + EF_SAVE_CHECK_GAP_PX, wraps};
+}
+const EF_CONFIRMS = [];
+function efCancelConfirm(c){
+  c.anims.forEach(a=>{ try{ a.cancel(); }catch(e){} });
+  c.parts.forEach(el=>el.remove());
+  c.span.classList.remove('ef-confirming');
+  const i = EF_CONFIRMS.indexOf(c);
+  if(i>=0) EF_CONFIRMS.splice(i,1);
+}
+function efCancelConfirmsIn(span){
+  EF_CONFIRMS.slice().forEach(c=>{ if(c.span===span) efCancelConfirm(c); });
+}
+function efCardOf(span){ return span.closest('.panel, .modal, .opp-header') || span.parentElement; }
+function efConfirmSaved(recId, key, inModal){
+  const sel = '.ef[data-rec="'+recId+'"][data-key="'+key+'"]';
+  const cells = Array.from(document.querySelectorAll(sel));
+  const span = cells.find(c=>!!c.closest('.modal')===!!inModal) || cells[0];
   if(!span || typeof span.animate !== 'function') return;
-  const root = getComputedStyle(document.documentElement);
-  const baseMs = parseFloat(root.getPropertyValue('--t-base')) || 180;
-  const ease = root.getPropertyValue('--ease').trim() || 'ease';
-  const posSoft = root.getPropertyValue('--pos-soft').trim();
-  const total = EF_SAVE_HOLD_MS + baseMs;
-  span.animate([
-    { backgroundColor: posSoft, offset: 0 },
-    { backgroundColor: posSoft, offset: EF_SAVE_HOLD_MS/total, easing: ease },
-    { backgroundColor: 'transparent', offset: 1 },
-  ], { duration: total });
+  const card = efCardOf(span);
+  EF_CONFIRMS.slice().forEach(c=>{
+    if(!c.span.isConnected || efCardOf(c.span)===card) efCancelConfirm(c);
+  });
+  const fit = efFitConfirm(span);
+  const line = document.createElement('span');
+  line.className = 'ef-sweep';
+  line.style.width = fit.w+'px';
+  const ok = document.createElement('span');
+  ok.className = 'ef-ok';
+  ok.style.left = fit.checkLeft+'px';
+  ok.setAttribute('aria-hidden','true');
+  ok.innerHTML = '<svg viewBox="0 0 16 16" focusable="false"><path d="M3.5 8.5l3 3 6-7"/></svg>';
+  span.appendChild(line);
+  span.appendChild(ok);
+  span.classList.add('ef-confirming');
+  const svg = ok.firstChild, path = svg.firstChild;
+  const c = {span, parts:[line, ok], anims:[]};
+  EF_CONFIRMS.push(c);
+  const hold = EF_SAVE_HOLD_MS;
+  const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduced){
+    const on = {duration: hold, easing: 'linear'};
+    c.anims.push(line.animate([{transform:'scaleX(1)', opacity:1}, {transform:'scaleX(1)', opacity:1}], on));
+    c.anims.push(svg.animate([{opacity:1}, {opacity:1}], on));
+  } else {
+    const root = getComputedStyle(document.documentElement);
+    const sweep = parseFloat(root.getPropertyValue('--t-sweep')) || 400;
+    const base = parseFloat(root.getPropertyValue('--t-base')) || 180;
+    const drawn = sweep + base, fadeAt = drawn + hold, total = fadeAt + base;
+    const opts = {duration: total, easing: 'linear'};
+    c.anims.push(line.animate([
+      {transform:'scaleX(0)', opacity:1, offset:0},
+      {transform:'scaleX(1)', opacity:1, offset:sweep/total},
+      {transform:'scaleX(1)', opacity:1, offset:fadeAt/total},
+      {transform:'scaleX(1)', opacity:0, offset:1},
+    ], opts));
+    c.anims.push(svg.animate([
+      {opacity:0, offset:0},
+      {opacity:0, offset:sweep/total},
+      {opacity:1, offset:(sweep+EF_SAVE_CHECK_IN_MS)/total},
+      {opacity:1, offset:fadeAt/total},
+      {opacity:0, offset:1},
+    ], opts));
+    c.anims.push(path.animate([
+      {strokeDasharray:'14', strokeDashoffset:14, offset:0},
+      {strokeDasharray:'14', strokeDashoffset:14, offset:sweep/drawn},
+      {strokeDasharray:'14', strokeDashoffset:0, offset:1},
+    ], {duration: drawn, easing: 'linear'}));
+  }
+  c.anims[0].finished.then(()=>efCancelConfirm(c)).catch(()=>{});
 }
 function efPushUndo(recId, def, oldVal, newVal){
   EF_UNDO_STACK.push({recId, def, oldVal, newVal});
@@ -105170,9 +105274,11 @@ function activateEdit(span){
   const recId = span.dataset.rec, key = span.dataset.key;
   const def = findDef(recId, key);
   if(!def) return;
+  const inModal = !!span.closest('.modal');
   const obj = EF_STORE[recId].obj;
   const val = def.get(obj);
   const elId = 'efc_'+(++EF_SEQ);
+  efCancelConfirmsIn(span);
   span.classList.add('editing');
   span.innerHTML = '<span class="ef-editing">'+controlHtml(def, elId, val)+'</span>'+
     '<span class="ef-error" id="'+elId+'_err" hidden></span>';
@@ -105197,7 +105303,7 @@ function activateEdit(span){
     auditFieldEdit(recId, def, oldVal, newVal);
     efPushUndo(recId, def, oldVal, newVal);
     if(EF_RERENDER) EF_RERENDER();
-    efFlashSaved(recId, key);
+    efConfirmSaved(recId, key, inModal);
   }
   if(isField){
     input.addEventListener('keydown', e=>{
@@ -105245,7 +105351,7 @@ document.addEventListener('keydown', function(e){
   entry.def.set(obj, entry.oldVal);
   auditFieldEdit(entry.recId, entry.def, entry.newVal, entry.oldVal);
   if(EF_RERENDER) EF_RERENDER();
-  efFlashSaved(entry.recId, entry.def.key);
+  efConfirmSaved(entry.recId, entry.def.key, !!document.querySelector('.modal'));
 });
 
 /* ---------- derived analytics (computed, never hardcoded) ---------- */
@@ -107573,7 +107679,7 @@ function restoreListTableState(tableSelector, ctx){
    which is already an approved, closed surface Kevin chose not to redraw. Renders nothing at all
    when LIST_RETURN_CTX is absent (a direct hash, a reload, a bookmark) rather than a disabled or
    empty bar, per D129's own ruling. The back-link reuses .drill verbatim, no new link style; the
-   arrows are their own small control family (like .modal-close/.card-expand), never .btn, since D125
+   arrows are their own small control family (like .modal-close), never .btn, since D125
    governs .btn and this isn't one. The disabled-end arrow stays in the DOM with its space reserved
    (a native disabled <button>, not removed), so the bar's contents never shift. Shared by
    renderOpp() and renderAccount() alike: one bar, drawn once, not two near-identical copies. */
@@ -109144,9 +109250,9 @@ function oppMetricStripHtml(o, acct){
    DETAILS TAB CARDS (D71) — a packed two-column grid, not a stack of equal
    height boxes. Compact .band-line rows (glyph + text) are reused from
    round 4b's band for Signals, unchanged in shape, just living in a normal
-   card now. Some cards carry a .card-expand corner control that opens the
-   card's full field set in the existing D34 modal — a card showing
-   everything it has gets no control (nothing hidden to expand into).
+   card now. A card that hides fields on its face (Deal) carries a "View all
+   N fields" header link that opens its full field set in the existing D34
+   modal (D258) — a card showing everything it has gets no link.
    ================================================================ */
 function nextBestActionMeta(o){
   const edits = (AUDIT_BY_OPP[o.id]||[]).filter(a=>a.field==='Next Best Action');
@@ -109353,13 +109459,21 @@ function dealFieldRowsHtml(recId, keys){
     return '<div><dt>'+def.label+'</dt><dd>'+efSpan(recId,def)+'</dd></div>';
   }).join('');
 }
+/* D258: the modal is reached from a "View all N fields" header link on the title's row (the
+   Account 360 band's link text, .drill), replacing D71's bottom-right corner arrow, which the save
+   confirmation's check collided with on the last row. A <button> so it stays keyboard-reachable.
+   The header keeps Borrower details' plain .panel-header shape (scope 4px under the title, R1 with
+   the card beside it); .toggle-header-top only adds the title-plus-link row, scope stays full width
+   below (R2). N is computed from the two key lists, never typed. */
 function sectionDealCardHtml(recId){
+  const n = DEAL_FACE_KEYS.length + DEAL_MODAL_EXTRA_KEYS.length;
   return '<div class="panel" data-card="deal" data-rec="'+esc(recId)+'"><div class="panel-header"><div class="panel-header-text">'+
-      '<div class="panel-title">Deal</div><div class="panel-scope">Opportunity-owned fields</div>'+
+      '<div class="toggle-header-top"><div class="panel-title">Deal</div>'+
+        '<button type="button" class="drill" onclick="openModal(\'oppDeal\')">View all '+n+' fields</button></div>'+
+      '<div class="panel-scope">Opportunity-owned fields</div>'+
     '</div></div><div class="panel-body"><dl class="kv kv-2col">'+
       dealFieldRowsHtml(recId, DEAL_FACE_KEYS)+
     '</dl></div>'+
-    '<button type="button" class="card-expand" title="Show all deal fields" onclick="openModal(\'oppDeal\')">&#8599;</button>'+
   '</div>';
 }
 MODALS.oppDeal = function(){
