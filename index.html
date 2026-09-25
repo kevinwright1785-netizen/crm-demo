@@ -937,7 +937,14 @@ table.tbl{width:100%;border-collapse:collapse}
    never collide with its neighbour. Line segments are absolutely positioned half-widths that
    meet under each dot; the dot's opaque fill masks the join. Outline is an inset shadow, not
    a border, so the active halo doesn't put a border and a shadow on the same element. */
-.track{display:flex;align-items:flex-start;margin:var(--s5) 0 0}
+.track{position:relative;display:flex;align-items:flex-start;margin:var(--s5) 0 0}
+/* D266: the stage-move travel (stageTravel()). While it runs the segments are hidden and two
+   1px lines, the track's first children so every dot (positioned, later in the DOM) paints over
+   them, draw the rail: a --line-2 base standing in for the hidden segments, and the --brand line
+   that travels, scaled from the track's left edge. Both are removed at the end. */
+.track.traveling .track-seg{visibility:hidden}
+.track-line{position:absolute;left:0;right:0;top:calc(var(--s5) / 2);height:1px;background:var(--line-2);pointer-events:none}
+.track-line.go{background:var(--brand);transform-origin:left center}
 /* No horizontal padding on the column: .track-row is its containing block, so padding here
    would inset every segment and leave a hole in the line at each column boundary. Label
    breathing room lives on the label instead. */
@@ -109313,8 +109320,80 @@ window.moveOppStage = function(oppId, toStage){
   const prevStage=o.stage;
   o.stage=toStage;
   auditFieldEdit(oppId, forward?STAGE_ADVANCE_DEF:STAGE_REGRESS_DEF, prevStage, toStage);
+  const travelFrom = stageTravelFrom(from); // D266: read before the re-render replaces the track
   if(EF_RERENDER) EF_RERENDER();
+  stageTravel(from, to, travelFrom);
 };
+/* D266 (§27c.6, Other/mocks/stage-track-mock-v1.html option B): a stage move made from the track
+   draws itself. One --brand line, from the track's left edge at the segments' height, travels from
+   where progress stood to the new stage's node centre, growing on an advance and pulling back on a
+   regression, on --t-slow and --ease (today's curve; --spring stays with sliding markers, D261),
+   by scaleX, never width. Meanwhile the segment fills are hidden and the line alone draws
+   progress; each node takes its reached state (its --st ramp fill and check) the frame the line
+   reaches its centre and loses it the frame a retracting line passes back over it, so skipped
+   stages fill in turn, and the halo lands on the new stage only when the line arrives. At the end
+   every node gets back its exact rendered class and glyph, the travel layer is removed, and the
+   track is the ordinary at-rest render. renderOpp() rebuilds the track on the move, so
+   moveOppStage() reads the start point first: the old stage's node centre, or, if a travel is
+   still running, the line's current position, so a second move continues from where the line is.
+   Only moveOppStage() calls this: no first render, navigation, tab switch or other re-render
+   animates. Labels' text, the "N days" line, the header Status and the metric strip are the new
+   render's from the start. Reduced motion is checked in JS first (§11.7): no travel. */
+function stageTravelFrom(fromIdx){
+  const track = document.querySelector('#view-opp .track');
+  if(!track) return null;
+  const line = track.querySelector('.track-line.go');
+  if(line) return {x: line.getBoundingClientRect().right - track.getBoundingClientRect().left};
+  return {idx: fromIdx};
+}
+function stageTravel(fromIdx, toIdx, start){
+  if(!start || (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
+  const track = document.querySelector('#view-opp .track');
+  if(!track || typeof track.animate !== 'function') return;
+  const stages = Array.from(track.querySelectorAll('.track-stage')).slice(0, TRACK_STAGES.length);
+  const tr = track.getBoundingClientRect(), W = tr.width;
+  if(!W) return;
+  const cx = stages.map(st=>{ const d = st.querySelector('.track-dot').getBoundingClientRect(); return d.left + d.width/2 - tr.left; });
+  const x0 = start.x != null ? start.x : cx[start.idx], x1 = cx[toIdx];
+  const rest = stages.map(st=>({cls: st.className, glyph: st.querySelector('.track-dot').innerHTML}));
+  const base = document.createElement('div'); base.className = 'track-line';
+  const line = document.createElement('div'); line.className = 'track-line go';
+  track.insertBefore(line, track.firstChild);
+  track.insertBefore(base, line);
+  track.classList.add('traveling');
+  const root = getComputedStyle(document.documentElement);
+  const anim = line.animate([{transform:'scaleX('+(x0/W)+')'}, {transform:'scaleX('+(x1/W)+')'}],
+    {duration: parseFloat(root.getPropertyValue('--t-slow')) || 280,
+     easing: root.getPropertyValue('--ease').trim() || 'ease', fill:'forwards'});
+  let shown = null, raf = 0;
+  function paint(){
+    const x = line.getBoundingClientRect().right - tr.left;
+    const arrived = anim.playState === 'finished' || Math.abs(x - x1) <= 0.5; // at the new node's centre
+    const key = stages.map((_,i)=>x >= cx[i] - 0.5 ? 1 : 0).join('') + (arrived ? 'A' : '');
+    if(key === shown) return;
+    shown = key;
+    stages.forEach((st,i)=>{
+      const reached = key[i] === '1', dot = st.querySelector('.track-dot');
+      st.classList.remove('done', 'active');
+      if(reached) st.classList.add(arrived && i === toIdx ? 'active' : 'done');
+      dot.innerHTML = reached && !(arrived && i === toIdx) ? '&#10003;' : '';
+    });
+  }
+  function tick(){
+    if(!track.isConnected) return;
+    paint();
+    raf = requestAnimationFrame(tick);
+  }
+  paint();
+  raf = requestAnimationFrame(tick);
+  anim.finished.then(()=>{
+    cancelAnimationFrame(raf);
+    if(!track.isConnected) return;
+    stages.forEach((st,i)=>{ st.className = rest[i].cls; st.querySelector('.track-dot').innerHTML = rest[i].glyph; });
+    base.remove(); line.remove();
+    track.classList.remove('traveling');
+  }).catch(()=>{});
+}
 
 /* D183 gave this kv-2col unconditionally, matching every other Details-tab field card — but the
    intake review draft's own product-terms card (New Opportunity flow) shares this one function
