@@ -774,7 +774,7 @@ a.stage-link{text-decoration:none;color:inherit;cursor:pointer}
 
 .scrim{position:fixed;inset:0;z-index:80;background:var(--scrim);display:flex;
   align-items:flex-start;justify-content:center;padding:var(--s7) var(--s5);overflow-y:auto}
-.modal{background:var(--paper);border-radius:var(--r-m);box-shadow:var(--lift-hi);
+.modal{position:relative;background:var(--paper);border-radius:var(--r-m);box-shadow:var(--lift-hi);
   width:100%;max-width:640px;max-height:84vh;display:flex;flex-direction:column;outline:none}
 .modal-head{display:flex;align-items:flex-start;gap:var(--s4);padding:var(--s5) var(--s5) var(--s3);
   flex:0 0 auto;border-bottom:1px solid transparent}
@@ -852,6 +852,11 @@ a.stage-link{text-decoration:none;color:inherit;cursor:pointer}
    segThumbMove() sets its translateX and width from the active button, as positionSlidingMarker()
    does for the tab marker. Colour stays on the buttons (active --ink, inactive --ink-2, D247); the
    focus outline stays on the button too. */
+/* D263: the crossfade's outgoing copy (xfadeRun()). One layer per card or modal, over the whole
+   box, clipped to it, never hit-testable, never read by assistive tech; the clones inside it sit
+   at the exact on-screen boxes the old content had. Removed when its fade ends. */
+.xfade-layer{position:absolute;inset:0;overflow:hidden;border-radius:inherit;pointer-events:none}
+.xfade-layer > *{position:absolute;margin:0;box-sizing:border-box}
 .seg-thumb{position:absolute;top:var(--s1);left:0;height:24px;background:var(--paper);border-radius:var(--r-s);
   box-shadow:var(--lift-thumb);pointer-events:none;
   transition:transform var(--t-base) var(--ease),width var(--t-base) var(--ease)}
@@ -105527,6 +105532,71 @@ if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){
 const SEG_THUMB_HTML = '<span class="seg-thumb" aria-hidden="true"></span>';
 const SEG_SEL = '.viewtoggle, .roletoggle';
 const SEG_FROM = new Map();      // data-seg -> {x, w}, captured on click, consumed by the re-render
+/* D263 (§27c.3, Other/mocks/view-switch-mock-v1.html card B): an opacity-only crossfade on an
+   in-card view switch. The content that changes, the scope line and the rows region, fades out
+   while the new fades in, in the same place, on --t-base and --ease; the title, header link,
+   segmented control and thumb do not fade. The switch re-renders the card (swapPanel()) or the
+   modal body (refreshModalIfOpen()), so the old content no longer exists afterwards: at click
+   time, in the same capture listener that records the thumb, xfadeCapture() clones each changing
+   region and records its on-screen box; when the MutationObserver sees the re-rendered control,
+   xfadeRun() lays the clones over the new content in one aria-hidden, pointer-events:none layer,
+   fades them 1 to 0 and the new regions 0 to 1, and removes the layer at the end. A new switch
+   removes any layer still fading first, so copies never stack. Only a click on a different view
+   of these six controls does this, so no first render, whole-page render or modal open fades
+   (D118); the Pipeline, Accounts and persona toggles are excluded by ruling. Reduced motion is
+   checked in JS before anything is captured (element.animate() is not covered by the CSS rule,
+   §11.7): the swap is then instant, as before. */
+const XFADE_KEYS = new Set(['setPartnerView','setLossView','setModalPartnerView','setModalLossView',
+  'setExecWlView','setExecWhyView']);
+const XFADE_FROM = new Map();    // data-seg -> {box, rect, parts:[{clone, rect}]}, consumed by the re-render
+function xfadeBox(ctl){ return ctl.closest('.modal') || ctl.closest('.panel'); }
+/* The regions that change. Cards: the scope line, the rows, and the Loss card's "Lost to" footer
+   (shown in one view only). Modals: the scope line, and every body child except the switch. */
+function xfadeRegions(box, ctl){
+  if(box.classList.contains('modal')){
+    const body = box.querySelector('.modal-body');
+    return [box.querySelector('.modal-scope')].concat(body ? Array.from(body.children).filter(c=>!c.contains(ctl) && c!==ctl) : []);
+  }
+  return [box.querySelector('.toggle-scope'), box.querySelector('.toggle-rows'), box.querySelector(':scope > .panel-footer')];
+}
+function xfadeClear(box){
+  box.querySelectorAll(':scope > .xfade-layer').forEach(l=>l.remove());
+}
+function xfadeCapture(ctl, key){
+  if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const box = xfadeBox(ctl);
+  if(!box) return;
+  xfadeClear(box);
+  const parts = xfadeRegions(box, ctl).filter(Boolean).map(el=>({clone: el.cloneNode(true), rect: el.getBoundingClientRect()}));
+  XFADE_FROM.set(key, {id: box.id, modal: box.classList.contains('modal'), parts});
+  setTimeout(function(){ XFADE_FROM.delete(key); }, 0);
+}
+function xfadeRun(ctl, xf){
+  const box = xfadeBox(ctl);
+  if(!box || typeof box.animate !== 'function') return;
+  xfadeClear(box);
+  const b = box.getBoundingClientRect();
+  const layer = document.createElement('div');
+  layer.className = 'xfade-layer';
+  layer.setAttribute('aria-hidden', 'true');
+  xf.parts.forEach(function(p){
+    p.clone.removeAttribute('id');
+    p.clone.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id'));
+    p.clone.style.left = (p.rect.left - b.left - box.clientLeft)+'px';
+    p.clone.style.top = (p.rect.top - b.top - box.clientTop)+'px';
+    p.clone.style.width = p.rect.width+'px';
+    p.clone.style.height = p.rect.height+'px';
+    p.clone.style.minHeight = '0';
+    layer.appendChild(p.clone);
+  });
+  box.appendChild(layer);
+  const root = getComputedStyle(document.documentElement);
+  const opts = {duration: parseFloat(root.getPropertyValue('--t-base')) || 180,
+    easing: root.getPropertyValue('--ease').trim() || 'ease'};
+  layer.animate([{opacity:1}, {opacity:0}], Object.assign({fill:'forwards'}, opts))
+    .finished.then(()=>layer.remove()).catch(()=>{});
+  xfadeRegions(box, ctl).filter(Boolean).forEach(el=>el.animate([{opacity:0}, {opacity:1}], opts));
+}
 const SEG_SIZE = new WeakMap();  // control -> "w x h" last seen, so ResizeObserver acts on real changes only
 function segThumbMove(ctl, from){
   const thumb = ctl.querySelector(':scope > .seg-thumb');
@@ -105569,6 +105639,7 @@ document.addEventListener('click', function(e){
   const c = ctl.getBoundingClientRect(), t = thumb.getBoundingClientRect();
   SEG_FROM.set(key, {x: t.left - c.left - ctl.clientLeft, w: t.width});
   setTimeout(function(){ SEG_FROM.delete(key); }, 0); // a click that re-renders nothing leaves no stale start
+  if(XFADE_KEYS.has(key) && !btn.classList.contains('active')) xfadeCapture(ctl, key);
 }, true);
 new MutationObserver(function(muts){
   const added = new Set(), changed = new Set();
@@ -105589,6 +105660,8 @@ new MutationObserver(function(muts){
     const from = SEG_FROM.get(ctl.dataset.seg);
     if(from) SEG_FROM.delete(ctl.dataset.seg);
     segThumbMove(ctl, from || 'instant');
+    const xf = XFADE_FROM.get(ctl.dataset.seg);
+    if(xf){ XFADE_FROM.delete(ctl.dataset.seg); xfadeRun(ctl, xf); }
   });
   changed.forEach(function(ctl){
     if(!added.has(ctl) && ctl.isConnected){ SEG_FROM.delete(ctl.dataset.seg); segThumbMove(ctl, 'slide'); }
@@ -106311,11 +106384,28 @@ window.addEventListener('hashchange', closeModal);
    would. A no-op when no modal is open, or a different one is. Existing modals are all read-only
    (Home's), so this had no caller before the Opportunity record's card modals made editing inside
    a modal possible for the first time. */
+/* D262 (Known issue 19): rebuilding the body destroyed whatever inside it had focus (a view
+   switch's button, an inline-edit input), so focus fell to <body>, outside the scrim, where its
+   Escape and Tab-trap keydown listener never fires. Focus now stays inside the modal: on the
+   replacement of the control that had it (same id, or same tag, onclick and label, so the view
+   button just clicked is found again in its new position), otherwise on the modal container. */
+function modalFocusKey(el){
+  return {id: el.id || '', tag: el.tagName, click: el.getAttribute('onclick') || '', text: (el.textContent || '').trim()};
+}
+function modalFindFocus(box, k){
+  if(k.id){ const e = document.getElementById(k.id); if(e && box.contains(e)) return e; }
+  if(!k.click) return null;
+  return Array.from(box.querySelectorAll(k.tag)).find(e=>
+    e.getAttribute('onclick')===k.click && (e.textContent || '').trim()===k.text) || null;
+}
 function refreshModalIfOpen(key){
   if(MODAL_OPEN_KEY !== key) return;
   const scrim = document.getElementById('modal-scrim');
   const def = MODALS[key];
   if(!scrim || !def) return;
+  const box = scrim.querySelector('.modal');
+  const was = document.activeElement;
+  const focusKey = box && was && was !== box && box.contains(was) ? modalFocusKey(was) : null;
   const d = def();
   const body = scrim.querySelector('.modal-body');
   if(body) body.innerHTML = d.body;
@@ -106334,6 +106424,10 @@ function refreshModalIfOpen(key){
      hairline (openModal) needs re-checking here too, not just on initial open. */
   const head = scrim.querySelector('.modal-head');
   if(body && head) head.classList.toggle('scrolled', body.scrollTop > 0);
+  if(box && (focusKey || !box.contains(document.activeElement))){
+    const again = focusKey && modalFindFocus(box, focusKey);
+    if(again !== document.activeElement) (again || box).focus({preventScroll: true});
+  }
 }
 
 /* ---------- quota progress ----------
