@@ -773,6 +773,8 @@ a.stage-link{text-decoration:none;color:inherit;cursor:pointer}
   padding:0 0 var(--s3);margin-bottom:var(--s3);border-bottom:1px solid var(--row-sep)}
 .stage-mini-item.clickable{cursor:pointer}
 .stage-mini-item.clickable:hover{background:var(--hover)}
+/* D276: same as .met-label above. The fill here does not transition, so neither does the colour. */
+.stage-mini-item.clickable:hover .stage-mini-k{color:var(--ink-2)}
 .stage-mini-k{font-size:11px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .stage-mini-v{font-size:11px;color:var(--ink-2);margin-top:var(--s1)}
 .stage-mini-v b{font-family:var(--ui);font-size:13px;color:var(--ink);font-weight:500;margin-right:2px}
@@ -804,6 +806,11 @@ a.stage-link{text-decoration:none;color:inherit;cursor:pointer}
 .panel.expandable:hover{border-color:var(--line-2)}
 .met.expandable{cursor:pointer;position:relative;transition:background .12s var(--ease)}
 .met.expandable:hover{background:var(--hover)}
+/* D276: --ink-3 fails 4.5:1 on --hover (4.31:1), so the label darkens to --ink-2 while the cell is
+   hovered only; at rest it stays --ink-3 (Known issue 16's last spot; D243 fixed its spots at rest).
+   The colour rides the fill's own 120ms, written as the token. */
+.met.expandable .met-label{transition:color var(--t-fast) var(--ease)}
+.met.expandable:hover .met-label{color:var(--ink-2)}
 
 .scrim{position:fixed;inset:0;z-index:80;background:var(--scrim);display:flex;
   align-items:flex-start;justify-content:center;padding:var(--s7) var(--s5);overflow-y:auto}
@@ -1591,7 +1598,7 @@ table.tbl{width:100%;border-collapse:collapse}
           </div>
           <div class="newmenu-item" onclick="closeNewMenu();location.hash='#/intake/simulated'">
             <div class="newmenu-item-title">Simulated demo</div>
-            <div class="newmenu-item-sub">Pick a scripted product scenario to show the flow — demo-only, not a shipping path</div>
+            <div class="newmenu-item-sub">Pick a scripted product scenario to show the flow. Demo-only, not a shipping path</div>
           </div>
         </div>
       </div>
@@ -110938,7 +110945,7 @@ function drawIntakeStep(){
         '<div class="match-banner-sub">'+esc(acct.industryName)+' · '+esc(acct.location)+' · Account already on file. This will be a new '+productLabel(product)+' opportunity on it</div>'+
       '</div>'+
       '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
-        '<div class="panel-title">Extracted fields</div><div class="panel-scope">Product Type detected: '+productLabel(product)+' · click any value to override</div>'+
+        '<div class="panel-title">Extracted fields</div><div class="panel-scope">Product type detected: '+productLabel(product)+' · click any value to override</div>'+
       '</div></div><div class="panel-body">'+coreKvHtml+'</div></div>'+
       '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
         '<div class="panel-title">'+productLabel(product)+' terms</div><div class="panel-scope">Product-conditional fields: this is what changes by product type</div>'+
