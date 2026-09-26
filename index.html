@@ -107607,8 +107607,10 @@ DRILLS.loss = {views:LOSS_VIEWS, count:v=>lossViewData(CURRENT_BDO_ID, v).rows.l
    replays it). The flag is set before any of the animation work below runs, deliberately: if
    anything here were interrupted (a route change, the tab backgrounding mid-transition) a later
    render of the same page must still land on fully-visible cards, never retry a half-finished
-   reveal and never leave one stuck at opacity 0. Cards are every .panel/.strip inside
-   #view-home, in DOM order, which for both Home pages is already visual order (D104, D253).
+   reveal and never leave one stuck at opacity 0. Cards are every .panel/.strip inside #view-home.
+   D118 amendment (Kevin, 2026-09-26, Other/mocks/entrance-mock-v1.html option A "Cascade"): the
+   stagger follows on-screen position, not DOM order, which put Partners and Where we're losing
+   (below the fold) ahead of Pipeline snapshot and Today (row 1, right). entranceDelays() below.
    Web Animations API (element.animate()), not a CSS class toggle. A CSS-transition version of this
    (add a "hidden" class, force a reflow, add a "visible" class) was built and tested first, and
    worked correctly on BDO Home but silently failed on Exec Home every time: confirmed via
@@ -107623,6 +107625,23 @@ DRILLS.loss = {views:LOSS_VIEWS, count:v=>lossViewData(CURRENT_BDO_ID, v).rows.l
    :root), not hardcoded, so :root stays the only place those numbers are actually defined. */
 const ENTRANCE_SEEN = {bdo:false, exec:false};
 const HOME_BAR_SEL = '.hbar-fill, .bullet-bar, .att-fill, .wfill, .stage-mini-fill'; // D265
+const ENTRANCE_ROW_PX = 8;   // card tops this close together are one row
+/* Visible cards group into rows by their tops (within ENTRANCE_ROW_PX); rows start top to bottom,
+   one step apart, and every card in a row starts together. A card whose top is below the viewport
+   starts one step after the last visible row. */
+function entranceDelays(cards, stepMs){
+  const fold = window.innerHeight + window.scrollY;
+  const tops = cards.map(c=>c.getBoundingClientRect().top + window.scrollY);
+  const rows = [];
+  Array.from(new Set(tops.filter(t=>t < fold))).sort((a,b)=>a-b)
+    .forEach(t=>{ if(!rows.length || t - rows[rows.length-1] > ENTRANCE_ROW_PX) rows.push(t); });
+  return tops.map(t=>{
+    if(t >= fold) return rows.length*stepMs;
+    let row = 0;
+    rows.forEach((r,k)=>{ if(t >= r - ENTRANCE_ROW_PX) row = k; });
+    return row*stepMs;
+  });
+}
 function playHomeEntrance(seenKey){
   if(ENTRANCE_SEEN[seenKey]) return;
   ENTRANCE_SEEN[seenKey] = true;
@@ -107634,9 +107653,10 @@ function playHomeEntrance(seenKey){
     const durationMs = parseFloat(root.getPropertyValue('--t-slow')) || 280;
     const stepMs = (parseFloat(root.getPropertyValue('--t-fast')) || 120) * 0.5;
     const easing = (root.getPropertyValue('--ease') || '').trim() || 'ease';
+    const delays = entranceDelays(cards, stepMs);
     const anims = cards.map((c,i)=>c.animate(
       [{opacity:0, transform:'translateY(8px)'}, {opacity:1, transform:'translateY(0)'}],
-      {duration:durationMs, delay:i*stepMs, easing:easing, fill:'both'}
+      {duration:durationMs, delay:delays[i], easing:easing, fill:'both'}
     ));
     /* D265 (§27c.5, figures-charts-mock-v1.html part 2, option B): on this same first landing, and
        only here, each card's bars grow from their left edge as the card fades in, with the card's
@@ -107647,7 +107667,7 @@ function playHomeEntrance(seenKey){
        page, since ENTRANCE_SEEN gates it, so bars never re-grow. Reduced motion returned above. */
     cards.forEach((c,i)=>c.querySelectorAll(HOME_BAR_SEL).forEach(bar=>anims.push(bar.animate(
       [{transform:'scaleX(0)'}, {transform:'scaleX(1)'}],
-      {duration:durationMs, delay:i*stepMs, easing:easing, fill:'both'}
+      {duration:durationMs, delay:delays[i], easing:easing, fill:'both'}
     ))));
     /* Safety net for the "never leave a card stuck invisible" requirement: fill:'both' already
        holds each animation's end state once it finishes on its own, but a pathological case (the
@@ -107659,7 +107679,7 @@ function playHomeEntrance(seenKey){
        animation is a no-op. */
     setTimeout(()=>{
       anims.forEach(a=>{ try{ a.finish(); }catch(e){} });
-    }, cards.length*stepMs + durationMs + 400);
+    }, Math.max(...delays) + durationMs + 400);
   });
 }
 
@@ -107768,12 +107788,11 @@ function renderHome(){
     '<div class="home-grid">'+
 
       '<div class="home-col home-col-8">'+
+        /* R1: the stacked header Pipeline snapshot shares this row with, no top-right element (the
+           feed has no drill link), so both cards' scope lines and first rows share geometry. */
         '<div class="panel feed-panel">'+
-          '<div class="panel-header"><div class="panel-header-text">'+
-            '<div class="panel-title">Needs your attention</div>'+
-            '<div class="panel-scope">'+feed.length+
-              ' signals across your book, ranked by urgency, most pressing first</div>'+
-          '</div></div>'+
+          panelHeaderHtml('Needs your attention',
+            feed.length+' signals across your book, ranked by urgency, most pressing first', '')+
           '<div class="panel-body flush">'+
             (feed.length ? feed.map(c=>
               /* D106: each item's own `section` (set in buildFeed(), per D89's destination rule)
