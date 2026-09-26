@@ -77,10 +77,15 @@
   /* D257: APPROVED DEVIATION, same shape as --r-full. Exactly one consumer, the inline-save
      confirmation line's sweep (efConfirmSaved). Not a fourth general duration. */
   --t-sweep:400ms;
+  /* D315: APPROVED DEVIATION, same shape as --t-sweep. Its only consumers are the drill-down pop-up
+     and the side panel entering and leaving; every other modal stays on --t-slow, content changes
+     inside an open panel on --t-base. */
+  --t-surface:560ms;
   /* D261: APPROVED DEVIATION from "one curve", same shape as --r-full and --t-sweep. The one
      spring: a closed-form damped spring, bounce 0.15, sampled to 49 points, peak overshoot 0.6%
      (Other/mocks/springs-mock-v1.html, row C). Sliding markers ONLY (.section-nav-marker,
-     .seg-thumb), always on --t-base, and only inside @supports (transition-timing-function:
+     .seg-thumb), always on --t-base, plus the side panel's slide on --t-surface (D315, read in JS
+     with a CSS.supports check standing in for the @supports rule), and only inside @supports (transition-timing-function:
      linear(0,1)): a custom property holding linear() fails only where it is used, so the --ease
      base rule is what an unsupporting browser keeps. Not a general second easing. */
   --spring:linear(0.0000, 0.0130, 0.0472, 0.0965, 0.1559, 0.2214, 0.2898,
@@ -752,6 +757,10 @@ a.stage-link{text-decoration:none;color:inherit;cursor:pointer}
 .home-calendar-panel{display:flex;flex-direction:column;flex:1 1 160px;min-height:160px}
 .home-calendar-panel > .panel-header{flex:0 0 auto}
 .home-calendar-panel > .panel-body{flex:1 1 auto;min-height:0}
+/* Known issue 20: in one column there is no second stack to level with, so the card takes its
+   natural height; the 160px basis above let its events overflow the card below 1140px. The side
+   panel's own one-column layout carries the same rule (body.panel-open, below). */
+@media (max-width:1140px){.home-calendar-panel{flex:0 0 auto}}
 
 /* ---------- Pipeline Snapshot's stage-mini row (D225): four columns, stage name / count+$ /
    a thin single-hue bar sized by dollars relative to the largest stage, each clickable to the
@@ -818,10 +827,8 @@ a.stage-link{text-decoration:none;color:inherit;cursor:pointer}
   width:100%;max-width:640px;max-height:84vh;display:flex;flex-direction:column;outline:none}
 .modal-head{display:flex;align-items:flex-start;gap:var(--s4);padding:var(--s5) var(--s5) var(--s3);
   flex:0 0 auto;border-bottom:1px solid transparent}
-/* D119: no divider under the header by default; a hairline appears only once the body actually
-   scrolls (toggled in openModal/refreshModalIfOpen). Transparent-by-default rather than
-   none/none so the hairline's arrival never shifts layout. */
-.modal-head.scrolled{border-bottom-color:var(--line)}
+/* D119: no divider under the header. Its scrolled-state hairline is replaced by the D312 scroll-edge
+   fade (below); the transparent border stays so the header keeps its height. */
 .modal-head-text{flex:1;min-width:0}
 .modal-title{font-family:var(--ui);font-size:19px;font-weight:500;letter-spacing:-.01em;color:var(--ink)}
 .modal-scope{font-size:12px;color:var(--ink-3);margin-top:var(--s1)}
@@ -833,11 +840,154 @@ a.stage-link{text-decoration:none;color:inherit;cursor:pointer}
    Quick-create (its first consumer) never overflows the 84vh body, so there's nothing for a
    scrolled-state footer hairline to react to yet; revisit if a future footer consumer does. */
 .modal-footer{display:flex;align-items:center;gap:var(--s3);padding:var(--s4) var(--s5);flex:0 0 auto}
-.modal-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s5);
-  padding:var(--s4) 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
-  margin-bottom:var(--s4)}
-.modal-fig{font-family:var(--ui);font-size:22px;font-weight:500;letter-spacing:-.03em;color:var(--ink)}
-.modal-lab{font-size:11px;font-weight:500;color:var(--ink-3)}
+
+/* ---------- drill-downs and the side panel (D301 to D316; spec Other/mocks/drill-panel-spec-v6.html) ----------
+   A drill-down with DRILL_POP_MAX_ROWS rows or fewer opens as the Sheet pop-up; more opens the split
+   side panel (D302). Both are built from the same parts: title and one-line scope, the figure first
+   with one line of context, then rows, then an optional footer (D303, O4). The close button reuses
+   .modal-close, which renders identically. */
+.dd-fig{font-family:var(--ui);font-size:29px;font-weight:500;letter-spacing:-.03em;color:var(--ink);line-height:1.1}
+.dd-fig .cur,.dd-fig .un{font-size:.62em;font-weight:400;color:var(--ink-2)}
+.dd-fig-2{color:var(--ink-2)}
+.dd-lead-sub{font-size:12px;color:var(--ink-2);margin-top:var(--s1)}
+.dd-note{font-size:12px;color:var(--ink-2);margin-top:var(--s3);line-height:1.45}
+.dd-muted{color:var(--ink-3)}
+.dd-figpair{display:flex;gap:var(--s6);align-items:flex-end}
+.dd-head{display:flex;align-items:flex-start;gap:var(--s4);flex:0 0 auto;border-bottom:1px solid transparent}
+.dd-head-text{flex:1;min-width:0}
+.dd-title{font-size:19px;font-weight:500;letter-spacing:-.01em;color:var(--ink)}
+.dd-scope{font-size:12px;color:var(--ink-3);margin-top:var(--s1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dd-lead{flex:0 0 auto}
+.dd-pre .stage-mini{margin-bottom:0;border-bottom:none;padding-bottom:0}
+.dd-seg{flex:0 0 auto}
+.dd-scroll{flex:1;min-height:0;overflow-y:auto}
+.dd-rows{display:flex;flex-direction:column}
+.dd-foot{display:flex;align-items:center;justify-content:flex-end;gap:var(--s3);flex:0 0 auto;border-top:1px solid transparent}
+.dd-foot-note{font-size:12px;color:var(--ink-3);margin-right:auto}
+.dd-link{font:500 12px var(--ui);color:var(--brand);background:none;border:none;padding:0;cursor:pointer}
+.dd-link:hover{color:var(--brand-2)}
+.dd-back{font:500 12px var(--ui);color:var(--brand);cursor:pointer;background:none;border:none;padding:0}
+.dd-back:hover{color:var(--brand-2)}
+.dd-link:focus-visible,.dd-back:focus-visible,.dd-row:focus-visible,.dd-pop:focus-visible,.dd-panel:focus-visible{
+  outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
+.dd-pop:focus,.dd-panel:focus{outline:none}
+/* Rows: the D305 hover reach, 8px past the text, --r-s corners; dividers inset to the text and hidden
+   beside the hovered row. */
+.dd-row{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--s4);align-items:center;
+  padding:var(--s3) var(--s2);margin:0 calc(-1*var(--s2));border-radius:var(--r-s);cursor:pointer;
+  transition:background var(--t-fast) var(--ease)}
+.dd-row::before{content:'';position:absolute;top:0;left:var(--s2);right:var(--s2);height:1px;background:var(--row-sep)}
+.dd-row:first-child::before,.dd-row:hover::before,.dd-row:hover + .dd-row::before{opacity:0}
+.dd-row:hover{background:var(--hover)}
+.dd-row.no-link{cursor:default}
+.dd-row.no-link:hover{background:transparent}
+.dd-row.no-link:hover::before,.dd-row.no-link:hover + .dd-row::before{opacity:1}
+.dd-row.no-link:first-child::before{opacity:0}
+/* bar rows share one right column width so every bar's track, and BDOs vs goal's pace line, line up */
+.dd-row.bar{grid-template-columns:minmax(0,1fr) 128px}
+.dd-row-l{min-width:0}
+.dd-row-name{font-size:13px;font-weight:500;color:var(--ink);margin-bottom:var(--s1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dd-row-name .tag{margin-left:var(--s2);vertical-align:1px}
+.dd-row-r{text-align:right}
+.dd-row-amt{font-size:13px;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+.dd-row-sub{font-size:11px;color:var(--ink-3);margin-top:var(--s1);white-space:nowrap}
+.dd-row-sub.warn{color:var(--warn-ink)}
+.dd-tags{display:flex;gap:var(--s1);flex-wrap:wrap;align-items:center}
+.dd-rbar{position:relative;height:4px;background:var(--sunken);border-radius:2px;margin-top:var(--s2)}
+.dd-rbar span{position:absolute;left:0;top:0;bottom:0;background:var(--brand);border-radius:2px}
+.dd-rbar span.warn{background:var(--warn)}
+.dd-rbar i{position:absolute;top:-3px;bottom:-3px;width:1px;background:var(--ink-2)}
+/* Win rate's per-product rows (count and size side by side) */
+.dd-wr-row{display:grid;grid-template-columns:1fr 88px 88px;align-items:center;gap:var(--s3);padding:var(--s3) 0;
+  box-shadow:inset 0 1px 0 var(--row-sep);font-size:13px}
+.dd-wr-row:nth-child(2){box-shadow:none}
+.dd-wr-head{font-size:11px;font-weight:500;color:var(--ink-3);padding:0 0 var(--s2);box-shadow:none}
+.dd-wr-v{text-align:right;font-variant-numeric:tabular-nums;color:var(--ink)}
+.dd-wr-n{margin-left:var(--s2);color:var(--ink-2);font-size:12px}
+
+/* The Sheet pop-up (D303, D307, D309): centred, 520px, --r-l, --s7 from the top, standard dimming.
+   Small drill-downs only; every other modal keeps D119's shell. */
+.dd-scrim{position:fixed;inset:0;z-index:var(--z-scrim);background:var(--scrim);display:flex;align-items:flex-start;
+  justify-content:center;padding:var(--s7) var(--s5) var(--s5)}
+.dd-pop{position:relative;z-index:var(--z-modal);background:var(--paper);box-shadow:var(--lift-hi);border-radius:var(--r-l);
+  width:100%;max-width:520px;max-height:84vh;display:flex;flex-direction:column;padding:var(--s6) var(--s6) 0}
+.dd-pop .dd-lead{padding:var(--s5) 0 var(--s4)}
+.dd-pop .dd-pre{padding:0 0 var(--s4)}
+.dd-pop .dd-seg{padding:0 0 var(--s3)}
+.dd-pop .dd-scroll{margin:0 calc(-1*var(--s2));padding:0 var(--s2)}
+.dd-pop .dd-foot{padding:var(--s4) 0 var(--s5)}
+.dd-pop .dd-foot-pad{height:var(--s5)}
+
+/* The split side panel (D301, D308): full height, 504px, one --line-2 hairline, no shadow, no
+   dimming. The page narrows by the same width, so nothing sits under it; both Home pages drop to one
+   column while it is open (D301, D316). */
+.dd-panel{position:fixed;top:0;right:0;bottom:0;width:504px;max-width:100vw;z-index:var(--z-modal);background:var(--paper);
+  border-left:1px solid var(--line-2);display:flex;flex-direction:column;will-change:transform}
+body.panel-open .app{padding-right:504px}
+body.panel-open .home-grid{grid-template-columns:minmax(0,1fr)}
+body.panel-open .home-col-8,body.panel-open .home-col-4{grid-column:span 1}
+body.panel-open .home-calendar-panel{flex:0 0 auto}
+.dd-panel-top{display:flex;align-items:center;justify-content:space-between;gap:var(--s3);padding:var(--s3) var(--s5) 0;min-height:44px}
+.dd-panel .dd-head{padding:var(--s3) var(--s5) var(--s3)}
+.dd-panel .dd-lead{padding:var(--s2) var(--s5) var(--s4)}
+.dd-panel .dd-pre{padding:0 var(--s5) var(--s4)}
+.dd-panel .dd-seg{padding:0 var(--s5) var(--s3)}
+.dd-panel .dd-rows{margin:0 var(--s5) var(--s4)}
+.dd-panel .dd-foot{padding:var(--s3) var(--s5)}
+/* The deal preview (D310): Details and Activity tabs, facts, next best action, signals, contacts. */
+.dd-block{padding:var(--s4) var(--s5);border-top:1px solid var(--line)}
+.dd-block:first-child{border-top:none;padding-top:var(--s2)}
+.dd-tabs + .dd-scroll .dd-block:first-child{padding-top:var(--s4)}
+.dd-tags-lead{margin-bottom:var(--s3)}
+.dd-fig-edit .ef{font-size:inherit}
+.dd-sec{font-size:11px;font-weight:500;color:var(--ink-3);margin:0 0 var(--s2)}
+.dd-facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s3) var(--s5)}
+.dd-fact-k{font-size:11px;font-weight:500;color:var(--ink-3)}
+.dd-fact-v{font-size:13px;color:var(--ink);margin-top:2px}
+.dd-fact-v .sub{color:var(--ink-2);font-size:12px}
+.dd-line{font-size:13px;color:var(--ink);line-height:1.45}
+.dd-line.muted{color:var(--ink-3)}
+.dd-fact-v .ef,.dd-line .ef{display:inline-block}
+.dd-sig{display:flex;gap:var(--s2);align-items:baseline;font-size:13px;color:var(--ink);padding:2px 0}
+.dd-dot{width:6px;height:6px;border-radius:var(--r-s);flex:0 0 6px;transform:translateY(-1px)}
+.dd-dot.warn{background:var(--warn)}
+.dd-dot.pos{background:var(--pos)}
+.dd-act{display:grid;grid-template-columns:64px 1fr auto;gap:var(--s3);font-size:12px;padding:var(--s1) 0;align-items:baseline}
+.dd-act .t{color:var(--ink-3)}
+.dd-act .s{color:var(--ink)}
+.dd-act .d{color:var(--ink-3);font-variant-numeric:tabular-nums}
+.dd-contact{display:flex;justify-content:space-between;font-size:12px;padding:var(--s1) 0}
+.dd-contact .n{color:var(--ink);font-weight:500}
+.dd-contact .r{color:var(--ink-2)}
+.dd-arrows{display:flex;align-items:center;gap:var(--s1);margin-left:auto}
+.dd-pos{font-size:12px;color:var(--ink-3);margin-right:var(--s1);font-variant-numeric:tabular-nums}
+.dd-arrow{height:24px;width:24px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line-2);
+  border-radius:var(--r-s);background:var(--paper);color:var(--ink-2);cursor:pointer;padding:0}
+.dd-arrow:hover:not(:disabled){background:var(--hover);color:var(--ink)}
+.dd-arrow:disabled{opacity:.4;cursor:default}
+.dd-open{height:var(--h);padding:0 var(--s4);border-radius:var(--r-s);background:var(--brand);color:var(--paper);border:none;
+  font:500 13px var(--ui);cursor:pointer}
+.dd-open:hover{background:var(--brand-2)}
+.dd-tabs{display:flex;gap:var(--s5);padding:0 var(--s5);border-bottom:1px solid var(--line);flex:0 0 auto}
+.dd-tab{position:relative;height:36px;padding:0;border:none;background:none;font:500 12px var(--ui);color:var(--ink-3);
+  cursor:pointer;display:inline-flex;align-items:center;gap:var(--s1)}
+.dd-tab:hover,.dd-tab.on{color:var(--ink)}
+.dd-tab.on::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--brand)}
+.dd-tab-n{font-size:11px;color:var(--ink-3)}
+.dd-arrow:focus-visible,.dd-open:focus-visible,.dd-tab:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
+/* the Opportunities row whose preview is open */
+#view-pipeline tr.dd-sel td{background:var(--brand-a06)}
+@media (prefers-reduced-motion:reduce){.dd-row{transition:none}}
+/* D312: the scroll-edge fade, on every scrolling area inside a surface (the drill-down pop-up and
+   panel, the remaining modals, the Board columns), never the page. Content fades out over 24px at
+   the top once scrolled and over 40px at the bottom while more remains (fadeEdges() sets the two
+   classes). A logged exception to the no-gradients rule, scoped to scroll edges (CLAUDE.md §4). The
+   mask reads alpha only, so its opaque stop is a token rather than a colour keyword. */
+.dd-scroll,.modal-body,.kcol-body{--fade-top:0px;--fade-bottom:0px;
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0,var(--ink) var(--fade-top),var(--ink) calc(100% - var(--fade-bottom)),transparent 100%);
+  mask-image:linear-gradient(to bottom,transparent 0,var(--ink) var(--fade-top),var(--ink) calc(100% - var(--fade-bottom)),transparent 100%)}
+.dd-scroll.fade-top,.modal-body.fade-top,.kcol-body.fade-top{--fade-top:var(--s5)}
+.dd-scroll.fade-bot,.modal-body.fade-bot,.kcol-body.fade-bot{--fade-bottom:40px}
 
 /* ---------- pipeline stage-filter chip (Pipeline view, arrived via a stage-bar click) ---------- */
 .stage-filter-clear{margin-left:var(--s1);background:none;border:none;color:var(--brand);
@@ -892,7 +1042,7 @@ a.stage-link{text-decoration:none;color:inherit;cursor:pointer}
    segThumbMove() sets its translateX and width from the active button, as positionSlidingMarker()
    does for the tab marker. Colour stays on the buttons (active --ink, inactive --ink-2, D247); the
    focus outline stays on the button too. */
-/* D263: the crossfade's outgoing copy (xfadeRun()). One layer per card or modal, over the whole
+/* D263: the crossfade's outgoing copy (xfadeRun()). One layer per card, over the whole
    box, clipped to it, never hit-testable, never read by assistive tech; the clones inside it sit
    at the exact on-screen boxes the old content had. Removed when its fade ends. */
 .xfade-layer{position:absolute;inset:0;overflow:hidden;border-radius:inherit;pointer-events:none}
@@ -1250,6 +1400,34 @@ table.tbl{width:100%;border-collapse:collapse}
 .acct-summary-row .sec{color:var(--ink-2)}
 .acct-summary-row.clickable{cursor:pointer}
 .acct-summary-row.clickable:hover{background:var(--hover)}
+
+/* ---------- D305 hover reach, option A "Reach out" (app-wide; spec drill-panel-spec-v6.html O11) ----------
+   Row text stays aligned with the card title; the row's box reaches --s2 past the text on each
+   side (negative margin, matching padding), so its hover fill does, with --r-s corners. Row
+   dividers are redrawn as a ::before inset to the text, and the dividers directly above and below
+   the hovered row hide. A logged R3 exception for fills only (D305, CLAUDE.md §4 R3), checked by
+   scripts/check-card-layout.js's R3_HOVER_REACH. Account 360 summary rows follow D305, not the
+   spec mock, whose border-top divider reached out with the fill (D305 amendment, 2026-09-26); the
+   1px border stays for its height, transparent, with the inset line drawn over it. The drill-down
+   rows (.dd-row) carry the same pattern in their own rule. Table rows round the hovered row's ends. */
+.feedrow:not(.static),.snap-row,.agenda-row{margin-inline:calc(-1*var(--s2));padding-inline:var(--s2);
+  border-radius:var(--r-s);box-shadow:none;position:relative}
+.feedrow:not(.static)::before,.snap-row::before,.agenda-row::before{content:'';position:absolute;top:0;
+  left:var(--s2);right:var(--s2);height:1px;background:var(--row-sep)}
+.feedrow:not(.static):first-child::before,.snap-row:first-child::before,.agenda-row:first-child::before,
+.stage-mini + .snap-row::before{display:none}
+.feedrow:hover::before,.feedrow:hover + .feedrow::before,
+.snap-row:hover::before,.snap-row:hover + .snap-row::before,
+.agenda-row.next::before,.agenda-row.next + .agenda-row::before{opacity:0}
+.acct-summary-row.clickable{margin-inline:calc(-1*var(--s2));padding-inline:var(--s2);border-radius:var(--r-s);position:relative}
+.acct-summary-row + .acct-summary-row.clickable{border-top-color:transparent}
+.acct-summary-row + .acct-summary-row.clickable::before{content:'';position:absolute;top:-1px;left:var(--s2);right:var(--s2);
+  height:1px;background:var(--line)}
+.acct-summary-row.clickable:hover::before,.acct-summary-row.clickable:hover + .acct-summary-row::before{opacity:0}
+.acct-summary-row.clickable:hover + .acct-summary-row:not(.clickable){border-top-color:transparent}
+.stage-mini-item.clickable{margin:calc(-1*var(--s1)) calc(-1*var(--s2));padding:var(--s1) var(--s2);border-radius:var(--r-s)}
+.tbl.clickable tbody tr:hover td:first-child{border-radius:var(--r-s) 0 0 var(--r-s)}
+.tbl.clickable tbody tr:hover td:last-child{border-radius:0 var(--r-s) var(--r-s) 0}
 /* D197: the Prospect Opportunities panel's own row shape, forked per D151 from the base 3-column
    .acct-summary-row above (Referred opportunities, Where their referrals lose keep that shape
    unchanged) — this panel leads with the product-type tag instead of a name cell (D197 dropped
@@ -105075,6 +105253,9 @@ const CORE_DEFS = [
   cdef('priority','Priority','select', PRIORITIES),
   cdef('notes','Notes','text'),
   cdef('nextBestAction','Next Best Action','text',null,{emptyLabel:'Add next best action'}),
+  /* D311 (amends D252): Yield gets a definition and is editable wherever it shows, first in the
+     side panel's deal preview. One decimal and a percent sign. */
+  cdef('yieldPct','Yield','percent',null,{format:v=>v==null?'Not set':Number(v).toFixed(1)+'%'}),
   cdef('underwriterId','Underwriter',
     'select',[{value:'',label:'Unassigned'}].concat(D.bdos.map(b=>({value:b.id,label:b.name}))),
     {set:(o,v)=>{o.underwriterId=v||null;}}),
@@ -105287,7 +105468,7 @@ function efCardOf(span){ return span.closest('.panel, .modal, .opp-header') || s
 function efConfirmSaved(recId, key, inModal){
   const sel = '.ef[data-rec="'+recId+'"][data-key="'+key+'"]';
   const cells = Array.from(document.querySelectorAll(sel));
-  const span = cells.find(c=>!!c.closest('.modal')===!!inModal) || cells[0];
+  const span = cells.find(c=>!!c.closest('.modal, .dd-panel')===!!inModal) || cells[0];
   if(!span || typeof span.animate !== 'function') return;
   const card = efCardOf(span);
   EF_CONFIRMS.slice().forEach(c=>{
@@ -105367,7 +105548,7 @@ function activateEdit(span){
   const recId = span.dataset.rec, key = span.dataset.key;
   const def = findDef(recId, key);
   if(!def) return;
-  const inModal = !!span.closest('.modal');
+  const inModal = !!span.closest('.modal, .dd-panel');
   const obj = EF_STORE[recId].obj;
   const val = def.get(obj);
   const elId = 'efc_'+(++EF_SEQ);
@@ -105444,7 +105625,7 @@ document.addEventListener('keydown', function(e){
   entry.def.set(obj, entry.oldVal);
   auditFieldEdit(entry.recId, entry.def, entry.newVal, entry.oldVal);
   if(EF_RERENDER) EF_RERENDER();
-  efConfirmSaved(entry.recId, entry.def.key, !!document.querySelector('.modal'));
+  efConfirmSaved(entry.recId, entry.def.key, !!document.querySelector('.modal, .dd-panel'));
 });
 
 /* ---------- derived analytics (computed, never hardcoded) ---------- */
@@ -105604,17 +105785,14 @@ const SEG_FROM = new Map();      // data-seg -> {x, w}, captured on click, consu
    (D118); the Pipeline, Accounts and persona toggles are excluded by ruling. Reduced motion is
    checked in JS before anything is captured (element.animate() is not covered by the CSS rule,
    §11.7): the swap is then instant, as before. */
-const XFADE_KEYS = new Set(['setPartnerView','setLossView','setModalPartnerView','setModalLossView',
-  'setExecWlView','setExecWhyView']);
+const XFADE_KEYS = new Set(['setPartnerView','setLossView','setExecWlView','setExecWhyView']);
 const XFADE_FROM = new Map();    // data-seg -> {box, rect, parts:[{clone, rect}]}, consumed by the re-render
-function xfadeBox(ctl){ return ctl.closest('.modal') || ctl.closest('.panel'); }
-/* The regions that change. Cards: the scope line, the rows, and the Loss card's "Lost to" footer
-   (shown in one view only). Modals: the scope line, and every body child except the switch. */
-function xfadeRegions(box, ctl){
-  if(box.classList.contains('modal')){
-    const body = box.querySelector('.modal-body');
-    return [box.querySelector('.modal-scope')].concat(body ? Array.from(body.children).filter(c=>!c.contains(ctl) && c!==ctl) : []);
-  }
+/* Cards only: the Partners and Loss modals that were also consumers became drill-downs (D302),
+   whose view switch fades the whole panel content instead (D315). */
+function xfadeBox(ctl){ return ctl.closest('.panel'); }
+/* The regions that change: the scope line, the rows, and the Loss card's "Lost to" footer (shown in
+   one view only). */
+function xfadeRegions(box){
   return [box.querySelector('.toggle-scope'), box.querySelector('.toggle-rows'), box.querySelector(':scope > .panel-footer')];
 }
 function xfadeClear(box){
@@ -105625,8 +105803,8 @@ function xfadeCapture(ctl, key){
   const box = xfadeBox(ctl);
   if(!box) return;
   xfadeClear(box);
-  const parts = xfadeRegions(box, ctl).filter(Boolean).map(el=>({clone: el.cloneNode(true), rect: el.getBoundingClientRect()}));
-  XFADE_FROM.set(key, {id: box.id, modal: box.classList.contains('modal'), parts});
+  const parts = xfadeRegions(box).filter(Boolean).map(el=>({clone: el.cloneNode(true), rect: el.getBoundingClientRect()}));
+  XFADE_FROM.set(key, {id: box.id, parts});
   setTimeout(function(){ XFADE_FROM.delete(key); }, 0);
 }
 function xfadeRun(ctl, xf){
@@ -105653,7 +105831,7 @@ function xfadeRun(ctl, xf){
     easing: root.getPropertyValue('--ease').trim() || 'ease'};
   layer.animate([{opacity:1}, {opacity:0}], Object.assign({fill:'forwards'}, opts))
     .finished.then(()=>layer.remove()).catch(()=>{});
-  xfadeRegions(box, ctl).filter(Boolean).forEach(el=>el.animate([{opacity:0}, {opacity:1}], opts));
+  xfadeRegions(box).filter(Boolean).forEach(el=>el.animate([{opacity:0}, {opacity:1}], opts));
 }
 const SEG_SIZE = new WeakMap();  // control -> "w x h" last seen, so ResizeObserver acts on real changes only
 function segThumbMove(ctl, from){
@@ -105866,11 +106044,16 @@ function route(){
     LIST_PENDING_RESTORE = null;
   }
 }
-function showView(id){ document.getElementById(id).classList.add('active'); }
+function showView(id){
+  const v = document.getElementById(id);
+  v.classList.add('active');
+  v.querySelectorAll(FADE_SEL).forEach(fadeEdges); // rendered while hidden, so measured only now (D312)
+}
 window.addEventListener('hashchange', route);
 
 let ROLE = 'bdo';
 window.setRole = function(role){
+  if(SURF_EL) closeSurface(true);
   ROLE = role;
   document.getElementById('role-bdo').classList.toggle('active', role==='bdo');
   document.getElementById('role-exec').classList.toggle('active', role==='exec');
@@ -106220,14 +106403,6 @@ function stageMiniHtml(myOpen){
 const MODALS = {};
 let MODAL_RETURN_FOCUS = null;
 let MODAL_OPEN_KEY = null;
-/* A card with its own internal view toggle (Partners, "Where we're losing") must open its modal
-   scoped to whichever view was active on the card, per-key, and let the modal's toggle switch
-   views independently afterward without touching the card. Keyed by modal key so this is one
-   generalized store rather than a pair of near-identical globals per toggle card — a third
-   toggle card (D81's divergence/stage-time card) reuses it for free. Plain JS state, not
-   anything written onto a DOM node, so swapPanel()'s wholesale node replacement (D80) never
-   touches it — confirmed, not assumed: nothing here is read from or written to a card element. */
-const MODAL_VIEW = {};
 
 /* Background scroll lock. position:fixed on the body is used rather than overflow:hidden
    because overflow:hidden still lets the page scroll under a fixed overlay in several browsers.
@@ -106236,6 +106411,18 @@ const MODAL_VIEW = {};
    open/close/open (openModal calls closeModal first) can never strand the body locked, and
    unlockScroll() run without a lock is a no-op. The reserved scrollbar gutter is handled in CSS
    (scrollbar-gutter), so nothing shifts sideways when the scrollbar goes away. */
+/* D312: the scroll-edge fade. Called after anything that renders a scrolling area inside a surface
+   (a modal opening or refreshing, a drill-down surface, the Board); a scroll or a window resize
+   re-checks it through the listeners below. */
+const FADE_SEL = '.dd-scroll, .modal-body, .kcol-body';
+function fadeEdges(el){
+  if(!el) return;
+  el.classList.toggle('fade-top', el.scrollTop > 0);
+  el.classList.toggle('fade-bot', el.scrollTop + el.clientHeight < el.scrollHeight - 1);
+}
+document.addEventListener('scroll', e=>{ if(e.target.matches && e.target.matches(FADE_SEL)) fadeEdges(e.target); }, true);
+window.addEventListener('resize', ()=>document.querySelectorAll(FADE_SEL).forEach(fadeEdges));
+
 let SCROLL_LOCK_Y = null;
 function lockScroll(){
   if(SCROLL_LOCK_Y !== null) return;
@@ -106266,48 +106453,6 @@ function sortableTh(label, opts){
   const cls = opts.num ? ' class="num"' : '';
   return '<th'+cls+' data-sort-type="'+(opts.type||'text')+'">'+
     '<button type="button" class="th-sort">'+label+'</button></th>';
-}
-function modalRow(cells, cls){
-  return '<tr'+(cls?' class="'+cls+'"':'')+'>'+cells.map(c=>{
-    if(typeof c!=='object') return '<td>'+c+'</td>';
-    const sortAttr = c.sort!=null ? ' data-sort="'+esc(String(c.sort))+'"' : '';
-    return '<td class="'+(c.cls||'')+'"'+sortAttr+'>'+c.v+'</td>';
-  }).join('')+'</tr>';
-}
-function modalTable(headers, rows){
-  if(!rows.length) return '<div class="empty">Nothing to show here.</div>';
-  return '<div class="tbl-wrap"><table class="tbl"><thead><tr>'+
-    headers.map(h=>{
-      const opts = (h!=null && typeof h==='object') ? h : {};
-      const label = (h!=null && typeof h==='object') ? (h.label!=null?h.label:'') : h;
-      return sortableTh(label, opts);
-    }).join('')+
-    '</tr></thead><tbody>'+rows.join('')+'</tbody></table></div>';
-}
-function modalStrip(items){
-  return '<div class="modal-strip">'+items.map(i=>
-    '<div><div class="modal-lab">'+esc(i.label)+'</div><div class="modal-fig">'+i.value+'</div></div>'
-  ).join('')+'</div>';
-}
-/* `extraSortType`/`extraSortValue` type the Detail column correctly per caller (MODALS.underwriting
-   passes a day count as 'number'; MODALS.funded passes fundedDate as 'date'); omitted, Detail
-   sorts as text, same as the plain Stage case when there's no `extra` at all. */
-function oppRowsTable(opps, extra, extraSortType, extraSortValue){
-  const rows = opps.slice().sort((a,b)=>b.facilitySize-a.facilitySize).map(o=>{
-    const detailSort = extraSortValue ? ' data-sort="'+esc(String(extraSortValue(o)))+'"' : '';
-    return '<tr onclick="closeModal();location.hash=\'#/opp/'+o.id+'\'">'+
-      '<td class="name">'+esc(getAccount(o.accountId).name)+'</td>'+
-      '<td class="sec">'+productLabel(o.productType)+'</td>'+
-      '<td class="sec"'+detailSort+'>'+(extra?extra(o):o.stage)+'</td>'+
-      '<td class="num" data-sort="'+o.facilitySize+'">'+moneyPlain(o.facilitySize)+'</td>'+
-    '</tr>';
-  });
-  if(!rows.length) return '<div class="empty">No deals in this set.</div>';
-  return '<div class="tbl-wrap"><table class="tbl clickable"><thead><tr>'+
-    sortableTh('Account',{type:'text'})+sortableTh('Product',{type:'text'})+
-    sortableTh(extra?'Detail':'Stage',{type: extra ? (extraSortType||'text') : 'text'})+
-    sortableTh('Facility',{num:true,type:'currency'})+
-    '</tr></thead><tbody>'+rows.join('')+'</tbody></table></div>';
 }
 
 /* ================================================================
@@ -106376,16 +106521,12 @@ document.addEventListener('click', function(e){
   withKeys.forEach(w=>tbody.appendChild(w.tr));
 });
 
-window.openModal = function(key, view){
+window.openModal = function(key){
   const def = MODALS[key];
   if(!def) return;
   closeModal();
   MODAL_RETURN_FOCUS = document.activeElement;
   MODAL_OPEN_KEY = key;
-  /* Only toggle-card callers pass `view` (the card's own current PARTNER_VIEW/LOSS_VIEW/etc.,
-     the single source of truth — never a second one introduced here); a plain metric-tile modal
-     passes nothing and MODALS[key] ignores MODAL_VIEW entirely. */
-  if(view !== undefined) MODAL_VIEW[key] = view;
   const d = def();
   const scrim = document.createElement('div');
   scrim.className = 'scrim';
@@ -106406,28 +106547,24 @@ window.openModal = function(key, view){
   scrim.addEventListener('mousedown', e=>{ if(e.target===scrim) closeModal(); });
   box.focus();
 
-  /* D119 scrolled-state header hairline: only the .modal-body scrolls (the shell is capped at
-     84vh), so this is the one place scroll position is actually known. */
-  const modalBodyEl = scrim.querySelector('.modal-body');
-  const modalHeadEl = scrim.querySelector('.modal-head');
-  const syncModalScrollState = ()=> modalHeadEl.classList.toggle('scrolled', modalBodyEl.scrollTop > 0);
-  modalBodyEl.addEventListener('scroll', syncModalScrollState);
-  syncModalScrollState();
+  fadeEdges(scrim.querySelector('.modal-body'));
 
-  /* focus trap: Tab cycles only within the dialog while it is open */
   scrim.addEventListener('keydown', function(e){
     if(e.key==='Escape'){ e.preventDefault(); closeModal(); return; }
-    if(e.key!=='Tab') return;
-    const f = box.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-    if(!f.length){ e.preventDefault(); return; }
-    const first=f[0], last=f[f.length-1];
-    if(e.shiftKey && (document.activeElement===first || document.activeElement===box)){
-      e.preventDefault(); last.focus();
-    } else if(!e.shiftKey && document.activeElement===last){
-      e.preventDefault(); first.focus();
-    }
+    if(e.key==='Tab') trapTab(e, box);
   });
 };
+/* Focus trap, shared by the modal and the drill-down pop-up: Tab cycles only within the dialog. */
+function trapTab(e, box){
+  const f = box.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+  if(!f.length){ e.preventDefault(); return; }
+  const first=f[0], last=f[f.length-1];
+  if(e.shiftKey && (document.activeElement===first || document.activeElement===box)){
+    e.preventDefault(); last.focus();
+  } else if(!e.shiftKey && document.activeElement===last){
+    e.preventDefault(); first.focus();
+  }
+}
 window.closeModal = function(){
   const s = document.getElementById('modal-scrim');
   if(s) s.remove();
@@ -106585,7 +106722,7 @@ function toastRescue(){
   document.addEventListener('visibilitychange', ()=>{ TOAST_HOLD.hidden = document.hidden; toastHoldChanged(); });
   document.addEventListener('keydown', e=>{
     if(e.key!=='Escape' || !TOASTS.length) return;
-    if(document.querySelector('.modal') || document.querySelector('.ef.editing')) return; // Esc keeps its meaning
+    if(document.querySelector('.modal, .dd-scrim:not(.leaving), .dd-panel:not(.leaving)') || document.querySelector('.ef.editing')) return; // Esc keeps its meaning
     toastDismiss(TOASTS[0]);
   }, true);
 })();
@@ -106640,15 +106777,383 @@ function refreshModalIfOpen(key){
      MODALS.* entry returns no `footer` and this is a no-op for them. */
   const footer = scrim.querySelector('.modal-footer');
   if(footer && d.footer) footer.innerHTML = d.footer;
-  /* Rebuilding .modal-body's content can change whether it overflows, so the D119 scrolled-state
-     hairline (openModal) needs re-checking here too, not just on initial open. */
-  const head = scrim.querySelector('.modal-head');
-  if(body && head) head.classList.toggle('scrolled', body.scrollTop > 0);
+  /* Rebuilding .modal-body's content can change whether it overflows, so its D312 fade is
+     re-checked here too, not just on open. */
+  if(body) fadeEdges(body);
   if(box && (focusKey || !box.contains(document.activeElement))){
     const again = focusKey && modalFindFocus(box, focusKey);
     if(again !== document.activeElement) (again || box).focus({preventScroll: true});
   }
 }
+
+/* ================================================================
+   DRILL-DOWN SURFACES (D301 to D316; spec Other/mocks/drill-panel-spec-v6.html)
+   A drill-down opens as the Sheet pop-up when it lists DRILL_POP_MAX_ROWS rows or fewer, and in the
+   split side panel otherwise (D302), counted when it opens; a toggle drill-down counts its largest
+   view, so a view switch never changes the surface (D314). Both surfaces are app-level elements
+   appended to <body>, outside every .view, so a page re-render never removes them. The panel keeps
+   a stack (a drill-down, then a deal opened from it) for its back link.
+   Click again to close (D304): the tile, card or row that opened the panel closes it; a different
+   one swaps its content. A pop-up closes on any click outside it, its opener included, since the
+   dimming covers the opener. Escape closes either. Focus returns to the opener where it can.
+   ================================================================ */
+const DRILL_POP_MAX_ROWS = 8;       // D302
+const DRILL_VIEW = {};              // the current view per toggle drill-down (Partners, Loss)
+let SURF_EL = null;                 // the open pop-up's dimming layer, or the open side panel
+let SURF_KIND = null;               // 'pop' | 'panel'
+let SURF_POP_KEY = null;            // the drill-down shown in the open pop-up
+let PANEL_STACK = [];               // [{kind:'drill', key} | {kind:'deal', id}], top last
+let SURF_OPENER = null;             // modalFocusKey() of whatever had focus when a surface opened
+let PANEL_LIST = null;              // {ids, index} while a deal preview came from the Opportunities list
+let PANEL_DEAL_TAB = 'details';     // the deal preview's tab; back to Details on the next deal (D310)
+let PANEL_PRIOR_RERENDER = null;    // the page's own EF_RERENDER, put back when the preview closes
+
+function drillSize(key){
+  const d = DRILLS[key];
+  return d.views ? Math.max(...d.views.map(v=>d.count(v.key))) : d.count();
+}
+function drillSurfaceFor(key){ return drillSize(key) <= DRILL_POP_MAX_ROWS ? 'pop' : 'panel'; }
+function drillParts(key){ return DRILLS[key].parts(DRILL_VIEW[key]); }
+function drillSegHtml(key){
+  const d = DRILLS[key];
+  return d.views ? '<div class="dd-seg">'+viewToggleHtml(d.views, DRILL_VIEW[key], 'setDrillView')+'</div>' : '';
+}
+function drillHeadHtml(p, close){
+  return '<div class="dd-head"><div class="dd-head-text"><div class="dd-title">'+p.title+'</div>'+
+    '<div class="dd-scope" title="'+esc(textOfHtml(p.scope))+'">'+p.scope+'</div></div>'+
+    (close ? '<button type="button" class="modal-close" aria-label="Close" onclick="closeSurface()">&#10005;</button>' : '')+'</div>';
+}
+function textOfHtml(html){ const t = document.createElement('div'); t.innerHTML = html; return t.textContent; }
+function surfRememberOpener(){
+  const a = document.activeElement;
+  SURF_OPENER = a && a !== document.body && !(SURF_EL && SURF_EL.contains(a)) ? modalFocusKey(a) : SURF_OPENER;
+}
+function surfReturnFocus(){
+  const k = SURF_OPENER;
+  SURF_OPENER = null;
+  if(!k) return;
+  const el = modalFindFocus(document.body, k);
+  if(el && el.focus && el.tabIndex >= 0) el.focus({preventScroll:true});
+}
+
+/* ---------- motion (D315; the O16 table of drill-panel-spec-v6.html) ----------
+   The pop-up and the panel enter and leave over --t-surface; content changes inside an open panel
+   fade on --t-base; reduced motion is opacity only over --t-fast. Durations and curves are read
+   from :root at call time, and reduced motion is checked here in JS as well as in CSS, since
+   element.animate() is not covered by the global CSS rule. The pop-up uses --ease. The panel
+   slides on --spring where linear() is supported, --ease otherwise (D261, widened by D315); the
+   page narrows in step on open, and on close returns at once, so only the panel moves. A new open
+   cancels a close of the same surface still running; a pop-up and a panel may cross (the pop-up
+   fades out as the panel slides in, and the reverse). */
+const SURF_LEAVING = {pop:null, panel:null};
+let SURF_PAGE_ANIM = null;          // the page's narrowing on panel open
+function surfTok(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+function surfMs(n){ return parseFloat(surfTok(n)) || 0; }
+function surfReduced(){ return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); }
+function surfPanelEase(){
+  return window.CSS && CSS.supports('transition-timing-function', 'linear(0,1)') ? surfTok('--spring') : surfTok('--ease');
+}
+function surfAnim(el, kf, o){ return el && typeof el.animate === 'function' ? el.animate(kf, o) : null; }
+function surfCancelLeaving(kind){
+  const l = SURF_LEAVING[kind];
+  if(!l) return;
+  if(l.anim) l.anim.cancel();
+  l.el.remove();
+  SURF_LEAVING[kind] = null;
+}
+function surfEnter(el, kind){
+  const ease = surfTok('--ease');
+  if(kind==='panel' && SURF_PAGE_ANIM){ SURF_PAGE_ANIM.cancel(); SURF_PAGE_ANIM = null; }
+  if(surfReduced()){ surfAnim(el, [{opacity:0}, {opacity:1}], {duration:surfMs('--t-fast'), easing:ease}); return; }
+  const d = surfMs('--t-surface');
+  if(kind==='pop'){
+    surfAnim(el, [{opacity:0}, {opacity:1}], {duration:d, easing:ease});
+    surfAnim(el.querySelector('.dd-pop'), [{opacity:0, transform:'translateY(8px) scale(.98)'}, {opacity:1, transform:'none'}], {duration:d, easing:ease});
+    return;
+  }
+  const curve = surfPanelEase(), w = el.getBoundingClientRect().width;
+  surfAnim(el, [{transform:'translateX(100%)'}, {transform:'translateX(0)'}], {duration:d, easing:curve});
+  SURF_PAGE_ANIM = surfAnim(document.querySelector('.app'), [{paddingRight:'0px'}, {paddingRight:w+'px'}], {duration:d, easing:curve});
+}
+function surfLeave(el, kind){
+  el.classList.add('leaving');
+  el.style.pointerEvents = 'none';
+  const ease = surfTok('--ease'), rm = surfReduced(), d = rm ? surfMs('--t-fast') : surfMs('--t-surface');
+  let anim;
+  if(rm) anim = surfAnim(el, [{opacity:1}, {opacity:0}], {duration:d, easing:ease, fill:'forwards'});
+  else if(kind==='pop'){
+    anim = surfAnim(el, [{opacity:1}, {opacity:0}], {duration:d, easing:ease, fill:'forwards'});
+    surfAnim(el.querySelector('.dd-pop'), [{opacity:1, transform:'none'}, {opacity:0, transform:'translateY(4px) scale(.98)'}], {duration:d, easing:ease, fill:'forwards'});
+  } else anim = surfAnim(el, [{transform:'translateX(0)'}, {transform:'translateX(100%)'}], {duration:d, easing:surfPanelEase(), fill:'forwards'});
+  surfCancelLeaving(kind);
+  SURF_LEAVING[kind] = {el, anim};
+  const done = ()=>{ el.remove(); if(SURF_LEAVING[kind] && SURF_LEAVING[kind].el===el) SURF_LEAVING[kind] = null; };
+  if(anim) anim.onfinish = done; else done();
+}
+/* A content change inside an open panel (another deal, back, a view switch, the arrows): the new
+   header, tabs, body and footer fade in, opacity only, on --t-base (the D263 family). */
+function surfSwapFade(panel){
+  const o = {duration:surfMs('--t-base'), easing:surfTok('--ease')};
+  ['.dd-head', '.dd-tabs', '.dd-scroll', '.dd-foot'].forEach(sel=>surfAnim(panel.querySelector(sel), [{opacity:0}, {opacity:1}], o));
+}
+
+/* ---------- the Sheet pop-up ---------- */
+function popInner(key){
+  const p = drillParts(key);
+  return drillHeadHtml(p, true)+
+    '<div class="dd-lead">'+p.lead+'</div>'+
+    (p.pre ? '<div class="dd-pre">'+p.pre+'</div>' : '')+drillSegHtml(key)+
+    '<div class="dd-scroll"><div class="dd-rows">'+p.body+'</div></div>'+
+    (p.foot ? '<div class="dd-foot">'+p.foot+'</div>' : '<div class="dd-foot-pad"></div>');
+}
+function openPop(key){
+  if(SURF_EL) closeSurface(SURF_KIND==='pop', true);   // an open panel slides out as the pop-up comes in
+  surfCancelLeaving('pop');
+  const scrim = document.createElement('div');
+  scrim.className = 'dd-scrim';
+  scrim.innerHTML = '<div class="dd-pop" role="dialog" aria-modal="true" tabindex="-1">'+popInner(key)+'</div>';
+  const box = scrim.querySelector('.dd-pop');
+  box.setAttribute('aria-label', textOfHtml(drillParts(key).title));
+  scrim.addEventListener('click', e=>{ if(e.target===scrim) closeSurface(); });
+  scrim.addEventListener('keydown', e=>{ if(e.key==='Tab') trapTab(e, box); });
+  document.body.appendChild(scrim);
+  lockScroll();
+  SURF_EL = scrim; SURF_KIND = 'pop'; SURF_POP_KEY = key;
+  fadeEdges(scrim.querySelector('.dd-scroll'));
+  surfEnter(scrim, 'pop');
+  box.focus();
+}
+/* A view switch inside the pop-up rebuilds it in place, with no entrance. */
+function refreshPop(){
+  const box = SURF_EL.querySelector('.dd-pop');
+  box.innerHTML = popInner(SURF_POP_KEY);
+  fadeEdges(SURF_EL.querySelector('.dd-scroll'));
+  box.focus({preventScroll:true});
+}
+
+/* ---------- the split side panel ---------- */
+function panelInnerDrill(key, back){
+  const p = drillParts(key);
+  return '<div class="dd-panel-top">'+back+'<button type="button" class="modal-close" aria-label="Close panel" onclick="closeSurface()">&#10005;</button></div>'+
+    drillHeadHtml(p, false)+
+    '<div class="dd-scroll"><div class="dd-lead">'+p.lead+'</div>'+(p.pre ? '<div class="dd-pre">'+p.pre+'</div>' : '')+drillSegHtml(key)+
+      '<div class="dd-rows">'+p.body+'</div></div>'+
+    (p.foot ? '<div class="dd-foot">'+p.foot+'</div>' : '');
+}
+/* `fade` marks a content change in an already-open panel (D315); an inline-edit refresh and a tab
+   switch pass nothing and show no motion. */
+function renderPanel(fade){
+  const view = PANEL_STACK[PANEL_STACK.length-1], prev = PANEL_STACK.length>1 ? PANEL_STACK[PANEL_STACK.length-2] : null;
+  const back = prev ? '<button type="button" class="dd-back" onclick="panelBack()">&lsaquo; '+drillParts(prev.key).title+'</button>' : '<span></span>';
+  const wasDeal = SURF_KIND==='panel' && SURF_EL.querySelector('.dd-open');
+  let panel = SURF_KIND==='panel' ? SURF_EL : null, entering = false;
+  if(!panel){
+    // an open pop-up fades out as the panel slides in (a deal clicked in the pop-up)
+    if(SURF_EL){ const stack = PANEL_STACK, list = PANEL_LIST; closeSurface(false, true); PANEL_STACK = stack; PANEL_LIST = list; }
+    surfCancelLeaving('panel');
+    entering = true;
+    panel = document.createElement('aside');
+    panel.className = 'dd-panel';
+    panel.setAttribute('aria-label', 'Side panel');
+    panel.tabIndex = -1;
+    document.body.appendChild(panel);
+    document.body.classList.add('panel-open');
+    SURF_EL = panel; SURF_KIND = 'panel';
+  }
+  panel.innerHTML = view.kind==='drill' ? panelInnerDrill(view.key, back) : panelInnerDeal(view.id, back);
+  fadeEdges(panel.querySelector('.dd-scroll'));
+  panelMarkSel();
+  if(entering) surfEnter(panel, 'panel'); else if(fade) surfSwapFade(panel);
+  if(view.kind==='deal'){
+    if(!wasDeal) PANEL_PRIOR_RERENDER = EF_RERENDER;
+    EF_RERENDER = panelEditRerender;
+  } else if(wasDeal) EF_RERENDER = PANEL_PRIOR_RERENDER;
+}
+function panelShowsDrill(key){
+  const v = SURF_KIND==='panel' && PANEL_STACK[PANEL_STACK.length-1];
+  return !!v && v.kind==='drill' && v.key===key;
+}
+window.panelBack = function(){ PANEL_STACK.pop(); PANEL_LIST = null; renderPanel(true); };
+
+/* ---------- opening and closing ---------- */
+window.openDrill = function(key, view){
+  const d = DRILLS[key];
+  if(!d) return;
+  if(panelShowsDrill(key) && (!view || view===DRILL_VIEW[key])){ closeSurface(); return; }   // D304
+  if(d.views) DRILL_VIEW[key] = view || DRILL_VIEW[key] || (key==='partners' ? PARTNER_VIEW : LOSS_VIEW);
+  surfRememberOpener();
+  if(drillSurfaceFor(key)==='pop') openPop(key);
+  else { PANEL_STACK = [{kind:'drill', key}]; renderPanel(true); }
+};
+window.setDrillView = function(v){
+  const key = SURF_KIND==='pop' ? SURF_POP_KEY : (PANEL_STACK[PANEL_STACK.length-1]||{}).key;
+  if(!key) return;
+  DRILL_VIEW[key] = v;
+  if(SURF_KIND==='pop') refreshPop();
+  else { renderPanel(true); const s = SURF_EL.querySelector('.dd-scroll'); if(s){ s.scrollTop = 0; fadeEdges(s); } }
+};
+/* `instant` removes the surface with no exit motion and skips focus return: the caller is
+   navigating. `keepOpener` is for a hand-over to the other surface, which keeps the first opener. */
+window.closeSurface = function(instant, keepOpener){
+  const el = SURF_EL, kind = SURF_KIND;
+  SURF_EL = null; SURF_KIND = null; SURF_POP_KEY = null; PANEL_STACK = []; PANEL_LIST = null;
+  if(!el) return;
+  if(el.querySelector('.dd-open')){ EF_RERENDER = PANEL_PRIOR_RERENDER; PANEL_PRIOR_RERENDER = null; }
+  if(instant) el.remove(); else surfLeave(el, kind);
+  panelMarkSel();
+  if(kind==='pop') unlockScroll();
+  else {   // the page gets its full layout back at once; only the panel moves (D315)
+    if(SURF_PAGE_ANIM){ SURF_PAGE_ANIM.cancel(); SURF_PAGE_ANIM = null; }
+    document.body.classList.remove('panel-open');
+  }
+  if(!keepOpener){ if(instant) SURF_OPENER = null; else surfReturnFocus(); }
+};
+/* ---------- the deal preview (D310) ----------
+   Facility size, Owner, Expected close, Yield and Next best action edit in place through the
+   inline-edit engine; days in stage, signals, activity and contacts are read-only; Stage and
+   Product type change on the full record. Two tabs, Details and Activity with its count. */
+function previewActHtml(a){
+  return '<div class="dd-act"><span class="t">'+esc(a.type)+'</span><span class="s">'+esc(a.subject)+'</span><span class="d">'+fmtDateShort(a.date)+'</span></div>';
+}
+function previewDetails(o){
+  const acct = getAccount(o.accountId), days = o.outcome==='open' ? currentDaysInStage(o) : null;
+  const liens = LIENS_BY_ACCT[o.accountId] || [], edges = EDGES_BY_ACCT[o.accountId] || [];
+  const wonEdges = edges.filter(e=>CLOSED_WON_ACCT_IDS.has(e.fromAccountId===o.accountId ? e.toAccountId : e.fromAccountId));
+  const sigs = [];
+  if(liens.some(l=>l.subordinated)) sigs.push('<div class="dd-sig"><span class="dd-dot warn"></span>Subordinated lien on file</div>');
+  if(wonEdges.length) sigs.push('<div class="dd-sig"><span class="dd-dot pos"></span>Trade ties to '+drillPlural(wonEdges.length,'Closed-Won account')+'</div>');
+  if(drillStale(o)) sigs.push('<div class="dd-sig"><span class="dd-dot warn"></span>Longer in '+o.stage+' than most open deals</div>');
+  const contacts = (CONTACTS_BY_ACCT[o.accountId]||[]).slice(0,3);
+  const rec = registerRecord(o.id, o), ed = k=>efSpan(rec, DEF_INDEX['core.'+k]);
+  return '<div class="dd-block"><div class="dd-tags dd-tags-lead">'+productTagHtml(o.productType)+stageTagHtml(o)+'</div>'+
+      '<div class="dd-fig dd-fig-edit">'+ed('facilitySize')+'</div><div class="dd-lead-sub">Facility size · '+esc(acct.location||'')+'</div></div>'+
+    '<div class="dd-block"><div class="dd-facts">'+
+      '<div><div class="dd-fact-k">Owner</div><div class="dd-fact-v">'+ed('bdoId')+'</div></div>'+
+      '<div><div class="dd-fact-k">'+(o.outcome==='open'?'Expected close':'Closed')+'</div><div class="dd-fact-v">'+
+        (o.outcome==='open' ? ed('expectedCloseDate') : (o.fundedDate ? fmtDate(o.fundedDate) : 'Not set'))+'</div></div>'+
+      '<div><div class="dd-fact-k">Days in stage</div><div class="dd-fact-v">'+(days!=null?days+' <span class="sub">· typical '+STAGE_P75[o.stage]+'</span>':'Closed')+'</div></div>'+
+      '<div><div class="dd-fact-k">Yield</div><div class="dd-fact-v">'+ed('yieldPct')+'</div></div>'+
+    '</div></div>'+
+    '<div class="dd-block"><div class="dd-sec">Next best action</div><div class="dd-line">'+ed('nextBestAction')+'</div></div>'+
+    (sigs.length ? '<div class="dd-block"><div class="dd-sec">Signals</div>'+sigs.join('')+'</div>' : '')+
+    '<div class="dd-block"><div class="dd-sec">Contacts</div>'+(contacts.length
+      ? contacts.map(c=>'<div class="dd-contact"><span class="n">'+esc(c.name)+'</span><span class="r">'+esc(c.role)+'</span></div>').join('')
+      : '<div class="dd-line muted">No contacts on file</div>')+'</div>';
+}
+function previewActivity(o){
+  const acts = (ACTS_BY_OPP[o.id]||[]).slice().sort((a,b)=>b.date.localeCompare(a.date));
+  return '<div class="dd-block">'+(acts.length ? acts.map(previewActHtml).join('') : '<div class="dd-line muted">No activity logged yet</div>')+'</div>';
+}
+function previewTabsHtml(o){
+  const n = (ACTS_BY_OPP[o.id]||[]).length;
+  const t = (k,l,c)=>'<button type="button" role="tab" aria-selected="'+(PANEL_DEAL_TAB===k)+'" class="dd-tab'+(PANEL_DEAL_TAB===k?' on':'')+'" '+
+    'onclick="setPreviewTab(\''+k+'\')">'+l+(c!=null?'<span class="dd-tab-n">'+c+'</span>':'')+'</button>';
+  return '<div class="dd-tabs" role="tablist">'+t('details','Details')+t('activity','Activity',n)+'</div>';
+}
+function previewArrowsHtml(){
+  if(!PANEL_LIST) return '';
+  const i = PANEL_LIST.index, n = PANEL_LIST.ids.length;
+  const chev = d=>'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="'+d+'"/></svg>';
+  return '<div class="dd-arrows">'+(i>=0 ? '<span class="dd-pos">'+(i+1)+' of '+n+'</span>' : '')+
+    '<button type="button" class="dd-arrow" aria-label="Previous deal" '+(previewStepTarget(-1)==null?'disabled':'')+' onclick="previewStep(-1)">'+chev('M18 15l-6-6-6 6')+'</button>'+
+    '<button type="button" class="dd-arrow" aria-label="Next deal" '+(previewStepTarget(1)==null?'disabled':'')+' onclick="previewStep(1)">'+chev('M6 9l6 6 6-6')+'</button></div>';
+}
+function panelInnerDeal(id, back){
+  const o = getOpp(id);
+  return '<div class="dd-panel-top">'+back+previewArrowsHtml()+'<button type="button" class="modal-close" aria-label="Close panel" onclick="closeSurface()">&#10005;</button></div>'+
+    '<div class="dd-head"><div class="dd-head-text"><div class="dd-title">'+esc(o.name)+'</div><div class="dd-scope">Preview · '+esc(productLabel(o.productType))+' opportunity</div></div></div>'+
+    previewTabsHtml(o)+
+    '<div class="dd-scroll">'+(PANEL_DEAL_TAB==='activity' ? previewActivity(o) : previewDetails(o))+'</div>'+
+    '<div class="dd-foot"><button type="button" class="dd-open" onclick="openFullRecord(\''+o.id+'\')">Open full record</button></div>';
+}
+function panelShowsDeal(id){
+  const v = SURF_KIND==='panel' && PANEL_STACK[PANEL_STACK.length-1];
+  return !!v && v.kind==='deal' && v.id===id;
+}
+/* An edit re-renders the page behind (its list or cards update at once) and then the preview,
+   keeping the preview's scroll. An edit that re-sorts the Opportunities list moves the deal, so the
+   list order is read again and the arrows step from the deal's new position; a deal that has left
+   the list (an owner change out of My open deals) steps to its old neighbours. */
+function panelEditRerender(){
+  const s1 = SURF_EL && SURF_EL.querySelector('.dd-scroll'), y = s1 ? s1.scrollTop : 0;
+  const page = ((location.hash||'#/home').replace('#/','').split('/')[0]) || 'home';
+  if(page==='pipeline') renderPipeline(); else if(page==='home') renderHome();
+  if(PANEL_LIST){
+    const id = PANEL_STACK[PANEL_STACK.length-1].id;
+    const ids = Array.from(document.querySelectorAll('#view-pipeline table.tbl tbody > tr')).map(tr=>tr.dataset.id);
+    const at = ids.indexOf(id);
+    PANEL_LIST = at>=0 ? {ids, index:at} : {ids, index:-1, gap:Math.min(PANEL_LIST.index, ids.length)};
+  }
+  if(SURF_KIND!=='panel') return;
+  renderPanel();
+  const s2 = SURF_EL.querySelector('.dd-scroll');
+  if(s2) s2.scrollTop = y;
+}
+/* The id one step away, or null at either end. `gap` is where a deal that left the list sat. */
+function previewStepTarget(d){
+  const L = PANEL_LIST;
+  if(!L) return null;
+  const i = L.index>=0 ? L.index + d : (d>0 ? L.gap : L.gap - 1);
+  return i>=0 && i<L.ids.length ? i : null;
+}
+window.previewStep = function(d){
+  const i = previewStepTarget(d);
+  if(i==null) return;
+  PANEL_LIST = {ids:PANEL_LIST.ids, index:i};
+  PANEL_DEAL_TAB = 'details';
+  PANEL_STACK = [{kind:'deal', id:PANEL_LIST.ids[i]}];
+  renderPanel(true);
+};
+window.setPreviewTab = function(k){ PANEL_DEAL_TAB = k; renderPanel(); };
+window.openDealPreview = function(id){
+  PANEL_LIST = null; PANEL_DEAL_TAB = 'details';
+  if(SURF_KIND==='panel') PANEL_STACK.push({kind:'deal', id});
+  else PANEL_STACK = [{kind:'deal', id}];   // from a pop-up: the pop-up gives way to the panel
+  renderPanel(true);
+};
+window.openFullRecord = function(id){
+  const fromList = !!PANEL_LIST;
+  closeSurface(true);
+  if(fromList) openPipelineRecord(id); else location.hash = '#/opp/'+id;
+};
+/* The Opportunities row whose preview is open stays highlighted, and is scrolled into view when a
+   step takes it near an edge. Re-applied whenever the list re-renders underneath. */
+function panelMarkSel(){
+  document.querySelectorAll('#view-pipeline tr.dd-sel').forEach(tr=>tr.classList.remove('dd-sel'));
+  if(!PANEL_LIST || PANEL_LIST.index<0) return;
+  const tr = document.querySelector('#view-pipeline tr[data-id="'+PANEL_LIST.ids[PANEL_LIST.index]+'"]');
+  if(!tr) return;
+  tr.classList.add('dd-sel');
+  const r = tr.getBoundingClientRect();
+  if(r.top<70 || r.bottom>innerHeight-70) tr.scrollIntoView({block:'center'});
+}
+new MutationObserver(()=>{ if(PANEL_LIST) panelMarkSel(); }).observe(document.getElementById('view-pipeline'), {childList:true});
+/* With a list preview open, the up and down arrows (and j/k) step through the list. */
+document.addEventListener('keydown', function(e){
+  if(!PANEL_LIST || SURF_KIND!=='panel') return;
+  const t = e.target, tag = t && t.tagName;
+  if(tag==='INPUT' || tag==='TEXTAREA' || tag==='SELECT' || (t && t.isContentEditable)) return;
+  const d = (e.key==='ArrowDown' || e.key==='j') ? 1 : (e.key==='ArrowUp' || e.key==='k') ? -1 : 0;
+  if(!d) return;
+  e.preventDefault();
+  previewStep(d);
+});
+window.drillToPipeline = function(seg, stage){
+  closeSurface(true);
+  PIPE_SEGMENT = seg; PIPE_VIEW = 'list';
+  if(stage){ location.hash = '#/pipeline/stage/'+stage; return; }
+  PIPE_STAGE_FILTER = null;
+  if(location.hash==='#/pipeline') route(); else location.hash = '#/pipeline';
+};
+/* Escape closes the surface, unless something inside it owns the key first: an inline edit reverts
+   (its own listener stops the event), and a modal opened over the page closes before the panel. */
+document.addEventListener('keydown', function(e){
+  if(!SURF_EL || e.key!=='Escape' || e.defaultPrevented) return;
+  if(document.getElementById('modal-scrim') || (e.target.closest && e.target.closest('.ef.editing'))) return;
+  e.preventDefault();
+  closeSurface();
+});
+window.addEventListener('hashchange', function(){ if(SURF_EL) closeSurface(true); });
 
 /* ---------- quota progress ----------
    Trimmed from the former "pipeline coverage" card's stats function — that card (weighted
@@ -106840,7 +107345,7 @@ function partnersPanelHtml(stats){
     '</div>';
   }).join('');
 
-  return '<div class="panel expandable" id="panel-partners" onclick="openModal(\'partners\', \''+view+'\')">'+
+  return '<div class="panel expandable" id="panel-partners" onclick="openDrill(\'partners\', \''+view+'\')">'+
     panelHeaderHtml('Partners', scope)+
     '<div class="toggle-seg-wrap">'+
       viewToggleHtml(PARTNER_VIEWS, view, 'setPartnerView')+
@@ -106956,7 +107461,7 @@ function lossPanelHtml(bdoId){
     '</div>';
   }).join('');
 
-  return '<div class="panel expandable" id="panel-loss" onclick="openModal(\'loss\', \''+view+'\')">'+
+  return '<div class="panel expandable" id="panel-loss" onclick="openDrill(\'loss\', \''+view+'\')">'+
     panelHeaderHtml('Where we\'re losing', d.scope)+
     '<div class="toggle-seg-wrap">'+
       viewToggleHtml(LOSS_VIEWS, view, 'setLossView')+
@@ -106977,167 +107482,125 @@ function lossPanelHtml(bdoId){
   '</div>';
 }
 
-/* Modal registry — each entry is the DEPTH behind a card's summary. Registered once; every
-   entry reads live from OPPS so it reflects in-session edits and stage moves. */
 function myOpps(){ return Object.values(OPPS).filter(o=>o.bdoId===CURRENT_BDO_ID); }
 
-MODALS.pipeline = function(){
-  const open = myOpps().filter(o=>o.outcome==='open');
-  const total = open.reduce((s,o)=>s+o.facilitySize,0);
-  return {
-    title:'Active pipeline',
-    scope:open.length+' open deals · '+moneyPlain(total)+' in facility size',
-    body: modalStrip([
-      {label:'Open deals', value:open.length},
-      {label:'Total facility', value:moneyShort(total)},
-      {label:'Average deal', value:moneyShort(open.length?total/open.length:0)},
-    ]) + oppRowsTable(open),
-  };
-};
+/* ---------- drill-downs, BDO Home (D301 to D316; spec Other/mocks/drill-panel-spec-v6.html) ----------
+   Each entry is the depth behind a tile or card: count() is how many rows it lists (D302 decides the
+   surface from it when opened), parts() returns title, scope, the lead (figure first, one line of
+   context), optional pre-rows content, the rows and an optional footer. Toggle drill-downs carry
+   `views`; their count takes a view. Every figure is read live from OPPS, so in-session edits show. */
+const DRILLS = {};
+function drillTotal(l){ return l.reduce((s,o)=>s+o.facilitySize,0); }
+function drillStale(o){ return o.outcome==='open' && currentDaysInStage(o) >= (STAGE_P75[o.stage]||Infinity); }
+function drillAsOf(){ return 'as of '+fmtDate(TODAY); }
+function drillPlural(n, one, many){ return n+' '+(n===1 ? one : (many || one+'s')); }
+function drillMyOpen(){ return myOpps().filter(o=>o.outcome==='open').sort((a,b)=>b.facilitySize-a.facilitySize); }
+function drillFundedThisYear(bdoId){
+  const yr = TODAY.slice(0,4);
+  return Object.values(OPPS).filter(o=>o.bdoId===bdoId && o.outcome==='won' && (o.fundedDate||'').slice(0,4)===yr)
+    .sort((a,b)=>b.fundedDate.localeCompare(a.fundedDate));
+}
+function drillFig(html){ return '<div class="dd-fig">'+html+'</div>'; }
+function drillListLink(label, fn){ return '<button type="button" class="dd-link" onclick="'+fn+'">'+label+' &rsaquo;</button>'; }
+/* O5 deal row: name, product and stage tags, facility size, one detail line (amber when flagged). */
+function drillDealRow(o, sub, subWarn, tags){
+  return '<div class="dd-row" tabindex="0" role="button" data-deal="'+o.id+'" onclick="openDealPreview(\''+o.id+'\')" '+
+      'onkeydown="if(event.key===\'Enter\')openDealPreview(\''+o.id+'\')">'+
+    '<div class="dd-row-l"><div class="dd-row-name">'+esc(o.name)+'</div><div class="dd-tags">'+(tags||productTagHtml(o.productType)+stageTagHtml(o))+'</div></div>'+
+    '<div class="dd-row-r"><div class="dd-row-amt">'+moneyPlain(o.facilitySize)+'</div><div class="dd-row-sub'+(subWarn?' warn':'')+'">'+sub+'</div></div></div>';
+}
+function drillDaysSub(o){ return drillPlural(currentDaysInStage(o),'day')+' in stage'; }
+/* O5 bar row: label, a thin bar, one value and one detail line; `opts.href` makes it a link (O8). */
+function drillBarRow(label, right, sub, pctW, opts){
+  opts = opts || {};
+  const link = opts.href ? ' tabindex="0" role="button" onclick="'+opts.href+'" onkeydown="if(event.key===\'Enter\'){'+opts.href+'}"' : '';
+  return '<div class="dd-row bar'+(opts.href?'':' no-link')+'"'+link+'>'+
+    '<div class="dd-row-l"><div class="dd-row-name">'+label+(opts.tag||'')+'</div>'+
+      (pctW!=null ? '<div class="dd-rbar"><span style="width:'+Math.max(0,Math.min(100,pctW)).toFixed(1)+'%"'+(opts.warn?' class="warn"':'')+'></span>'+
+        (opts.marker!=null ? '<i style="left:'+opts.marker.toFixed(1)+'%" title="'+esc(opts.markerTip||'')+'"></i>' : '')+'</div>' : '')+
+    '</div><div class="dd-row-r"><div class="dd-row-amt">'+right+'</div>'+(sub?'<div class="dd-row-sub">'+sub+'</div>':'')+'</div></div>';
+}
 
-MODALS.underwriting = function(){
-  const uw = myOpps().filter(o=>o.outcome==='open' && o.stage==='Underwriting');
-  const total = uw.reduce((s,o)=>s+o.facilitySize,0);
-  return {
-    title:'Deals in Underwriting',
-    scope:'The credit gate — '+uw.length+' deal'+(uw.length===1?'':'s')+' · '+moneyPlain(total),
-    body: modalStrip([
-      {label:'At the gate', value:uw.length},
-      {label:'Facility', value:moneyShort(total)},
-      {label:'Avg days in stage', value:(uw.length
-        ? Math.round(uw.reduce((s,o)=>s+currentDaysInStage(o),0)/uw.length)+'d' : '—')},
-    ]) + oppRowsTable(uw, o=>currentDaysInStage(o)+' days in Underwriting', 'number', o=>currentDaysInStage(o)),
-  };
-};
+DRILLS.pipeline = {count:()=>drillMyOpen().length, parts(){
+  const l = drillMyOpen(), t = drillTotal(l);
+  return {title:'Active pipeline', scope:'Your open deals, every stage, '+drillAsOf(),
+    lead: drillFig(money(t))+'<div class="dd-lead-sub">Across '+drillPlural(l.length,'open deal')+' · average '+moneyShort(l.length?t/l.length:0)+'</div>',
+    pre: stageMiniHtml(l),
+    body: l.map(o=>drillDealRow(o, drillDaysSub(o), drillStale(o))).join(''),
+    foot: drillListLink('Open in Opportunities', "drillToPipeline('myOpen')")};
+}};
 
-MODALS.winrate = function(){
+DRILLS.underwriting = {count:()=>drillMyOpen().filter(o=>o.stage==='Underwriting').length, parts(){
+  const l = drillMyOpen().filter(o=>o.stage==='Underwriting'), t = drillTotal(l);
+  const avg = l.length ? Math.round(l.reduce((s,o)=>s+currentDaysInStage(o),0)/l.length) : 0;
+  return {title:'Deals in Underwriting', scope:'At the credit gate, '+drillAsOf(),
+    lead: drillFig(money(t))+'<div class="dd-lead-sub">'+drillPlural(l.length,'deal')+' · average '+avg+' days in Underwriting, typical '+STAGE_P75.Underwriting+'</div>',
+    body: l.map(o=>drillDealRow(o, drillDaysSub(o), drillStale(o), productTagHtml(o.productType))).join(''),
+    foot: drillListLink('Open in Opportunities', "drillToPipeline('myOpen','Underwriting')")};
+}};
+
+/* Below MIN_RATE_SAMPLE the figures follow the Win rate tile's own convention (won and lost counts
+   by count, no rate by size), never a dash. */
+DRILLS.winrate = {count:()=>3, parts(){
   const mine = myOpps();
   const won = mine.filter(o=>o.outcome==='won' && inTrailing12(o.fundedDate));
   const lost = mine.filter(o=>o.outcome==='lost' && inTrailing12(lostDateOf(o)));
-  const wS = won.reduce((s,o)=>s+o.facilitySize,0), lS = lost.reduce((s,o)=>s+o.facilitySize,0);
-  const closedN = won.length+lost.length;
-  const reliable = rateReliable(closedN);
+  const ws = drillTotal(won), ls = drillTotal(lost), n = won.length+lost.length, ok = rateReliable(n);
+  const tooFew = '<span class="dd-muted">Too few</span>';
   const rows = ['Factoring','ABL','TermLoan'].map(pt=>{
-    const w = won.filter(o=>o.productType===pt), l = lost.filter(o=>o.productType===pt);
-    const n = w.length+l.length;
-    const ws = w.reduce((s,o)=>s+o.facilitySize,0), ls = l.reduce((s,o)=>s+o.facilitySize,0);
-    return modalRow([
-      {v:productLabel(pt), cls:'name'}, {v:w.length, cls:'num', sort:w.length}, {v:l.length, cls:'num', sort:l.length},
-      {v:rateReliable(n)?pct(w.length/n):'—', cls:'num', sort:rateReliable(n)?w.length/n:null},
-      {v:rateReliable(n)?pct(ws/(ws+ls)):'—', cls:'num', sort:rateReliable(n)?ws/(ws+ls):null},
-    ]);
-  });
-  return {
-    title:'Win rate',
-    scope: closedN+' closed deals, trailing 12 months'+(reliable?'. The count-and-size divergence is the signal':', too few to rate reliably'),
-    body: modalStrip([
-      {label:'Won / lost', value:won.length+' / '+lost.length},
-      {label:'By count', value: reliable ? pct(won.length/Math.max(1,closedN)) : '—'},
-      {label:'By size', value: reliable ? pct(wS/Math.max(1,wS+lS)) : '—'},
-    ]) +
-    (reliable
-      ? '<p class="chart-note mt-3">Winning more deals than dollars means the losses are landing on '+
-        'the bigger tickets, the count-and-size divergence this product surfaces by default.</p>'
-      : '<p class="chart-note mt-3">Fewer than '+MIN_RATE_SAMPLE+' closed deals in the trailing 12 '+
-        'months, so a percentage here would move by double digits on a single deal. Counts are shown '+
-        'instead of a rate. This is a normal sample size for one rep\'s book in commercial lending, '+
-        'not a data problem.</p>')+
-    modalTable([{label:'Product',type:'text'}, {label:'Won',num:true,type:'number'}, {label:'Lost',num:true,type:'number'},
-      {label:'Win % count',num:true,type:'number'}, {label:'Win % size',num:true,type:'number'}], rows),
-  };
-};
+    const w = won.filter(o=>o.productType===pt), l = lost.filter(o=>o.productType===pt), k = w.length+l.length;
+    const a = drillTotal(w), b = drillTotal(l), r = rateReliable(k);
+    return '<div class="dd-wr-row"><div>'+productTagHtml(pt)+'<span class="dd-wr-n">'+w.length+' of '+k+' won</span></div>'+
+      '<div class="dd-wr-v">'+(r?pct(w.length/k):tooFew)+'</div>'+
+      '<div class="dd-wr-v">'+(r?pct(a/(a+b)):tooFew)+'</div></div>';
+  }).join('');
+  const diverges = ok && (won.length/n) > (ws/(ws+ls));
+  return {title:'Win rate', scope:'Your closed deals, trailing 12 months',
+    lead:'<div class="dd-figpair"><div>'+drillFig(ok?pct(won.length/n):won.length+'W &middot; '+lost.length+'L')+'<div class="dd-lead-sub">by count</div></div>'+
+      '<div><div class="dd-fig dd-fig-2">'+(ok?pct(ws/(ws+ls)):tooFew)+'</div><div class="dd-lead-sub">by size</div></div></div>'+
+      '<div class="dd-note">'+won.length+' won, '+lost.length+' lost.'+(diverges?' You win more deals than dollars, so the losses are the bigger deals.':'')+'</div>',
+    body:'<div class="dd-wr"><div class="dd-wr-row dd-wr-head"><div>Product</div><div class="dd-wr-v">By count</div><div class="dd-wr-v">By size</div></div>'+rows+'</div>',
+    foot:'<span class="dd-foot-note">Rates show once a product has '+MIN_RATE_SAMPLE+' closed deals</span>'};
+}};
 
-MODALS.funded = function(){
-  const yr = TODAY.slice(0,4);
-  const ytd = myOpps().filter(o=>o.outcome==='won' && (o.fundedDate||'').slice(0,4)===yr);
-  const total = ytd.reduce((s,o)=>s+o.facilitySize,0);
-  const st = quotaStats(CURRENT_BDO_ID);
-  return {
-    title:'Funded year to date',
-    scope:ytd.length+' deals funded in '+yr+' · '+moneyPlain(total),
-    body: modalStrip([
-      {label:'Funded YTD', value:moneyShort(total)},
-      {label:'Annual target', value:moneyShort(st.quota)},
-      {label:'Still to close', value:st.remaining>0?moneyShort(st.remaining):'Target met'},
-    ]) + oppRowsTable(ytd, o=>'Funded '+fmtDate(o.fundedDate), 'date', o=>o.fundedDate),
-  };
-};
+DRILLS.funded = {count:()=>drillFundedThisYear(CURRENT_BDO_ID).length, parts(){
+  const yr = TODAY.slice(0,4), l = drillFundedThisYear(CURRENT_BDO_ID), st = quotaStats(CURRENT_BDO_ID);
+  return {title:'Funded this year', scope:'Your deals funded in '+yr+', '+drillAsOf(),
+    lead: drillFig(money(st.fundedYTD))+'<div class="dd-lead-sub">'+drillPlural(l.length,'deal')+' · '+
+      Math.round(st.fundedYTD/Math.max(1,st.quota)*100)+'% of your '+moneyShort(st.quota)+' goal · '+(st.remaining>0?moneyShort(st.remaining)+' to go':'goal met')+'</div>',
+    body: l.map(o=>drillDealRow(o, 'Funded '+fmtDateShort(o.fundedDate), false, productTagHtml(o.productType))).join('')};
+}};
 
-/* Both partners/loss modals below are scoped to whichever view was active when the card was
-   clicked (MODAL_VIEW[key], set by openModal's `view` arg) — never a fixed dump of every view
-   stacked together. setModalPartnerView/setModalLossView switch only the modal's own state and
-   refresh the modal body in place; they never call swapPanel, so the card and the Home grid are
-   untouched by a view change made inside the modal. */
-MODALS.partners = function(){
-  const view = MODAL_VIEW.partners || PARTNER_VIEW;
-  const stats = partnerStats(CURRENT_BDO_ID);
-  const vd = partnerViewRows(stats, view);
-  const rows = vd.rows.map(r=>modalRow([
-    {v:esc(r.p.name), cls:'name'}, {v:esc(r.p.partnerType), cls:'sec'},
-    {v:r.mine, cls:'num', sort:r.mine}, {v:r.firmTotal, cls:'num', sort:r.firmTotal},
-    {v:rateReliable(r.closedN)?pct(r.winRate):'—', cls:'num', sort:rateReliable(r.closedN)?r.winRate:null},
-    {v:r.days!=null?r.days+'d':'—', cls:'num', sort:r.days},
-    {v:r.p.isDormant?'Dormant':'Active', cls:'sec'},
-  ]));
-  const dormant = stats.filter(r=>r.p.isDormant).length;
-  return {
-    title:'Partners',
-    scope: vd.scope,
-    body: viewToggleHtml(PARTNER_VIEWS, view, 'setModalPartnerView')+
-    modalStrip([
-      {label:'Referral sources', value:stats.length},
-      {label:'Gone quiet', value:dormant},
-      {label:'Referrals to you, YTD', value:stats.reduce((s,r)=>s+r.mine,0)},
-    ]) +
-    '<p class="chart-note mt-3">Volume counts referrals sent to you, year to date. Win rate is '+
-    'each partner\'s trailing-12-month record, firm-wide (a rate over one or two of your own deals '+
-    'is noise). Below '+MIN_RATE_SAMPLE+' closed referrals in that window, the count is shown '+
-    'instead of a rate. This is normal for a referral relationship in this business, not missing data.</p>'+
-    modalTable([{label:'Partner',type:'text'},{label:'Type',type:'text'},
-      {label:'To you (YTD)',num:true,type:'number'},{label:'Lifetime',num:true,type:'number'},
-      {label:'Win rate',num:true,type:'number'},{label:'Last referral',num:true,type:'number'},
-      {label:'Status',type:'text'}], rows),
-  };
-};
-window.setModalPartnerView = function(v){ MODAL_VIEW.partners = v; refreshModalIfOpen('partners'); };
+/* Partner rows open that partner's Account 360 Summary (O8). */
+DRILLS.partners = {views:PARTNER_VIEWS, count:v=>partnerViewRows(partnerStats(CURRENT_BDO_ID), v).rows.length, parts(v){
+  const stats = partnerStats(CURRENT_BDO_ID), vd = partnerViewRows(stats, v);
+  const quiet = stats.filter(r=>r.p.isDormant).length, ytd = stats.reduce((s,r)=>s+r.mine,0);
+  const max = v==='volume' ? Math.max(1,...vd.rows.map(r=>r.mine)) : v==='dormancy' ? Math.max(1,...vd.rows.map(r=>r.days||0)) : 1;
+  const body = vd.rows.map(r=>{
+    const tag = r.p.isDormant ? ' <span class="tag warn" title="No referral in over 90 days">Dormant</span>' : '';
+    const href = "closeSurface(true);location.hash='#/account/"+r.p.id+"/summary'";
+    if(v==='volume') return drillBarRow(esc(r.p.name), drillPlural(r.mine,'referral'), r.firmTotal+' lifetime, firm-wide', r.mine/max*100, {tag, href});
+    if(v==='quality') return drillBarRow(esc(r.p.name), rateReliable(r.closedN)?pct(r.winRate):'<span class="dd-muted">Too few to rate</span>',
+      r.won+' of '+r.closedN+' won', rateReliable(r.closedN)?r.winRate*100:null, {tag, href});
+    return drillBarRow(esc(r.p.name), r.days+' days', 'since their last referral', (r.days||0)/max*100, {tag, href, warn:r.p.isDormant});
+  }).join('');
+  return {title:'Partners', scope:vd.scope,
+    lead: drillFig(stats.length)+'<div class="dd-lead-sub">referral sources · '+quiet+' gone quiet · '+drillPlural(ytd,'referral')+' to you this year</div>',
+    body};
+}};
 
-function lossModalTable(view, rows){
-  if(view==='competitor'){
-    return modalTable([{label:'Lender',type:'text'},{label:'Deals',num:true,type:'number'},
-      {label:'Facility',num:true,type:'currency'},{label:'Evidence',num:true,type:'number'}],
-      rows.map(r=>modalRow([{v:esc(r.label), cls:'name'}, {v:r.n, cls:'num', sort:r.n},
-        {v:moneyPlain(r.val), cls:'num', sort:r.val}, {v:r.ucc+' UCC', cls:'num sec', sort:r.ucc}])));
-  }
-  const header = view==='reason' ? 'Closed lost reason' : 'Stage';
-  return modalTable([{label:header,type:'text'},{label:'Lost',num:true,type:'number'},
-    {label:'Facility',num:true,type:'currency'}],
-    rows.map(r=>modalRow([{v:esc(r.label), cls:'name'}, {v:r.n, cls:'num', sort:r.n},
-      {v:moneyPlain(r.val), cls:'num', sort:r.val}])));
-}
-MODALS.loss = function(){
-  const view = MODAL_VIEW.loss || LOSS_VIEW;
-  const d = lossViewData(CURRENT_BDO_ID, view);
+DRILLS.loss = {views:LOSS_VIEWS, count:v=>lossViewData(CURRENT_BDO_ID, v).rows.length, parts(v){
+  const d = lossViewData(CURRENT_BDO_ID, v);
+  const max = Math.max(1,...d.rows.map(r=>r.val));
   const firmLost = Object.values(OPPS).filter(o=>o.outcome==='lost' && inTrailing12(lostDateOf(o)));
   const attributed = firmLost.filter(o=>o.lostToCompetitor);
-  return {
-    title:'Where we\'re losing',
-    scope: d.scope,
-    body: viewToggleHtml(LOSS_VIEWS, view, 'setModalLossView')+
-    modalStrip([
-      {label:(d.firm?'Firm losses':'Your losses'), value:d.total},
-      {label:'Distinct '+(view==='competitor'?'lenders':view==='reason'?'reasons':'stages'),
-        value:d.rows.filter(r=>r.n>0).length},
-      {label:'Largest single-bucket loss', value: d.rows.length?moneyShort(Math.max(...d.rows.map(r=>r.val))):'—'},
-    ]) +
-    (view==='competitor'
-      ? '<p class="chart-note mt-3">Attribution comes from the borrower or from a competitor\'s UCC '+
-        'filing after the loss. '+attributed.length+' of '+firmLost.length+' losses named a winner, '+
-        'the rest never revealed one.</p>'
-      : '')+
-    lossModalTable(view, d.rows),
-  };
-};
-window.setModalLossView = function(v){ MODAL_VIEW.loss = v; refreshModalIfOpen('loss'); };
+  const body = d.rows.map(r=>drillBarRow(esc(r.label), moneyPlain(r.val),
+    (v==='competitor' ? drillPlural(r.n,'deal')+' · '+r.ucc+' seen in UCC filings' : drillPlural(r.n,'loss','losses')), r.val/max*100)).join('');
+  return {title:'Where we\'re losing', scope:d.scope,
+    lead: drillFig(d.total)+'<div class="dd-lead-sub">'+(d.firm?'losses with a known winner, firm-wide':'of your deals lost')+' · '+moneyShort(d.rows.reduce((s,r)=>s+r.val,0))+' in facility size</div>'+
+      (v==='competitor'?'<div class="dd-note">The borrower told us, or a UCC filing appeared after the loss. '+attributed.length+' of '+firmLost.length+' firm-wide losses named a winner.</div>':''),
+    body};
+}};
 
 /* D118: once per session, per page ('bdo' vs. 'exec' tracked separately so toggling personas the
    first time still plays each page's own entrance, but toggling back to one already seen never
@@ -107266,18 +107729,18 @@ function renderHome(){
        already-scoped prior window to compare against (see above), so they get real computed change
        lines. */
     '<div class="strip strip-4">'+
-      '<div class="met expandable" tabindex="0" onclick="openModal(\'pipeline\')">'+
+      '<div class="met expandable" tabindex="0" onclick="openDrill(\'pipeline\')">'+
         '<div class="met-label">Active pipeline</div>'+
         '<div class="met-figure">'+moneyShort(pipelineValue)+'</div>'+
         '<div class="met-sub">'+myOpen.length+' open deal'+(myOpen.length===1?'':'s')+
           ' · '+myOpenAccts+' account'+(myOpenAccts===1?'':'s')+'</div>'+
         '<span class="met-view">View</span></div>'+
-      '<div class="met expandable" tabindex="0" onclick="openModal(\'underwriting\')">'+
+      '<div class="met expandable" tabindex="0" onclick="openDrill(\'underwriting\')">'+
         '<div class="met-label">Deals in Underwriting</div>'+
         '<div class="met-figure">'+inUW.length+'</div>'+
         '<div class="met-sub">'+moneyShort(inUWValue)+' at the credit gate</div>'+
         '<span class="met-view">View</span></div>'+
-      '<div class="met expandable" tabindex="0" onclick="openModal(\'winrate\')">'+
+      '<div class="met expandable" tabindex="0" onclick="openDrill(\'winrate\')">'+
         '<div class="met-label">Win rate</div>'+
         (winRateReliable
           ? '<div class="met-figure">'+pct(winByCount)+'</div>'+
@@ -107287,7 +107750,7 @@ function renderHome(){
             '<div class="met-sub">Too few closed deals to rate, trailing 12mo</div>'
         )+
         '<span class="met-view">View</span></div>'+
-      '<div class="met expandable" tabindex="0" onclick="openModal(\'funded\')">'+
+      '<div class="met expandable" tabindex="0" onclick="openDrill(\'funded\')">'+
         '<div class="met-label">Funded YTD</div>'+
         '<div class="met-figure">'+money(wonYTDValue)+'</div>'+
         '<div class="met-sub">'+wonYTD.length+' deal'+(wonYTD.length===1?'':'s')+' funded this year</div>'+
@@ -107549,7 +108012,7 @@ function execBdoPanelHtml(){
     '</div>').join('');
   return '<div class="panel" id="panel-exec-bdos">'+
     panelHeaderHtml('BDOs vs goal', 'Funded this year against each annual goal',
-      '<span class="drill" onclick="openModal(\'execBdos\')">All BDOs &rsaquo;</span>')+
+      '<span class="drill" onclick="openDrill(\'execBdos\')">All BDOs &rsaquo;</span>')+
     '<div class="panel-body">'+
       '<div class="att">'+
         '<div class="att-head">'+markers('mark', true)+'</div>'+
@@ -107560,25 +108023,18 @@ function execBdoPanelHtml(){
     '</div>'+
   '</div>';
 }
-MODALS.execBdos = function(){
-  const rows = execBdoAttainment();
-  const yr = TODAY.slice(0,4);
-  const counts = {};
-  Object.values(OPPS).forEach(o=>{ if(o.outcome==='won' && (o.fundedDate||'').slice(0,4)===yr) counts[o.bdoId]=(counts[o.bdoId]||0)+1; });
-  return {
-    title:'BDOs vs goal',
-    scope:'Funded this year against each annual goal, '+rows.length+' BDOs',
-    body: modalTable([{label:'BDO',type:'text'},{label:'Deals',num:true,type:'number'},{label:'Funded',num:true,type:'currency'},
-      {label:'Goal',num:true,type:'currency'},{label:'Of goal',num:true,type:'number'}],
-      rows.map(r=>modalRow([
-        {v:esc(r.b.name), cls:'name'},
-        {v:counts[r.b.id]||0, cls:'num', sort:counts[r.b.id]||0},
-        {v:moneyPlain(r.funded), cls:'num', sort:r.funded},
-        {v:moneyPlain(r.goal), cls:'num', sort:r.goal},
-        {v:Math.round(r.pctOf)+'%', cls:'num', sort:r.pctOf},
-      ]))),
-  };
-};
+/* BDOs vs goal as a drill-down: one bar row per BDO on one shared scale, a thin pace line through
+   every bar, amber when behind pace (O5). Rows are not links: there is no BDO page yet (O8). */
+DRILLS.execBdos = {count:()=>execBdoAttainment().length, parts(){
+  const rows = execBdoAttainment(), pace = execGoalStats().paceShare*100;
+  const funded = rows.reduce((s,r)=>s+r.funded,0), goal = rows.reduce((s,r)=>s+(r.goal||0),0);
+  const scale = Math.max(100,...rows.map(r=>r.pctOf));
+  return {title:'BDOs vs goal', scope:'Funded this year against each annual goal',
+    lead: drillFig(money(funded))+'<div class="dd-lead-sub">'+Math.round(funded/Math.max(1,goal)*100)+'% of the '+moneyShort(goal)+' combined goal · pace today '+Math.round(pace)+'%</div>',
+    body: rows.map(r=>drillBarRow(esc(r.b.name), Math.round(r.pctOf)+'%', moneyShort(r.funded)+' of '+moneyShort(r.goal), r.pctOf/scale*100,
+      {marker: pace/scale*100, markerTip:'Straight-line pace, '+Math.round(pace)+'%', warn: r.pctOf < pace})).join(''),
+    foot:'<span class="dd-foot-note">The thin line is where straight-line pace puts each BDO today</span>'};
+}};
 
 /* ---------- Signals (mock N4/N7): a two-sided feed, "Going well" above "Needs attention"
    (RESEARCH_10 §4). Six item types, each computed from real records and shown only when its data
@@ -107622,14 +108078,14 @@ function execSignals(){
   const top = att[0];
   if(top && top.pctOf>=pacePct){
     const ahead = att.filter(r=>r.pctOf>=pacePct).length;
-    good.push({icon:'pos', glyph:feedIconSvg('trend'), action:'See BDO', onclick:"openModal('execTopBdo')",
+    good.push({icon:'pos', glyph:feedIconSvg('trend'), action:'See BDO', onclick:"openDrill('execTopBdo')",
       title: esc(top.b.name)+' is at '+Math.round(top.pctOf)+'% of annual goal',
       sub: moneyShort(top.funded)+' funded on a '+moneyShort(top.goal)+' goal · '+ahead+' of '+att.length+' BDOs ahead of pace'});
   }
   const large = execNewLargeDeals();
   if(large.length){
     const o = large[0];
-    good.push({icon:'pos', glyph:feedIconSvg('plus'), action:'See deals', onclick:"openModal('execNewLarge')",
+    good.push({icon:'pos', glyph:feedIconSvg('plus'), action:'See deals', onclick:"openDrill('execNewLarge')",
       title: large.length+' new deal'+(large.length===1?'':'s')+' over $'+(EXEC_LARGE_DEAL/1e6)+'M entered the pipeline',
       sub: 'Largest: '+dealLine(o)+', '+o.stage+' · last 30 days'});
   }
@@ -107637,7 +108093,7 @@ function execSignals(){
   const pushed = execPushedIn(w.start, w.end), pushedPrior = execPushedIn(w.priorStart, w.priorEnd);
   if(pushed.length){
     const dir = pushed.length>pushedPrior.length ? 'up from ' : pushed.length<pushedPrior.length ? 'down from ' : 'level with ';
-    bad.push({icon:'warn', glyph:feedIconSvg('clock'), action:'See deals', onclick:"openModal('execPushed')",
+    bad.push({icon:'warn', glyph:feedIconSvg('clock'), action:'See deals', onclick:"openDrill('execPushed')",
       title: dealsLabel(pushed.length)+' pushed their close date',
       sub: moneyShort(sumFacility(pushed))+' · '+dir+dealsLabel(pushedPrior.length)+', '+moneyShort(sumFacility(pushedPrior))+' in the prior 30 days'});
   }
@@ -107645,7 +108101,7 @@ function execSignals(){
   if(stalled.length){
     const worst = TRACK_STAGES.map(st=>{ const g = stalled.filter(o=>o.stage===st); return {st, n:g.length, v:sumFacility(g)}; })
       .sort((a,b)=>b.v-a.v)[0];
-    bad.push({icon:'warn', glyph:feedIconSvg('alert'), action:'See deals', onclick:"openModal('execStalled')",
+    bad.push({icon:'warn', glyph:feedIconSvg('alert'), action:'See deals', onclick:"openDrill('execStalled')",
       title: dealsLabel(stalled.length)+' stalled, no activity in '+EXEC_STALL_DAYS+'+ days',
       sub: moneyShort(sumFacility(stalled))+' total · '+worst.n+' of them ('+moneyShort(worst.v)+') in '+worst.st});
   }
@@ -107677,51 +108133,36 @@ function execSignalsPanelHtml(){
     '<div class="panel-body flush">'+body+'</div>'+
   '</div>';
 }
-MODALS.execTopBdo = function(){
-  const top = execTopBdo();
-  if(!top) return {title:'BDOs vs goal', scope:'No BDOs', body:'<div class="empty">No BDOs on record.</div>'};
-  const yr = TODAY.slice(0,4);
-  const deals = Object.values(OPPS).filter(o=>o.bdoId===top.b.id && o.outcome==='won' && (o.fundedDate||'').slice(0,4)===yr);
-  return {
-    title: esc(top.b.name),
-    scope: dealsLabel(deals.length)+' funded this year · '+moneyShort(top.funded)+' of a '+moneyShort(top.goal)+' goal · '+Math.round(top.pctOf)+'%',
-    body: oppRowsTable(deals, o=>'Funded '+fmtDateShort(o.fundedDate), 'date', o=>o.fundedDate),
-  };
-};
-MODALS.execNewLarge = function(){
-  const deals = execNewLargeDeals();
-  return {
-    title: 'New deals over $'+(EXEC_LARGE_DEAL/1e6)+'M',
-    scope: dealsLabel(deals.length)+' created since '+fmtDateShort(execWindows().start)+', still open · '+moneyShort(sumFacility(deals)),
-    body: oppRowsTable(deals),
-  };
-};
-MODALS.execPushed = function(){
-  const w = execWindows();
-  const deals = execPushedIn(w.start, w.end);
-  const lastPush = {};
+DRILLS.execTopBdo = {count:()=>{ const t = execTopBdo(); return t ? drillFundedThisYear(t.b.id).length : 0; }, parts(){
+  const t = execTopBdo();
+  if(!t) return {title:'BDOs vs goal', scope:'No BDOs on record', lead:'', body:''};
+  const l = drillFundedThisYear(t.b.id);
+  return {title:esc(t.b.name), scope:'Funded this year, '+drillAsOf(),
+    lead: drillFig(money(t.funded))+'<div class="dd-lead-sub">'+drillPlural(l.length,'deal')+' · '+Math.round(t.pctOf)+'% of a '+moneyShort(t.goal)+' goal</div>',
+    body: l.map(o=>drillDealRow(o, 'Funded '+fmtDateShort(o.fundedDate), false, productTagHtml(o.productType))).join('')};
+}};
+DRILLS.execNewLarge = {count:()=>execNewLargeDeals().length, parts(){
+  const l = execNewLargeDeals(), w = execWindows();
+  return {title:'New deals over $'+(EXEC_LARGE_DEAL/1e6)+'M', scope:'Created since '+fmtDateShort(w.start)+', still open',
+    lead: drillFig(money(drillTotal(l)))+'<div class="dd-lead-sub">'+drillPlural(l.length,'deal')+', firm-wide</div>',
+    body: l.map(o=>drillDealRow(o, 'Created '+fmtDateShort(o.createdDate)+' · '+esc(BDOS[o.bdoId]?BDOS[o.bdoId].name:''), false)).join('')};
+}};
+DRILLS.execPushed = {count:()=>{ const w = execWindows(); return execPushedIn(w.start, w.end).length; }, parts(){
+  const w = execWindows(), l = execPushedIn(w.start, w.end).slice().sort((a,b)=>b.facilitySize-a.facilitySize), last = {};
   D.auditEvents.forEach(e=>{
-    if(e.field!=='expectedCloseDate' || !inRange(e.changedAt, w.start, w.end) ||
-      String(e.newValue).slice(0,7) <= String(e.oldValue).slice(0,7)) return;
-    if(!lastPush[e.opportunityId] || e.changedAt>lastPush[e.opportunityId].changedAt) lastPush[e.opportunityId] = e;
+    if(e.field!=='expectedCloseDate' || !inRange(e.changedAt, w.start, w.end) || String(e.newValue).slice(0,7) <= String(e.oldValue).slice(0,7)) return;
+    if(!last[e.opportunityId] || e.changedAt>last[e.opportunityId].changedAt) last[e.opportunityId] = e;
   });
-  return {
-    title: 'Close dates pushed',
-    scope: dealsLabel(deals.length)+' moved to a later month since '+fmtDateShort(w.start)+' · '+moneyShort(sumFacility(deals)),
-    body: oppRowsTable(deals, o=>{ const e = lastPush[o.id]; return e ? fmtDateShort(e.oldValue)+' to '+fmtDateShort(e.newValue) : o.stage; },
-      'date', o=>lastPush[o.id] ? lastPush[o.id].newValue : ''),
-  };
-};
-MODALS.execStalled = function(){
-  const rows = execStalledDeals();
-  const lastBy = {}; rows.forEach(x=>{ lastBy[x.o.id] = x.last; });
-  return {
-    title: 'Stalled deals',
-    scope: dealsLabel(rows.length)+' with no activity in '+EXEC_STALL_DAYS+'+ days, firm-wide · '+moneyShort(sumFacility(rows.map(x=>x.o))),
-    body: oppRowsTable(rows.map(x=>x.o), o=>o.stage+' · '+(lastBy[o.id] ? daysBetween(lastBy[o.id], TODAY)+'d since activity' : 'no activity logged'),
-      'number', o=>lastBy[o.id] ? daysBetween(lastBy[o.id], TODAY) : 9999),
-  };
-};
+  return {title:'Close dates pushed', scope:'Moved to a later month since '+fmtDateShort(w.start)+', firm-wide',
+    lead: drillFig(money(drillTotal(l)))+'<div class="dd-lead-sub">'+drillPlural(l.length,'deal')+' now expected to close later</div>',
+    body: l.map(o=>{ const e = last[o.id]; return drillDealRow(o, e ? fmtDateShort(e.oldValue)+' to '+fmtDateShort(e.newValue) : o.stage, false); }).join('')};
+}};
+DRILLS.execStalled = {count:()=>execStalledDeals().length, parts(){
+  const rows = execStalledDeals().slice().sort((a,b)=>b.o.facilitySize-a.o.facilitySize);
+  return {title:'Stalled deals', scope:'No activity in '+EXEC_STALL_DAYS+' days or more, firm-wide',
+    lead: drillFig(money(drillTotal(rows.map(x=>x.o))))+'<div class="dd-lead-sub">'+drillPlural(rows.length,'open deal')+' '+(rows.length===1?'has':'have')+' gone quiet</div>',
+    body: rows.map(x=>drillDealRow(x.o, x.last ? daysBetween(x.last, TODAY)+' days since activity' : 'No activity logged', true)).join('')};
+}};
 
 /* ---------- Yield (mock N3; D252) ----------
    Each cell is the facility-size-weighted average of the deals' own entered yieldPct; the app
@@ -108034,6 +108475,7 @@ function renderPipeline(){
       '</div>'+
     '</div>'+
     (PIPE_VIEW==='kanban' ? kanbanHtml : listHtml);
+  document.querySelectorAll('#view-pipeline .kcol-body').forEach(fadeEdges);
 }
 /* Changing segment swaps the underlying deal set, so any stage drill-down from BDO Home no
    longer applies — cleared here. Toggling List/Board keeps it: same deals, different presentation. */
@@ -108068,11 +108510,22 @@ function captureListReturnCtx(kind, clickedId, tableSelector, label, extra){
     scrollY: window.scrollY,
   }, extra);
 }
-window.openPipelineOpp = function(id){
+/* A list row opens the deal's preview in the side panel (D310); the preview's "Open full record"
+   comes back here, so D106's return bar and next/previous still work from the record. */
+function openPipelineRecord(id){
   const seg = SEGMENTS.find(s=>s.key===PIPE_SEGMENT);
   LIST_RETURN_CTX = captureListReturnCtx('pipeline', id, '#view-pipeline table.tbl',
     seg ? seg.label.toLowerCase() : 'the list', {segment:PIPE_SEGMENT, stageFilter:PIPE_STAGE_FILTER});
   location.hash = '#/opp/'+id;
+}
+window.openPipelineOpp = function(id){
+  if(panelShowsDeal(id)){ closeSurface(); return; }   // D304
+  surfRememberOpener();
+  const ids = Array.from(document.querySelectorAll('#view-pipeline table.tbl tbody > tr')).map(tr=>tr.dataset.id);
+  PANEL_LIST = {ids, index: ids.indexOf(id)};
+  PANEL_DEAL_TAB = 'details';
+  PANEL_STACK = [{kind:'deal', id}];
+  renderPanel(true);
 };
 /* The back-link and the arrows both funnel through here, for either list. Returning is a one-shot
    instruction (LIST_PENDING_RESTORE) consumed by route()'s own pipeline/accounts branch right
