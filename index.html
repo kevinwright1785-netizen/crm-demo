@@ -105741,7 +105741,7 @@ function route(){
     pipeline: 'Opportunities',
     opp: 'Opportunity',
     account: 'Account',
-    intake: 'New Opportunity',
+    intake: 'New opportunity',
     accounts: 'Accounts',
     network: 'Network',
     bdoperf: 'BDO Performance',
@@ -110714,7 +110714,7 @@ function drawIntakeStep(){
   if(INTAKE_STATE==='drop'){
     if(INTAKE_MODE==='simulated'){
       el.innerHTML =
-        '<h1 class="page-heading">New Opportunity: Simulated Demo</h1>'+
+        '<h1 class="page-heading">New opportunity: Simulated demo</h1>'+
         '<div class="page-sub">Pick a scripted scenario: product type drives which fields extract</div>'+
         wizardBarHtml(0)+
         demoOnlyBannerHtml()+
@@ -110732,7 +110732,7 @@ function drawIntakeStep(){
       return;
     }
     el.innerHTML =
-      '<h1 class="page-heading">New Opportunity</h1>'+
+      '<h1 class="page-heading">New opportunity</h1>'+
       '<div class="page-sub">Drop borrower documents and Keystone builds the deal for you</div>'+
       wizardBarHtml(0)+
       '<div class="dropzone" id="dropzone" onclick="document.getElementById(\'filepick\').click()">'+
@@ -110762,7 +110762,7 @@ function drawIntakeStep(){
     const total = labels.length;
     const phrases = pickCyclePhrases(labels, 5).concat(['Cross-checking totals…']);
     el.innerHTML =
-      '<h1 class="page-heading">New Opportunity</h1>'+
+      '<h1 class="page-heading">New opportunity</h1>'+
       '<div class="page-sub">Extracting from '+total+' documents&hellip;</div>'+
       wizardBarHtml(1)+
       demoOnlyBannerHtml()+
@@ -110799,7 +110799,7 @@ function drawIntakeStep(){
       {source:'Network mapping', blurb:'Map trade relationships & warm intros'},
     ];
     el.innerHTML =
-      '<h1 class="page-heading">New Opportunity</h1>'+
+      '<h1 class="page-heading">New opportunity</h1>'+
       '<div class="page-sub">Extraction complete for '+esc(INTAKE_CTX.account.name)+'</div>'+
       wizardBarHtml(1)+
       demoOnlyBannerHtml()+
@@ -110854,7 +110854,7 @@ function drawIntakeStep(){
                              // the run hasn't already actually computed
     const phrases = ['Querying Dun & Bradstreet','Searching ZoomInfo','Running lien/UCC search','Mapping network relationships'];
     el.innerHTML =
-      '<h1 class="page-heading">New Opportunity</h1>'+
+      '<h1 class="page-heading">New opportunity</h1>'+
       '<div class="page-sub">Running intelligence on '+esc(INTAKE_CTX.account.name)+'&hellip;</div>'+
       wizardBarHtml(2)+
       demoOnlyBannerHtml()+
@@ -110929,19 +110929,19 @@ function drawIntakeStep(){
       '</dl>';
 
     el.innerHTML =
-      '<h1 class="page-heading">New Opportunity</h1>'+
+      '<h1 class="page-heading">New opportunity</h1>'+
       '<div class="page-sub">Review the extracted deal. Every field below is overridable before you create it</div>'+
       wizardBarHtml(3)+
       demoOnlyBannerHtml()+
       '<div class="match-banner">'+
         '<div class="match-banner-title">Matched to existing account: '+esc(acct.name)+'</div>'+
-        '<div class="match-banner-sub">'+esc(acct.industryName)+' · '+esc(acct.location)+' · Account already on file. This will be a new '+product+' opportunity on it</div>'+
+        '<div class="match-banner-sub">'+esc(acct.industryName)+' · '+esc(acct.location)+' · Account already on file. This will be a new '+productLabel(product)+' opportunity on it</div>'+
       '</div>'+
       '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
         '<div class="panel-title">Extracted fields</div><div class="panel-scope">Product Type detected: '+productLabel(product)+' · click any value to override</div>'+
       '</div></div><div class="panel-body">'+coreKvHtml+'</div></div>'+
       '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
-        '<div class="panel-title">'+product+' terms</div><div class="panel-scope">Product-conditional fields: this is what changes by product type</div>'+
+        '<div class="panel-title">'+productLabel(product)+' terms</div><div class="panel-scope">Product-conditional fields: this is what changes by product type</div>'+
       '</div></div><div class="panel-body">'+productFieldsHtml(recId,'kv')+'</div></div>'+
       (INTAKE_INTEL ? intelResultsPanelHtml(INTAKE_INTEL) : '')+
       '<div class="actions-end">'+
