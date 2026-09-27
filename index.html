@@ -868,7 +868,7 @@ a.stage-link{text-decoration:none;color:inherit;cursor:pointer}
 .dd-link:hover{color:var(--brand-2)}
 .dd-back{font:500 12px var(--ui);color:var(--brand);cursor:pointer;background:none;border:none;padding:0}
 .dd-back:hover{color:var(--brand-2)}
-.dd-link:focus-visible,.dd-back:focus-visible,.dd-row:focus-visible,.dd-pop:focus-visible,.dd-panel:focus-visible{
+.dd-link:focus-visible,.dd-back:focus-visible,.dd-row:focus-visible,.snap-row:focus-visible,.dd-pop:focus-visible,.dd-panel:focus-visible{
   outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
 .dd-pop:focus,.dd-panel:focus{outline:none}
 /* Rows: the D305 hover reach, 8px past the text, --r-s corners; dividers inset to the text and hidden
@@ -927,6 +927,11 @@ body.panel-open .app{padding-right:504px}
 body.panel-open .home-grid{grid-template-columns:minmax(0,1fr)}
 body.panel-open .home-col-8,body.panel-open .home-col-4{grid-column:span 1}
 body.panel-open .home-calendar-panel{flex:0 0 auto}
+/* D319: a preview opened from a Pipeline snapshot row puts that card first in the one-column order
+   (snapshot, feed, Partners and Where we're losing, Today), so the clicked row stays on screen. On
+   body, so renderHome() rebuilding the page after an inline edit keeps it. */
+body.snap-lead.panel-open #view-home .home-grid > .home-col{display:contents}
+body.snap-lead.panel-open #view-home .snapshot-panel{order:-1}
 .dd-panel-top{display:flex;align-items:center;justify-content:space-between;gap:var(--s3);padding:var(--s3) var(--s5) 0;min-height:44px}
 .dd-panel .dd-head{padding:var(--s3) var(--s5) var(--s3)}
 .dd-panel .dd-lead{padding:var(--s2) var(--s5) var(--s4)}
@@ -959,12 +964,6 @@ body.panel-open .home-calendar-panel{flex:0 0 auto}
 .dd-contact{display:flex;justify-content:space-between;font-size:12px;padding:var(--s1) 0}
 .dd-contact .n{color:var(--ink);font-weight:500}
 .dd-contact .r{color:var(--ink-2)}
-.dd-arrows{display:flex;align-items:center;gap:var(--s1);margin-left:auto}
-.dd-pos{font-size:12px;color:var(--ink-3);margin-right:var(--s1);font-variant-numeric:tabular-nums}
-.dd-arrow{height:24px;width:24px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line-2);
-  border-radius:var(--r-s);background:var(--paper);color:var(--ink-2);cursor:pointer;padding:0}
-.dd-arrow:hover:not(:disabled){background:var(--hover);color:var(--ink)}
-.dd-arrow:disabled{opacity:.4;cursor:default}
 .dd-open{height:var(--h);padding:0 var(--s4);border-radius:var(--r-s);background:var(--brand);color:var(--paper);border:none;
   font:500 13px var(--ui);cursor:pointer}
 .dd-open:hover{background:var(--brand-2)}
@@ -974,9 +973,7 @@ body.panel-open .home-calendar-panel{flex:0 0 auto}
 .dd-tab:hover,.dd-tab.on{color:var(--ink)}
 .dd-tab.on::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--brand)}
 .dd-tab-n{font-size:11px;color:var(--ink-3)}
-.dd-arrow:focus-visible,.dd-open:focus-visible,.dd-tab:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
-/* the Opportunities row whose preview is open */
-#view-pipeline tr.dd-sel td{background:var(--brand-a06)}
+.dd-open:focus-visible,.dd-tab:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
 @media (prefers-reduced-motion:reduce){.dd-row{transition:none}}
 /* D312: the scroll-edge fade, on every scrolling area inside a surface (the drill-down pop-up and
    panel, the remaining modals, the Board columns), never the page. Content fades out over 24px at
@@ -105946,18 +105943,21 @@ function route(){
        clicking a firm-wide finding ("Proposal is where deals die most often") landed on one demo
        BDO's own Proposal deals instead of the firm-wide set the item was actually about. There is
        no "my deals" for the exec persona, so exec always gets the firm-wide segment. */
-    if(parts[1]==='stage' && parts[2]){
-      PIPE_STAGE_FILTER = parts[2];
-      PIPE_SEGMENT = ROLE==='exec' ? 'allOpen' : 'myOpen';
-      PIPE_VIEW = 'list';
-    } else if(LIST_PENDING_RESTORE && LIST_PENDING_RESTORE.kind==='pipeline'){
-      /* D106 parts (b)/(c)/D129: listReturnToList() set this before navigating here. Restoring
-         segment/filter before renderPipeline() runs, rather than the plain #/pipeline branch's own
-         unconditional PIPE_STAGE_FILTER=null below, is what makes "returns restore the list
-         exactly" true for the filter too, not just row order/sort/scroll (those three are replayed
-         after the render, further down). */
+    if(!LIST_PENDING_RESTORE) LIST_PENDING_RESTORE = pipeHistoryRestore();   // D317: browser Back
+    if(LIST_PENDING_RESTORE && LIST_PENDING_RESTORE.kind==='pipeline'){
+      /* D106 parts (b)/(c)/D129: listReturnToList() set this before navigating here (or D317's
+         browser Back found it on the list's history entry). Restoring segment/filter before
+         renderPipeline() runs, rather than the plain #/pipeline branch's own unconditional
+         PIPE_STAGE_FILTER=null below, is what makes "returns restore the list exactly" true for
+         the filter too, not just row order/sort/scroll (those three are replayed after the render,
+         further down). Checked before the stage branch: a list reached through #/pipeline/stage/X
+         comes back with whatever filter it showed when the row was clicked. */
       PIPE_SEGMENT = LIST_PENDING_RESTORE.segment;
       PIPE_STAGE_FILTER = LIST_PENDING_RESTORE.stageFilter;
+      PIPE_VIEW = 'list';
+    } else if(parts[1]==='stage' && parts[2]){
+      PIPE_STAGE_FILTER = parts[2];
+      PIPE_SEGMENT = ROLE==='exec' ? 'allOpen' : 'myOpen';
       PIPE_VIEW = 'list';
     } else {
       PIPE_STAGE_FILTER = null;
@@ -105974,7 +105974,7 @@ function route(){
     const section = OPP_SECTIONS.some(s=>s.key===parts[2]) ? parts[2] : null;
     /* D106 parts (b)/(c)/D129, generalized by D146: LIST_RETURN_CTX only stays valid for the
        record it actually describes, checked by kind too now that it can point at either list.
-       openPipelineOpp() and listStepRecord() both keep ctx.ids[ctx.index] in sync with whatever id
+       openPipelineRecord() and listStepRecord() both keep ctx.ids[ctx.index] in sync with whatever id
        they're about to navigate to; any other way of reaching an opportunity (a feed item, a
        snapshot row, a board card, a modal table row, create-and-open) lands on some other id that
        won't match, so the stale context is dropped here rather than surviving into a record it has
@@ -106338,8 +106338,8 @@ window.addEventListener('hashchange', ()=>{ TIP_EL.style.display='none'; });
 /* Pipeline Snapshot: the BDO's biggest active deals, ranked by facility size. A genuine ranked
    list — ordering is the only "shape" here, and a reader can just read it — so it stays a list
    per the governing chart rule, not a funnel/chart rendering of the same four numbers. Each row
-   deep-links to the Opportunity record (the record page is the full deal, a modal would be a
-   shallower copy of it). */
+   opens that deal's preview in the side panel (D318), the same as a deal row in a Home drill-down;
+   the preview's "Open full record" goes on to the record. Clicking the row again closes it (D304). */
 function pipelineSnapshotHtml(myOpen){
   const top = myOpen.slice().sort((a,b)=>b.facilitySize-a.facilitySize).slice(0,5);
   if(!top.length) return '<div class="empty">No open deals right now.</div>';
@@ -106351,7 +106351,8 @@ function pipelineSnapshotHtml(myOpen){
        stageTagHtml(), reused verbatim), plus the stale chip only when it actually fires,
        replacing the old grey "stage · product · owner" meta line. The owner name is dropped:
        every row on this personal, single-BDO page is already this BDO's own. */
-    return '<div class="snap-row" onclick="location.hash=\'#/opp/'+o.id+'\'">'+
+    return '<div class="snap-row" tabindex="0" role="button" onclick="openSnapshotPreview(\''+o.id+'\')" '+
+        'onkeydown="if(event.key===\'Enter\')openSnapshotPreview(\''+o.id+'\')">'+
       '<div class="snap-main">'+
         '<div class="snap-name-line">'+
           '<span class="snap-name">'+esc(acct.name)+'</span>'+
@@ -106804,7 +106805,6 @@ let SURF_KIND = null;               // 'pop' | 'panel'
 let SURF_POP_KEY = null;            // the drill-down shown in the open pop-up
 let PANEL_STACK = [];               // [{kind:'drill', key} | {kind:'deal', id}], top last
 let SURF_OPENER = null;             // modalFocusKey() of whatever had focus when a surface opened
-let PANEL_LIST = null;              // {ids, index} while a deal preview came from the Opportunities list
 let PANEL_DEAL_TAB = 'details';     // the deal preview's tab; back to Details on the next deal (D310)
 let PANEL_PRIOR_RERENDER = null;    // the page's own EF_RERENDER, put back when the preview closes
 
@@ -106944,12 +106944,16 @@ function panelInnerDrill(key, back){
    switch pass nothing and show no motion. */
 function renderPanel(fade){
   const view = PANEL_STACK[PANEL_STACK.length-1], prev = PANEL_STACK.length>1 ? PANEL_STACK[PANEL_STACK.length-2] : null;
-  const back = prev ? '<button type="button" class="dd-back" onclick="panelBack()">&lsaquo; '+drillParts(prev.key).title+'</button>' : '<span></span>';
+  /* D319: a panel with nothing behind it still carries a back link, to where it was opened from;
+     it closes the panel. */
+  const root = view.from==='snapshot' ? 'Pipeline snapshot' : view.kind==='drill' ? 'Home' : '';
+  const back = prev ? '<button type="button" class="dd-back" onclick="panelBack()">&lsaquo; '+drillParts(prev.key).title+'</button>'
+    : root ? '<button type="button" class="dd-back" onclick="closeSurface()">&lsaquo; '+root+'</button>' : '<span></span>';
   const wasDeal = SURF_KIND==='panel' && SURF_EL.querySelector('.dd-open');
   let panel = SURF_KIND==='panel' ? SURF_EL : null, entering = false;
   if(!panel){
     // an open pop-up fades out as the panel slides in (a deal clicked in the pop-up)
-    if(SURF_EL){ const stack = PANEL_STACK, list = PANEL_LIST; closeSurface(false, true); PANEL_STACK = stack; PANEL_LIST = list; }
+    if(SURF_EL){ const stack = PANEL_STACK; closeSurface(false, true); PANEL_STACK = stack; }
     surfCancelLeaving('panel');
     entering = true;
     panel = document.createElement('aside');
@@ -106962,7 +106966,6 @@ function renderPanel(fade){
   }
   panel.innerHTML = view.kind==='drill' ? panelInnerDrill(view.key, back) : panelInnerDeal(view.id, back);
   fadeEdges(panel.querySelector('.dd-scroll'));
-  panelMarkSel();
   if(entering) surfEnter(panel, 'panel'); else if(fade) surfSwapFade(panel);
   if(view.kind==='deal'){
     if(!wasDeal) PANEL_PRIOR_RERENDER = EF_RERENDER;
@@ -106973,7 +106976,7 @@ function panelShowsDrill(key){
   const v = SURF_KIND==='panel' && PANEL_STACK[PANEL_STACK.length-1];
   return !!v && v.kind==='drill' && v.key===key;
 }
-window.panelBack = function(){ PANEL_STACK.pop(); PANEL_LIST = null; renderPanel(true); };
+window.panelBack = function(){ PANEL_STACK.pop(); renderPanel(true); };
 
 /* ---------- opening and closing ---------- */
 window.openDrill = function(key, view){
@@ -106983,7 +106986,7 @@ window.openDrill = function(key, view){
   if(d.views) DRILL_VIEW[key] = view || DRILL_VIEW[key] || (key==='partners' ? PARTNER_VIEW : LOSS_VIEW);
   surfRememberOpener();
   if(drillSurfaceFor(key)==='pop') openPop(key);
-  else { PANEL_STACK = [{kind:'drill', key}]; renderPanel(true); }
+  else { document.body.classList.remove('snap-lead'); PANEL_STACK = [{kind:'drill', key}]; renderPanel(true); }   // D319
 };
 window.setDrillView = function(v){
   const key = SURF_KIND==='pop' ? SURF_POP_KEY : (PANEL_STACK[PANEL_STACK.length-1]||{}).key;
@@ -106996,15 +106999,14 @@ window.setDrillView = function(v){
    navigating. `keepOpener` is for a hand-over to the other surface, which keeps the first opener. */
 window.closeSurface = function(instant, keepOpener){
   const el = SURF_EL, kind = SURF_KIND;
-  SURF_EL = null; SURF_KIND = null; SURF_POP_KEY = null; PANEL_STACK = []; PANEL_LIST = null;
+  SURF_EL = null; SURF_KIND = null; SURF_POP_KEY = null; PANEL_STACK = [];
   if(!el) return;
   if(el.querySelector('.dd-open')){ EF_RERENDER = PANEL_PRIOR_RERENDER; PANEL_PRIOR_RERENDER = null; }
   if(instant) el.remove(); else surfLeave(el, kind);
-  panelMarkSel();
   if(kind==='pop') unlockScroll();
   else {   // the page gets its full layout back at once; only the panel moves (D315)
     if(SURF_PAGE_ANIM){ SURF_PAGE_ANIM.cancel(); SURF_PAGE_ANIM = null; }
-    document.body.classList.remove('panel-open');
+    document.body.classList.remove('panel-open', 'snap-lead');   // D319
   }
   if(!keepOpener){ if(instant) SURF_OPENER = null; else surfReturnFocus(); }
 };
@@ -107050,17 +107052,9 @@ function previewTabsHtml(o){
     'onclick="setPreviewTab(\''+k+'\')">'+l+(c!=null?'<span class="dd-tab-n">'+c+'</span>':'')+'</button>';
   return '<div class="dd-tabs" role="tablist">'+t('details','Details')+t('activity','Activity',n)+'</div>';
 }
-function previewArrowsHtml(){
-  if(!PANEL_LIST) return '';
-  const i = PANEL_LIST.index, n = PANEL_LIST.ids.length;
-  const chev = d=>'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="'+d+'"/></svg>';
-  return '<div class="dd-arrows">'+(i>=0 ? '<span class="dd-pos">'+(i+1)+' of '+n+'</span>' : '')+
-    '<button type="button" class="dd-arrow" aria-label="Previous deal" '+(previewStepTarget(-1)==null?'disabled':'')+' onclick="previewStep(-1)">'+chev('M18 15l-6-6-6 6')+'</button>'+
-    '<button type="button" class="dd-arrow" aria-label="Next deal" '+(previewStepTarget(1)==null?'disabled':'')+' onclick="previewStep(1)">'+chev('M6 9l6 6 6-6')+'</button></div>';
-}
 function panelInnerDeal(id, back){
   const o = getOpp(id);
-  return '<div class="dd-panel-top">'+back+previewArrowsHtml()+'<button type="button" class="modal-close" aria-label="Close panel" onclick="closeSurface()">&#10005;</button></div>'+
+  return '<div class="dd-panel-top">'+back+'<button type="button" class="modal-close" aria-label="Close panel" onclick="closeSurface()">&#10005;</button></div>'+
     '<div class="dd-head"><div class="dd-head-text"><div class="dd-title">'+esc(o.name)+'</div><div class="dd-scope">Preview · '+esc(productLabel(o.productType))+' opportunity</div></div></div>'+
     previewTabsHtml(o)+
     '<div class="dd-scroll">'+(PANEL_DEAL_TAB==='activity' ? previewActivity(o) : previewDetails(o))+'</div>'+
@@ -107070,80 +107064,47 @@ function panelShowsDeal(id){
   const v = SURF_KIND==='panel' && PANEL_STACK[PANEL_STACK.length-1];
   return !!v && v.kind==='deal' && v.id===id;
 }
-/* An edit re-renders the page behind (its list or cards update at once) and then the preview,
-   keeping the preview's scroll. An edit that re-sorts the Opportunities list moves the deal, so the
-   list order is read again and the arrows step from the deal's new position; a deal that has left
-   the list (an owner change out of My open deals) steps to its old neighbours. */
+/* An edit re-renders the page behind (its cards update at once) and then the preview, keeping the
+   preview's scroll. */
 function panelEditRerender(){
   const s1 = SURF_EL && SURF_EL.querySelector('.dd-scroll'), y = s1 ? s1.scrollTop : 0;
   const page = ((location.hash||'#/home').replace('#/','').split('/')[0]) || 'home';
   if(page==='pipeline') renderPipeline(); else if(page==='home') renderHome();
-  if(PANEL_LIST){
-    const id = PANEL_STACK[PANEL_STACK.length-1].id;
-    const ids = Array.from(document.querySelectorAll('#view-pipeline table.tbl tbody > tr')).map(tr=>tr.dataset.id);
-    const at = ids.indexOf(id);
-    PANEL_LIST = at>=0 ? {ids, index:at} : {ids, index:-1, gap:Math.min(PANEL_LIST.index, ids.length)};
-  }
   if(SURF_KIND!=='panel') return;
   renderPanel();
   const s2 = SURF_EL.querySelector('.dd-scroll');
   if(s2) s2.scrollTop = y;
 }
-/* The id one step away, or null at either end. `gap` is where a deal that left the list sat. */
-function previewStepTarget(d){
-  const L = PANEL_LIST;
-  if(!L) return null;
-  const i = L.index>=0 ? L.index + d : (d>0 ? L.gap : L.gap - 1);
-  return i>=0 && i<L.ids.length ? i : null;
-}
-window.previewStep = function(d){
-  const i = previewStepTarget(d);
-  if(i==null) return;
-  PANEL_LIST = {ids:PANEL_LIST.ids, index:i};
-  PANEL_DEAL_TAB = 'details';
-  PANEL_STACK = [{kind:'deal', id:PANEL_LIST.ids[i]}];
-  renderPanel(true);
-};
 window.setPreviewTab = function(k){ PANEL_DEAL_TAB = k; renderPanel(); };
 window.openDealPreview = function(id){
-  PANEL_LIST = null; PANEL_DEAL_TAB = 'details';
+  PANEL_DEAL_TAB = 'details';
   if(SURF_KIND==='panel') PANEL_STACK.push({kind:'deal', id});
   else PANEL_STACK = [{kind:'deal', id}];   // from a pop-up: the pop-up gives way to the panel
   renderPanel(true);
 };
-window.openFullRecord = function(id){
-  const fromList = !!PANEL_LIST;
-  closeSurface(true);
-  if(fromList) openPipelineRecord(id); else location.hash = '#/opp/'+id;
+/* D318: a Pipeline snapshot row on BDO Home. The preview's back link reads "Pipeline snapshot" and
+   closes it (D319); clicking the same row again closes it (D304), a different row swaps it, and a
+   drill-down panel already open gives way to it. `snap-lead` goes on first, so the card leads the
+   one-column order in the same frame the column drops (D319). */
+window.openSnapshotPreview = function(id){
+  if(panelShowsDeal(id) && PANEL_STACK.length===1){ closeSurface(); return; }
+  surfRememberOpener();
+  document.body.classList.add('snap-lead');
+  PANEL_DEAL_TAB = 'details';
+  PANEL_STACK = [{kind:'deal', id, from:'snapshot'}];
+  renderPanel(true);
 };
-/* The Opportunities row whose preview is open stays highlighted, and is scrolled into view when a
-   step takes it near an edge. Re-applied whenever the list re-renders underneath. */
-function panelMarkSel(){
-  document.querySelectorAll('#view-pipeline tr.dd-sel').forEach(tr=>tr.classList.remove('dd-sel'));
-  if(!PANEL_LIST || PANEL_LIST.index<0) return;
-  const tr = document.querySelector('#view-pipeline tr[data-id="'+PANEL_LIST.ids[PANEL_LIST.index]+'"]');
-  if(!tr) return;
-  tr.classList.add('dd-sel');
-  const r = tr.getBoundingClientRect();
-  if(r.top<70 || r.bottom>innerHeight-70) tr.scrollIntoView({block:'center'});
-}
-new MutationObserver(()=>{ if(PANEL_LIST) panelMarkSel(); }).observe(document.getElementById('view-pipeline'), {childList:true});
-/* With a list preview open, the up and down arrows (and j/k) step through the list. */
-document.addEventListener('keydown', function(e){
-  if(!PANEL_LIST || SURF_KIND!=='panel') return;
-  const t = e.target, tag = t && t.tagName;
-  if(tag==='INPUT' || tag==='TEXTAREA' || tag==='SELECT' || (t && t.isContentEditable)) return;
-  const d = (e.key==='ArrowDown' || e.key==='j') ? 1 : (e.key==='ArrowUp' || e.key==='k') ? -1 : 0;
-  if(!d) return;
-  e.preventDefault();
-  previewStep(d);
-});
+window.openFullRecord = function(id){
+  closeSurface(true);
+  location.hash = '#/opp/'+id;
+};
 window.drillToPipeline = function(seg, stage){
   closeSurface(true);
   PIPE_SEGMENT = seg; PIPE_VIEW = 'list';
   if(stage){ location.hash = '#/pipeline/stage/'+stage; return; }
   PIPE_STAGE_FILTER = null;
-  if(location.hash==='#/pipeline') route(); else location.hash = '#/pipeline';
+  if(location.hash==='#/pipeline'){ try{ history.replaceState(null, ''); }catch(e){} route(); }   // D317: not a Back
+  else location.hash = '#/pipeline';
 };
 /* Escape closes the surface, unless something inside it owns the key first: an inline edit reverts
    (its own listener stops the event), and a modal opened over the page closes before the panel. */
@@ -108459,14 +108420,14 @@ function renderPipeline(){
       const days = o.outcome==='open' ? currentDaysInStage(o) : null;
       /* D106 parts (b)/(c)/D129: data-id lets captureListReturnCtx() and restoreListTableState()
          read/reorder the literal displayed row order straight from the DOM, without re-parsing
-         each row's own onclick string. openPipelineOpp() captures the list's full context
+         each row's own onclick string. openPipelineRecord() captures the list's full context
          (segment, filter, this exact row order, scroll position) before navigating, since that's
          the last moment the list is still on screen to read from. No index is baked into the
          onclick itself: the D84 sortable-table listener reorders rows via plain DOM
          appendChild() without rewriting any onclick attribute, so a literal index here would go
          stale the moment a column is sorted; captureListReturnCtx() derives the clicked row's
          index fresh from wherever it actually sits in the DOM at click time instead. */
-      return '<tr data-id="'+o.id+'" onclick="openPipelineOpp(\''+o.id+'\')">'+
+      return '<tr data-id="'+o.id+'" onclick="openPipelineRecord(\''+o.id+'\')">'+
         '<td class="name">'+esc(o.name)+'</td>'+
         '<td class="sec">'+esc(owner?owner.name:'')+'</td>'+
         '<td class="sec">'+productTagHtml(o.productType)+'</td>'+
@@ -108529,23 +108490,24 @@ function captureListReturnCtx(kind, clickedId, tableSelector, label, extra){
     scrollY: window.scrollY,
   }, extra);
 }
-/* A list row opens the deal's preview in the side panel (D310); the preview's "Open full record"
-   comes back here, so D106's return bar and next/previous still work from the record. */
-function openPipelineRecord(id){
+/* A list row goes straight to the full record (D317, reversing D310's list preview), however the
+   list was reached. The snapshot is also written onto the list's own history entry, so the
+   browser's Back restores segment, stage filter, row order, sort and scroll exactly as the return
+   bar's back link does; route() reads it through pipeHistoryRestore(). */
+window.openPipelineRecord = function(id){
   const seg = SEGMENTS.find(s=>s.key===PIPE_SEGMENT);
   LIST_RETURN_CTX = captureListReturnCtx('pipeline', id, '#view-pipeline table.tbl',
     seg ? seg.label.toLowerCase() : 'the list', {segment:PIPE_SEGMENT, stageFilter:PIPE_STAGE_FILTER});
+  try{ history.replaceState({listReturn:LIST_RETURN_CTX}, ''); }catch(e){}
   location.hash = '#/opp/'+id;
-}
-window.openPipelineOpp = function(id){
-  if(panelShowsDeal(id)){ closeSurface(); return; }   // D304
-  surfRememberOpener();
-  const ids = Array.from(document.querySelectorAll('#view-pipeline table.tbl tbody > tr')).map(tr=>tr.dataset.id);
-  PANEL_LIST = {ids, index: ids.indexOf(id)};
-  PANEL_DEAL_TAB = 'details';
-  PANEL_STACK = [{kind:'deal', id}];
-  renderPanel(true);
 };
+/* D317: the snapshot a row click left on this history entry, or null. Only a Back or Forward onto
+   the list's own entry finds one; the nav rail, a Home stage click and the back link each push a
+   fresh entry that carries none. */
+function pipeHistoryRestore(){
+  const st = history.state;
+  return st && st.listReturn && st.listReturn.kind==='pipeline' ? st.listReturn : null;
+}
 /* The back-link and the arrows both funnel through here, for either list. Returning is a one-shot
    instruction (LIST_PENDING_RESTORE) consumed by route()'s own pipeline/accounts branch right
    after it renders the plain, default-order list, then reorders the fresh table's rows to match
@@ -111686,6 +111648,9 @@ function renderStub(viewId, title, note){
 const railAvatarEl = document.getElementById('rail-avatar');
 railAvatarEl.textContent = initials(BDOS[CURRENT_BDO_ID].name);
 railAvatarEl.title = BDOS[CURRENT_BDO_ID].name+', '+BDOS[CURRENT_BDO_ID].title;
+/* D317: a reload starts the list fresh, as D129 already rules for the record's return bar; only a
+   Back or Forward within the session replays a snapshot. */
+try{ if(pipeHistoryRestore()) history.replaceState(null, ''); }catch(e){}
 route();
 
 })();
