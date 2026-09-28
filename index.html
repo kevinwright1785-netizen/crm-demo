@@ -625,45 +625,19 @@ button.drill:focus-visible{outline:var(--focus) solid var(--brand);outline-offse
    removed rather than left in place unused. */
 
 
-/* ---------- fixed two-column grid: the Opportunity Details tab (D104 applied to record pages,
-   D174/D175) ----------
-   Runtime packing (packGrid()) is retired everywhere it used to run. D253: Exec Home's own
-   diagnostics/production grids, the other consumers of this rule, were retired with the Exec
-   Home rebuild; .opp-details-grid is the one left. One fixed CSS grid, stated order in the DOM, column bottoms
-   level BY CONSTRUCTION rather than measured and stretched. Each .home-col is a flex column;
-   its last card (:last-child) takes the remaining height via flex:1 1 auto, so a column's own
-   variable-content card (never a short, fixed-field one) is what absorbs the difference — pure
-   CSS, no offsetHeight read, nothing written back by JS. Below 1140px (the same breakpoint
-   value .home-grid above uses, D104) the grid collapses to a single column and every card
-   renders at its own natural height, in DOM order — no JS breakpoint check anywhere, no JS
-   constant to keep in sync with the CSS literal. */
-.opp-details-grid{display:grid;
-  grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--s5);align-items:stretch}
-@media (max-width:1140px){
-  .opp-details-grid{grid-template-columns:minmax(0,1fr)}
-}
-.opp-details-grid > .home-col{min-width:0;display:flex;flex-direction:column}
-.opp-details-grid > .home-col > .panel:last-child{flex:1 1 auto}
-
-/* D186: the Details tab's own stretched last card in each column (whichever card that is,
-   keyed to :last-child by position below, never to a card by name, since D187 shows that
-   position can change) distributes its field rows across the card's own available height,
-   rather than leaving a fixed-height field block sitting above a blank void. Title and scope line stay put (.panel-header keeps
-   flex:0 0 auto, its own default); only .panel-body and its one child, the field grid, take part
-   in the stretch, and align-content:space-between (a CSS Grid row-axis property, since the field
-   grid is already display:grid via .kv) spaces the rows out, the last one landing flush with the
-   card's own bottom padding, same as every unstretched card. No JS, no measurement, no
-   per-record logic. APPROVED DEVIATION from CLAUDE.md §4's 4pt spacing scale, same shape as
-   --r-full: the resulting row gap varies per record (whatever height the column's own content
-   difference produces), which is off-scale by definition. Approved by Kevin, 2026-09-15, scoped
-   exactly to this stretched last card on the Details tab. Not license to distribute rows on any
-   other card, any list, or any other page; see CLAUDE.md §4 and DESIGN_STANDARDS.md §3 for the
-   same "not for anything else" framing --r-full already carries. */
-.opp-details-grid > .home-col > .panel:last-child{display:flex;flex-direction:column}
-.opp-details-grid > .home-col > .panel:last-child > .panel-body{
-  flex:1 1 auto;display:flex;flex-direction:column}
-.opp-details-grid > .home-col > .panel:last-child > .panel-body > .kv{
-  flex:1 1 auto;align-content:space-between}
+/* ---------- the Opportunity Details tab: rows of two (D330, spec O3; replaces D174/D175's two
+   columns) ----------
+   Cards run in DOM order two to a row, the rows level by construction: grid rows stretch both of
+   their cards to the taller one, whose fields stay top-aligned. With an odd number of cards the last
+   one runs full width (.opp-details-full) and its two-column field grid becomes three. Below 1140px
+   (the breakpoint .home-grid uses, D104) one column, in DOM order. No card stretches its field rows
+   to fill a column, so D186's fill (a column's last card spreading its rows) is retired with the
+   columns. */
+.opp-details-rows{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--s5);align-items:stretch}
+.opp-details-rows > .panel{margin-bottom:0;min-width:0}
+.opp-details-rows > .opp-details-full{grid-column:1 / -1}
+.opp-details-rows > .opp-details-full .kv-2col{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:1140px){.opp-details-rows{grid-template-columns:minmax(0,1fr)}}
 
 /* ---------- BDO Home body: 12-column grid (D222/D223, supersedes D104/D123's row shape) ----------
    One 12-column grid, 24px gap: the left stack spans 8 (the action feed, then Partners and Where
@@ -684,8 +658,8 @@ button.drill:focus-visible{outline:var(--focus) solid var(--brand);outline-offse
 /* D223: each stack's own last item stretches to close the height gap between the two stacks, so
    both stacks end level with no ragged page edge. Scoped per stack by class, not a generic
    :last-child selector, so it can never out-specificity .home-calendar-panel's own flex-basis
-   rule below, the same per-grid scoping .opp-details-grid and Exec Home's .exec-grid already
-   use for their own last-child rule, rather than one shared global one. */
+   rule below, the same per-grid scoping Exec Home's .exec-grid already uses for its own
+   last-child rule, rather than one shared global one. */
 .home-grid > .home-col-8 > .home-row-secondary{flex:1 1 auto}
 
 /* ---------- Exec Home (D253; spec Other/mocks/exec-home-mock-v1.html, its D250 override block)
@@ -1256,9 +1230,6 @@ table.tbl{width:100%;border-collapse:collapse}
    here rather than fixed by a scoped override on Account 360's fork (.acct-title/.acct-hero,
    already 500). Neither class ever set 500 before; .opp-hero set 400 explicitly. */
 .opp-title{font-family:var(--ui);font-size:20px;font-weight:500;letter-spacing:-.01em;color:var(--ink);margin-top:var(--s1)}
-.opp-hero{font-family:var(--ui);font-size:44px;font-weight:500;letter-spacing:-.03em;color:var(--ink);
-  margin-top:var(--s3)}
-.opp-hero .cur,.opp-hero .un{font-size:.45em;font-weight:400;color:var(--ink-2)}
 /* D264: rolling digits (figRoll()). A changed character sits in an inline-block cell, the new one
    in flow and the old one stacked over it, absolutely, so the cell keeps the new character's width
    and baseline. clip-path on the figure clips the travelling characters to its own box without
@@ -1268,10 +1239,14 @@ table.tbl{width:100%;border-collapse:collapse}
 .fig-roll{position:relative;display:inline-block}
 .fig-roll-new{display:inline-block}
 .fig-roll-old{position:absolute;left:0;bottom:0;display:inline-block}
-.opp-hero-label{font-size:11px;font-weight:500;color:var(--ink-3);margin-top:var(--s1)}
-.opp-meta{display:flex;gap:var(--s5);margin-top:var(--s4);flex-wrap:wrap}
+/* D330 O1: the large facility size figure is gone (it leads the strip now), so the meta line sits
+   --s3 under the name. Status is drawn --warn-ink once days in stage reach the typical. */
+.opp-meta{display:flex;gap:var(--s5);margin-top:var(--s3);flex-wrap:wrap}
 .opp-meta-item{font-size:12px;color:var(--ink-2)}
 .opp-meta-item b{color:var(--ink);font-weight:500}
+.opp-meta-item b.warn{color:var(--warn-ink)}
+/* D330 O2: a strip figure that is an inline-edit field keeps the figure's own type and width. */
+.met-edit .met-figure .ef{display:inline-block}
 
 /* D69/D135/D136: the Account record's full-width band, between the strip and the tab bar. D71
    removed the Opportunity's own version of this band before this pass began (PROJECT_STATE D71),
@@ -1490,11 +1465,6 @@ table.tbl{width:100%;border-collapse:collapse}
    components, so it stops reading as a different app glued onto Home. min-width:0 on
    .record-main stops wide content (tables) from blowing past the viewport. */
 .record-main{min-width:0}
-/* Details tab (D174/D175, order D184/D187): a fixed two-column grid, the .opp-details-grid CSS
-   above — see that block's own comment for the mechanism. Borrower details anchors column one (left, D187, the most
-   important card on the tab, no longer held last just to give D175 a stretch target now that
-   D186 fills whichever card ends up last); {Product Type} terms and Underwriting-or-Outcome are
-   each their column's own last card, so they're the ones D186's fill applies to. */
 /* Compact single-line rows, reused by the Signals card. A small colored glyph (no icon box, no
    radius) plus text — deliberately not .feedrow/.feed-icon, whose zero-padding "static" variant
    combined with a "flush" panel body caused the icon-overlaps-the-edge bug (D69/D71); these rows
@@ -1542,6 +1512,7 @@ table.tbl{width:100%;border-collapse:collapse}
 .kv dt{font-size:11px;font-weight:500;color:var(--ink-3)}
 .kv dd{font-size:13px;color:var(--ink);margin-top:var(--s1);font-weight:400}
 .kv dd.muted{color:var(--ink-3)}
+.kv dd .sec{color:var(--ink-3)}   /* D331: the quiet part of a value, e.g. "since 2014" */
 /* D183: the field grid used by every Details-tab card, capped at two columns (vs. .kv's own
    auto-fill above, which places 3-4 across on a wide card). Declared AFTER .kv on purpose: both
    are plain class selectors of equal specificity, so at equal specificity the LATER rule wins the
@@ -110325,47 +110296,52 @@ function lienPanelHtml(o){
 
 /* ================================================================
    OPPORTUNITY METRIC STRIP (D71) — Home's own component (.strip/.met),
-   reused rather than reinvented. Four computed figures about THIS deal,
-   never facility size (already the header hero — repeating it here would
-   be exactly the kind of filler the strip exists to avoid).
+   reused rather than reinvented. Four figures about THIS deal; since D330 facility size leads
+   them (the header hero is gone).
    D115: none of these four cells gets a change line. A change line is a period-over-period
-   comparison, and every figure here is a point-in-time fact about ONE deal (its stage age, its
-   own close date, its owner, its own contact count), not a portfolio metric with a period scope
+   comparison, and every figure here is a point-in-time fact about ONE deal (its size, its close
+   date, its yield, its own contact count), not a portfolio metric with a period scope
    to compare across. There is no honest "prior period" version of "who owns this deal" to diff
    against. None of the four cells opens a modal either (no .expandable, no onclick), so none gets
    the hover "view" affordance: clicking through isn't how this strip works, the fields below it
    on the page are the actual detail.
    ================================================================ */
-function oppMetricStripHtml(o, acct){
-  const owner = BDOS[o.bdoId];
+/* D330 (spec O2): Facility size (the inline-edit field the header's hero used to be), Expected
+   close, Yield (editable, D311) and Contacts. A closed deal's second figure is Funded (won) or Lost
+   at (lost); days in stage moves to the header's Status line (O1). */
+function oppRateText(o){
+  const f = o.productFields || {};
+  if(o.productType==='Factoring') return f.discountFeePct!=null ? f.discountFeePct+'% discount fee' : '';
+  if(o.productType==='TermLoan' && f.rateType==='Fixed') return f.fixedRatePct!=null ? f.fixedRatePct+'% fixed' : '';
+  return f.rateSpreadBps!=null ? 'SOFR + '+f.rateSpreadBps+' bps' : '';
+}
+/* This year's won deals of the product, dollar-weighted (weightedYield(), as the Exec Home Yield card). */
+function oppProductYieldSub(pt){
+  const yr = TODAY.slice(0,4);
+  const l = Object.values(OPPS).filter(o=>o.outcome==='won' && o.productType===pt && (o.fundedDate||'').slice(0,4)===yr);
+  const y = weightedYield(l);
+  return productLabel(pt)+' funded YTD: '+(y!=null && rateReliable(l.length) ? y.toFixed(1)+'%' : 'too few to compare');
+}
+function oppMetricStripHtml(o, acct, recId){
   const contacts = CONTACTS_BY_ACCT[o.accountId] || [];
-  const days = o.outcome==='open' ? currentDaysInStage(o) : null;
-  const closeDays = o.expectedCloseDate ? daysBetween(TODAY, o.expectedCloseDate) : null;
-  const closeSub = o.outcome!=='open' ? (o.outcome==='won'?'Closed · Won':'Closed · Lost')
-    : closeDays==null ? ''
-    : closeDays>=0 ? 'in '+closeDays+' day'+(closeDays===1?'':'s')
-    : Math.abs(closeDays)+' day'+(Math.abs(closeDays)===1?'':'s')+' overdue';
+  const met = (label, fig, sub, edit)=>'<div class="met'+(edit?' met-edit':'')+'"><div class="met-label">'+label+'</div>'+
+    '<div class="met-figure">'+fig+'</div><div class="met-sub">'+sub+'</div></div>';
+  const rate = oppRateText(o);
+  let second;
+  if(o.outcome==='won') second = met('Funded', fmtDate(o.fundedDate), 'Expected close was '+fmtDateShort(o.expectedCloseDate));
+  else if(o.outcome==='lost') second = met('Lost at', o.lostAtStage, fmtDateShort(closedDateOf(o))+' · '+reasonDisplay(o.closedLostReason||''));
+  else {
+    const closeDays = o.expectedCloseDate ? daysBetween(TODAY, o.expectedCloseDate) : null;
+    const closeSub = closeDays==null ? ''
+      : closeDays>=0 ? 'in '+closeDays+' day'+(closeDays===1?'':'s')
+      : Math.abs(closeDays)+' day'+(Math.abs(closeDays)===1?'':'s')+' overdue';
+    second = met('Expected close', o.expectedCloseDate?fmtDate(o.expectedCloseDate):'–', closeSub);
+  }
   return '<div class="strip strip-4">'+
-    '<div class="met">'+
-      '<div class="met-label">Days in stage</div>'+
-      '<div class="met-figure">'+(days!=null?days+'d':'–')+'</div>'+
-      '<div class="met-sub">'+(o.outcome==='open'?o.stage:(o.outcome==='won'?'Closed · Won':'Closed · Lost'))+'</div>'+
-    '</div>'+
-    '<div class="met">'+
-      '<div class="met-label">Expected close</div>'+
-      '<div class="met-figure">'+(o.expectedCloseDate?fmtDate(o.expectedCloseDate):'–')+'</div>'+
-      '<div class="met-sub">'+closeSub+'</div>'+
-    '</div>'+
-    '<div class="met">'+
-      '<div class="met-label">Owner</div>'+
-      '<div class="met-figure">'+esc(owner?owner.name:'–')+'</div>'+
-      '<div class="met-sub">Relationship owner</div>'+
-    '</div>'+
-    '<div class="met">'+
-      '<div class="met-label">Contacts</div>'+
-      '<div class="met-figure">'+contacts.length+'</div>'+
-      '<div class="met-sub">stakeholder'+(contacts.length===1?'':'s')+' mapped</div>'+
-    '</div>'+
+    met('Facility size', efSpan(recId, DEF_INDEX['core.facilitySize']), productLabel(o.productType)+(rate?' · '+esc(rate):''), true)+
+    second+
+    met('Yield', efSpan(recId, DEF_INDEX['core.yieldPct']), oppProductYieldSub(o.productType), true)+
+    met('Contacts', contacts.length, 'stakeholder'+(contacts.length===1?'':'s')+' mapped')+
   '</div>';
 }
 
@@ -110629,23 +110605,29 @@ function sectionBorrowerDetailsHtml(o, acct){
       '<div><dt>DBA</dt><dd class="muted">Not on file</dd></div>'+
       '<div><dt>Business address</dt><dd>'+esc(acct.location)+'</dd></div>'+
       '<div><dt>Industry</dt><dd>'+esc(acct.industryName)+'</dd></div>'+
-      '<div><dt>Years in business</dt><dd class="muted">Not on file</dd></div>'+
+      /* D331 (spec O6, Known issue 13): from the account's founded year; "Not on file" only without one. */
+      (acct.foundedYear ? '<div><dt>Years in business</dt><dd>'+(Number(TODAY.slice(0,4))-acct.foundedYear)+' <span class="sec">since '+acct.foundedYear+'</span></dd></div>'
+        : '<div><dt>Years in business</dt><dd class="muted">Not on file</dd></div>')+
       '<div><dt>Annual revenue</dt><dd>'+moneyPlain(acct.annualRevenue)+'</dd></div>'+
       '<div><dt>Open opportunities</dt><dd>'+openOpps.length+' · '+moneyPlain(openTotal)+'</dd></div>'+
       '<div><dt>Client since</dt><dd>'+fmtDate(acct.createdDate)+'</dd></div>'+
     '</dl></div></div>';
 }
 
-function sectionUnderwritingCardHtml(recId){
+/* D330 (spec O5): only once the deal has reached Underwriting (a stage-history entry) or carries a
+   credit-team value; the decline rows only once it is declined. */
+function sectionUnderwritingCardHtml(o, recId){
   const obj = EF_STORE[recId].obj;
+  const reached = getStageHistory(o.id).find(h=>h.stage==='Underwriting');
+  if(!reached && !(obj.underwriterId || obj.riskRating || obj.stipulations || obj.declineReason)) return '';
   return '<div class="panel" data-card="underwriting"><div class="panel-header"><div class="panel-header-text">'+
-      '<div class="panel-title">Underwriting</div><div class="panel-scope">Credit team fields</div>'+
+      '<div class="panel-title">Underwriting</div><div class="panel-scope">'+(reached ? 'Reached '+fmtDate(reached.enteredDate) : 'Credit team fields')+'</div>'+
     '</div></div><div class="panel-body"><dl class="kv kv-2col">'+
       '<div><dt>Underwriter</dt><dd>'+efSpan(recId,DEF_INDEX['core.underwriterId'])+'</dd></div>'+
       '<div><dt>Risk rating</dt><dd>'+efSpan(recId,DEF_INDEX['core.riskRating'])+'</dd></div>'+
       '<div><dt>Stipulations</dt><dd>'+efSpan(recId,DEF_INDEX['core.stipulations'])+'</dd></div>'+
-      '<div><dt>Decline reason</dt><dd>'+efSpan(recId,DEF_INDEX['core.declineReason'])+'</dd></div>'+
-      governedExplanationRow(recId,'Decline explanation',!!obj.declineReason,DEF_INDEX['core.declineReasonDetail'])+
+      (obj.declineReason ? '<div><dt>Decline reason</dt><dd>'+efSpan(recId,DEF_INDEX['core.declineReason'])+'</dd></div>'+
+        governedExplanationRow(recId,'Decline explanation',true,DEF_INDEX['core.declineReasonDetail']) : '')+
     '</dl></div></div>';
 }
 
@@ -110670,30 +110652,18 @@ function sectionProductTermsCardHtml(o, recId){
     '</div></div><div class="panel-body">'+productFieldsHtml(recId)+'</div></div>';
 }
 
-/* Details tab (D174/D175, order amended D184, amended again D187): a fixed two-column grid,
-   stated order, column bottoms level by construction — no measurement, no JS. Left column:
-   Borrower details, Next best action, {Product Type} terms. Right column: Deal, Signals,
-   Underwriting, then Outcome (closed deals only — sectionOutcomeCardHtml() returns '' when the
-   deal is still open, so the column's last card is simply Underwriting on an open deal). D187
-   moves Borrower details to the top of the left column (Kevin's ruling: it's the most important
-   card on the tab, and only sat last because D175 needed a stretch target there; D186's own
-   fill (below) removes that reason, so order is read priority alone now). {Product Type} terms
-   is last-left instead, deliberately: it has a field grid, so D186's fill still applies to it;
-   Next best action last would reintroduce the band, since it's a placeholder line, not fields.
-   Each column is a flex column (.home-col, CSS above); its last card carries flex:1 1 auto, and
-   D186's own fill (a CSS Grid align-content rule keyed to :last-child, not to any card by name)
-   distributes that card's field rows across the available height rather than leaving blank space
-   — the same emit-and-render call on every render (a fresh navigation or an EF_RERENDER edit
-   alike), since there is nothing measured to remember or replay. */
+/* Details tab (D330, spec O3/O4; replaces D174/D175's columns and D184/D187's order): rows of two,
+   level by row (.opp-details-rows, CSS above). Order: Next best action, Signals, Borrower details,
+   Deal, {Product Type} terms, then Underwriting when shown (O5). On a closed deal Outcome takes Next
+   best action's place and there is no Next best action card (O4). With an odd number of cards the
+   last runs full width. */
 function sectionDetailsHtml(o, recId, acct){
-  const left = sectionBorrowerDetailsHtml(o, acct)+sectionNextBestActionCardHtml(o, recId)+
-    sectionProductTermsCardHtml(o, recId);
-  const right = sectionDealCardHtml(recId)+sectionSignalsCardHtml(o)+
-    sectionUnderwritingCardHtml(recId)+sectionOutcomeCardHtml(o, recId);
-  return '<div class="opp-details-grid">'+
-    '<div class="home-col">'+left+'</div>'+
-    '<div class="home-col">'+right+'</div>'+
-  '</div>';
+  const closed = o.outcome!=='open';
+  const cards = [closed ? sectionOutcomeCardHtml(o, recId) : sectionNextBestActionCardHtml(o, recId),
+    sectionSignalsCardHtml(o), sectionBorrowerDetailsHtml(o, acct), sectionDealCardHtml(recId),
+    sectionProductTermsCardHtml(o, recId), sectionUnderwritingCardHtml(o, recId)].filter(Boolean);
+  if(cards.length % 2) cards[cards.length-1] = cards[cards.length-1].replace(/^<div class="panel"/, '<div class="panel opp-details-full"');
+  return '<div class="opp-details-rows">'+cards.join('')+'</div>';
 }
 function sectionNetworkHtml(o){
   return networkPanelHtml(o)+
@@ -110751,10 +110721,10 @@ function sectionDocumentsHtml(docs, scopeNoun){
    with the container already visible, where the internal call is correct and, for setOppSection(),
    the intended animated glide. */
 /* D264 (§27c.4 ruled C, Other/mocks/figures-charts-mock-v1.html part 1, option C): rolling digits
-   on the Opportunity record's own figures, the hero Facility size and the four metric-strip
-   .met-figure values, and nowhere else. renderOpp() rebuilds the whole record on every edit, undo
+   on the Opportunity record's own figures, the four metric-strip .met-figure values (the hero
+   Facility size until D330 moved it into the strip), and nowhere else. renderOpp() rebuilds the whole record on every edit, undo
    and stage move, so the old figure is gone by the time the new one exists: each render records
-   the displayed text of those five figures (FIG_ROLL_LAST), and the next render of the SAME record
+   the displayed text of those figures (FIG_ROLL_LAST), and the next render of the SAME record
    that is not a navigation compares against it. A figure whose text changed rolls: compared
    right-aligned, character by character, only the characters that differ move; the old one leaves
    by 100% of its own height and fades, the new one enters from the other side, on --t-base and
@@ -110765,10 +110735,11 @@ function sectionDocumentsHtml(docs, scopeNoun){
    changes no size, baseline or scroll behaviour); the old characters are aria-hidden and, with
    every per-character wrapper, removed at the end, leaving the figure's DOM exactly as rendered.
    Reduced motion is checked in JS (element.animate() is outside the CSS rule, §11.7): no roll. */
-let FIG_ROLL_LAST = null; // {id, texts:[hero, strip 1..4]}
+/* D330: the hero is gone, so the four strip figures are the whole set, in strip order; Facility size
+   and Yield hold edit fields, and the roll animates the characters inside them. */
+let FIG_ROLL_LAST = null; // {id, texts:[strip 1..4]}
 function figRollEls(){
-  const v = document.getElementById('view-opp');
-  return [v.querySelector('.opp-hero .ef')].concat(Array.from(v.querySelectorAll('.strip .met-figure')));
+  return Array.from(document.getElementById('view-opp').querySelectorAll('.strip .met-figure'));
 }
 function figText(el){ return el ? (el.textContent || '').trim() : ''; }
 function figNumber(t){
@@ -110871,6 +110842,8 @@ function renderOpp(id, section, isNav){
   };
 
   const recId = registerRecord(o.id, o);
+  /* D330 O1: Status carries the typical days for an open deal's stage (the Signals card's stale rule). */
+  const typical = o.outcome==='open' ? Math.max(STAGE_P75[o.stage]||0, 1) : null;
   // Re-render the page and, if a card modal is open for this record (the Deal card modal is the
   // first modal in the app where fields are actually editable inside it), refresh its body in
   // place too — otherwise a save made inside the modal would show stale data until it's reopened.
@@ -110911,17 +110884,16 @@ function renderOpp(id, section, isNav){
       '<div class="opp-eyebrow"><span>'+productLabel(o.productType)+'</span><span>·</span>'+
         '<span class="drill" onclick="location.hash=\'#/account/'+o.accountId+'/summary\'">'+esc(acct.name)+'</span></div>'+
       '<div class="opp-title">'+efSpan(recId,DEF_INDEX['core.name'])+'</div>'+
-      '<div class="opp-hero"><span class="ef-hero">'+efSpan(recId,DEF_INDEX['core.facilitySize'])+'</span></div>'+
-      '<div class="opp-hero-label">Facility size</div>'+
       '<div class="opp-meta">'+
         '<div class="opp-meta-item">Owner <b>'+esc(owner?owner.name:'')+'</b></div>'+
-        '<div class="opp-meta-item">Status <b>'+stageStatusText(o)+'</b></div>'+
+        '<div class="opp-meta-item">Status <b'+(typical!=null && currentDaysInStage(o)>=typical?' class="warn"':'')+'>'+
+          stageStatusText(o)+(typical!=null?', typical '+typical:'')+'</b></div>'+
         '<div class="opp-meta-item">Created <b>'+fmtDate(o.createdDate)+'</b></div>'+
       '</div>'+
       renderStageTrackHtml(o)+
     '</div>'+
 
-    oppMetricStripHtml(o, acct)+
+    oppMetricStripHtml(o, acct, recId)+
     '<div class="record-main">'+navHtml+sectionBody+'</div>';
   tabBodyHoldAfter('view-opp'); // D246
   if(!isNav) positionTabMarker();
