@@ -105538,6 +105538,13 @@ function auditFieldEdit(recId, def, oldVal, newVal){
     oldValue: displayValue(def, oldVal, true), newValue: displayValue(def, newVal, true),
     changedBy: CURRENT_BDO_ID, changedAt: TODAY,
   });
+  /* D337 (D335 b): a close-date edit is also logged in the dataset's own audit shape (raw field key,
+     ISO dates), the one shape execPushedIn() reads, so a session push counts exactly as a dataset
+     push does. Only a date-to-date change: setting or clearing a date is not a move. */
+  if(def.key==='core.expectedCloseDate' && oldVal && newVal){
+    D.auditEvents.push({id:'audit_RT_'+(++EF_SEQ), opportunityId: recId, field:'expectedCloseDate',
+      oldValue:String(oldVal), newValue:String(newVal), changedBy: CURRENT_BDO_ID, changedAt: TODAY});
+  }
 }
 /* activateEdit() wires one edit session per cell. `settled` guards the exact ordering bug most
    auto-commit implementations get wrong: pressing Escape can trigger a DOM teardown (EF_RERENDER)
@@ -111161,6 +111168,12 @@ function wizardBarHtml(step){
     '<span class="tag '+(i===step?'brand':'neutral')+'">'+(i+1)+' '+s+'</span>'
   ).join('')+'</div>';
 }
+/* D337 (D335 c): Drop documents' review step says its fields are scripted, in the Simulated demo's
+   tag style. Proposed wording, for Kevin. */
+function heroScriptedTagHtml(){
+  if(INTAKE_MODE!=='hero') return '';
+  return '<div class="chipbar tight"><span class="tag warn">Demo: these fields are scripted, not read from your files</span></div>';
+}
 function demoOnlyBannerHtml(){
   if(INTAKE_MODE!=='simulated') return '';
   return '<div class="chipbar tight">'+
@@ -111232,6 +111245,13 @@ function startPhraseCycle(centerId, phrases, intervalMs){
    product-specific docs) and maps each to its real narration phrase via DOC_PHRASES. Every phrase
    traces back to a document type actually in `labels` (CLAUDE.md §2b) — this only changes HOW MANY
    of the real set get cycled, never fabricates one that wasn't there. */
+/* D339: Drop documents' ring phrases, one per dropped file by its real name, at most `count`. */
+function heroFilePhrases(names, count){
+  count = Math.max(1, Math.min(count || 5, names.length));
+  const picked = [];
+  for(let i=0;i<count;i++) picked.push(names[Math.floor(i*names.length/count)]);
+  return picked.map(n=>'Reading '+n+'…');
+}
 function pickCyclePhrases(labels, count){
   count = Math.max(1, Math.min(count || 5, labels.length));
   const picked = [];
@@ -111329,12 +111349,12 @@ function drawIntakeStep(){
         '<div class="dropzone-icon">&#8681;</div>'+
         '<div class="dropzone-title">Drop AP/AR aging, financials, or formation docs</div>'+
         '<div class="dropzone-sub">Or click to browse. Any file starts extraction</div>'+
-        '<input type="file" id="filepick" onchange="startHeroExtraction()">'+
+        '<input type="file" id="filepick" multiple onchange="startHeroExtraction(this.files)">'+
       '</div>';
     const dz = document.getElementById('dropzone');
     dz.addEventListener('dragover', e=>{ e.preventDefault(); dz.classList.add('dragover'); });
     dz.addEventListener('dragleave', ()=>dz.classList.remove('dragover'));
-    dz.addEventListener('drop', e=>{ e.preventDefault(); dz.classList.remove('dragover'); startHeroExtraction(); });
+    dz.addEventListener('drop', e=>{ e.preventDefault(); dz.classList.remove('dragover'); startHeroExtraction(e.dataTransfer && e.dataTransfer.files); });
     return;
   }
 
@@ -111348,12 +111368,16 @@ function drawIntakeStep(){
        time is held roughly constant regardless of document count — the count's own pace is what
        scales, not the ring's — so a small demo scenario and a hypothetical much larger one both
        read as the same calm, fixed-length beat rather than one that balloons with volume. */
-    const labels = intakeDocLabels(INTAKE_CTX.productType);
+    /* D339: Drop documents counts and names the files actually dropped (CLAUDE.md §2b); only the
+       Simulated demo narrates its scripted document list. Timing is the same formula either way. */
+    const hero = INTAKE_MODE==='hero';
+    const labels = hero ? INTAKE_CTX.files : intakeDocLabels(INTAKE_CTX.productType);
     const total = labels.length;
-    const phrases = pickCyclePhrases(labels, 5).concat(['Cross-checking totals…']);
+    const unit = hero ? 'file' : 'document';
+    const phrases = (hero ? heroFilePhrases(labels, 5) : pickCyclePhrases(labels, 5)).concat(['Cross-checking totals…']);
     el.innerHTML =
       '<h1 class="page-heading">New opportunity</h1>'+
-      '<div class="page-sub">Extracting from '+total+' documents&hellip;</div>'+
+      '<div class="page-sub">'+(hero ? 'Reading '+total+' '+unit+(total===1?'':'s') : 'Extracting from '+total+' documents')+'&hellip;</div>'+
       wizardBarHtml(1)+
       demoOnlyBannerHtml()+
       '<div class="panel">'+processRingHtml('extract', 'Reading your documents')+'</div>';
@@ -111368,7 +111392,7 @@ function drawIntakeStep(){
     const countTimer = setInterval(function(){
       if(!document.getElementById('extract-count')){ clearInterval(countTimer); return; }
       n++;
-      setProcCount('extract-count', n, 'of '+total+' document'+(total===1?'':'s'));
+      setProcCount('extract-count', n, 'of '+total+' '+unit+(total===1?'':'s'));
       if(n>=total) clearInterval(countTimer);
     }, COUNT_PACE_MS);
     INTAKE_TIMER = setTimeout(function(){ INTAKE_STATE='ready'; drawIntake(); }, RING_RUN_MS + 500);
@@ -111396,8 +111420,13 @@ function drawIntakeStep(){
       '<div class="panel">'+
         '<div class="panel-header"><div class="panel-header-text">'+
           '<div class="panel-title">Extraction complete</div>'+
-          '<div class="panel-scope">'+intakeDocLabels(INTAKE_CTX.productType).length+' documents read for '+esc(INTAKE_CTX.account.name)+'</div>'+
+          '<div class="panel-scope">'+(INTAKE_MODE==='hero'
+            ? INTAKE_CTX.files.length+' file'+(INTAKE_CTX.files.length===1?'':'s')
+            : intakeDocLabels(INTAKE_CTX.productType).length+' documents')+' read for '+esc(INTAKE_CTX.account.name)+'</div>'+
         '</div></div>'+
+        /* D339: the files read, by name, Drop documents only */
+        (INTAKE_MODE==='hero' ? '<div class="panel-body"><div class="chipbar tight">'+
+          INTAKE_CTX.files.map(f=>'<span class="tag neutral">'+esc(f)+'</span>').join('')+'</div></div>' : '')+
       '</div>'+
       '<div class="panel intel-panel">'+
         '<div class="panel-header"><div class="panel-header-text">'+
@@ -111522,7 +111551,7 @@ function drawIntakeStep(){
       '<h1 class="page-heading">New opportunity</h1>'+
       '<div class="page-sub">Review the extracted deal. Every field below is overridable before you create it</div>'+
       wizardBarHtml(3)+
-      demoOnlyBannerHtml()+
+      demoOnlyBannerHtml()+heroScriptedTagHtml()+
       '<div class="match-banner">'+
         '<div class="match-banner-title">Matched to existing account: '+esc(acct.name)+'</div>'+
         '<div class="match-banner-sub">'+esc(acct.industryName)+' · '+esc(acct.location)+' · Account already on file. This will be a new '+productLabel(product)+' opportunity on it</div>'+
@@ -111540,9 +111569,12 @@ function drawIntakeStep(){
       '</div>';
   }
 }
-window.startHeroExtraction = function(){
+window.startHeroExtraction = function(files){
+  if(!files || !files.length) return;   // D339: nothing dropped, nothing to read
   INTAKE_MODE='hero';
-  INTAKE_CTX = {account:INTAKE_ACCOUNT, productType:INTAKE_PRODUCT};
+  /* D337 (D335 c): the names of the files actually dropped or picked, the only documents the
+     created deal attaches. */
+  INTAKE_CTX = {account:INTAKE_ACCOUNT, productType:INTAKE_PRODUCT, files:Array.from(files||[]).map(f=>f.name)};
   INTAKE_STATE='extracting';
   drawIntake();
 };
@@ -111571,10 +111603,12 @@ window.startOverIntake = function(){
 window.completeIntake = function(){
   const draft = INTAKE_DRAFT || draftOpportunity(INTAKE_CTX.account, INTAKE_CTX.productType);
   const opp = commitDraftOpportunity(draft);
-  /* D334: every document the extraction read (the same list its narration names, CLAUDE.md §2b)
-     joins the new deal's Documents list, uploaded today by the current user. Manual entry reads
-     none and attaches none. */
-  DOCS_BY_OPP[opp.id] = intakeDocLabels(INTAKE_CTX.productType).map(type=>{
+  /* D334: the intake's documents join the new deal's Documents list, uploaded today by the current
+     user. D337 (D335 c): Drop documents attaches only the files actually dropped, one row per file
+     under its real name; Simulated demo drops nothing and keeps its scripted list. Manual entry
+     reads none and attaches none. */
+  const docNames = INTAKE_MODE==='hero' ? (INTAKE_CTX.files||[]) : intakeDocLabels(INTAKE_CTX.productType);
+  DOCS_BY_OPP[opp.id] = docNames.map(type=>{
     RUNTIME_COUNTER++;
     return {id:'doc_NEW_'+RUNTIME_COUNTER, opportunityId:opp.id, type, uploadedDate:TODAY, uploadedBy:CURRENT_BDO_ID};
   });
