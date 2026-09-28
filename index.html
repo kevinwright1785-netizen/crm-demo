@@ -1701,6 +1701,11 @@ table.tbl{width:100%;border-collapse:collapse}
 @media (max-width:900px){
   .rail{display:none}
   .strip-4{grid-template-columns:repeat(2,minmax(0,1fr))}
+  /* D334: the topbar's fixed 240px search box and unshrinkable title pushed "+ New" 30px past a
+     390px viewport. Here only, both may shrink; nothing changes above 900px. */
+  .topbar-title{min-width:0;overflow:hidden;text-overflow:ellipsis}
+  .searchbox{flex:0 1 240px;min-width:0}
+  .searchbox input{min-width:0}
 }
 </style>
 
@@ -104980,6 +104985,12 @@ D.networkEdges.forEach(e=>{
 const CLOSED_WON_ACCT_IDS = new Set(D.opportunities.filter(o=>o.outcome==='won').map(o=>o.accountId));
 
 function getAccount(id){ return PROSPECTS[id] || PARTNERS[id] || {name:'Unknown account'}; }
+/* D334: the live stores. Every record created in the session (quick-create, intake) is written to
+   OPPS and PROSPECTS, never to the dataset arrays D.opportunities and D.prospects, which stay the
+   generated snapshot. Anything that lists or counts deals or accounts reads these, in the same order
+   as the dataset (object keys keep insertion order), with session records last. */
+function allOpps(){ return Object.values(OPPS); }
+function allAccounts(){ return [...Object.values(PROSPECTS), ...Object.values(PARTNERS)]; }
 function getOpp(id){ return OPPS[id]; }
 function getStageHistory(id){ return STAGEHIST[id] || []; }
 function initials(name){ return name.split(' ').map(w=>w[0]).slice(0,2).join(''); }
@@ -108505,7 +108516,7 @@ function currentDaysInStage(o){
 
 function renderPipeline(){
   const seg = SEGMENTS.find(s=>s.key===PIPE_SEGMENT);
-  const opps = D.opportunities.filter(seg.filter).filter(o=>!PIPE_STAGE_FILTER || o.stage===PIPE_STAGE_FILTER);
+  const opps = allOpps().filter(seg.filter).filter(o=>!PIPE_STAGE_FILTER || o.stage===PIPE_STAGE_FILTER);
   const totalVal = opps.reduce((s,o)=>s+o.facilitySize,0);
 
   const cols = seg.grouping==='product'
@@ -108711,7 +108722,7 @@ function listReturnBarHtml(){
 
 /* ================================================================
    ACCOUNTS (D54), commit 2 of the Accounts pass. One list, both Account types (D133): D133's
-   "one object, one page" is a list-level rule too, so this reads `[...D.prospects, ...D.partners]`
+   "one object, one page" is a list-level rule too, so this reads `allAccounts()` (PROSPECTS then PARTNERS, D334)
    directly rather than merging two separately-filtered arrays, since a dual-type Account (embedded
    `partnerProfile`, D136) lives once, in `D.prospects`, and never needs deduping here. Same table
    styling and sortable-column mechanics every other table in the app already uses (§7/D84), D51
@@ -108735,8 +108746,8 @@ let ACCOUNT_SECTION_FOR = null;
    will render as primary, so the two never disagree about what this row fundamentally is. */
 function accountPrimaryType(a){
   if(!a.isDualType) return a.accountTypes[0];
-  const prospectHasOpen = D.opportunities.some(o=>o.accountId===a.id && o.outcome==='open');
-  const partnerHasOpen = D.opportunities.some(o=>o.referralPartnerId===a.id && o.outcome==='open');
+  const prospectHasOpen = allOpps().some(o=>o.accountId===a.id && o.outcome==='open');
+  const partnerHasOpen = allOpps().some(o=>o.referralPartnerId===a.id && o.outcome==='open');
   return (partnerHasOpen && !prospectHasOpen) ? 'Partner' : 'Prospect';
 }
 function accountTypeTagsHtml(a){
@@ -108751,19 +108762,19 @@ function accountTypeTagsHtml(a){
    not a gap papered over. */
 function accountRowStats(a){
   const primary = accountPrimaryType(a);
-  const openOpps = D.opportunities.filter(o=>o.accountId===a.id && o.outcome==='open');
+  const openOpps = allOpps().filter(o=>o.accountId===a.id && o.outcome==='open');
   const openValue = openOpps.reduce((s,o)=>s+o.facilitySize,0);
   let secondaryFigure, lastTouch, ownerId;
   if(primary==='Prospect'){
-    const wonOpps = D.opportunities.filter(o=>o.accountId===a.id && o.outcome==='won');
+    const wonOpps = allOpps().filter(o=>o.accountId===a.id && o.outcome==='won');
     secondaryFigure = wonOpps.reduce((s,o)=>s+o.facilitySize,0); // Exposure: currently funded facilities
     const acctActs = D.activities.filter(x=>x.accountId===a.id);
     lastTouch = acctActs.length ? acctActs.reduce((m,x)=>x.date>m?x.date:m, acctActs[0].date) : null;
     const ownerOpp = openOpps.slice().sort((x,y)=>y.facilitySize-x.facilitySize)[0]
-      || D.opportunities.filter(o=>o.accountId===a.id).slice().sort((x,y)=>y.createdDate.localeCompare(x.createdDate))[0];
+      || allOpps().filter(o=>o.accountId===a.id).slice().sort((x,y)=>y.createdDate.localeCompare(x.createdDate))[0];
     ownerId = ownerOpp ? ownerOpp.bdoId : null;
   } else {
-    const referred = D.opportunities.filter(o=>o.referralPartnerId===a.id);
+    const referred = allOpps().filter(o=>o.referralPartnerId===a.id);
     secondaryFigure = referred.filter(o=>inTrailing12(o.createdDate)).reduce((s,o)=>s+o.facilitySize,0); // Referred TTM
     lastTouch = a.isDualType ? a.partnerProfile.lastReferralDate : a.lastReferralDate;
     const recentReferred = referred.slice().sort((x,y)=>y.createdDate.localeCompare(x.createdDate))[0];
@@ -108773,7 +108784,7 @@ function accountRowStats(a){
 }
 
 function renderAccounts(){
-  const all = [...D.prospects, ...D.partners];
+  const all = allAccounts();
   const filtered = ACCT_TYPE_FILTER==='prospects' ? all.filter(a=>a.accountTypes.includes('Prospect'))
     : ACCT_TYPE_FILTER==='partners' ? all.filter(a=>a.accountTypes.includes('Partner'))
     : all;
@@ -108865,29 +108876,29 @@ function partnerProfileOf(a){ return a.isDualType ? a.partnerProfile : a; }
 
 /* Real, firm-wide comparison point for the Partner band's "avg referral vs firm average" field:
    computed once from every referred Opportunity that exists, never a guessed benchmark. */
-const FIRM_AVG_REFERRAL_SIZE = (function(){
-  const referred = D.opportunities.filter(o=>o.referralPartnerId);
+function firmAvgReferralSize(){   // D334: live, so a session deal counts on both sides of a comparison
+  const referred = allOpps().filter(o=>o.referralPartnerId);
   return referred.length ? referred.reduce((s,o)=>s+o.facilitySize,0)/referred.length : 0;
-})();
+}
 
 /* D151 correction pass: the mock's Partner strip compares a partner's own referral win rate
    against the firm-wide average across every partner, the same real-comparison-point pattern
-   FIRM_AVG_REFERRAL_SIZE already established above. Computed once from every closed referred
-   Opportunity that exists; null (not 0) when none exist yet, same honest-gap handling as
+   firmAvgReferralSize() already established above. Computed at each call (D334) from every closed
+   referred Opportunity that exists; null (not 0) when none exist yet, same honest-gap handling as
    avgReferralGapDays() below. */
-const FIRM_REFERRAL_WIN_RATE = (function(){
-  const closed = D.opportunities.filter(o=>o.referralPartnerId && o.outcome!=='open');
+function firmReferralWinRate(){
+  const closed = allOpps().filter(o=>o.referralPartnerId && o.outcome!=='open');
   const won = closed.filter(o=>o.outcome==='won');
   return closed.length ? won.length/closed.length : null;
-})();
+}
 /* Pass 2, commit 2: the Partner Summary's Count vs size panel needs the firm-wide trailing-12-
    month referral pool (every partner's own referred Opportunities in that window) to compute one
    partner's own share by count and by size: the same real-comparison-point pattern
-   FIRM_AVG_REFERRAL_SIZE/FIRM_REFERRAL_WIN_RATE already establish above. */
-const FIRM_TTM_REFERRED = (function(){
-  const opps = D.opportunities.filter(o=>o.referralPartnerId && inTrailing12(o.createdDate));
+   firmAvgReferralSize()/firmReferralWinRate() already establish above. */
+function firmTtmReferred(){
+  const opps = allOpps().filter(o=>o.referralPartnerId && inTrailing12(o.createdDate));
   return {count: opps.length, value: opps.reduce((s,o)=>s+o.facilitySize,0)};
-})();
+}
 /* Pass 2: the one verdict-badge renderer (DESIGN_STANDARDS §6a): a panel's own real conclusion,
    tinted per §2a's brand/pos/warn/neg map, or nothing at all when a panel has no real conclusion
    to state (never a placeholder badge). */
@@ -108915,7 +108926,7 @@ function warmPathsFor(accountId){
   });
   const list = Object.keys(byOther).map(otherId=>({
     accountId: otherId,
-    fundedValue: D.opportunities.filter(o=>o.accountId===otherId && o.outcome==='won')
+    fundedValue: allOpps().filter(o=>o.accountId===otherId && o.outcome==='won')
       .reduce((s,o)=>s+o.facilitySize,0),
   })).sort((x,y)=>y.fundedValue-x.fundedValue);
   /* Pass 2, commit 3: `list` (every real warm counterparty, not just the strongest) is exposed so
@@ -109053,8 +109064,8 @@ function accountConfig(a){
   const cfg = {primaryType, secondaryType, sections};
 
   if(primaryType==='Prospect'){
-    const openOpps = D.opportunities.filter(o=>o.accountId===a.id && o.outcome==='open');
-    const wonOpps = D.opportunities.filter(o=>o.accountId===a.id && o.outcome==='won');
+    const openOpps = allOpps().filter(o=>o.accountId===a.id && o.outcome==='open');
+    const wonOpps = allOpps().filter(o=>o.accountId===a.id && o.outcome==='won');
     const openValue = openOpps.reduce((s,o)=>s+o.facilitySize,0);
     const exposureValue = wonOpps.reduce((s,o)=>s+o.facilitySize,0);
     const acctActs = ACTS_BY_ACCT[a.id]||[];
@@ -109063,7 +109074,7 @@ function accountConfig(a){
        bare date; needs the actual most-recent activity record, not just its date string. */
     const lastAct = acctActs.length ? acctActs.reduce((m,x)=>x.date>m.date?x:m, acctActs[0]) : null;
     const ownerOpp = openOpps.slice().sort((x,y)=>y.facilitySize-x.facilitySize)[0]
-      || D.opportunities.filter(o=>o.accountId===a.id).slice().sort((x,y)=>y.createdDate.localeCompare(x.createdDate))[0];
+      || allOpps().filter(o=>o.accountId===a.id).slice().sort((x,y)=>y.createdDate.localeCompare(x.createdDate))[0];
     const owner = ownerOpp ? BDOS[ownerOpp.bdoId] : null;
     /* D151 correction pass: mock's "Liens on file" strip cell, real LIENS_BY_ACCT data (already
        used by the Opportunity's own Intelligence tab, lienPanelHtml()), never fabricated. */
@@ -109075,7 +109086,12 @@ function accountConfig(a){
        shared definition, above. */
     const warmPaths = warmPathsFor(a.id);
 
-    cfg.metaParts = [esc(a.industryName), esc(a.location), 'Customer since '+fmtDateMonthYear(a.createdDate),
+    /* D334: a quick-created account carries only a name until fields are entered, so every
+       dataset field below reads "–" when empty (CLAUDE.md §2b: nothing invented). Dataset accounts
+       have every field and render exactly as before. */
+    const has = v => v!=null && v!=='';
+    cfg.metaParts = [has(a.industryName) ? esc(a.industryName) : null, has(a.location) ? esc(a.location) : null,
+      'Customer since '+fmtDateMonthYear(a.createdDate),
       owner ? 'Owner: '+esc(owner.name) : null];
     cfg.pills = accountTypeTagsHtml(a);
     cfg.heroLabel = 'Total exposure';
@@ -109102,7 +109118,7 @@ function accountConfig(a){
           : 'No activity logged yet'},
     ];
 
-    const prov = a.fieldProvenance;
+    const prov = a.fieldProvenance || {};
     const dnbCount = Object.keys(prov).filter(k=>prov[k].source==='dnb').length;
     const repCount = Object.keys(prov).filter(k=>prov[k].source==='rep').length;
     const latestRefresh = Object.keys(prov).filter(k=>prov[k].source==='dnb').map(k=>prov[k].asOf).sort().pop();
@@ -109120,42 +109136,42 @@ function accountConfig(a){
        size, neither modeled), left as the raw enum. */
     const OWNERSHIP_QUALIFIER = {'Founder-owned':'founder owned','Family-owned':'family owned',
       'PE-backed':'PE-backed','Employee-owned':'employee owned','Publicly traded':'publicly traded'};
-    const paydexDays = paydexDaysSlow(a.paydex);
+    const paydexDays = has(a.paydex) ? paydexDaysSlow(a.paydex) : 0;
     const paydexPhrase = paydexDays>0 ? 'pays '+paydexDays+' days slow'
       : paydexDays<0 ? 'pays '+Math.abs(paydexDays)+' days early' : 'pays on time';
 
     cfg.bandGroups = [
       {title:'The business', fields:[
-        {k:'Legal entity', v:esc(a.legalEntityType)+', '+esc(stateFullName(a.entityState))},
-        {k:'Founded', v:a.foundedYear+', '+esc(OWNERSHIP_QUALIFIER[a.ownership]||a.ownership.toLowerCase())},
-        {k:'Employees', v:a.employeeCount.toLocaleString('en-US')},
-        {k:'Sites', v:a.siteCount},
+        {k:'Legal entity', v: has(a.legalEntityType) ? esc(a.legalEntityType)+', '+esc(stateFullName(a.entityState)) : '–'},
+        {k:'Founded', v: !has(a.foundedYear) ? '–' : has(a.ownership) ? a.foundedYear+', '+esc(OWNERSHIP_QUALIFIER[a.ownership]||a.ownership.toLowerCase()) : String(a.foundedYear)},
+        {k:'Employees', v: has(a.employeeCount) ? a.employeeCount.toLocaleString('en-US') : '–'},
+        {k:'Sites', v: has(a.siteCount) ? a.siteCount : '–'},
       ]},
       {title:'The financials', fields:[
-        {k:'Revenue', v:moneyPlain(a.annualRevenue),
+        {k:'Revenue', v: has(a.annualRevenue) ? moneyPlain(a.annualRevenue) : '–',
           /* trend.value uses money(), the same abbreviating-with-styled-units formatter the
              hero and strip currency figures now use, not f.v's full-digit moneyPlain(): the mock
              keeps the value and its inline "+9% yoy" change on one line beside the chart, and the
              full-digit form doesn't fit that column width without wrapping to a third line. f.v
              (moneyPlain) is untouched for the "View all N fields" modal, where precision reads as
              real to a finance reader. */
-          trend:{label:'Revenue, FY'+TODAY.slice(0,4), value:money(a.annualRevenue),
-            change:acctTrendChangeHtml(a.revenueTrend[4], a.revenueTrend[3], 'yoy', 'up')},
-          chart:acctTrendSparklineHtml(a.revenueTrend, ['FY-4','FY-3','FY-2','FY-1','FY0'])},
-        {k:'EBITDA', v:money(a.ebitda)+', '+pct(a.ebitda/a.annualRevenue,1)+' margin'},
-        {k:'Existing lenders', v: a.existingLenders.length ? esc(a.existingLenders.join(', ')) : '–'},
+          trend: a.revenueTrend ? {label:'Revenue, FY'+TODAY.slice(0,4), value:money(a.annualRevenue),
+            change:acctTrendChangeHtml(a.revenueTrend[4], a.revenueTrend[3], 'yoy', 'up')} : null,
+          chart: a.revenueTrend ? acctTrendSparklineHtml(a.revenueTrend, ['FY-4','FY-3','FY-2','FY-1','FY0']) : null},
+        {k:'EBITDA', v: has(a.ebitda) && a.annualRevenue ? money(a.ebitda)+', '+pct(a.ebitda/a.annualRevenue,1)+' margin' : '–'},
+        {k:'Existing lenders', v: (a.existingLenders||[]).length ? esc(a.existingLenders.join(', ')) : '–'},
       ]},
       {title:'The credit picture', fields:[
-        {k:'D&B rating', v:esc(a.dnbRating)},
-        {k:'Paydex', v:a.paydex+' &middot; '+paydexPhrase},
-        {k:'Ownership', v:esc(a.ownership)},
+        {k:'D&B rating', v: has(a.dnbRating) ? esc(a.dnbRating) : '–'},
+        {k:'Paydex', v: has(a.paydex) ? a.paydex+' &middot; '+paydexPhrase : '–'},
+        {k:'Ownership', v: has(a.ownership) ? esc(a.ownership) : '–'},
         {k:'Referred by', v: referredBy ? '<span class="drill" onclick="location.hash=\'#/account/'+referredBy.id+'\'">'+esc(referredBy.name)+'</span>' : '–'},
       ]},
     ];
     cfg.bandExtraFields = [
-      {k:'Location', v:esc(a.location)},
-      {k:'Domain', v:esc(a.domain)},
-      {k:'Industry code', v:esc(a.industryCode)},
+      {k:'Location', v: has(a.location) ? esc(a.location) : '–'},
+      {k:'Domain', v: has(a.domain) ? esc(a.domain) : '–'},
+      {k:'Industry code', v: has(a.industryCode) ? esc(a.industryCode) : '–'},
       {k:'Client since', v:fmtDate(a.createdDate)},
     ];
     cfg.bandScope = (latestRefresh ? 'D&amp;B, refreshed '+fmtDateShort(latestRefresh)
@@ -109163,7 +109179,7 @@ function accountConfig(a){
       ' &middot; '+repCount+' rep-entered';
   } else {
     const profile = partnerProfileOf(a);
-    const referred = D.opportunities.filter(o=>o.referralPartnerId===a.id);
+    const referred = allOpps().filter(o=>o.referralPartnerId===a.id);
     const funded = referred.filter(o=>o.outcome==='won');
     const ttmReferred = referred.filter(o=>inTrailing12(o.createdDate));
     const ttmValue = ttmReferred.reduce((s,o)=>s+o.facilitySize,0);
@@ -109178,7 +109194,7 @@ function accountConfig(a){
     const contact = profile.primaryContactId ? CONTACTS_BY_ID[profile.primaryContactId] : null;
     const partnerAvg = referred.length ? lifetimeValue/referred.length : null;
     /* D151 correction pass: mock's "Win rate on referrals" strip cell, real closed-referral
-       outcomes, by count and by size, against FIRM_REFERRAL_WIN_RATE (every partner's own closed
+       outcomes, by count and by size, against firmReferralWinRate() (every partner's own closed
        referrals), never a guessed benchmark. */
     const closedReferred = referred.filter(o=>o.outcome!=='open');
     const wonReferred = closedReferred.filter(o=>o.outcome==='won');
@@ -109213,7 +109229,7 @@ function accountConfig(a){
         figureCls: isDormant?'warn':'', sub: gapSub, subCls: isDormant?'warn':''},
       {label:'Win rate on referrals', figure: winRateByCount!=null ? figUnit(Math.round(winRateByCount*100),'%') : '–',
         sub: winRateByCount!=null ? 'by count'+(winRateBySize!=null ? ' &middot; '+pct(winRateBySize)+' by size' : '') : 'No closed referrals yet',
-        change: (winRateByCount!=null && FIRM_REFERRAL_WIN_RATE!=null) ? metChangePointsHtml(winRateByCount, FIRM_REFERRAL_WIN_RATE, 'vs firm partners', 'up') : ''},
+        change: (winRateByCount!=null && firmReferralWinRate()!=null) ? metChangePointsHtml(winRateByCount, firmReferralWinRate(), 'vs firm partners', 'up') : ''},
       {label:'Referrals in pipeline', figure: openReferred.length,
         sub: openReferred.length===0 ? 'None open right now'
           : openReferred.length===1 ? money(openReferredValue)+', in '+esc(openReferred[0].stage)
@@ -109242,7 +109258,7 @@ function accountConfig(a){
        Prospect's own entityState already is, computed here since Partners never got their own
        stored entityState field, no dataset change needed) and "est." wording. "Avg referral"
        shows the real firm-average dollar figure the mock names ("vs $1.9M firm"), not the
-       percent-delta this pass's own D151 commit had substituted for it: FIRM_AVG_REFERRAL_SIZE
+       percent-delta this pass's own D151 commit had substituted for it: firmAvgReferralSize()
        was already computed for exactly this comparison. "Win rate, lifetime" reuses
        winRateByCount, already computed above for the strip, rather than a second calculation.
        Gaps, not fabricated: "Segment" (the mock's value describes an industry/deal-size band
@@ -109267,7 +109283,7 @@ function accountConfig(a){
       {title:'Lifetime economics', fields:[
         {k:'Referred', v:referred.length+' deals, '+money(lifetimeValue)},
         {k:'Funded', v:funded.length+' deals, '+money(fundedValue)},
-        {k:'Avg referral', v: partnerAvg==null ? '–' : money(partnerAvg)+', vs '+money(FIRM_AVG_REFERRAL_SIZE)+' firm'},
+        {k:'Avg referral', v: partnerAvg==null ? '–' : money(partnerAvg)+', vs '+money(firmAvgReferralSize())+' firm'},
         {k:'Win rate, lifetime', v: winRateByCount!=null ? pct(winRateByCount)+' by count' : '–'},
       ]},
     ];
@@ -109450,11 +109466,12 @@ function acctReferralCadenceHtml(a, cfg){
    ratio of any active partner" claim is checked against every real partner, never assumed true
    the way the mock's own single illustrative example states it as fact. */
 function partnerSizeToCountShares(partnerId){
-  const ttm = D.opportunities.filter(o=>o.referralPartnerId===partnerId && inTrailing12(o.createdDate));
-  if(!ttm.length || !FIRM_TTM_REFERRED.count) return null;
-  const byCount = ttm.length/FIRM_TTM_REFERRED.count;
+  const ttm = allOpps().filter(o=>o.referralPartnerId===partnerId && inTrailing12(o.createdDate));
+  const firm = firmTtmReferred();
+  if(!ttm.length || !firm.count) return null;
+  const byCount = ttm.length/firm.count;
   const value = ttm.reduce((s,o)=>s+o.facilitySize,0);
-  const bySize = FIRM_TTM_REFERRED.value ? value/FIRM_TTM_REFERRED.value : 0;
+  const bySize = firm.value ? value/firm.value : 0;
   return {byCount, bySize};
 }
 function isHighestSizeToCountRatio(partnerId, ratio){
@@ -109825,7 +109842,7 @@ function acctSecondaryTabHtml(a, cfg){
         '<div><dt>Status</dt><dd>'+(p.isDormant?'<span class="tag warn">Dormant</span>':'<span class="tag pos">Active</span>')+'</dd></div>'+
       '</dl></div></div>';
   }
-  const openOpps = D.opportunities.filter(o=>o.accountId===a.id && o.outcome==='open');
+  const openOpps = allOpps().filter(o=>o.accountId===a.id && o.outcome==='open');
   return '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
       '<div class="panel-title">Prospect profile</div>'+
       '<div class="panel-scope">This Account is also a borrower</div>'+
@@ -109844,8 +109861,8 @@ function renderAccount(id, section, isNav){
   const cfg = accountConfig(a);
   const sections = cfg.sections;
 
-  const acctOpps = D.opportunities.filter(o=>o.accountId===a.id);
-  const referredOpps = D.opportunities.filter(o=>o.referralPartnerId===a.id);
+  const acctOpps = allOpps().filter(o=>o.accountId===a.id);
+  const referredOpps = allOpps().filter(o=>o.referralPartnerId===a.id);
   const contacts = CONTACTS_BY_ACCT[a.id] || [];
   const acts = (ACTS_BY_ACCT[a.id]||[]).slice().sort((x,y)=>y.date.localeCompare(x.date));
   const docs = DOCS_BY_ACCT[a.id] || [];
@@ -109855,7 +109872,7 @@ function renderAccount(id, section, isNav){
   const auditOpps = cfg.primaryType==='Prospect' ? acctOpps : referredOpps;
   let secondaryCount = null;
   if(cfg.secondaryType==='Partner') secondaryCount = a.partnerProfile.referralCount;
-  else if(cfg.secondaryType==='Prospect') secondaryCount = D.opportunities.filter(o=>o.accountId===a.id).length;
+  else if(cfg.secondaryType==='Prospect') secondaryCount = allOpps().filter(o=>o.accountId===a.id).length;
   /* D162 fix commit: D138/the mocks show no count on Summary or Audit; `audit` was mistakenly
      included here (the Opportunity record's own OPP_SECTIONS never counts Audit either, this
      brought the Account record in line with that existing precedent, not a new rule). */
@@ -110589,7 +110606,7 @@ MODALS.oppDeal = function(){
    "Borrower context" band group — both were "stuff about the Account, From Account scope," one
    card reads more considered than two. Still no drill link: Accounts is still an inert nav stub. */
 function sectionBorrowerDetailsHtml(o, acct){
-  const openOpps = D.opportunities.filter(x=>x.accountId===o.accountId && x.outcome==='open');
+  const openOpps = allOpps().filter(x=>x.accountId===o.accountId && x.outcome==='open');
   const openTotal = openOpps.reduce((s,x)=>s+x.facilitySize,0);
   /* D145 commit 2: the account name itself is now the drill link (D65 Amendment 1's stated
      condition, "Accounts is an inert stub," has lapsed since D54/D151-D173); "From" stays plain
@@ -111554,6 +111571,13 @@ window.startOverIntake = function(){
 window.completeIntake = function(){
   const draft = INTAKE_DRAFT || draftOpportunity(INTAKE_CTX.account, INTAKE_CTX.productType);
   const opp = commitDraftOpportunity(draft);
+  /* D334: every document the extraction read (the same list its narration names, CLAUDE.md §2b)
+     joins the new deal's Documents list, uploaded today by the current user. Manual entry reads
+     none and attaches none. */
+  DOCS_BY_OPP[opp.id] = intakeDocLabels(INTAKE_CTX.productType).map(type=>{
+    RUNTIME_COUNTER++;
+    return {id:'doc_NEW_'+RUNTIME_COUNTER, opportunityId:opp.id, type, uploadedDate:TODAY, uploadedBy:CURRENT_BDO_ID};
+  });
   INTAKE_DRAFT = null;
   location.hash = '#/opp/'+opp.id;
   toastDealCreated(opp); // D267, moment 2
@@ -111724,8 +111748,11 @@ window.submitQuickCreate = function(){
   let acct = qcResolveAccount();
   if(!acct){
     RUNTIME_COUNTER++;
+    /* D334: accountTypes and isDualType are what Account 360 keys its layout on (renderAccount()
+       reads "Account not found." without them); every other field is empty until entered. */
     acct = {
       id: 'acct_c_NEW_'+RUNTIME_COUNTER, name: QC.acctName.trim(), accountType: 'Prospect',
+      accountTypes: ['Prospect'], isDualType: false,
       industryCode: null, industryName: null, location: null,
       employeeCount: null, annualRevenue: null, createdDate: TODAY, domain: null
     };
