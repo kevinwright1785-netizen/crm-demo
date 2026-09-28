@@ -299,6 +299,21 @@ h1,h2,h3,p,dl,dd{margin:0}
 .met-view{position:absolute;top:var(--s3);right:var(--s3);font-size:11px;font-weight:500;
   color:var(--brand);opacity:0;transition:opacity var(--t-fast) var(--ease);pointer-events:none}
 .met.expandable:hover .met-view,.met.expandable:focus-visible .met-view{opacity:1}
+/* D322 O2: the tinted part of a headline cell's one line (pace, or pushed close dates rising). */
+.met-sub .t-warn,.dd-lead-sub .t-warn{color:var(--warn-ink)}
+.met-sub .t-pos,.dd-lead-sub .t-pos{color:var(--pos-ink)}
+.dd-lead-sub .t-neg{color:var(--neg-ink)}   /* D327: a falling change in a drill-down's lead */
+/* D322 O9: an expandable cell's hover fill follows the strip's rounded outer corners. The radius
+   sits on the first and last cells' outer corners only, never on a bordered side (the last cell's
+   D127 left hairline stays square), and not as overflow:hidden on the strip, which would clip a
+   focused cell's outline. */
+.strip .met:first-child{border-radius:var(--r-l) 0 0 var(--r-l)}
+.strip .met:last-child{border-radius:0 var(--r-l) var(--r-l) 0}
+/* D322 O10: a clickable cell's label stops short of the hover "View", so the two never overlap. */
+.strip .met.expandable .met-label{padding-right:var(--s5)}
+/* D322 O7: a focused headline cell draws the app's focus ring, inset so the strip's neighbours and
+   edge never cover it. */
+.strip .met.expandable:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:calc(var(--focus-offset) * -1)}
 
 /* ---------- panels ---------- */
 .panel{position:relative;background:var(--paper);border:1px solid var(--line);border-radius:var(--r-l);margin-bottom:var(--s5)}
@@ -703,10 +718,19 @@ button.drill:focus-visible{outline:var(--focus) solid var(--brand);outline-offse
 a.stage-link{text-decoration:none;color:inherit;cursor:pointer}
 .stage-link .chev{margin-left:var(--s2);color:var(--ink-2)}
 .stage-link:hover .hbar-name{color:var(--brand)}
+/* D326: every clickable card row takes this look (Why we lose, Wins and losses, BDOs vs goal): a
+   pointer, the name in --brand on hover, a chevron after the value, the focus ring, Enter opens. */
+.stage-link[role="button"]{cursor:pointer}
+.stage-link:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset);border-radius:var(--r-s)}
+.att-row.stage-link:hover .att-name{color:var(--brand)}
+/* D326 O14: a Yield figure is a click target of its own; the row's hover fill stays as it is. */
+.price-tbl td.ycell{cursor:pointer;transition:color var(--t-fast) var(--ease)}
+.price-tbl td.ycell:hover{color:var(--brand)}
+.price-tbl td.ycell:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:calc(var(--focus-offset) * -1)}
 /* N6/N17 BDOs vs goal: % of goal per BDO on one shared scale, with pace (dashed) and goal (solid)
    lines running through every row; dollars on hover. */
 .att{position:relative}
-.att-head,.att-row,.att-lines{display:grid;grid-template-columns:120px minmax(0,1fr) 44px;gap:var(--s3);align-items:center}
+.att-head,.att-row,.att-lines{display:grid;grid-template-columns:120px minmax(0,1fr) 56px;gap:var(--s3);align-items:center}
 .att-head{height:16px}
 .att-row{height:36px}
 .att-name{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -731,7 +755,7 @@ a.stage-link{text-decoration:none;color:inherit;cursor:pointer}
 .lk.bar{width:12px;height:8px;border-radius:var(--r-s);background:var(--brand)}
 .lk.tick{width:0;height:12px;border-left:2px solid var(--ink)}
 .wl-rows{min-height:200px}
-.wrow{display:grid;grid-template-columns:160px minmax(0,1fr) 44px;gap:var(--s3);align-items:center;height:40px;cursor:default}
+.wrow{display:grid;grid-template-columns:160px minmax(0,1fr) 56px;gap:var(--s3);align-items:center;height:40px;cursor:default}
 .wname{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .wtrack{position:relative;height:10px;background:var(--brand-a07);border-radius:var(--r-s)}
 .wfill{position:absolute;left:0;top:0;bottom:0;background:var(--brand-a65);border-radius:var(--r-s)}
@@ -859,6 +883,12 @@ a.stage-link{text-decoration:none;color:inherit;cursor:pointer}
 .dd-scope{font-size:12px;color:var(--ink-3);margin-top:var(--s1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dd-lead{flex:0 0 auto}
 .dd-pre .stage-mini{margin-bottom:0;border-bottom:none;padding-bottom:0}
+/* D325 O8: a drill-down's breakdown row (product or stage today), in the stage-breakdown look. */
+.stage-mini.cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.stage-mini.cols-5{grid-template-columns:repeat(5,minmax(0,1fr))}
+.stage-mini.cols-6{grid-template-columns:repeat(6,minmax(0,1fr))}
+.stage-mini-fill.lost{background:var(--neg)}
+.dd-pre .dd-sec{margin-bottom:var(--s2)}
 .dd-seg{flex:0 0 auto}
 .dd-scroll{flex:1;min-height:0;overflow-y:auto}
 .dd-rows{display:flex;flex-direction:column}
@@ -105121,29 +105151,23 @@ function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;
    arguments. Returns '' (no element at all) when there's no honest prior-period figure to compare
    against, never a fabricated or zero-filled delta (CLAUDE.md §2b's no-fabrication rule, applied
    to a computed number instead of narration copy). */
-function metChangeValueHtml(current, prior, label, goodDirection){
-  if(!prior) return '';
-  const delta = (current-prior)/prior;
-  if(!isFinite(delta)) return '';
+/* The change itself, {cls:'pos'|'neg'|'', txt}, or null when there is no honest figure. D327: the
+   strip line and a drill-down's lead line share it, so both format a change the same way. */
+function changeParts(delta, unit, goodDirection){
+  if(!isFinite(delta)) return null;
   const up = delta>0;
   const good = delta===0 ? null : (goodDirection==='up' ? up : !up);
-  const cls = good==null ? '' : (good?'pos':'neg');
-  const sign = delta===0 ? '' : (up?'+':'−');
-  const mag = Math.abs(delta*100);
-  const shown = mag<10 ? mag.toFixed(1) : String(Math.round(mag));
-  return '<div class="met-change'+(cls?' '+cls:'')+'">'+sign+shown+'% '+label+'</div>';
+  const mag = Math.abs(delta);
+  return {cls: good==null ? '' : (good?'pos':'neg'),
+    txt: (delta===0 ? '' : (up?'+':'−'))+(mag<10 ? mag.toFixed(1) : String(Math.round(mag)))+unit};
 }
-function metChangePointsHtml(currentRatio, priorRatio, label, goodDirection){
-  const deltaPts = (currentRatio-priorRatio)*100;
-  if(!isFinite(deltaPts)) return '';
-  const up = deltaPts>0;
-  const good = deltaPts===0 ? null : (goodDirection==='up' ? up : !up);
-  const cls = good==null ? '' : (good?'pos':'neg');
-  const sign = deltaPts===0 ? '' : (up?'+':'−');
-  const mag = Math.abs(deltaPts);
-  const shown = mag<10 ? mag.toFixed(1) : String(Math.round(mag));
-  return '<div class="met-change'+(cls?' '+cls:'')+'">'+sign+shown+'pts '+label+'</div>';
-}
+function changeValueParts(current, prior, goodDirection){ return prior ? changeParts((current-prior)/prior*100, '%', goodDirection) : null; }
+function changePointsParts(currentRatio, priorRatio, goodDirection){ return changeParts((currentRatio-priorRatio)*100, 'pts', goodDirection); }
+function metChangeHtml(c, label){ return c ? '<div class="met-change'+(c.cls?' '+c.cls:'')+'">'+c.txt+' '+label+'</div>' : ''; }
+function metChangeValueHtml(current, prior, label, goodDirection){ return metChangeHtml(changeValueParts(current, prior, goodDirection), label); }
+function metChangePointsHtml(currentRatio, priorRatio, label, goodDirection){ return metChangeHtml(changePointsParts(currentRatio, priorRatio, goodDirection), label); }
+/* D327: the same change at the end of a drill-down's lead line, after " · ", tinted by direction. */
+function leadChangeHtml(c, label){ return c ? ' · <span'+(c.cls?' class="t-'+c.cls+'"':'')+'>'+c.txt+' '+label+'</span>' : ''; }
 
 /* ================================================================
    CONTROLLED VOCABULARIES — mirrors data/generate.js exactly so
@@ -107373,7 +107397,7 @@ function lossViewData(bdoId, view, limit){
        falls back to firm-wide (D100, above), so there is no source to name either. The
        count stays data-driven; the words around it are now fixed, always-one-line copy. */
     return {rows, scope: myLost.length+' closed-lost deals by stage, trailing 12 months',
-      total:myLost.length, tone:'', firm:false};
+      total:myLost.length, tone:'', firm:false, pool:myLost, keyOf:o=>o.lostAtStage};
   }
 
   if(view==='reason'){
@@ -107387,7 +107411,7 @@ function lossViewData(bdoId, view, limit){
        the exception, gets named, inline rather than as a leading qualifier that risked the old
        2-line wrap. The old "Your own book is too small to read" caveat is dropped, same as
        stage's, per the same R2 always-one-line requirement. */
-    return {rows, total:pool.length, tone:'', firm:usingFirm,
+    return {rows, total:pool.length, tone:'', firm:usingFirm, pool, keyOf:o=>o.closedLostReason,
       scope: pool.length+' closed-lost deals by reason'+(usingFirm?', firm-wide':'')+', trailing 12 months'};
   }
 
@@ -107398,7 +107422,7 @@ function lossViewData(bdoId, view, limit){
   const rows = Object.entries(t).sort((a,b)=>b[1].n-a[1].n).slice(0,limit)
     .map(([k,v])=>({label:k, n:v.n, val:v.val, ucc:v.ucc}));
   /* D234-D239, Part 3b: same firm-wide-only-when-it's-the-fallback pattern as "reason" above. */
-  return {rows, total:pool.length, tone:'warn', firm:usingFirm,
+  return {rows, total:pool.length, tone:'warn', firm:usingFirm, pool, keyOf:o=>o.lostToCompetitor,
     scope: pool.length+' losses with a known winner'+(usingFirm?', firm-wide':'')+', 12mo'};
 }
 
@@ -107482,10 +107506,68 @@ function drillBarRow(label, right, sub, pctW, opts){
     '</div><div class="dd-row-r"><div class="dd-row-amt">'+right+'</div>'+(sub?'<div class="dd-row-sub">'+sub+'</div>':'')+'</div></div>';
 }
 
+/* D322: a headline strip cell that opens its drill-down, on both Homes: click, or Enter when
+   focused (O7); "View" on hover; click again to close (D304). The label carries its full text as a
+   title, since it ellipsizes when the panel narrows the page. */
+function metCellHtml(key, label, figureHtml, extraHtml, linesHtml){
+  const open = "openDrill('"+key+"')";
+  return '<div class="met expandable" tabindex="0" onclick="'+open+'" onkeydown="if(event.key===\'Enter\'){event.preventDefault();'+open+'}">'+
+    '<div class="met-label" title="'+esc(label)+'">'+label+'</div>'+
+    '<div class="met-figure">'+figureHtml+'</div>'+(extraHtml||'')+linesHtml+
+    '<span class="met-view">View</span></div>';
+}
+
+/* ---------- the deals behind a card value (D326) ----------
+   A clickable card row opens a drill-down listing exactly the deals behind its figure, on the D302
+   surface for its size. Clicked inside the open side panel it stacks there, with a back link to the
+   drill-down it came from; from a card or a pop-up it opens on its own. Keys are built from the
+   view and the group's label, so they are stable across re-renders and view switches and D304's
+   click-again works; each definition's parts() recomputes its list from live data. */
+const ROW_CHEV = '<span class="chev">&rsaquo;</span>';
+function drillSlug(s){ return String(s).replace(/[^A-Za-z0-9]+/g, '_'); }
+function rowOpenAttrs(call){
+  return ' tabindex="0" role="button" onclick="'+call+'" onkeydown="if(event.key===\'Enter\')'+call+'"';
+}
+function groupOpenCall(key){ return "openGroupDrill('"+key+"',event)"; }
+window.openGroupDrill = function(key, ev){
+  if(ev){ ev.stopPropagation(); if(ev.type==='keydown') ev.preventDefault(); }
+  const inPanel = ev && ev.target && ev.target.closest && ev.target.closest('.dd-panel');
+  if(inPanel && SURF_KIND==='panel'){ PANEL_STACK.push({kind:'drill', key}); renderPanel(true); return; }
+  openDrill(key);
+};
+function closedOnLabel(o){ return fmtDateShort(closedDateOf(o) || o.fundedDate || ''); }
+/* Lost deals behind a row (Why we lose, BDO Home's Where we're losing). get() returns
+   {title, list, scope, of (all dollars lost, for the share), competitor}. */
+function lostGroupDrill(key, get){
+  DRILLS[key] = {count:()=>get().list.length, parts(){
+    const g = get(), l = g.list.slice().sort((a,b)=>b.facilitySize-a.facilitySize), t = sumFacility(l);
+    return {title: esc(g.title), scope: g.scope,
+      lead: drillFig(money(t))+'<div class="dd-lead-sub">'+dealsLabel(l.length)+(g.of ? ' · '+pct(t/Math.max(1,g.of))+' of all dollars lost' : '')+'</div>',
+      body: l.map(o=>drillDealRow(o, 'Lost '+closedOnLabel(o)+(g.competitor
+        ? ' · '+(o.lostToCompetitorEvidence==='UCC filing' ? 'seen in a UCC filing' : 'reported by the borrower')
+        : (o.lostAtStage ? ' at '+o.lostAtStage : '')), false, productTagHtml(o.productType))).join('')};
+  }};
+  return key;
+}
+/* Closed deals, won and lost, behind a Wins and losses row. */
+function closedGroupDrill(key, get){
+  DRILLS[key] = {count:()=>get().list.length, parts(){
+    const g = get(), l = g.list.slice().sort((a,b)=>b.facilitySize-a.facilitySize), st = execWinStats(l);
+    const lostN = st.n - st.won, ok = rateReliable(st.n), tooFew = '<span class="dd-muted">Too few</span>';
+    return {title: esc(g.title), scope:'Deals closed in the last 12 months, firm-wide',
+      lead: '<div class="dd-figpair"><div>'+drillFig(ok ? Math.round(st.dealsPct)+'%' : st.won+'W &middot; '+lostN+'L')+'<div class="dd-lead-sub">of deals won</div></div>'+
+        '<div><div class="dd-fig dd-fig-2">'+(ok ? Math.round(st.dollarsPct)+'%' : tooFew)+'</div><div class="dd-lead-sub">of dollars won</div></div></div>'+
+        '<div class="dd-note">'+st.won+' won, '+lostN+' lost.'+(ok ? '' : ' Rates show once a group has '+MIN_RATE_SAMPLE+' closed deals.')+'</div>',
+      body: l.map(o=>drillDealRow(o, 'Closed '+closedOnLabel(o)+' · '+ownerName(o), false)).join('')};
+  }};
+  return key;
+}
+
 DRILLS.pipeline = {count:()=>drillMyOpen().length, parts(){
   const l = drillMyOpen(), t = drillTotal(l);
-  return {title:'Active pipeline', scope:'Your open deals, every stage, '+drillAsOf(),
-    lead: drillFig(money(t))+'<div class="dd-lead-sub">Across '+drillPlural(l.length,'open deal')+' · average '+moneyShort(l.length?t/l.length:0)+'</div>',
+  const accts = new Set(l.map(o=>o.accountId)).size;
+  return {title:'Open pipeline', scope:'Your open deals, every stage, '+drillAsOf(),
+    lead: drillFig(money(t))+'<div class="dd-lead-sub">'+dealsLabel(l.length)+' across '+drillPlural(accts,'account')+' · average '+moneyShort(l.length?t/l.length:0)+'</div>',
     pre: stageMiniHtml(l),
     body: l.map(o=>drillDealRow(o, drillDaysSub(o), drillStale(o))).join(''),
     foot: drillListLink('Open in Opportunities', "drillToPipeline('myOpen')")};
@@ -107516,8 +107598,12 @@ DRILLS.winrate = {count:()=>3, parts(){
       '<div class="dd-wr-v">'+(r?pct(a/(a+b)):tooFew)+'</div></div>';
   }).join('');
   const diverges = ok && (won.length/n) > (ws/(ws+ls));
-  return {title:'Win rate', scope:'Your closed deals, trailing 12 months',
-    lead:'<div class="dd-figpair"><div>'+drillFig(ok?pct(won.length/n):won.length+'W &middot; '+lost.length+'L')+'<div class="dd-lead-sub">by count</div></div>'+
+  /* D327: the change the cell dropped (D323), shown only when both windows clear MIN_RATE_SAMPLE. */
+  const wonP = mine.filter(o=>o.outcome==='won' && inPriorTrailing12(o.fundedDate)).length;
+  const nP = wonP + mine.filter(o=>o.outcome==='lost' && inPriorTrailing12(lostDateOf(o))).length;
+  const change = ok && rateReliable(nP) ? leadChangeHtml(changePointsParts(won.length/n, wonP/nP, 'up'), 'vs the prior 12 months') : '';
+  return {title:'Win rate', scope:'Your closed deals, last 12 months',
+    lead:'<div class="dd-figpair"><div>'+drillFig(ok?pct(won.length/n):won.length+'W &middot; '+lost.length+'L')+'<div class="dd-lead-sub">by count'+change+'</div></div>'+
       '<div><div class="dd-fig dd-fig-2">'+(ok?pct(ws/(ws+ls)):tooFew)+'</div><div class="dd-lead-sub">by size</div></div></div>'+
       '<div class="dd-note">'+won.length+' won, '+lost.length+' lost.'+(diverges?' You win more deals than dollars, so the losses are the bigger deals.':'')+'</div>',
     body:'<div class="dd-wr"><div class="dd-wr-row dd-wr-head"><div>Product</div><div class="dd-wr-v">By count</div><div class="dd-wr-v">By size</div></div>'+rows+'</div>',
@@ -107526,9 +107612,12 @@ DRILLS.winrate = {count:()=>3, parts(){
 
 DRILLS.funded = {count:()=>drillFundedThisYear(CURRENT_BDO_ID).length, parts(){
   const yr = TODAY.slice(0,4), l = drillFundedThisYear(CURRENT_BDO_ID), st = quotaStats(CURRENT_BDO_ID);
-  return {title:'Funded this year', scope:'Your deals funded in '+yr+', '+drillAsOf(),
+  /* D327: the change the cell dropped (D323), against last year's same window, when there is one. */
+  const prior = drillTotal(myOpps().filter(o=>o.outcome==='won' && inPriorYTD(o.fundedDate)));
+  return {title:'Funded YTD', scope:'Your deals funded in '+yr+', '+drillAsOf(),
     lead: drillFig(money(st.fundedYTD))+'<div class="dd-lead-sub">'+drillPlural(l.length,'deal')+' · '+
-      Math.round(st.fundedYTD/Math.max(1,st.quota)*100)+'% of your '+moneyShort(st.quota)+' goal · '+(st.remaining>0?moneyShort(st.remaining)+' to go':'goal met')+'</div>',
+      Math.round(st.fundedYTD/Math.max(1,st.quota)*100)+'% of your '+moneyShort(st.quota)+' goal · '+(st.remaining>0?moneyShort(st.remaining)+' to go':'goal met')+
+      leadChangeHtml(changeValueParts(st.fundedYTD, prior, 'up'), 'vs last year')+'</div>',
     body: l.map(o=>drillDealRow(o, 'Funded '+fmtDateShort(o.fundedDate), false, productTagHtml(o.productType))).join('')};
 }};
 
@@ -107555,8 +107644,18 @@ DRILLS.loss = {views:LOSS_VIEWS, count:v=>lossViewData(CURRENT_BDO_ID, v).rows.l
   const max = Math.max(1,...d.rows.map(r=>r.val));
   const firmLost = Object.values(OPPS).filter(o=>o.outcome==='lost' && inTrailing12(lostDateOf(o)));
   const attributed = firmLost.filter(o=>o.lostToCompetitor);
-  const body = d.rows.map(r=>drillBarRow(esc(r.label), moneyPlain(r.val),
-    (v==='competitor' ? drillPlural(r.n,'deal')+' · '+r.ucc+' seen in UCC filings' : drillPlural(r.n,'loss','losses')), r.val/max*100)).join('');
+  /* D326 O15: a row with losses opens the deals behind it (amending D303's "loss rows are not
+     links"); inside this panel it stacks, with "‹ Where we're losing" as its back link. */
+  const body = d.rows.map(r=>{
+    const sub = v==='competitor' ? drillPlural(r.n,'deal')+' · '+r.ucc+' seen in UCC filings' : drillPlural(r.n,'loss','losses');
+    if(!r.n) return drillBarRow(esc(r.label), moneyPlain(r.val), sub, 0);
+    const key = lostGroupDrill('bloss_'+v+'_'+drillSlug(r.label), ()=>{
+      const dd = lossViewData(CURRENT_BDO_ID, v);
+      return {title: v==='stage' ? 'Lost at '+r.label : r.label, list: dd.pool.filter(o=>dd.keyOf(o)===r.label), competitor: v==='competitor',
+        scope: (v==='stage' ? 'Your deals' : v==='reason' ? 'Deals lost for this reason' : 'Deals they won from us')+(dd.firm?', firm-wide':'')+', last 12 months'};
+    });
+    return drillBarRow(esc(r.label), moneyPlain(r.val), sub, r.val/max*100, {href:groupOpenCall(key)});
+  }).join('');
   return {title:'Where we\'re losing', scope:d.scope,
     lead: drillFig(d.total)+'<div class="dd-lead-sub">'+(d.firm?'losses with a known winner, firm-wide':'of your deals lost')+' · '+moneyShort(d.rows.reduce((s,r)=>s+r.val,0))+' in facility size</div>'+
       (v==='competitor'?'<div class="dd-note">The borrower told us, or a UCC filing appeared after the loss. '+attributed.length+' of '+firmLost.length+' firm-wide losses named a winner.</div>':''),
@@ -107656,9 +107755,6 @@ function renderHome(){
   const pipelineValue = myOpen.reduce((s,o)=>s+o.facilitySize,0);
   const wonYTD = myWon.filter(o=>inYTD(o.fundedDate));
   const wonYTDValue = wonYTD.reduce((s,o)=>s+o.facilitySize,0);
-  /* D115: Funded YTD's change line, prior-year same-elapsed-window (inPriorYTD), the natural,
-     already-YTD-scoped comparison for this cell. */
-  const wonPriorYTDValue = myWon.filter(o=>inPriorYTD(o.fundedDate)).reduce((s,o)=>s+o.facilitySize,0);
   /* D100: Win Rate is a performance measure, not a snapshot — it must obey the period-scope rule
      (trailing 12 months, since a single rep's YTD closed count runs too thin some months of the
      year) and the small-sample rule (MIN_RATE_SAMPLE): below 10 closed deals, show the counts,
@@ -107671,19 +107767,8 @@ function renderHome(){
   const lostSize = myLostT12.reduce((s,o)=>s+o.facilitySize,0);
   const winByCount = closedN ? myWonT12.length/closedN : 0;
   const winBySize = (wonSize+lostSize) ? wonSize/(wonSize+lostSize) : 0;
-  /* D115: Win Rate's change line needs the PRIOR trailing-12 window at the same reliability bar as
-     the current one. Comparing a real rate to one built on a handful of deals would be exactly
-     the over-confident-number problem MIN_RATE_SAMPLE exists to prevent, just moved into the delta
-     instead of the headline figure. */
-  const myWonPriorT12 = myWon.filter(o=>inPriorTrailing12(o.fundedDate));
-  const myLostPriorT12 = myLost.filter(o=>inPriorTrailing12(lostDateOf(o)));
-  const closedPriorN = myWonPriorT12.length+myLostPriorT12.length;
-  const winRatePriorReliable = rateReliable(closedPriorN);
-  const winByCountPrior = closedPriorN ? myWonPriorT12.length/closedPriorN : 0;
   const inUW = myOpen.filter(o=>o.stage==='Underwriting');
   const inUWValue = inUW.reduce((s,o)=>s+o.facilitySize,0);
-  /* D126: Active pipeline's strip-cell scope line. */
-  const myOpenAccts = new Set(myOpen.map(o=>o.accountId)).size;
 
   const feed = buildFeed(CURRENT_BDO_ID);
   const agenda = buildAgenda(CURRENT_BDO_ID);
@@ -107702,41 +107787,17 @@ function renderHome(){
         ' need you today</span>'+
     '</div>'+
 
-    /* D126: BDO Home strip returns to four cells, reversing D124's verdict block. Active pipeline
-       is a snapshot total of currently-open deals, so, like Deals in Underwriting, it deliberately
-       carries no change line: an honest prior-period comparison would mean reconstructing which
-       deals were open as of a past date from the full stage-history audit trail, deal by deal, a
-       real computation out of scope for this pass. Win Rate and Funded YTD both have a genuine,
-       already-scoped prior window to compare against (see above), so they get real computed change
-       lines. */
+    /* D126 four cells; D323: each is the figure plus one line, opening its drill-down
+       (metCellHtml(), shared with Exec Home). Open pipeline and Underwriting are snapshots with no
+       change line; Win rate's and Funded YTD's change lines (D115) leave the cell (D323). Open
+       pipeline's figure uses money() like the rest of the strip (D323 O6, reversing D126's
+       moneyShort()). */
     '<div class="strip strip-4">'+
-      '<div class="met expandable" tabindex="0" onclick="openDrill(\'pipeline\')">'+
-        '<div class="met-label">Active pipeline</div>'+
-        '<div class="met-figure">'+moneyShort(pipelineValue)+'</div>'+
-        '<div class="met-sub">'+myOpen.length+' open deal'+(myOpen.length===1?'':'s')+
-          ' · '+myOpenAccts+' account'+(myOpenAccts===1?'':'s')+'</div>'+
-        '<span class="met-view">View</span></div>'+
-      '<div class="met expandable" tabindex="0" onclick="openDrill(\'underwriting\')">'+
-        '<div class="met-label">Deals in Underwriting</div>'+
-        '<div class="met-figure">'+inUW.length+'</div>'+
-        '<div class="met-sub">'+moneyShort(inUWValue)+' at the credit gate</div>'+
-        '<span class="met-view">View</span></div>'+
-      '<div class="met expandable" tabindex="0" onclick="openDrill(\'winrate\')">'+
-        '<div class="met-label">Win rate</div>'+
-        (winRateReliable
-          ? '<div class="met-figure">'+pct(winByCount)+'</div>'+
-            '<div class="met-sub">by count · '+pct(winBySize)+' by size, on '+closedN+' closed, trailing 12mo</div>'+
-            (winRatePriorReliable ? metChangePointsHtml(winByCount, winByCountPrior, 'vs prior 12mo', 'up') : '')
-          : '<div class="met-figure">'+myWonT12.length+'W &middot; '+myLostT12.length+'L</div>'+
-            '<div class="met-sub">Too few closed deals to rate, trailing 12mo</div>'
-        )+
-        '<span class="met-view">View</span></div>'+
-      '<div class="met expandable" tabindex="0" onclick="openDrill(\'funded\')">'+
-        '<div class="met-label">Funded YTD</div>'+
-        '<div class="met-figure">'+money(wonYTDValue)+'</div>'+
-        '<div class="met-sub">'+wonYTD.length+' deal'+(wonYTD.length===1?'':'s')+' funded this year</div>'+
-        metChangeValueHtml(wonYTDValue, wonPriorYTDValue, 'vs last year', 'up')+
-        '<span class="met-view">View</span></div>'+
+      metCellHtml('pipeline', 'Open pipeline', money(pipelineValue), '', '<div class="met-sub">'+dealsLabel(myOpen.length)+'</div>')+
+      metCellHtml('underwriting', 'Deals in Underwriting', String(inUW.length), '', '<div class="met-sub">'+moneyShort(inUWValue)+'</div>')+
+      metCellHtml('winrate', 'Win rate', winRateReliable ? pct(winByCount) : myWonT12.length+'W &middot; '+myLostT12.length+'L',
+        '', '<div class="met-sub">'+(winRateReliable ? 'by count · '+pct(winBySize)+' by size' : 'Too few to rate')+'</div>')+
+      metCellHtml('funded', 'Funded YTD', money(wonYTDValue), '', '<div class="met-sub">'+dealsLabel(wonYTD.length)+'</div>')+
     '</div>'+
 
     /* D222/D223/D225: one 12-column grid, replacing D104/D123's two-row shape. Left stack
@@ -107874,58 +107935,113 @@ function execOpenOn(dateStr){
   });
 }
 
-function execMetHtml(label, figureHtml, extraHtml, sub, change, changeCls){
-  return '<div class="met">'+
-    '<div class="met-label">'+label+'</div>'+
-    '<div class="met-figure">'+figureHtml+'</div>'+
-    (extraHtml||'')+
-    '<div class="met-sub">'+sub+'</div>'+
-    '<div class="met-change'+(changeCls?' '+changeCls:'')+'">'+change+'</div>'+
-  '</div>';
+/* D322 O2: the count compared with the prior 30 days' count. */
+function changeWord(n, prior){ return n>prior ? 'up from ' : n<prior ? 'down from ' : 'level with '; }
+function execPaceLine(g){
+  const gap = g.value - g.pace;
+  return {txt: moneyShort(Math.abs(gap))+(gap<0 ? ' behind pace' : ' ahead of pace'), cls: gap<0 ? 't-warn' : 't-pos'};
 }
-function execPriorLine(list){ return '30 days before: '+moneyShort(sumFacility(list))+', '+dealsLabel(list.length); }
+function execPriorSub(n, prior){ return dealsLabel(n)+' · 30 days before: '+moneyShort(sumFacility(prior))+', '+dealsLabel(prior.length); }
+/* D322: each cell is the figure plus one line, count and change (option A); each opens its
+   drill-down (metCellHtml()). The goal share lives in the bullet's tooltip and the drill-down. */
 function execStripHtml(){
   const w = execWindows();
-  const g = execGoalStats();
-  const gap = g.value - g.pace;
-  const bullet = '<div class="bullet">'+
+  const g = execGoalStats(), pace = execPaceLine(g);
+  const bullet = '<div class="bullet"'+tipAttr('Annual goal', pct(g.ratio)+' of '+moneyShort(g.target),
+      'Pace line: '+pct(g.paceShare)+' of the year gone')+'>'+
     '<div class="bullet-bar" style="width:'+(Math.min(1, g.ratio)*100).toFixed(1)+'%"></div>'+
     '<div class="bullet-pace" style="left:'+(Math.min(1, g.paceShare)*100).toFixed(1)+'%"></div>'+
   '</div>';
-  const paceLine = moneyShort(Math.abs(gap))+(gap<0?' behind':' ahead of')+' pace for '+fmtDateShort(TODAY);
   const added = execAddedIn(w.start, w.end), addedPrior = execAddedIn(w.priorStart, w.priorEnd);
   const funded = execFundedIn(w.start, w.end), fundedPrior = execFundedIn(w.priorStart, w.priorEnd);
   const pushed = execPushedIn(w.start, w.end), pushedPrior = execPushedIn(w.priorStart, w.priorEnd);
   const since = fmtDateShort(w.start);
+  const sub = t=>'<div class="met-sub">'+t+'</div>';
+  /* More slippage than the prior 30 days is the bad direction, so a rise in pushed dollars reads warn. */
+  const pushedWorse = sumFacility(pushed) > sumFacility(pushedPrior);
   return '<div class="strip strip-4">'+
-    execMetHtml('Funded this year', money(g.value), bullet,
-      pct(g.ratio)+' of '+moneyShort(g.target)+' annual goal · '+dealsLabel(g.count),
-      paceLine, gap<0?'warn':'pos')+
-    execMetHtml('Added since '+since, money(sumFacility(added)), '',
-      added.length+' new deal'+(added.length===1?'':'s'), execPriorLine(addedPrior), '')+
-    execMetHtml('Funded since '+since, money(sumFacility(funded)), '',
-      dealsLabel(funded.length), execPriorLine(fundedPrior), '')+
-    /* More slippage than the prior 30 days is the bad direction, so an increase reads warn. */
-    execMetHtml('Close dates pushed since '+since, money(sumFacility(pushed)), '',
-      dealsLabel(pushed.length)+' moved to a later month', execPriorLine(pushedPrior),
-      sumFacility(pushed)>sumFacility(pushedPrior)?'warn':'')+
+    metCellHtml('execFundedYtd', 'Funded YTD', money(g.value), bullet,
+      sub(dealsLabel(g.count)+' · <span class="'+pace.cls+'">'+pace.txt+'</span>'))+
+    metCellHtml('execAdded', 'Added since '+since, money(sumFacility(added)), '',
+      sub(dealsLabel(added.length)+', '+changeWord(added.length, addedPrior.length)+addedPrior.length))+
+    metCellHtml('execFunded30', 'Funded since '+since, money(sumFacility(funded)), '',
+      sub(dealsLabel(funded.length)+', '+changeWord(funded.length, fundedPrior.length)+fundedPrior.length))+
+    metCellHtml('execPushed', 'Close dates pushed since '+since, money(sumFacility(pushed)), '',
+      sub(dealsLabel(pushed.length)+', <span class="'+(pushedWorse?'t-warn':'')+'">'+changeWord(pushed.length, pushedPrior.length)+pushedPrior.length+'</span>'))+
   '</div>';
 }
 
+/* ---------- headline drill-downs (D322, D325) ---------- */
+function ownerName(o){ return esc(BDOS[o.bdoId] ? BDOS[o.bdoId].name : ''); }
+/* D325 O8: a breakdown row in the stage-breakdown look, not clickable (its columns are not lists
+   of their own), each column with a tooltip. */
+function breakdownRowHtml(cols){
+  const max = Math.max(1, ...cols.map(c=>c.value));
+  return '<div class="stage-mini cols-'+cols.length+'">'+cols.map(c=>
+    '<div class="stage-mini-item"'+tipAttr(c.label, dealsLabel(c.count)+' · '+moneyShort(c.value))+'>'+
+      '<div class="stage-mini-k">'+c.label+'</div>'+
+      '<div class="stage-mini-v"><b>'+c.count+'</b> '+moneyShort(c.value)+'</div>'+
+      '<div class="stage-mini-track"><div class="stage-mini-fill'+(c.lost?' lost':'')+'" style="width:'+((c.value/max)*100).toFixed(1)+'%"></div></div>'+
+    '</div>').join('')+'</div>';
+}
+function productBreakdownHtml(list){
+  return breakdownRowHtml(['Factoring','ABL','TermLoan'].map(pt=>{
+    const g = list.filter(o=>o.productType===pt);
+    return {label:productLabel(pt), count:g.length, value:sumFacility(g)};
+  }));
+}
+/* Where the deals are today: open ones by stage, then Closed won (only if any) and Closed lost. */
+function stageTodayBreakdownHtml(list){
+  const cols = TRACK_STAGES.map(st=>{ const g = list.filter(o=>o.outcome==='open' && o.stage===st); return {label:st, count:g.length, value:sumFacility(g)}; });
+  const won = list.filter(o=>o.outcome==='won'), lost = list.filter(o=>o.outcome==='lost');
+  if(won.length) cols.push({label:'Closed won', count:won.length, value:sumFacility(won)});
+  if(lost.length) cols.push({label:'Closed lost', count:lost.length, value:sumFacility(lost), lost:true});
+  return '<div class="dd-sec">Where they are today</div>'+breakdownRowHtml(cols);
+}
+function execFundedYtdList(){
+  const yr = TODAY.slice(0,4);
+  return Object.values(OPPS).filter(o=>o.outcome==='won' && (o.fundedDate||'').slice(0,4)===yr);
+}
+DRILLS.execFundedYtd = {count:()=>execFundedYtdList().length, parts(){
+  const g = execGoalStats(), pace = execPaceLine(g);
+  const l = execFundedYtdList().sort((a,b)=>b.fundedDate.localeCompare(a.fundedDate) || b.facilitySize-a.facilitySize);
+  return {title:'Funded YTD', scope:'Deals funded in '+TODAY.slice(0,4)+', firm-wide, '+drillAsOf(),
+    lead: drillFig(money(g.value))+'<div class="dd-lead-sub">'+dealsLabel(g.count)+' · '+pct(g.ratio)+' of the '+moneyShort(g.target)+
+      ' annual goal · <span class="'+pace.cls+'">'+pace.txt+'</span></div>',
+    pre: productBreakdownHtml(l),
+    body: l.map(o=>drillDealRow(o, 'Funded '+fmtDateShort(o.fundedDate)+' · '+ownerName(o), false, productTagHtml(o.productType))).join(''),
+    foot: drillListLink('Open in Opportunities', "drillToPipeline('wonYTD')")};
+}};
+/* No footer: no list shows exactly these deals. */
+DRILLS.execAdded = {count:()=>{ const w = execWindows(); return execAddedIn(w.start, w.end).length; }, parts(){
+  const w = execWindows(), l = execAddedIn(w.start, w.end).sort((a,b)=>b.facilitySize-a.facilitySize);
+  return {title:'Added since '+fmtDateShort(w.start), scope:'Deals created, firm-wide, '+drillAsOf(),
+    lead: drillFig(money(sumFacility(l)))+'<div class="dd-lead-sub">'+execPriorSub(l.length, execAddedIn(w.priorStart, w.priorEnd))+'</div>',
+    pre: stageTodayBreakdownHtml(l),
+    body: l.map(o=>drillDealRow(o, 'Created '+fmtDateShort(o.createdDate)+' · '+ownerName(o), false)).join('')};
+}};
+DRILLS.execFunded30 = {count:()=>{ const w = execWindows(); return execFundedIn(w.start, w.end).length; }, parts(){
+  const w = execWindows(), l = execFundedIn(w.start, w.end).sort((a,b)=>b.fundedDate.localeCompare(a.fundedDate) || b.facilitySize-a.facilitySize);
+  return {title:'Funded since '+fmtDateShort(w.start), scope:'Deals funded, firm-wide, '+drillAsOf(),
+    lead: drillFig(money(sumFacility(l)))+'<div class="dd-lead-sub">'+execPriorSub(l.length, execFundedIn(w.priorStart, w.priorEnd))+'</div>',
+    body: l.map(o=>drillDealRow(o, 'Funded '+fmtDateShort(o.fundedDate)+' · '+ownerName(o), false, productTagHtml(o.productType))).join('')};
+}};
+
 /* Generic ranked-bar-list builder: the shared .hbar-row/.hbar-fill markup (D221, D231), one call
-   per ranked list. rows: [{label, value, display, tip, rowCls, fillCls, onclick, href}]. A row
-   with `href` renders as a real link (keyboard-reachable), not a div with an onclick. */
+   per ranked list. rows: [{label, value, display, tip, rowCls, fillCls, onclick, href, open}]. A
+   row with `href` renders as a real link (keyboard-reachable), not a div with an onclick. A row
+   with `open` (a call taking `event`) opens a drill-down in the clickable-row look (D326). */
 function hbarListHtml(rows, opts){
   opts = opts || {};
   const max = opts.max!=null ? opts.max : Math.max(1, ...rows.map(r=>r.value));
   return rows.map(r=>{
     const width = Math.max(r.value>0?2:0, (r.value/max)*100);
     const tag = r.href ? 'a' : 'div';
-    return '<'+tag+' class="hbar-row'+(r.rowCls?(' '+r.rowCls):'')+'"'+(r.href?' href="'+r.href+'"':'')+
-      (r.onclick?' onclick="'+r.onclick+'"':'')+(r.tip||'')+(r.onclick?' style="cursor:pointer"':'')+'>'+
+    return '<'+tag+' class="hbar-row'+(r.rowCls?(' '+r.rowCls):'')+(r.open?' stage-link':'')+'"'+(r.href?' href="'+r.href+'"':'')+
+      (r.onclick?' onclick="'+r.onclick+'"':'')+(r.open?rowOpenAttrs(r.open):'')+(r.tip||'')+(r.onclick?' style="cursor:pointer"':'')+'>'+
       '<div class="hbar-fill '+(r.fillCls||'')+'" style="width:'+width.toFixed(1)+'%"></div>'+
       '<div class="hbar-name">'+r.label+'</div>'+
-      '<div class="hbar-val">'+r.display+'</div>'+
+      '<div class="hbar-val">'+r.display+(r.open?ROW_CHEV:'')+'</div>'+
     '</'+tag+'>';
   }).join('');
 }
@@ -107938,7 +108054,7 @@ function execOpenPipelinePanelHtml(){
   const w = execWindows();
   const then = execOpenOn(w.priorEnd);
   const thenVal = sumFacility(then);
-  const dir = total>thenVal ? 'up from ' : total<thenVal ? 'down from ' : 'level with ';
+  const dir = changeWord(total, thenVal);
   const rows = TRACK_STAGES.map(st=>{
     const g = open.filter(o=>o.stage===st), v = sumFacility(g);
     return {label:st, value:v, href:'#/pipeline/stage/'+st, rowCls:'stage-link',
@@ -107984,14 +108100,16 @@ function execBdoPanelHtml(){
     '<div class="att-'+cls+' pace" style="left:'+x(pacePct)+'%">'+(withLabels?'<span>Pace</span>':'')+'</div>'+
     '<div class="att-'+cls+' goal" style="left:'+x(100)+'%">'+(withLabels?'<span>Goal</span>':'')+'</div>'+
   '</div><div></div>';
+  /* D326 O13: each row opens that BDO's funded YTD deals. */
   const body = rows.map(r=>
-    '<div class="att-row"'+tipAttr(r.b.name, Math.round(r.pctOf)+'% of goal', moneyShort(r.funded)+' funded of '+moneyShort(r.goal)+' goal')+'>'+
+    '<div class="att-row stage-link"'+tipAttr(r.b.name, Math.round(r.pctOf)+'% of goal', moneyShort(r.funded)+' funded of '+moneyShort(r.goal)+' goal')+
+      rowOpenAttrs(groupOpenCall(bdoFundedDrill(r.b.id)))+'>'+
       '<div class="att-name">'+esc(r.b.name)+'</div>'+
       '<div class="att-track"><div class="att-fill" style="width:'+x(r.pctOf)+'%"></div></div>'+
-      '<div class="att-val">'+Math.round(r.pctOf)+'%</div>'+
+      '<div class="att-val">'+Math.round(r.pctOf)+'%'+ROW_CHEV+'</div>'+
     '</div>').join('');
   return '<div class="panel" id="panel-exec-bdos">'+
-    panelHeaderHtml('BDOs vs goal', 'Funded this year against each annual goal',
+    panelHeaderHtml('BDOs vs goal', 'Funded YTD against each annual goal',
       '<span class="drill" onclick="openDrill(\'execBdos\')">All BDOs &rsaquo;</span>')+
     '<div class="panel-body">'+
       '<div class="att">'+
@@ -108003,16 +108121,31 @@ function execBdoPanelHtml(){
     '</div>'+
   '</div>';
 }
+/* One BDO's deals funded YTD (D326 O13): one drill-down per BDO, opened from a BDOs vs goal row on
+   the card or in "All BDOs", and from the Signals "See BDO" item (D327), so D304's click-again
+   closes it from any of them. The pace part of the lead is tinted. */
+function bdoFundedDrill(id){
+  const key = 'bdo_'+id;
+  DRILLS[key] = DRILLS[key] || {count:()=>drillFundedThisYear(id).length, parts(){
+    const r = execBdoAttainment().find(x=>x.b.id===id), l = drillFundedThisYear(id), pace = execGoalStats().paceShare*100;
+    const behind = r.pctOf < pace;
+    return {title: esc(r.b.name), scope:'Funded YTD, '+drillAsOf(),
+      lead: drillFig(money(r.funded))+'<div class="dd-lead-sub">'+dealsLabel(l.length)+' · '+Math.round(r.pctOf)+'% of a '+moneyShort(r.goal)+' goal · '+
+        '<span class="'+(behind?'t-warn':'t-pos')+'">'+(behind?'behind':'ahead of')+' pace</span></div>',
+      body: l.map(o=>drillDealRow(o, 'Funded '+fmtDateShort(o.fundedDate), false, productTagHtml(o.productType))).join('')};
+  }};
+  return key;
+}
 /* BDOs vs goal as a drill-down: one bar row per BDO on one shared scale, a thin pace line through
-   every bar, amber when behind pace (O5). Rows are not links: there is no BDO page yet (O8). */
+   every bar, amber when behind pace (O5). Each row opens that BDO's funded YTD deals (D326 O13). */
 DRILLS.execBdos = {count:()=>execBdoAttainment().length, parts(){
   const rows = execBdoAttainment(), pace = execGoalStats().paceShare*100;
   const funded = rows.reduce((s,r)=>s+r.funded,0), goal = rows.reduce((s,r)=>s+(r.goal||0),0);
   const scale = Math.max(100,...rows.map(r=>r.pctOf));
-  return {title:'BDOs vs goal', scope:'Funded this year against each annual goal',
+  return {title:'BDOs vs goal', scope:'Funded YTD against each annual goal',
     lead: drillFig(money(funded))+'<div class="dd-lead-sub">'+Math.round(funded/Math.max(1,goal)*100)+'% of the '+moneyShort(goal)+' combined goal · pace today '+Math.round(pace)+'%</div>',
     body: rows.map(r=>drillBarRow(esc(r.b.name), Math.round(r.pctOf)+'%', moneyShort(r.funded)+' of '+moneyShort(r.goal), r.pctOf/scale*100,
-      {marker: pace/scale*100, markerTip:'Straight-line pace, '+Math.round(pace)+'%', warn: r.pctOf < pace})).join(''),
+      {marker: pace/scale*100, markerTip:'Straight-line pace, '+Math.round(pace)+'%', warn: r.pctOf < pace, href:groupOpenCall(bdoFundedDrill(r.b.id))})).join(''),
     foot:'<span class="dd-foot-note">The thin line is where straight-line pace puts each BDO today</span>'};
 }};
 
@@ -108034,7 +108167,6 @@ function execNewLargeDeals(){
   return execAddedIn(w.start, w.end).filter(o=>o.outcome==='open' && o.facilitySize>=EXEC_LARGE_DEAL)
     .sort((a,b)=>b.facilitySize-a.facilitySize);
 }
-function execTopBdo(){ return execBdoAttainment()[0] || null; }
 function execDormantPartner(){
   return D.partners.filter(p=>p.isDormant).map(p=>{
     const deals = Object.values(OPPS).filter(o=>o.referralPartnerId===p.id);
@@ -108058,7 +108190,7 @@ function execSignals(){
   const top = att[0];
   if(top && top.pctOf>=pacePct){
     const ahead = att.filter(r=>r.pctOf>=pacePct).length;
-    good.push({icon:'pos', glyph:feedIconSvg('trend'), action:'See BDO', onclick:"openDrill('execTopBdo')",
+    good.push({icon:'pos', glyph:feedIconSvg('trend'), action:'See BDO', onclick:"openDrill('"+bdoFundedDrill(top.b.id)+"')",
       title: esc(top.b.name)+' is at '+Math.round(top.pctOf)+'% of annual goal',
       sub: moneyShort(top.funded)+' funded on a '+moneyShort(top.goal)+' goal · '+ahead+' of '+att.length+' BDOs ahead of pace'});
   }
@@ -108072,7 +108204,7 @@ function execSignals(){
 
   const pushed = execPushedIn(w.start, w.end), pushedPrior = execPushedIn(w.priorStart, w.priorEnd);
   if(pushed.length){
-    const dir = pushed.length>pushedPrior.length ? 'up from ' : pushed.length<pushedPrior.length ? 'down from ' : 'level with ';
+    const dir = changeWord(pushed.length, pushedPrior.length);
     bad.push({icon:'warn', glyph:feedIconSvg('clock'), action:'See deals', onclick:"openDrill('execPushed')",
       title: dealsLabel(pushed.length)+' pushed their close date',
       sub: moneyShort(sumFacility(pushed))+' · '+dir+dealsLabel(pushedPrior.length)+', '+moneyShort(sumFacility(pushedPrior))+' in the prior 30 days'});
@@ -108113,14 +108245,6 @@ function execSignalsPanelHtml(){
     '<div class="panel-body flush">'+body+'</div>'+
   '</div>';
 }
-DRILLS.execTopBdo = {count:()=>{ const t = execTopBdo(); return t ? drillFundedThisYear(t.b.id).length : 0; }, parts(){
-  const t = execTopBdo();
-  if(!t) return {title:'BDOs vs goal', scope:'No BDOs on record', lead:'', body:''};
-  const l = drillFundedThisYear(t.b.id);
-  return {title:esc(t.b.name), scope:'Funded this year, '+drillAsOf(),
-    lead: drillFig(money(t.funded))+'<div class="dd-lead-sub">'+drillPlural(l.length,'deal')+' · '+Math.round(t.pctOf)+'% of a '+moneyShort(t.goal)+' goal</div>',
-    body: l.map(o=>drillDealRow(o, 'Funded '+fmtDateShort(o.fundedDate), false, productTagHtml(o.productType))).join('')};
-}};
 DRILLS.execNewLarge = {count:()=>execNewLargeDeals().length, parts(){
   const l = execNewLargeDeals(), w = execWindows();
   return {title:'New deals over $'+(EXEC_LARGE_DEAL/1e6)+'M', scope:'Created since '+fmtDateShort(w.start)+', still open',
@@ -108133,8 +108257,8 @@ DRILLS.execPushed = {count:()=>{ const w = execWindows(); return execPushedIn(w.
     if(e.field!=='expectedCloseDate' || !inRange(e.changedAt, w.start, w.end) || String(e.newValue).slice(0,7) <= String(e.oldValue).slice(0,7)) return;
     if(!last[e.opportunityId] || e.changedAt>last[e.opportunityId].changedAt) last[e.opportunityId] = e;
   });
-  return {title:'Close dates pushed', scope:'Moved to a later month since '+fmtDateShort(w.start)+', firm-wide',
-    lead: drillFig(money(drillTotal(l)))+'<div class="dd-lead-sub">'+drillPlural(l.length,'deal')+' now expected to close later</div>',
+  return {title:'Close dates pushed since '+fmtDateShort(w.start), scope:'Moved to a later month, firm-wide, '+drillAsOf(),
+    lead: drillFig(money(drillTotal(l)))+'<div class="dd-lead-sub">'+execPriorSub(l.length, execPushedIn(w.priorStart, w.priorEnd))+'</div>',
     body: l.map(o=>{ const e = last[o.id]; return drillDealRow(o, e ? fmtDateShort(e.oldValue)+' to '+fmtDateShort(e.newValue) : o.stage, false); }).join('')};
 }};
 DRILLS.execStalled = {count:()=>execStalledDeals().length, parts(){
@@ -108153,25 +108277,46 @@ function weightedYield(list){
   const size = sumFacility(list);
   return size ? list.reduce((s,o)=>s+o.facilitySize*(o.yieldPct||0),0)/size : null;
 }
-function execYieldPanelHtml(){
+/* D326 O14: the columns, also the views of each row's drill-down, which opens on the clicked one. */
+const YIELD_VIEWS = [{key:'ytd', label:'Funded YTD'}, {key:'open', label:'Open pipeline'},
+  {key:'prior', label:'Funded '+(Number(TODAY.slice(0,4))-1)}];
+function yieldList(pt, view){
   const yr = TODAY.slice(0,4), prior = String(Number(yr)-1);
-  const won = Object.values(OPPS).filter(o=>o.outcome==='won');
-  const cols = [
-    won.filter(o=>(o.fundedDate||'').slice(0,4)===yr),
-    execFirmOpen(),
-    won.filter(o=>(o.fundedDate||'').slice(0,4)===prior),
-  ];
-  const cell = list => { const v = weightedYield(list); return '<td class="num">'+(v==null?'–':v.toFixed(1)+'%')+'</td>'; };
-  const row = (labelHtml, pt, cls) => '<tr'+(cls?' class="'+cls+'"':'')+'><td>'+labelHtml+'</td>'+
-    cols.map(c=>cell(pt?c.filter(o=>o.productType===pt):c)).join('')+'</tr>';
+  const base = view==='open' ? execFirmOpen()
+    : Object.values(OPPS).filter(o=>o.outcome==='won' && (o.fundedDate||'').slice(0,4)===(view==='ytd' ? yr : prior));
+  return pt ? base.filter(o=>o.productType===pt) : base;
+}
+const YIELD_ROWS = [null, 'Factoring', 'TermLoan', 'ABL'];
+YIELD_ROWS.forEach(pt=>{
+  DRILLS['yield_'+(pt||'all')] = {views:YIELD_VIEWS, count:v=>yieldList(pt, v).length, parts(v){
+    const l = yieldList(pt, v).sort((a,b)=>b.facilitySize-a.facilitySize), y = weightedYield(l);
+    return {title:'Yield, '+(pt ? productLabel(pt) : 'all products'), scope:'Annualized, dollar-weighted, '+drillAsOf(),
+      lead: drillFig(y==null ? '–' : y.toFixed(1)+'%')+'<div class="dd-lead-sub">'+dealsLabel(l.length)+' · '+moneyShort(sumFacility(l))+' in facility size</div>',
+      body: l.map(o=>drillDealRow(o, 'Yield '+(o.yieldPct!=null ? o.yieldPct.toFixed(1)+'%' : 'not set')+' · '+
+        (v==='open' ? ownerName(o) : 'Funded '+fmtDateShort(o.fundedDate)), false, v==='open' ? null : productTagHtml(o.productType))).join('')};
+  }};
+});
+function execYieldPanelHtml(){
+  const prior = String(Number(TODAY.slice(0,4))-1);
+  /* Each figure opens the deals behind it (D326 O14); an empty cell stays plain. */
+  const cell = (pt, view) => {
+    const v = weightedYield(yieldList(pt, view));
+    if(v==null) return '<td class="num">–</td>';
+    return '<td class="num ycell"'+rowOpenAttrs("openDrill('yield_"+(pt||'all')+"','"+view+"')")+'>'+v.toFixed(1)+'%</td>';
+  };
+  /* D327: the first cell opens the row on Funded YTD, the same call as that figure, so D304 closes
+     from either and another view switches to Funded YTD. */
+  const row = (labelHtml, pt, cls) => '<tr'+(cls?' class="'+cls+'"':'')+'><td class="ycell"'+
+      rowOpenAttrs("openDrill('yield_"+(pt||'all')+"','ytd')")+'>'+labelHtml+'</td>'+
+    YIELD_VIEWS.map(c=>cell(pt, c.key)).join('')+'</tr>';
   return '<div class="panel" id="panel-exec-yield">'+
     panelHeaderHtml('Yield', 'Annualized, dollar-weighted', '')+
     '<div class="panel-body yield-body">'+
       '<div class="tbl-wrap"><table class="tbl price-tbl"><thead><tr>'+
-        '<th>Product</th><th class="num">Funded this year</th><th class="num">Open pipeline</th><th class="num">Funded '+prior+'</th>'+
+        '<th>Product</th><th class="num">Funded YTD</th><th class="num">Open pipeline</th><th class="num">Funded '+prior+'</th>'+
       '</tr></thead><tbody>'+
         row('All products', null, 'yall')+
-        ['Factoring','TermLoan','ABL'].map(pt=>row(productTagHtml(pt), pt)).join('')+
+        YIELD_ROWS.slice(1).map(pt=>row(productTagHtml(pt), pt)).join('')+
       '</tbody></table></div>'+
     '</div>'+
   '</div>';
@@ -108234,14 +108379,17 @@ function execWinsPanelHtml(){
      track's end. */
   const rated = groups.filter(g=>rateReliable(g.st.n));
   const scale = Math.max(1, ...rated.map(g=>Math.max(g.st.dealsPct, g.st.dollarsPct))) * 1.15;
+  /* D326 O12: each row opens that group's closed deals, won and lost. */
   const rows = groups.map(g=>{
     const t = tipAttr(g.label, g.st.won+' of '+g.st.n+' deals won ('+Math.round(g.st.dealsPct)+'%)', Math.round(g.st.dollarsPct)+'% of dollars won');
-    if(!rateReliable(g.st.n)) return '<div class="wrow"'+t+'><div class="wname">'+esc(g.label)+'</div>'+
-      '<div class="wthin">'+g.st.won+' of '+g.st.n+' won · too few to rate</div></div>';
-    return '<div class="wrow"'+t+'><div class="wname">'+esc(g.label)+'</div>'+
+    const key = closedGroupDrill('wl_'+view+'_'+drillSlug(g.label), ()=>({title: view==='stage' ? 'Reached '+g.label : g.label,
+      list: (execWinGroups(view, execClosed12()).find(x=>x.label===g.label) || {list:[]}).list}));
+    const open = '<div class="wrow stage-link"'+t+rowOpenAttrs(groupOpenCall(key))+'><div class="wname">'+esc(g.label)+'</div>';
+    if(!rateReliable(g.st.n)) return open+'<div class="wthin">'+g.st.won+' of '+g.st.n+' won · too few to rate'+ROW_CHEV+'</div></div>';
+    return open+
       '<div class="wtrack"><div class="wfill" style="width:'+(g.st.dealsPct/scale*100).toFixed(1)+'%"></div>'+
         '<div class="wtick" style="left:'+(g.st.dollarsPct/scale*100).toFixed(1)+'%"></div></div>'+
-      '<div class="wval">'+Math.round(g.st.dealsPct)+'%</div></div>';
+      '<div class="wval">'+Math.round(g.st.dealsPct)+'%'+ROW_CHEV+'</div></div>';
   }).join('');
   /* The verdict reads warn when the dollar share won trails the deal share won: winning the
      smaller deals, the count-and-size divergence CLAUDE.md §2 exists to surface. */
@@ -108267,19 +108415,31 @@ window.setExecWlView = function(v){
 const EXEC_WHY_VIEWS = [{key:'reason', label:'By reason'}, {key:'competitor', label:'Lost to'}];
 let EXEC_WHY_VIEW = 'reason';
 function reasonDisplay(r){ return String(r).replace(/\s[\u2013\u2014]\s/g, ', '); }
+/* Lost deals grouped by reason (display form) or, among those with a known winner, by lender;
+   ranked by dollars, then deals, then name. */
+function execWhyGroups(view, lost){
+  const map = {};
+  (view==='reason' ? lost : lost.filter(o=>o.lostToCompetitor)).forEach(o=>{
+    const k = view==='reason' ? reasonDisplay(o.closedLostReason||'No reason recorded') : o.lostToCompetitor;
+    (map[k] = map[k] || []).push(o);
+  });
+  return Object.entries(map).map(([label, list])=>({label, list, size:sumFacility(list)}))
+    .sort((a,b)=>b.size-a.size || b.list.length-a.list.length || a.label.localeCompare(b.label));
+}
 function execWhyPanelHtml(){
   const view = EXEC_WHY_VIEW;
   const lost = execClosed12().filter(o=>o.outcome==='lost');
   const known = lost.filter(o=>o.lostToCompetitor);
-  const map = {};
-  (view==='reason' ? lost : known).forEach(o=>{
-    const k = view==='reason' ? reasonDisplay(o.closedLostReason||'No reason recorded') : o.lostToCompetitor;
-    (map[k] = map[k] || []).push(o);
-  });
-  const groups = Object.entries(map).map(([label, list])=>({label, list, size:sumFacility(list)}))
-    .sort((a,b)=>b.size-a.size || b.list.length-a.list.length || a.label.localeCompare(b.label)).slice(0, EXEC_WL_ROWS);
+  const groups = execWhyGroups(view, lost).slice(0, EXEC_WL_ROWS);
+  /* D326 O11: each row opens the lost deals behind it. */
   const rows = hbarListHtml(groups.map(g=>({label:esc(g.label), value:g.size, display:moneyShort(g.size),
-    tip:tipAttr(g.label, moneyShort(g.size)+' lost', dealsLabel(g.list.length))})));
+    tip:tipAttr(g.label, moneyShort(g.size)+' lost', dealsLabel(g.list.length)),
+    open: groupOpenCall(lostGroupDrill('why_'+view+'_'+drillSlug(g.label), ()=>{
+      const all = execClosed12().filter(o=>o.outcome==='lost');
+      return {title:g.label, list:(execWhyGroups(view, all).find(x=>x.label===g.label) || {list:[]}).list, of:sumFacility(all),
+        competitor: view==='competitor',
+        scope: view==='reason' ? 'Lost for this reason, last 12 months, firm-wide' : 'Deals they won from us, last 12 months, firm-wide'};
+    }))})));
   /* "Known for N of M losses" belongs to Lost to only; By reason renders the same line hidden so
      the card never changes height between views (CLAUDE.md §4 toggle-card rule, R5). */
   return '<div class="panel" id="panel-exec-why">'+
