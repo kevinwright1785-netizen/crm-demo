@@ -1223,13 +1223,21 @@ table.tbl{width:100%;border-collapse:collapse}
 .pipe-return-arrow[disabled]{color:var(--ink-3);background:var(--sunken);cursor:not-allowed}
 
 /* ---------- opportunity record ---------- */
-.opp-header{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-l);padding:var(--s5);
+.opp-header{position:relative;background:var(--paper);border:1px solid var(--line);border-radius:var(--r-l);padding:var(--s5);
   margin-bottom:var(--s5)}
+/* D342 O3: "Close deal" (or "Reopen deal"), top right of the deal header, on the eyebrow's row */
+.opp-hdr-actions{position:absolute;top:var(--s5);right:var(--s5);display:flex;gap:var(--s2)}
 .opp-eyebrow{font-size:11px;color:var(--ink-3);display:flex;align-items:center;gap:var(--s2)}
 /* D145 commit 2: weight 500 (D111's default), closing the miss D159 found and deliberately left
    here rather than fixed by a scoped override on Account 360's fork (.acct-title/.acct-hero,
    already 500). Neither class ever set 500 before; .opp-hero set 400 explicitly. */
 .opp-title{font-family:var(--ui);font-size:20px;font-weight:500;letter-spacing:-.01em;color:var(--ink);margin-top:var(--s1)}
+/* D344 (amends D342): the name's edit cell hugs its text, as the strip's editable figures do, and the
+   title keeps clear of the header button: its right padding (112px) covers the wider button,
+   "Reopen deal" at 96.8px, less the cell's --s2 reach, with --s5 to spare. A longer name wraps inside
+   the cap and never reaches the button. */
+.opp-title{padding-right:calc(var(--s7) + var(--s7) + var(--s4))}
+.opp-title .ef{display:inline-block;max-width:100%}
 /* D264: rolling digits (figRoll()). A changed character sits in an inline-block cell, the new one
    in flow and the old one stacked over it, absolutely, so the cell keeps the new character's width
    and baseline. clip-path on the figure clips the travelling characters to its own box without
@@ -1674,6 +1682,63 @@ table.tbl{width:100%;border-collapse:collapse}
 .form-field.has-error input,.form-field.has-error select{border-color:var(--neg)}
 .form-field-error{font-size:11px;color:var(--neg);margin-top:var(--s1)}
 .form-field-hint{font-size:11px;color:var(--ink-3);margin-top:var(--s1)}
+
+/* ---------- close and reopen a deal (D342, spec close-deal-spec-v1.html) ----------
+   The dialog is the Sheet pop-up (.dd-scrim/.dd-pop, D303, D309); the Won/Lost menu is the + New menu
+   (.newmenu), fixed under the control that opened it. Literal sizes kept from the spec, none on the
+   4pt scale: the tile's 56px height, the reason rows' and "More reasons" 36px, the menu's 280px
+   minimum width, the textarea's 72px minimum height, 14px icons, the 2px error rule. */
+.cd-body{display:flex;flex-direction:column;gap:var(--s5);padding:var(--s5) 0 var(--s2)}
+.cd-choice{display:grid;grid-template-columns:1fr 1fr;gap:var(--s3)}
+.cd-tile{display:flex;align-items:center;gap:var(--s3);height:56px;padding:0 var(--s4);border:1px solid var(--line-2);
+  border-radius:var(--r-m);background:var(--paper);text-align:left;cursor:pointer;
+  transition:background var(--t-fast) var(--ease),border-color var(--t-fast) var(--ease)}
+.cd-tile:hover{background:var(--hover)}
+.cd-tile:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
+.cd-tile svg{width:var(--s4);height:var(--s4);flex:0 0 var(--s4);color:var(--ink-3)}
+.cd-tile.won.on{border-color:var(--pos);background:var(--pos-soft)}
+.cd-tile.won.on svg{color:var(--pos)}
+.cd-tile.lost.on{border-color:var(--neg);background:var(--neg-soft)}
+.cd-tile.lost.on svg{color:var(--neg)}
+.cd-tile-t{display:block;font-size:13px;font-weight:500;color:var(--ink)}
+.cd-tile-s{display:block;font-size:11px;color:var(--ink-2);margin-top:var(--s1)}
+.cd-2col{display:grid;grid-template-columns:1fr 1fr;gap:var(--s4)}
+.cd-static{font-size:13px;color:var(--ink);line-height:var(--h)}
+.cd-static span{color:var(--ink-2)}
+.form-field textarea{display:block;width:100%;min-height:72px;padding:var(--s2) var(--s3);border:1px solid var(--line-2);
+  border-radius:var(--r-s);background:var(--paper);color:var(--ink);font:inherit;font-size:12px;line-height:1.45;resize:vertical}
+.form-field.has-error textarea{border-color:var(--neg)}
+.form-field input:focus-visible,.form-field select:focus-visible,.form-field textarea:focus-visible{
+  outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
+.cd-opt{color:var(--ink-3);font-weight:400}
+.cd-reasons{display:flex;flex-direction:column;margin:0 calc(-1*var(--s2))}
+.cd-sec{font-size:11px;font-weight:500;color:var(--ink-3);padding:var(--s3) var(--s2) var(--s1)}
+.cd-sec:first-child{padding-top:0}
+.form-field .cd-reason{margin:0;font-weight:400}
+.form-field label.cd-reason{display:grid;grid-template-columns:var(--s4) minmax(0,1fr) auto;align-items:center;gap:var(--s3);min-height:36px;
+  padding:0 var(--s2);border-radius:var(--r-s);cursor:pointer;font-size:13px;color:var(--ink);
+  transition:background var(--t-fast) var(--ease)}
+.cd-reason:hover{background:var(--hover)}
+.cd-reason.on{background:var(--brand-a06)}
+.form-field .cd-reason input{width:var(--s4);height:var(--s4);margin:0;padding:0;border:none;accent-color:var(--brand)}
+.cd-reason-g{font-size:11px;color:var(--ink-3);white-space:nowrap}
+.form-field.has-error .cd-reasons{box-shadow:inset 2px 0 0 var(--neg)}
+.cd-more{display:flex;align-items:center;gap:var(--s2);height:36px;padding:0 var(--s2);border:none;background:none;
+  font:500 12px var(--ui);color:var(--brand);cursor:pointer;border-radius:var(--r-s)}
+.cd-more:hover{color:var(--brand-2);background:var(--hover)}
+.cd-more:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
+.cd-more span{color:var(--ink-3);font-weight:400}
+.cd-more svg{width:14px;height:14px}
+.cd-more.up svg{transform:rotate(180deg)}
+.newmenu.cd-float{position:fixed;right:auto;z-index:var(--z-topbar);min-width:280px}
+.cd-mi{display:flex;align-items:flex-start;gap:var(--s3)}
+.cd-mi:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:calc(-1*var(--focus))}
+.cd-mi:focus{background:var(--hover)}
+.cd-mi .newmenu-item-title,.cd-mi .newmenu-item-sub{display:block}
+.cd-mi-ic{display:grid;place-items:center;width:var(--s5);height:var(--s5);flex:0 0 var(--s5);border-radius:var(--r-s)}
+.cd-mi-ic svg{width:14px;height:14px}
+.cd-mi-ic.won{background:var(--pos-soft);color:var(--pos)}
+.cd-mi-ic.lost{background:var(--neg-soft);color:var(--neg)}
 .form-section-label{font-size:11px;font-weight:500;color:var(--ink-3);margin:var(--s5) 0 var(--s3)}
 .form-section-label:first-child{margin-top:0}
 /* Product-type picker (quick-create, D105): three selectable controls reusing the .tag
@@ -105176,12 +105241,30 @@ const INDUSTRIES = [
   { code: '2131', name: 'Energy Services' },
   { code: '3399', name: 'Consumer Products' },
 ];
+/* D343: spelled as data/generate.js stores them, en dashes (D191); the em-dash copies here matched
+   none of the 84 lost deals carrying these three reasons. */
 const CLOSED_LOST_REASONS = {
-  Qualification: ['Not a fit — product/segment mismatch', 'Unresponsive / went dark', 'Deal size below minimum'],
-  Analysis: ['Financials disqualified', 'Went with incumbent bank', 'Timing — not ready'],
-  Proposal: ['Lost to competitor on terms', 'Pricing — too expensive', 'Structure rejected'],
+  Qualification: ['Not a fit – product/segment mismatch', 'Unresponsive / went dark', 'Deal size below minimum'],
+  Analysis: ['Financials disqualified', 'Went with incumbent bank', 'Timing – not ready'],
+  Proposal: ['Lost to competitor on terms', 'Pricing – too expensive', 'Structure rejected'],
   Underwriting: ['Declined in credit committee', 'Failed field exam / appraisal', 'Died in legal / documentation', 'Borrower withdrew'],
 };
+/* D299: the six loss-reason groups, in the order D299's table lists them, and each value's group.
+   The only copy in the app (Exec Home's "Why we lose" groups by the value itself). D342 O9: the
+   explanation prompt for each group. */
+const LOSS_GROUPS = ['Declined in credit','Not a fit','Lost to competitor','Terms or timing','Went dark','Withdrawn'];
+const LOSS_GROUP_OF = {
+  'Declined in credit committee':'Declined in credit', 'Financials disqualified':'Declined in credit',
+  'Failed field exam / appraisal':'Declined in credit', 'Died in legal / documentation':'Declined in credit',
+  'Not a fit – product/segment mismatch':'Not a fit', 'Deal size below minimum':'Not a fit',
+  'Lost to competitor on terms':'Lost to competitor', 'Went with incumbent bank':'Lost to competitor',
+  'Pricing – too expensive':'Terms or timing', 'Timing – not ready':'Terms or timing', 'Structure rejected':'Terms or timing',
+  'Unresponsive / went dark':'Went dark', 'Borrower withdrew':'Withdrawn',
+};
+const LOSS_PROMPT = {'Declined in credit':'What did credit decline, and why?', 'Not a fit':'What did not fit?',
+  'Lost to competitor':'Who won it, and on what terms?', 'Terms or timing':'What would have had to change?',
+  'Went dark':'When did you last hear from them?', 'Withdrawn':'Why did the borrower withdraw?'};
+function lossReasonStage(r){ return Object.keys(CLOSED_LOST_REASONS).find(st=>CLOSED_LOST_REASONS[st].includes(r)) || ''; }
 // Mirrors data/generate.js's COMPETITOR_ARCHETYPES exactly (display/edit options only here — the
 // template does no PRNG generation, so unlike the generator's copy this one carries no length
 // constraint). Keep the values in sync by hand if the generator's list ever changes.
@@ -105307,8 +105390,12 @@ const DEF_INDEX = {};
 CORE_DEFS.forEach(d=>DEF_INDEX[d.key]=d);
 Object.values(PDEF).forEach(d=>DEF_INDEX[d.key]=d);
 DEF_INDEX['core.productType'] = REVIEW_PRODUCT_TYPE_DEF;
+/* D343: the stage's own reasons first, then the other stages' (D342 (b): any reason may be recorded at
+   any stage), so a reason recorded from another stage still shows as a selected option. */
 function closedLostReasonDef(lostAtStage){
-  return cdef('closedLostReason','Closed lost reason','select', CLOSED_LOST_REASONS[lostAtStage]||[]);
+  const own = CLOSED_LOST_REASONS[lostAtStage] || [];
+  const others = Object.values(CLOSED_LOST_REASONS).flat().filter(r=>!own.includes(r));
+  return cdef('closedLostReason','Closed lost reason','select', own.concat(others));
 }
 
 function displayValue(def, val, plain){
@@ -105391,6 +105478,7 @@ function findDef(recId, key){
     return closedLostReasonDef(obj.lostAtStage);
   }
   if(key==='core.productType') return REVIEW_PRODUCT_TYPE_DEF;
+  if(key==='core.stage') return stageFieldDef(EF_STORE[recId].obj);
   return DEF_INDEX[key];
 }
 /* Validation runs at commit, not at keystroke. Exactly two rules beyond "no rule at all" existed
@@ -105583,6 +105671,9 @@ function activateEdit(span){
     session.settled = true;
     const oldVal = def.get(obj);
     if(String(oldVal)===String(newVal)){ if(EF_RERENDER) EF_RERENDER(); return; } // no change: no write, no feedback
+    /* D342 O2: a field whose pick is an action (the Stage field: a stage move, or the close or reopen
+       dialog) writes nothing itself; the action does its own writes, Audit and toast. */
+    if(def.act){ if(EF_RERENDER) EF_RERENDER(); def.act(recId, newVal); return; }
     def.set(obj, newVal);
     auditFieldEdit(recId, def, oldVal, newVal);
     efPushUndo(recId, def, oldVal, newVal);
@@ -105917,6 +106008,7 @@ document.querySelectorAll(SEG_SEL).forEach(function(ctl){ segWatch(ctl); segThum
 
 /* ---------- routing ---------- */
 function route(){
+  closeMenuClose();
   const hash = location.hash || '#/home';
   const parts = hash.replace('#/','').split('/');
   const view = parts[0] || 'home';
@@ -110038,9 +110130,9 @@ function trackNodes(o){
          financials) and the bar has to be able to say so. */
       if(i!==idx) n.moveTo=n.stage;
     });
-    /* Closed is deliberately not a move target — closing needs a won/lost outcome and, when
-       lost, a stage-aware reason (D9). A progress bar can't ask for either. */
-    nodes.push({stage:'Closed', label:'Closed', cls:'', sub:null, moveTo:null});
+    /* Closed is not a move target: closing needs a won/lost outcome and, when lost, a reason (D9),
+       which a progress bar can't ask for. D342 O1: it opens the Won/Lost menu, which asks. */
+    nodes.push({stage:'Closed', label:'Closed', cls:'', sub:null, moveTo:null, close:true});
   }
   return nodes;
 }
@@ -110056,6 +110148,7 @@ function renderStageTrackHtml(o){
     const attrs = n.moveTo
       ? ' onclick="moveOppStage(\''+o.id+'\',\''+n.moveTo+'\')" title="'+
         (back?'Move back to ':'Advance to ')+n.moveTo+'"'
+      : n.close ? ' onclick="openCloseMenu(this.querySelector(\'.track-dot\'),\''+o.id+'\',\'center\')" title="Close as won or lost"'
       : '';
     /* Both outer half-segments are rendered, so the line runs the full content width of the
        header margin to margin rather than stopping at the first and last node centres. A
@@ -110067,7 +110160,7 @@ function renderStageTrackHtml(o){
        here) never gets one, so .won/.lost stay exactly on --pos/--neg with no st-N to collide. */
     const stIdx = TRACK_STAGES.indexOf(n.stage);
     const stCls = stIdx>=0 ? ' st-'+(stIdx+1) : '';
-    html+='<div class="track-stage'+(n.cls?' '+n.cls:'')+stCls+(n.moveTo?' move':'')+'"'+attrs+'>'+
+    html+='<div class="track-stage'+(n.cls?' '+n.cls:'')+stCls+(n.moveTo||n.close?' move':'')+'"'+attrs+'>'+
       '<div class="track-row">'+
         '<div class="track-seg l'+(reached(i)?' fill':'')+'"></div>'+
         '<div class="track-seg r'+((last?reached(i):reached(i+1))?' fill':'')+'"></div>'+
@@ -110127,6 +110220,322 @@ function toastStageMoved(oppId, fromStage, toStage){
       toastUpdate(t, {icon:'check', title:'Stage move undone', line:name+' is back in '+fromStage, ms:TOAST_MS});
     }});
 }
+/* ================================================================
+   CLOSE AND REOPEN A DEAL (D342, spec Other/mocks/close-deal-spec-v1.html, legend O1 to O13).
+   Three ways in on an open deal: the Closed dot on the stage track (O1), the Stage field first on the
+   Deal card (O2) and one "Close deal" header button (O3). The dot and the button open a small
+   Won/Lost menu drawn as the + New menu (O4); the Stage field and the menu open the dialog, the
+   Sheet pop-up (D303), on the choice (O5). Lost records the current stage (O6), a reason from the
+   stage's list with every other one a click away (O7, O8), an explanation prompted by the reason's
+   D299 group (O9) and, on a competitor loss, who won it (O10). Won asks the funded date, and facility
+   size and yield only when the deal has none (O11). A "Closed as" toast carries Undo (O12, D267's
+   shape). A lost deal reopens from the Outcome card, the header button and the Stage field (O13).
+   Every write goes to the live stores (OPPS, STAGEHIST, Audit), so each surface shows the close
+   through its own render.
+   ================================================================ */
+const CLOSE_DEF = cdef('stage','Deal closed','text');
+const REOPEN_DEF = cdef('stage','Deal reopened','text');
+const CLOSE_UNDO_DEF = cdef('stage','Close undone','text');
+const LOST_REASON_AUDIT_DEF = cdef('closedLostReason','Closed lost reason','text');
+const REOPEN_WHY_DEF = cdef('reopenReason','Reopen reason','text');
+const CD_SVG = p=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+p+'</svg>';
+const CD_ICON_WON = CD_SVG('<path d="M20 6 9 17l-5-5"/>');
+const CD_ICON_LOST = CD_SVG('<path d="M18 6 6 18M6 6l12 12"/>');
+const CD_ICON_CHEV = CD_SVG('<path d="m6 9 6 6 6-6"/>');
+const STAGE_FIELD_LABEL = {ClosedWon:'Closed won', ClosedLost:'Closed lost'};
+
+/* O7, O8: the stage's own reasons, then the other nine. */
+function closeReasonParts(stage){
+  const all = Object.values(CLOSED_LOST_REASONS).flat(), main = CLOSED_LOST_REASONS[stage] || [];
+  return {main, others: all.filter(r=>!main.includes(r))};
+}
+/* O4: the menu rows' sub-lines, computed from the deal and the owner's own Funded YTD. */
+function closeFacts(o){
+  const days = currentDaysInStage(o);
+  const who = o.bdoId===CURRENT_BDO_ID ? '' : ' ('+((BDOS[o.bdoId]||{}).name||'')+')';
+  return {won:'Adds '+moneyShort(o.facilitySize)+' to Funded YTD'+who, lost:'Lost at '+o.stage+' after '+days+' day'+(days===1?'':'s')};
+}
+
+/* ---------- O4: the Won / Lost menu, under the control that opened it ---------- */
+let CLOSE_MENU = null;   // {el, anchor}
+function closeMenuClose(refocus){
+  if(!CLOSE_MENU) return;
+  const {el, anchor} = CLOSE_MENU;
+  CLOSE_MENU = null;
+  el.remove();
+  document.removeEventListener('mousedown', closeMenuOutside, true);
+  window.removeEventListener('scroll', closeMenuScroll, true);
+  if(refocus && anchor && anchor.focus) anchor.focus();
+}
+function closeMenuOutside(e){ if(CLOSE_MENU && !CLOSE_MENU.el.contains(e.target) && !CLOSE_MENU.anchor.contains(e.target)) closeMenuClose(); }
+function closeMenuScroll(){ closeMenuClose(); }
+window.openCloseMenu = function(anchor, oppId, align){
+  if(CLOSE_MENU && CLOSE_MENU.anchor===anchor){ closeMenuClose(); return; }   // D304: click again closes
+  closeMenuClose();
+  const o = OPPS[oppId];
+  if(!o || o.outcome!=='open') return;
+  const f = closeFacts(o);
+  const item = (k, icon, t, sub)=>'<div class="newmenu-item cd-mi" role="menuitem" tabindex="-1" data-k="'+k+'">'+
+    '<span class="cd-mi-ic '+k+'">'+icon+'</span><span><span class="newmenu-item-title">'+t+'</span>'+
+    '<span class="newmenu-item-sub">'+esc(sub)+'</span></span></div>';
+  const el = document.createElement('div');
+  el.className = 'newmenu cd-float';
+  el.setAttribute('role', 'menu');
+  el.innerHTML = item('won', CD_ICON_WON, 'Close as won', f.won)+item('lost', CD_ICON_LOST, 'Close as lost', f.lost);
+  document.body.appendChild(el);
+  const r = anchor.getBoundingClientRect(), w = el.offsetWidth, gut = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--s4'));
+  let left = align==='right' ? r.right - w : r.left + r.width/2 - w/2;
+  left = Math.max(gut, Math.min(left, window.innerWidth - w - gut));
+  el.style.left = left+'px';
+  el.style.top = (r.bottom + parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--s2')))+'px';
+  CLOSE_MENU = {el, anchor};
+  const items = Array.from(el.querySelectorAll('.cd-mi'));
+  items.forEach((it, i)=>{
+    it.addEventListener('click', ()=>{ closeMenuClose(true); openCloseDeal(oppId, it.dataset.k); });
+    it.addEventListener('keydown', ev=>{
+      if(ev.key==='ArrowDown' || ev.key==='ArrowUp'){ ev.preventDefault(); items[(i + (ev.key==='ArrowDown'?1:items.length-1)) % items.length].focus(); }
+      else if(ev.key==='Enter' || ev.key===' '){ ev.preventDefault(); it.click(); }
+      else if(ev.key==='Escape'){ ev.preventDefault(); ev.stopPropagation(); closeMenuClose(true); }
+    });
+  });
+  items[0].focus();
+  setTimeout(()=>{ document.addEventListener('mousedown', closeMenuOutside, true); window.addEventListener('scroll', closeMenuScroll, true); }, 0);
+};
+
+/* ---------- O5: the dialog, the Sheet pop-up ---------- */
+let CD = null;   // the open dialog's draft
+window.openCloseDeal = function(oppId, outcome){
+  const o = OPPS[oppId];
+  if(!o || o.outcome!=='open') return;
+  CD = {mode:'close', oppId, outcome:outcome||'won', reason:'', detail:'', lostTo:'', funded:TODAY,
+    needSize: !(Number(o.facilitySize)>0), needYld: o.yieldPct==null || o.yieldPct==='', size:'', yld:'', errors:{}, more:false};
+  closeDealSheet();
+};
+window.openReopenDeal = function(oppId, stage){
+  const o = OPPS[oppId];
+  if(!o || o.outcome!=='lost') return;
+  CD = {mode:'reopen', oppId, stage:stage||o.lostAtStage, why:'', errors:{}};
+  closeDealSheet();
+};
+function closeDealSheet(){
+  closeMenuClose();
+  if(MODAL_OPEN_KEY) closeModal();   // the Stage field inside the Deal modal hands over to the sheet
+  if(SURF_EL) closeSurface(true, true);
+  surfRememberOpener();
+  surfCancelLeaving('pop');
+  const scrim = document.createElement('div');
+  scrim.className = 'dd-scrim';
+  scrim.innerHTML = '<div class="dd-pop" role="dialog" aria-modal="true" tabindex="-1"></div>';
+  const box = scrim.querySelector('.dd-pop');
+  scrim.addEventListener('click', e=>{ if(e.target===scrim) closeSurface(); });
+  scrim.addEventListener('keydown', e=>{ if(e.key==='Tab') trapTab(e, box); });
+  document.body.appendChild(scrim);
+  lockScroll();
+  SURF_EL = scrim; SURF_KIND = 'pop'; SURF_POP_KEY = null;
+  cdDraw();
+  surfEnter(scrim, 'pop');
+  box.focus();
+}
+function cdField(label, inner, errKey, extraCls){
+  const err = CD.errors[errKey];
+  return '<div class="form-field'+(extraCls?' '+extraCls:'')+(err?' has-error':'')+'"><label>'+label+'</label>'+inner+
+    (err ? '<div class="form-field-error">'+esc(err)+'</div>' : '')+'</div>';
+}
+function cdDraw(){
+  if(!CD || !SURF_EL) return;
+  const box = SURF_EL.querySelector('.dd-pop');
+  const o = OPPS[CD.oppId], acct = getAccount(o.accountId);
+  const focusKey = document.activeElement && box.contains(document.activeElement) ? document.activeElement.dataset.cd : null;
+  box.setAttribute('aria-label', (CD.mode==='close'?'Close ':'Reopen ')+acct.name);
+  box.innerHTML = CD.mode==='close' ? cdCloseHtml(o, acct) : cdReopenHtml(o, acct);
+  fadeEdges(box.querySelector('.dd-scroll'));
+  if(focusKey){ const el = box.querySelector('[data-cd="'+focusKey+'"]'); if(el) el.focus({preventScroll:true}); }
+}
+function cdCloseHtml(o, acct){
+  const days = currentDaysInStage(o);
+  const scope = productLabel(o.productType)+' · '+moneyShort(o.facilitySize)+' · '+days+' day'+(days===1?'':'s')+' in '+o.stage;
+  const tile = (k, icon, t, sub)=>'<button type="button" role="radio" aria-checked="'+(CD.outcome===k)+'" data-cd="t-'+k+'" '+
+    'class="cd-tile '+k+(CD.outcome===k?' on':'')+'" onclick="cdSet(\'outcome\',\''+k+'\')">'+icon+
+    '<span><span class="cd-tile-t">'+t+'</span><span class="cd-tile-s">'+sub+'</span></span></button>';
+  let body = '<div class="cd-choice" role="radiogroup" aria-label="Outcome">'+
+    tile('won', CD_ICON_WON, 'Won', 'Funded')+tile('lost', CD_ICON_LOST, 'Lost', 'Record why')+'</div>';
+  let foot = '';
+  if(CD.outcome==='won'){
+    body += cdField('Funded date', '<input type="date" data-cd="funded" max="'+TODAY+'" value="'+esc(CD.funded)+'" '+
+      'oninput="cdType(\'funded\',this.value)">', 'funded');
+    const need = [];
+    if(CD.needSize) need.push(cdField('Facility size', '<input type="text" inputmode="numeric" data-cd="size" placeholder="Not on file" value="'+esc(CD.size)+'" '+
+      'oninput="cdType(\'size\',this.value.replace(/[^0-9.]/g,\'\'))">', 'size'));
+    if(CD.needYld) need.push(cdField('Yield (%)', '<input type="text" inputmode="decimal" data-cd="yld" placeholder="Not on file" value="'+esc(CD.yld)+'" '+
+      'oninput="cdType(\'yld\',this.value)">', 'yld'));
+    if(need.length===2) body += '<div class="cd-2col">'+need.join('')+'</div>';
+    else if(need.length) body += need[0];
+  } else {
+    body += cdField('Lost at', '<div class="cd-static">'+esc(o.stage)+' <span>· from the stage track</span></div>', 'x');
+    body += cdField('Reason', cdReasonListHtml(o), 'reason');
+    const g = LOSS_GROUP_OF[CD.reason];
+    if(g==='Lost to competitor') body += cdField('Lost to <span class="cd-opt">(optional)</span>', cdLostToHtml(o), 'lostTo');
+    body += cdField('Explanation', '<textarea data-cd="detail" rows="3" placeholder="'+esc(g ? LOSS_PROMPT[g] : 'Explain the reason in a sentence or two.')+'" '+
+      'oninput="cdType(\'detail\',this.value)">'+esc(CD.detail)+'</textarea>', 'detail');
+    foot = '<span class="dd-foot-note">Recorded as lost at '+esc(o.stage)+'</span>';
+  }
+  return drillHeadHtml({title:'Close '+esc(acct.name), scope:esc(scope)}, true)+
+    '<div class="dd-scroll"><div class="cd-body">'+body+'</div></div>'+
+    '<div class="dd-foot">'+foot+'<button type="button" class="btn" onclick="closeSurface()">Cancel</button>'+
+      '<button type="button" class="btn primary" data-cd="go" onclick="cdSubmit()">'+(CD.outcome==='won'?'Close as won':'Close as lost')+'</button></div>';
+}
+function cdReasonRow(r, right){
+  const on = CD.reason===r, all = Object.values(CLOSED_LOST_REASONS).flat(), i = all.indexOf(r);
+  return '<label class="cd-reason'+(on?' on':'')+'"><input type="radio" name="cd-reason" data-cd="r'+i+'"'+(on?' checked':'')+
+    ' onchange="cdSet(\'reason\','+i+')"><span>'+esc(r)+'</span><span class="cd-reason-g">'+esc(right)+'</span></label>';
+}
+function cdReasonListHtml(o){
+  const {main, others} = closeReasonParts(o.stage);
+  const selOther = others.includes(CD.reason), open = CD.more || selOther;
+  let h = '<div class="cd-reasons" role="radiogroup" aria-label="Reason">'+main.map(r=>cdReasonRow(r, LOSS_GROUP_OF[r])).join('');
+  if(!open) h += '<button type="button" class="cd-more" data-cd="more" onclick="cdSet(\'more\',true)">'+
+    'More reasons, from other stages <span>'+others.length+'</span>'+CD_ICON_CHEV+'</button>';
+  else {
+    LOSS_GROUPS.forEach(g=>{
+      const rs = others.filter(r=>LOSS_GROUP_OF[r]===g);
+      if(rs.length) h += '<div class="cd-sec">'+esc(g)+'</div>'+rs.map(r=>cdReasonRow(r, lossReasonStage(r))).join('');
+    });
+    if(!selOther) h += '<button type="button" class="cd-more up" data-cd="more" onclick="cdSet(\'more\',false)">Fewer reasons'+CD_ICON_CHEV+'</button>';
+  }
+  return h+'</div>';
+}
+/* O10: tracked competitors on this deal first, then the other lenders, plus "Not known". */
+function cdLostToHtml(o){
+  const tracked = o.competitors || [], others = COMPETITOR_ARCHETYPES.filter(c=>!tracked.includes(c));
+  const opt = c=>'<option value="'+esc(c)+'"'+(CD.lostTo===c?' selected':'')+'>'+esc(c)+'</option>';
+  return '<select data-cd="lostTo" onchange="cdType(\'lostTo\',this.value)"><option value="">Not known</option>'+
+    (tracked.length ? '<optgroup label="Tracked on this deal">'+tracked.map(opt).join('')+'</optgroup>'+
+      '<optgroup label="Other lenders">'+others.map(opt).join('')+'</optgroup>' : others.map(opt).join(''))+'</select>';
+}
+function cdReopenHtml(o, acct){
+  const closed = (getStageHistory(o.id).find(h=>h.stage==='ClosedLost')||{}).enteredDate;
+  const scope = 'Closed lost '+fmtDate(closed)+' · '+o.closedLostReason;
+  const body = cdField('Reopen at', '<select data-cd="stage" onchange="cdType(\'stage\',this.value)">'+
+      TRACK_STAGES.map(st=>'<option'+(CD.stage===st?' selected':'')+'>'+st+'</option>').join('')+'</select>', 'stage')+
+    cdField('Why is it reopening?', '<textarea data-cd="why" rows="3" oninput="cdType(\'why\',this.value)">'+esc(CD.why)+'</textarea>', 'why');
+  return drillHeadHtml({title:'Reopen '+esc(acct.name), scope:esc(scope)}, true)+
+    '<div class="dd-scroll"><div class="cd-body">'+body+'</div></div>'+
+    '<div class="dd-foot"><span class="dd-foot-note">The close stays in Audit</span>'+
+      '<button type="button" class="btn" onclick="closeSurface()">Cancel</button>'+
+      '<button type="button" class="btn primary" data-cd="go" onclick="cdSubmit()">Reopen deal</button></div>';
+}
+window.cdSet = function(k, v){
+  if(k==='reason'){
+    CD.reason = Object.values(CLOSED_LOST_REASONS).flat()[v] || ''; delete CD.errors.reason;
+    if(LOSS_GROUP_OF[CD.reason]!=='Lost to competitor') CD.lostTo = '';
+  } else { CD[k] = v; delete CD.errors[k]; }
+  cdDraw();
+  if(k==='outcome'){ const t = SURF_EL && SURF_EL.querySelector('[data-cd="t-'+v+'"]'); if(t) t.focus({preventScroll:true}); }
+};
+/* Typing stores the value and clears the field's error; it redraws only to drop an error, so the
+   caret stays put. */
+window.cdType = function(k, v){
+  CD[k] = v;
+  if(CD.errors[k]){ delete CD.errors[k]; cdDraw(); }
+};
+/* Validation at submit; the primary button is never disabled. */
+window.cdSubmit = function(){
+  const e = {};
+  if(CD.mode==='close'){
+    if(CD.outcome==='won'){
+      if(!CD.funded) e.funded = 'Enter the funded date.';
+      else if(CD.funded > TODAY) e.funded = 'Funded date cannot be after today, '+fmtDate(TODAY)+'.';
+      if(CD.needSize && !(Number(CD.size)>0)) e.size = 'Enter a number greater than 0.';
+      if(CD.needYld && !(Number(CD.yld)>0)) e.yld = 'Enter a number greater than 0.';
+    } else {
+      if(!CD.reason) e.reason = 'Choose a reason.';
+      if(!CD.detail.trim()) e.detail = 'Explanation required.';
+    }
+  } else if(!CD.why.trim()) e.why = 'Say why it is reopening.';
+  CD.errors = e;
+  if(Object.keys(e).length){ cdDraw(); return; }
+  if(CD.mode==='close') cdCommitClose(); else cdCommitReopen();
+};
+function cdRerender(o){ if(OPP_SECTION_FOR===o.id && EF_RERENDER) EF_RERENDER(); }
+function cdCommitClose(){
+  const o = OPPS[CD.oppId], hist = STAGEHIST[o.id], d = CD, name = getAccount(o.accountId).name;
+  const snap = {o:JSON.parse(JSON.stringify(o)), hist:JSON.parse(JSON.stringify(hist||[]))}, from = o.stage;
+  if(hist[hist.length-1].terminal!==undefined) hist.pop();
+  const cur = hist[hist.length-1];
+  if(cur){ cur.exitedDate = TODAY; cur.durationDays = daysBetween(cur.enteredDate, TODAY); }
+  let line;
+  if(d.outcome==='won'){
+    o.outcome = 'won'; o.stage = 'ClosedWon'; o.fundedDate = d.funded;
+    hist.push({stage:'ClosedWon', enteredDate:TODAY, exitedDate:null, durationDays:null, terminal:true});
+    auditFieldEdit(o.id, CLOSE_DEF, from, 'Closed won');
+    if(d.needSize){ const v = Number(d.size); auditFieldEdit(o.id, DEF_INDEX['core.facilitySize'], o.facilitySize, v); o.facilitySize = v; }
+    if(d.needYld){ const v = Number(d.yld); auditFieldEdit(o.id, DEF_INDEX['core.yieldPct'], o.yieldPct, v); o.yieldPct = v; }
+    line = name+', funded '+fmtDate(d.funded);
+  } else {
+    o.outcome = 'lost'; o.stage = 'ClosedLost'; o.lostAtStage = from;
+    o.closedLostReason = d.reason; o.closedLostReasonDetail = d.detail.trim();
+    o.lostToCompetitor = d.lostTo || null; o.lostToCompetitorEvidence = d.lostTo ? 'Reported by borrower' : null;
+    hist.push({stage:'ClosedLost', enteredDate:TODAY, exitedDate:null, durationDays:null, terminal:true});
+    auditFieldEdit(o.id, CLOSE_DEF, from, 'Closed lost');
+    auditFieldEdit(o.id, LOST_REASON_AUDIT_DEF, '', d.reason);
+    line = name+', '+d.reason;
+  }
+  closeSurface();
+  CD = null;
+  cdRerender(o);
+  /* O12: Undo puts the deal and its history back exactly, and only while it is still closed. */
+  toastShow({icon:'check', title:o.outcome==='won' ? 'Closed as won' : 'Closed as lost', line, action:'Undo', ms:TOAST_UNDO_MS,
+    onAction: t=>{
+      if(o.outcome==='open'){ toastDismiss(t); return; }
+      const closedAs = o.outcome==='won' ? 'Closed won' : 'Closed lost';
+      Object.keys(o).forEach(k=>delete o[k]);
+      Object.assign(o, snap.o);
+      STAGEHIST[o.id] = snap.hist;
+      auditFieldEdit(o.id, CLOSE_UNDO_DEF, closedAs, from);
+      cdRerender(o);
+      toastUpdate(t, {icon:'check', title:'Close undone', line:name+' is back in '+from, ms:TOAST_MS});
+    }});
+}
+function cdCommitReopen(){
+  const o = OPPS[CD.oppId], d = CD, name = getAccount(o.accountId).name, hist = STAGEHIST[o.id], was = o.closedLostReason;
+  if(hist.length && hist[hist.length-1].stage==='ClosedLost') hist.pop();
+  hist.push({stage:d.stage, enteredDate:TODAY, exitedDate:null, durationDays:null});
+  hist.push({stage:d.stage, enteredDate:TODAY, exitedDate:null, durationDays:null, terminal:false});
+  o.outcome = 'open'; o.stage = d.stage;
+  o.lostAtStage = null; o.closedLostReason = null; o.closedLostReasonDetail = null;
+  o.lostToCompetitor = null; o.lostToCompetitorEvidence = null;
+  auditFieldEdit(o.id, REOPEN_DEF, 'Closed lost', d.stage);
+  auditFieldEdit(o.id, LOST_REASON_AUDIT_DEF, was, '');
+  auditFieldEdit(o.id, REOPEN_WHY_DEF, '', d.why.trim());
+  closeSurface();
+  CD = null;
+  cdRerender(o);
+  toastShow({icon:'check', title:'Deal reopened', line:name+' is back in '+d.stage, ms:TOAST_MS});
+}
+
+/* O2, O13: the Stage field, first on the Deal card, in the inline-edit engine. An open stage runs
+   the track's own move (with its Undo toast, D267); a closed option opens the dialog on it. On a lost
+   deal it reopens; on a won deal it is read-only (stageRowHtml()). */
+function stageFieldDef(o){
+  const open = o.outcome==='open';
+  const options = open
+    ? TRACK_STAGES.map(st=>({value:st, label:st})).concat([{value:'__won', label:'Closed won'}, {value:'__lost', label:'Closed lost'}])
+    : [{value:'__cur', label:'Closed lost'}].concat(TRACK_STAGES.map(st=>({value:'__re_'+st, label:'Reopen at '+st})));
+  return {key:'core.stage', label:'Stage', type:'select', options,
+    get: x=>x.outcome==='open' ? x.stage : '__cur',
+    set: ()=>{},
+    act: (recId, v)=>{
+      if(v==='__won' || v==='__lost') openCloseDeal(o.id, v==='__won' ? 'won' : 'lost');
+      else if(v.indexOf('__re_')===0) openReopenDeal(o.id, v.slice(5));
+      else moveOppStage(o.id, v);
+    }};
+}
+function stageRowHtml(recId){
+  const o = EF_STORE[recId].obj;
+  const body = o.outcome==='won' ? esc(STAGE_FIELD_LABEL[o.stage] || o.stage) : efSpan(recId, stageFieldDef(o));
+  return '<div><dt>Stage</dt><dd>'+body+'</dd></div>';
+}
+
 /* D266 (§27c.6, Other/mocks/stage-track-mock-v1.html option B): a stage move made from the track
    draws itself. One --brand line, from the track's left edge at the segments' height, travels from
    where progress stood to the new stage's node centre, growing on an advance and pulling back on a
@@ -110569,15 +110978,16 @@ function governedExplanationRow(recId, label, reasonSet, def){
   return '<div><dt>'+label+(missing?' <span class="tag warn">Required</span>':'')+'</dt><dd>'+efSpan(recId,def)+'</dd></div>';
 }
 
-/* Deal card (D71): face shows 6 fields, the corner control opens all 15 (Stage is deliberately in
-   neither list — it's already the header stage track and the strip's Days in Stage figure, a
-   third repetition would be exactly the filler the strip's own facility-size rule guards against).
-   One row-builder shared by the face and the modal so the two never drift out of sync. */
-const DEAL_FACE_KEYS = ['bdoId','productType','expectedCloseDate','channel','nextStep','priority'];
+/* Deal card (D71): face shows 7 fields, the corner control opens all 16. D342 O2 puts Stage first,
+   reversing D71's "Stage in neither list": it is where a deal is moved, closed and reopened by
+   keyboard, not only a third display of the stage (stageRowHtml()). One row-builder shared by the
+   face and the modal so the two never drift out of sync. */
+const DEAL_FACE_KEYS = ['stage','bdoId','productType','expectedCloseDate','channel','nextStep','priority'];
 const DEAL_MODAL_EXTRA_KEYS = ['name','facilitySize','fundedDate','referralPartnerId','referralDate',
   'useOfProceeds','competitors','nextStepDate','notes'];
 function dealFieldRowsHtml(recId, keys){
   return keys.map(k=>{
+    if(k==='stage') return stageRowHtml(recId);
     const def = DEF_INDEX['core.'+k];
     return '<div><dt>'+def.label+'</dt><dd>'+efSpan(recId,def)+'</dd></div>';
   }).join('');
@@ -110665,8 +111075,13 @@ function sectionOutcomeCardHtml(o, recId){
   } else {
     rows += '<div><dt>Funded date</dt><dd>'+efSpan(recId,DEF_INDEX['core.fundedDate'])+'</dd></div>';
   }
+  /* D342 O13: a lost deal reopens from the title row (the Deal card's "View all" shape). */
+  const title = o.outcome==='lost'
+    ? '<div class="toggle-header-top"><div class="panel-title">Outcome</div>'+
+      '<button type="button" class="drill" onclick="openReopenDeal(\''+o.id+'\')">Reopen deal</button></div>'
+    : '<div class="panel-title">Outcome</div>';
   return '<div class="panel" data-card="outcome"><div class="panel-header"><div class="panel-header-text">'+
-      '<div class="panel-title">Outcome</div><div class="panel-scope">Renders only when the deal is closed</div>'+
+      title+'<div class="panel-scope">Renders only when the deal is closed</div>'+
     '</div></div><div class="panel-body"><dl class="kv kv-2col">'+rows+'</dl></div></div>';
 }
 
@@ -110843,6 +111258,7 @@ function figRoll(el, oldT, newT){
   }).catch(()=>{});
 }
 function renderOpp(id, section, isNav){
+  closeMenuClose();   // D342: the Won/Lost menu never outlives the render that drew its control
   const o = getOpp(id);
   if(!o){
     document.getElementById('view-opp').innerHTML = '<div class="empty">Opportunity not found.</div>';
@@ -110907,6 +111323,9 @@ function renderOpp(id, section, isNav){
     '<div class="opp-header">'+
       '<div class="opp-eyebrow"><span>'+productLabel(o.productType)+'</span><span>·</span>'+
         '<span class="drill" onclick="location.hash=\'#/account/'+o.accountId+'/summary\'">'+esc(acct.name)+'</span></div>'+
+      /* D342 O3: one button; "Reopen deal" on a lost deal, none on a won one */
+      (o.outcome==='open' ? '<div class="opp-hdr-actions"><button type="button" class="btn" onclick="openCloseMenu(this,\''+o.id+'\',\'right\')">Close deal</button></div>'
+        : o.outcome==='lost' ? '<div class="opp-hdr-actions"><button type="button" class="btn" onclick="openReopenDeal(\''+o.id+'\')">Reopen deal</button></div>' : '')+
       '<div class="opp-title">'+efSpan(recId,DEF_INDEX['core.name'])+'</div>'+
       '<div class="opp-meta">'+
         '<div class="opp-meta-item">Owner <b>'+esc(owner?owner.name:'')+'</b></div>'+
