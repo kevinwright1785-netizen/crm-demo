@@ -1776,6 +1776,70 @@ table.tbl{width:100%;border-collapse:collapse}
   .searchbox{flex:0 1 240px;min-width:0}
   .searchbox input{min-width:0}
 }
+
+/* ---------- global search (D349, D350; spec Other/mocks/search-spec-v1.html, S1 to S17) ----------
+   Results under the top-bar box with the page dimmed (--scrim) and the top bar lifted so it stays
+   lit; deals, accounts, contacts and liens in their own groups; a read-only preview pane that
+   follows the highlight. No motion anywhere (S15). Carried from the approved spec (D151): the
+   tags' compact 1px/6px padding and the row's 2px line gap are the spec's own values, off the 4pt
+   scale, the same shape as .toggle-scope's 2px. */
+/* S1 top-bar box */
+.searchbox .sx-k{font:500 11px var(--ui);color:var(--ink-3);background:var(--sunken);border-radius:var(--r-s);padding:0 var(--s1);white-space:nowrap}
+.searchbox.sx-open{width:360px;flex-basis:360px}
+.searchbox.sx-open .sx-k{display:none}
+.searchbox:has(input:focus-visible){outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
+/* S3 surface */
+.sx-scrim{position:fixed;inset:0;background:var(--scrim);z-index:var(--z-scrim)}
+.topbar.sx-lift{z-index:var(--z-modal)}
+.sx-drop{position:fixed;z-index:var(--z-modal);background:var(--paper);border-radius:var(--r-m);box-shadow:var(--lift-hi);
+  display:flex;flex-direction:column;overflow:hidden;font-family:var(--ui)}
+.sx-body{display:flex;min-height:0;flex:1}
+.sx-list{flex:1;min-width:0;overflow-y:auto;padding:var(--s2) var(--s4) var(--s3)}
+.sx-pane{flex:0 0 46%;min-width:0;border-left:1px solid var(--line);overflow-y:auto;display:flex;flex-direction:column}
+.sx-pane .dd-head{padding:var(--s5) var(--s5) var(--s1)}
+.sx-pane .dd-block{padding:var(--s4) var(--s5)}
+.sx-pane .dd-head + .dd-block{border-top:none}
+.sx-pane-foot{margin-top:auto;padding:var(--s4) var(--s5) var(--s5)}
+.sx-pane-empty{padding:var(--s5);font-size:12px;color:var(--ink-3)}
+/* S7 groups */
+.sx-gh{display:flex;align-items:baseline;gap:var(--s2);font-size:11px;font-weight:500;color:var(--ink-3);padding:var(--s3) 0 var(--s1)}
+.sx-gh:first-child{padding-top:var(--s2)}
+.sx-note{font-size:11px;color:var(--ink-3);padding:0 0 var(--s1)}
+/* S8 to S11 rows: the drill-down row (D303, D305) with an object icon */
+.sx-row{position:relative;display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:var(--s3);align-items:center;
+  padding:var(--s2);margin:0 calc(-1*var(--s2));border-radius:var(--r-s);cursor:pointer}
+.sx-row::before{content:'';position:absolute;top:0;left:var(--s2);right:var(--s2);height:1px;background:var(--row-sep)}
+.sx-gh + .sx-row::before,.sx-note + .sx-row::before,.sx-row.act::before,.sx-row.act + .sx-row::before,.sx-row.act + .sx-more + .sx-row::before{opacity:0}
+.sx-row.act{background:var(--hover)}
+.sx-ic{width:28px;height:28px;border-radius:var(--r-s);background:var(--sunken);color:var(--ink-2);display:grid;place-items:center}
+.sx-ic svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.sx-l{min-width:0}
+.sx-n{font-size:13px;font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:18px}
+.sx-s{font-size:11px;color:var(--ink-3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:16px;display:flex;gap:var(--s1);align-items:center}
+.sx-s .sx-dot{color:var(--line-2)}
+.sx-s .tag,.sx-pr .tag{height:auto;padding:1px 6px;font-size:11px;margin:0;vertical-align:0}
+.sx-r{text-align:right;font-size:13px;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+.sx-r.soft{font-size:12px;color:var(--ink-2)}
+.sx-hl{background:var(--brand-a15);color:inherit}
+.sx-more{display:flex;align-items:center;padding:var(--s2);margin:0 calc(-1*var(--s2));border-radius:var(--r-s);font:500 12px var(--ui);color:var(--brand);cursor:pointer}
+.sx-more.act{background:var(--hover)}
+/* S12 pane lists */
+.sx-pr{display:flex;justify-content:space-between;align-items:center;gap:var(--s3);font-size:12px;padding:var(--s1) 0}
+.sx-pr .l{display:flex;gap:var(--s1);align-items:center;min-width:0;overflow:hidden;white-space:nowrap}
+.sx-pr .l .n{color:var(--ink);font-weight:500;overflow:hidden;text-overflow:ellipsis}
+.sx-pr .l .o{color:var(--ink-2);overflow:hidden;text-overflow:ellipsis}
+.sx-pr .r{color:var(--ink-2);font-variant-numeric:tabular-nums;white-space:nowrap}
+/* S13 empty */
+.sx-empty{padding:var(--s5) 0 var(--s3)}
+.sx-empty-t{font-size:13px;font-weight:500;color:var(--ink)}
+.sx-empty-s{font-size:12px;color:var(--ink-2);margin-top:var(--s1)}
+/* footer */
+.sx-foot{display:flex;align-items:center;gap:var(--s4);padding:var(--s2) var(--s4);border-top:1px solid var(--line);font-size:11px;color:var(--ink-3);flex:0 0 auto}
+.sx-foot .sx-kbd{font:500 11px var(--ui);color:var(--ink-2);background:var(--sunken);border-radius:var(--r-s);padding:0 var(--s1);margin-right:var(--s1)}
+.sx-foot .sx-sp{margin-left:auto}
+.sx-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+/* Below 900px the spec draws nothing; the pane gives its width to the list so rows stay readable. */
+@media (max-width:900px){ .sx-pane{display:none} }
 </style>
 
 <div class="app">
@@ -1828,7 +1892,9 @@ table.tbl{width:100%;border-collapse:collapse}
       <div class="topbar-spacer"></div>
       <div class="searchbox">
         <span aria-hidden="true">&#8981;</span>
-        <input type="text" placeholder="Search accounts, deals, contacts&hellip;">
+        <input type="text" placeholder="Search deals, accounts, contacts, liens" aria-label="Search"
+          role="combobox" aria-expanded="false" aria-controls="sx-listbox" aria-autocomplete="list">
+        <span class="sx-k" aria-hidden="true">Ctrl K</span>
       </div>
       <div class="roletoggle" data-seg="setRole">
         <span class="seg-thumb" aria-hidden="true"></span>
@@ -106841,7 +106907,7 @@ function toastRescue(){
   document.addEventListener('visibilitychange', ()=>{ TOAST_HOLD.hidden = document.hidden; toastHoldChanged(); });
   document.addEventListener('keydown', e=>{
     if(e.key!=='Escape' || !TOASTS.length) return;
-    if(document.querySelector('.modal, .dd-scrim:not(.leaving), .dd-panel:not(.leaving)') || document.querySelector('.ef.editing')) return; // Esc keeps its meaning
+    if(document.querySelector('.modal, .dd-scrim:not(.leaving), .dd-panel:not(.leaving), .sx-drop') || document.querySelector('.ef.editing')) return; // Esc keeps its meaning
     toastDismiss(TOASTS[0]);
   }, true);
 })();
@@ -107135,7 +107201,9 @@ window.closeSurface = function(instant, keepOpener){
 function previewActHtml(a){
   return '<div class="dd-act"><span class="t">'+esc(a.type)+'</span><span class="s">'+esc(a.subject)+'</span><span class="d">'+fmtDateShort(a.date)+'</span></div>';
 }
-function previewDetails(o){
+/* `ro` (D350): global search's preview pane draws the same parts read-only, with no Next best
+   action block and "You" for your own deals (spec S12); the side panel's call is unchanged. */
+function previewDetails(o, ro){
   const acct = getAccount(o.accountId), days = o.outcome==='open' ? currentDaysInStage(o) : null;
   const liens = LIENS_BY_ACCT[o.accountId] || [], edges = EDGES_BY_ACCT[o.accountId] || [];
   const wonEdges = edges.filter(e=>CLOSED_WON_ACCT_IDS.has(e.fromAccountId===o.accountId ? e.toAccountId : e.fromAccountId));
@@ -107144,9 +107212,10 @@ function previewDetails(o){
   if(wonEdges.length) sigs.push('<div class="dd-sig"><span class="dd-dot pos"></span>Trade ties to '+drillPlural(wonEdges.length,'Closed-Won account')+'</div>');
   if(drillStale(o)) sigs.push('<div class="dd-sig"><span class="dd-dot warn"></span>Longer in '+o.stage+' than most open deals</div>');
   const contacts = (CONTACTS_BY_ACCT[o.accountId]||[]).slice(0,3);
-  const rec = registerRecord(o.id, o), ed = k=>efSpan(rec, DEF_INDEX['core.'+k]);
+  const ed = ro ? k=>(k==='bdoId' ? esc(ownerLabel(o.bdoId)) : displayValue(DEF_INDEX['core.'+k], o[k]))
+    : (rec=>k=>efSpan(rec, DEF_INDEX['core.'+k]))(registerRecord(o.id, o));
   return '<div class="dd-block"><div class="dd-tags dd-tags-lead">'+productTagHtml(o.productType)+stageTagHtml(o)+'</div>'+
-      '<div class="dd-fig dd-fig-edit">'+ed('facilitySize')+'</div><div class="dd-lead-sub">Facility size · '+esc(acct.location||'')+'</div></div>'+
+      '<div class="dd-fig'+(ro?'':' dd-fig-edit')+'">'+ed('facilitySize')+'</div><div class="dd-lead-sub">Facility size · '+esc(acct.location||'')+'</div></div>'+
     '<div class="dd-block"><div class="dd-facts">'+
       '<div><div class="dd-fact-k">Owner</div><div class="dd-fact-v">'+ed('bdoId')+'</div></div>'+
       '<div><div class="dd-fact-k">'+(o.outcome==='open'?'Expected close':'Closed')+'</div><div class="dd-fact-v">'+
@@ -107154,7 +107223,7 @@ function previewDetails(o){
       '<div><div class="dd-fact-k">Days in stage</div><div class="dd-fact-v">'+(days!=null?days+' <span class="sub">· typical '+STAGE_P75[o.stage]+'</span>':'Closed')+'</div></div>'+
       '<div><div class="dd-fact-k">Yield</div><div class="dd-fact-v">'+ed('yieldPct')+'</div></div>'+
     '</div></div>'+
-    '<div class="dd-block"><div class="dd-sec">Next best action</div><div class="dd-line">'+ed('nextBestAction')+'</div></div>'+
+    (ro ? '' : '<div class="dd-block"><div class="dd-sec">Next best action</div><div class="dd-line">'+ed('nextBestAction')+'</div></div>')+
     (sigs.length ? '<div class="dd-block"><div class="dd-sec">Signals</div>'+sigs.join('')+'</div>' : '')+
     '<div class="dd-block"><div class="dd-sec">Contacts</div>'+(contacts.length
       ? contacts.map(c=>'<div class="dd-contact"><span class="n">'+esc(c.name)+'</span><span class="r">'+esc(c.role)+'</span></div>').join('')
@@ -107170,10 +107239,13 @@ function previewTabsHtml(o){
     'onclick="setPreviewTab(\''+k+'\')">'+l+(c!=null?'<span class="dd-tab-n">'+c+'</span>':'')+'</button>';
   return '<div class="dd-tabs" role="tablist">'+t('details','Details')+t('activity','Activity',n)+'</div>';
 }
+function dealPreviewHeadHtml(o){
+  return '<div class="dd-head"><div class="dd-head-text"><div class="dd-title">'+esc(o.name)+'</div><div class="dd-scope">Preview · '+esc(productLabel(o.productType))+' opportunity</div></div></div>';
+}
 function panelInnerDeal(id, back){
   const o = getOpp(id);
   return '<div class="dd-panel-top">'+back+'<button type="button" class="modal-close" aria-label="Close panel" onclick="closeSurface()">&#10005;</button></div>'+
-    '<div class="dd-head"><div class="dd-head-text"><div class="dd-title">'+esc(o.name)+'</div><div class="dd-scope">Preview · '+esc(productLabel(o.productType))+' opportunity</div></div></div>'+
+    dealPreviewHeadHtml(o)+
     previewTabsHtml(o)+
     '<div class="dd-scroll">'+(PANEL_DEAL_TAB==='activity' ? previewActivity(o) : previewDetails(o))+'</div>'+
     '<div class="dd-foot"><button type="button" class="dd-open" onclick="openFullRecord(\''+o.id+'\')">Open full record</button></div>';
@@ -107212,6 +107284,320 @@ window.openSnapshotPreview = function(id){
   PANEL_STACK = [{kind:'deal', id, from:'snapshot'}];
   renderPanel(true);
 };
+/* ---------- global search (D349, D350; spec Other/mocks/search-spec-v1.html, S1 to S17) ----------
+   Results open under the top-bar box with the page dimmed; the list groups deals, accounts,
+   contacts and liens; a read-only preview pane follows the highlight. It reads the live stores
+   (allOpps(), allAccounts()), so a deal or account made this session is found (S17). Contacts and
+   liens are never created in a session, so their dataset order (CONTACTS_BY_ID, D.liens) is the
+   live set. Recents are the records opened this session, in memory (D340: persistence is
+   production). No motion (S15). */
+const SX_MAC = /Mac|iPhone|iPad/.test(navigator.platform||'');
+const SX_GROUP = {deal:['Deals','deal','deals'], acct:['Accounts','account','accounts'], contact:['Contacts','contact','contacts'], lien:['Liens','lien','liens']};
+const SX_ICON = {
+  deal:'<path d="M4 8h16v11H4z"/><path d="M9 8V6a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M4 13h16"/>',
+  acct:'<path d="M5 20V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v15"/><path d="M15 10h3a1 1 0 0 1 1 1v9"/><path d="M8 8h3M8 12h3M8 16h3M3 20h18"/>',
+  contact:'<circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5"/>',
+  lien:'<path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/><path d="M10 13h5M10 17h5"/>'
+};
+let SX_DROP = null, SX_SCRIM = null, SX_OPENER = null, SX_Q = '', SX_ACT = 0, SX_ITEMS = [], SX_EXPAND = {}, SX_RECENT = [];
+let SX_IDX = null;   // per-render counts over the live stores: open deals and deals per account, referrals per partner
+function ownerLabel(bdoId){ return bdoId===CURRENT_BDO_ID ? 'You' : (BDOS[bdoId] ? BDOS[bdoId].name : ''); }
+function sxBox(){ return document.querySelector('.topbar .searchbox'); }
+function sxInput(){ return sxBox().querySelector('input'); }
+function sxMonth(s){ return s ? toDateObj(s).toLocaleDateString('en-US',{month:'short',year:'numeric',timeZone:'UTC'}) : ''; }
+function sxIcon(k){ return '<span class="sx-ic" aria-hidden="true"><svg viewBox="0 0 24 24">'+SX_ICON[k]+'</svg></span>'; }
+function sxDot(){ return '<span class="sx-dot">·</span>'; }
+function sxIndex(){
+  const openBy = {}, dealsBy = {}, refBy = {};
+  allOpps().forEach(o=>{
+    if(o.outcome==='open') openBy[o.accountId] = (openBy[o.accountId]||0)+1;
+    (dealsBy[o.accountId] = dealsBy[o.accountId]||[]).push(o);
+    if(o.referralPartnerId) (refBy[o.referralPartnerId] = refBy[o.referralPartnerId]||[]).push(o);
+  });
+  return {openBy, dealsBy, refBy};
+}
+
+/* S5 matching: whole value 100, starts with 90, a word starts with 80, every typed word starts a
+   word 75, anywhere 60, one typo (4 or more characters, one word) 40. */
+function sxNorm(s){ return String(s||'').toLowerCase(); }
+function sxWords(s){ return sxNorm(s).split(/[^a-z0-9@.]+/).filter(Boolean); }
+function sxOneEdit(a, b){
+  if(a===b) return true;
+  const la = a.length, lb = b.length;
+  if(Math.abs(la-lb)>1) return false;
+  let i = 0; while(i<la && i<lb && a[i]===b[i]) i++;
+  if(la===lb){ if(a.slice(i+1)===b.slice(i+1)) return true; return a[i]===b[i+1] && a[i+1]===b[i] && a.slice(i+2)===b.slice(i+2); }
+  return la>lb ? a.slice(i+1)===b.slice(i) : a.slice(i)===b.slice(i+1);
+}
+function sxScore(text, q){
+  const t = sxNorm(text); if(!t || !q) return 0;
+  if(t===q) return 100;
+  if(t.indexOf(q)===0) return 90;
+  if(new RegExp('(^|[^a-z0-9])'+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).test(t)) return 80;
+  const ws = sxWords(t), qs = q.split(/\s+/).filter(Boolean);
+  if(qs.length>1 && qs.every(x=>ws.some(w=>w.indexOf(x)===0))) return 75;
+  if(t.indexOf(q)>=0) return 60;
+  if(q.length>=4 && qs.length===1 && ws.some(w=>sxOneEdit(q,w) || (w.length>q.length && sxOneEdit(q, w.slice(0,q.length))))) return 40;
+  return 0;
+}
+function sxHl(text, q){
+  const t = String(text), i = sxNorm(t).indexOf(q);
+  if(!q || i<0) return esc(t);
+  return esc(t.slice(0,i))+'<mark class="sx-hl">'+esc(t.slice(i,i+q.length))+'</mark>'+esc(t.slice(i+q.length));
+}
+function sxRecentRank(id){ const i = SX_RECENT.findIndex(r=>r.id===id); return i<0 ? 0 : 10-i; }
+/* S6 what is searched; S7 to S11 the order inside each group */
+function sxSearch(q){
+  const R = {deal:[], acct:[], contact:[], lien:[]}, open = o=>o.outcome==='open';
+  allOpps().forEach(o=>{ const s = sxScore(o.name,q); if(s) R.deal.push({k:'deal', s, o}); });
+  allAccounts().forEach(a=>{
+    let s = sxScore(a.name,q), via = null;
+    const c = sxScore(a.location,q)*0.6, d = sxScore(a.domain,q)*0.6;
+    if(c>s){ s = c; via = 'loc'; } if(d>s){ s = d; via = 'dom'; }
+    if(s) R.acct.push({k:'acct', s, a, via});
+  });
+  Object.values(CONTACTS_BY_ID).forEach(c=>{
+    let s = sxScore(c.name,q); if(q.indexOf('@')>=0) s = Math.max(s, sxScore(c.email,q));
+    if(s) R.contact.push({k:'contact', s, c});
+  });
+  D.liens.forEach(l=>{ const s = Math.max(sxScore(l.securedParty,q), sxScore(l.filingNumber,q)); if(s) R.lien.push({k:'lien', s, l}); });
+  const openBy = SX_IDX.openBy;
+  R.deal.sort((x,y)=>y.s-x.s || (open(y.o)-open(x.o)) || ((y.o.bdoId===CURRENT_BDO_ID)-(x.o.bdoId===CURRENT_BDO_ID)) ||
+    (sxRecentRank(y.o.id)-sxRecentRank(x.o.id)) || (TRACK_STAGES.indexOf(y.o.stage)-TRACK_STAGES.indexOf(x.o.stage)) || (y.o.facilitySize-x.o.facilitySize));
+  R.acct.sort((x,y)=>y.s-x.s || (sxRecentRank(y.a.id)-sxRecentRank(x.a.id)) || ((openBy[y.a.id]||0)-(openBy[x.a.id]||0)) || x.a.name.localeCompare(y.a.name));
+  R.contact.sort((x,y)=>y.s-x.s || x.c.name.localeCompare(y.c.name));
+  R.lien.sort((x,y)=>y.s-x.s || (y.l.filingDate>x.l.filingDate ? 1 : -1));
+  return R;
+}
+/* S4 recents: deals and accounts opened this session, newest first, 5 */
+function sxNoteRoute(){
+  const h = (location.hash||'').replace('#/','').split('/');
+  const e = h[0]==='opp' && h[1] ? {k:'deal', id:h[1]} : h[0]==='account' && h[1] ? {k:'acct', id:h[1]} : null;
+  if(!e) return;
+  SX_RECENT = [e].concat(SX_RECENT.filter(r=>r.id!==e.id)).slice(0,5);
+}
+
+/* S8 to S11 rows */
+function sxDealRow(it, twin){
+  const o = it.o;
+  const sub = productTagHtml(o.productType)+stageTagHtml(o)+sxDot()+'<span>'+esc(ownerLabel(o.bdoId))+'</span>'+
+    (twin ? sxDot()+'<span>opened '+sxMonth(o.createdDate)+'</span>' : '');
+  return {html:'<div class="sx-row" role="option">'+sxIcon('deal')+'<div class="sx-l"><div class="sx-n">'+sxHl(o.name,SX_Q)+'</div><div class="sx-s">'+sub+'</div></div>'+
+    '<div class="sx-r">'+moneyShort(o.facilitySize)+'</div></div>', go:()=>sxGo('#/opp/'+o.id), it};
+}
+function sxAcctRow(it){
+  const a = it.a, isP = a.accountType==='Partner', kind = isP ? 'Partner' : 'Prospect', what = esc(isP ? (a.partnerType||'') : (a.industryName||''));
+  const parts = it.via==='loc' ? [kind, sxHl(a.location,SX_Q), what] : it.via==='dom' ? [kind, sxHl(a.domain,SX_Q), esc(a.location||'')] : [kind, what, esc(a.location||'')];
+  const n = SX_IDX.openBy[a.id]||0;
+  const r = isP ? (SX_IDX.refBy[a.id]||[]).length+' referrals' : (n ? n+' open deal'+(n>1?'s':'') : 'No open deals');
+  return {html:'<div class="sx-row" role="option">'+sxIcon('acct')+'<div class="sx-l"><div class="sx-n">'+sxHl(a.name,SX_Q)+'</div><div class="sx-s">'+parts.filter(Boolean).join(sxDot())+'</div></div>'+
+    '<div class="sx-r soft">'+r+'</div></div>', go:()=>sxGo('#/account/'+a.id+'/summary'), it};
+}
+function sxContactRow(it){
+  const c = it.c, a = getAccount(c.accountId);
+  return {html:'<div class="sx-row" role="option">'+sxIcon('contact')+'<div class="sx-l"><div class="sx-n">'+sxHl(c.name,SX_Q)+'</div><div class="sx-s">'+
+    esc(c.role)+sxDot()+esc(a.name)+(SX_Q.indexOf('@')>=0 ? sxDot()+sxHl(c.email,SX_Q) : '')+'</div></div><div class="sx-r soft"></div></div>',
+    go:()=>sxGo('#/account/'+c.accountId+'/contacts'), it};
+}
+/* S11: the borrower leads (departs from RESEARCH_21 §9, D349 f) */
+function sxLienRow(it){
+  const l = it.l, a = getAccount(l.accountId);
+  const party = sxNorm(l.filingNumber).indexOf(SX_Q)>=0 ? esc(l.securedParty)+sxDot()+sxHl(l.filingNumber,SX_Q) : sxHl(l.securedParty,SX_Q);
+  return {html:'<div class="sx-row" role="option">'+sxIcon('lien')+'<div class="sx-l"><div class="sx-n">'+esc(a.name)+'</div><div class="sx-s">Lien'+sxDot()+party+sxDot()+
+    'filed '+sxMonth(l.filingDate)+sxDot()+(l.subordinated?'Subordinated':'Senior')+'</div></div><div class="sx-r soft"></div></div>',
+    go:()=>sxGo('#/account/'+l.accountId+'/summary'), it};
+}
+const SX_ROW = {deal:sxDealRow, acct:sxAcctRow, contact:sxContactRow, lien:sxLienRow};
+/* S8: two shown deals alike on account, product, stage and owner add "opened <month>" */
+function sxTwins(list){
+  const seen = {}, tw = {};
+  list.forEach(it=>{ const o = it.o, k = o.accountId+'|'+o.productType+'|'+(o.outcome==='open'?o.stage:o.outcome)+'|'+o.bdoId;
+    if(seen[k]){ tw[o.id] = 1; tw[seen[k]] = 1; } else seen[k] = o.id; });
+  return tw;
+}
+
+/* S12 the preview pane, read-only, in the deal preview's own parts (D310) */
+function sxFact(k, v){ return '<div><div class="dd-fact-k">'+k+'</div><div class="dd-fact-v">'+v+'</div></div>'; }
+function sxHead(t, s){ return '<div class="dd-head"><div class="dd-head-text"><div class="dd-title">'+esc(t)+'</div><div class="dd-scope">'+s+'</div></div></div>'; }
+function sxFoot(label){ return '<div class="sx-pane-foot"><button type="button" class="dd-open" data-pane-open="1">'+label+'</button></div>'; }
+function sxPr(l, r){ return '<div class="sx-pr"><div class="l">'+l+'</div><div class="r">'+r+'</div></div>'; }
+function sxPrBlock(title, rows){ return rows.length ? '<div class="dd-block"><div class="dd-sec">'+title+'</div>'+rows.join('')+'</div>' : ''; }
+function sxContactLine(c){ return '<div class="dd-contact"><span class="n">'+esc(c.name)+'</span><span class="r">'+esc(c.role)+'</span></div>'; }
+function sxByOpenThenNewest(x, y){ return ((y.outcome==='open')-(x.outcome==='open')) || y.createdDate.localeCompare(x.createdDate); }
+function sxPaneDeal(o){
+  const acts = (ACTS_BY_OPP[o.id]||[]).slice().sort((x,y)=>y.date.localeCompare(x.date)).slice(0,3);
+  return dealPreviewHeadHtml(o)+previewDetails(o, true)+
+    (acts.length ? '<div class="dd-block"><div class="dd-sec">Latest activity</div>'+acts.map(previewActHtml).join('')+'</div>' : '')+
+    sxFoot('Open full record');
+}
+function sxPaneAcct(a){
+  if(a.accountType==='Partner'){
+    const refs = (SX_IDX.refBy[a.id]||[]).slice().sort(sxByOpenThenNewest).slice(0,5);
+    return sxHead(a.name, 'Partner account · '+esc(a.location||''))+
+      '<div class="dd-block"><div class="dd-facts">'+sxFact('Partner type', esc(a.partnerType))+sxFact('Referrals', (SX_IDX.refBy[a.id]||[]).length)+
+        sxFact('Last referral', a.lastReferralDate ? fmtDate(a.lastReferralDate) : 'Not set')+sxFact('Segment', esc(a.segment||''))+'</div></div>'+
+      sxPrBlock('Referred deals', refs.map(o=>sxPr('<span class="n">'+esc(o.name)+'</span>'+stageTagHtml(o), moneyShort(o.facilitySize))))+sxFoot('Open account');
+  }
+  const deals = (SX_IDX.dealsBy[a.id]||[]).slice().sort(sxByOpenThenNewest).slice(0,5), liens = LIENS_BY_ACCT[a.id]||[];
+  return sxHead(a.name, 'Prospect account · '+esc(a.location||''))+
+    '<div class="dd-block"><div class="dd-facts">'+sxFact('Industry', esc(a.industryName))+sxFact('Revenue', moneyShort(a.annualRevenue))+
+      sxFact('Open deals', SX_IDX.openBy[a.id]||0)+sxFact('Liens on file', liens.length+(liens.some(l=>l.subordinated) ? ' <span class="sub">· subordinated</span>' : ''))+'</div></div>'+
+    sxPrBlock('Deals', deals.map(o=>sxPr(productTagHtml(o.productType)+stageTagHtml(o)+'<span class="o">'+esc(ownerLabel(o.bdoId))+'</span>', moneyShort(o.facilitySize))))+sxFoot('Open account');
+}
+function sxPaneContact(c){
+  const a = getAccount(c.accountId), others = (CONTACTS_BY_ACCT[c.accountId]||[]).filter(x=>x.id!==c.id);
+  return sxHead(c.name, esc(c.role)+' · '+esc(a.name))+
+    '<div class="dd-block"><div class="dd-facts">'+sxFact('Email', esc(c.email))+sxFact('Phone', esc(c.phone))+'</div></div>'+
+    '<div class="dd-block"><div class="dd-sec">Others at '+esc(a.name)+'</div>'+(others.length ? others.map(sxContactLine).join('') : '<div class="dd-line muted">No other contacts on file</div>')+'</div>'+
+    sxFoot('Open contacts');
+}
+function sxPaneLien(l){
+  const a = getAccount(l.accountId), all = (LIENS_BY_ACCT[l.accountId]||[]).slice().sort((x,y)=>y.filingDate.localeCompare(x.filingDate));
+  return sxHead(l.securedParty, 'UCC lien on '+esc(a.name))+
+    '<div class="dd-block"><div class="dd-facts">'+sxFact('Filing number', esc(l.filingNumber))+sxFact('Filed', fmtDate(l.filingDate))+
+      sxFact('Position', l.subordinated?'Subordinated':'Senior')+sxFact('Collateral', esc(l.collateralDescription))+'</div></div>'+
+    sxPrBlock('All liens on '+esc(a.name), all.map(x=>sxPr('<span class="n">'+esc(x.securedParty)+'</span>'+(x.subordinated?'<span class="o">· Subordinated</span>':''), fmtDateShort(x.filingDate))))+
+    sxFoot('Open account');
+}
+function sxRenderPane(){
+  const p = SX_DROP && SX_DROP.querySelector('.sx-pane'); if(!p) return;
+  const row = SX_ITEMS[SX_ACT];
+  if(!row || !row.it){ p.innerHTML = '<div class="sx-pane-empty">'+(SX_ITEMS.length ? '' : 'Nothing to preview')+'</div>'; return; }
+  const x = row.it;
+  p.innerHTML = x.k==='deal' ? sxPaneDeal(x.o) : x.k==='acct' ? sxPaneAcct(x.a) : x.k==='contact' ? sxPaneContact(x.c) : sxPaneLien(x.l);
+  p.scrollTop = 0;
+}
+
+/* S1 to S3 open, place, close */
+function sxOpen(){
+  if(SX_DROP){ sxPlace(); return; }
+  if(!SX_OPENER) SX_OPENER = document.activeElement;
+  sxBox().classList.add('sx-open'); sxInput().setAttribute('aria-expanded','true');
+  document.querySelector('.topbar').classList.add('sx-lift');
+  SX_SCRIM = document.createElement('div'); SX_SCRIM.className = 'sx-scrim';
+  SX_SCRIM.addEventListener('mousedown', e=>{ e.preventDefault(); sxClose(false); sxInput().blur(); });
+  document.body.appendChild(SX_SCRIM);
+  SX_DROP = document.createElement('div'); SX_DROP.className = 'sx-drop';
+  SX_DROP.innerHTML = '<div class="sx-body"><div class="sx-list" id="sx-listbox" role="listbox" aria-label="Search results"></div><div class="sx-pane"></div></div><div class="sx-foot"></div>';
+  SX_DROP.addEventListener('mousedown', e=>e.preventDefault());   // keep focus in the box
+  SX_DROP.addEventListener('mousemove', e=>{ const r = e.target.closest('[data-i]'); if(r){ const i = +r.getAttribute('data-i'); if(i!==SX_ACT){ SX_ACT = i; sxPaintAct(false); } } });
+  SX_DROP.addEventListener('click', e=>{
+    if(e.target.closest('[data-pane-open]')){ sxChoose(); return; }
+    const r = e.target.closest('[data-i]'); if(r){ SX_ACT = +r.getAttribute('data-i'); sxChoose(); }
+  });
+  document.body.appendChild(SX_DROP);
+  SX_ACT = 0; sxRender(); sxPlace();
+}
+function sxClose(restore){
+  if(!SX_DROP) return;
+  document.querySelector('.topbar').classList.remove('sx-lift');
+  sxBox().classList.remove('sx-open'); sxInput().setAttribute('aria-expanded','false'); sxInput().removeAttribute('aria-activedescendant');
+  SX_DROP.remove(); SX_DROP = null; if(SX_SCRIM){ SX_SCRIM.remove(); SX_SCRIM = null; }
+  const o = SX_OPENER; SX_OPENER = null;
+  if(restore && o && o!==sxInput() && o.focus && document.contains(o)) o.focus();
+  /* D350: an opener that cannot take focus (the page body) left focus in the box, where a click
+     then opened nothing; the box lets go instead, as Esc already does. */
+  if(restore && document.activeElement===sxInput()) sxInput().blur();
+}
+/* S3: 900px wide, right edge on the box, 8px under the top bar, the left edge held 24px inside the
+   content area; height min(70% of the window, the window less top less 24px). The spec draws
+   nothing at 900px wide or less; there the right edge is held 24px inside the window instead, since
+   the box sits too far left to leave the list readable (D350). */
+const SX_NARROW = window.matchMedia('(max-width:900px)');
+function sxPlace(){
+  if(!SX_DROP) return;
+  const main = document.querySelector('.main').getBoundingClientRect(), b = sxBox().getBoundingClientRect(), tb = document.querySelector('.topbar').getBoundingClientRect();
+  const right = SX_NARROW.matches ? window.innerWidth-24 : b.right;
+  const left = Math.max(main.left+24, right-900), top = tb.bottom+8;
+  SX_DROP.style.left = left+'px'; SX_DROP.style.width = (right-left)+'px'; SX_DROP.style.top = top+'px';
+  SX_DROP.style.height = Math.min(window.innerHeight*0.7, window.innerHeight-top-24)+'px';
+}
+
+/* S4, S7, S13 */
+function sxRender(){
+  if(!SX_DROP) return;
+  const list = SX_DROP.querySelector('.sx-list');
+  let h = '', idx = 0, counts = '';
+  SX_ITEMS = []; SX_IDX = sxIndex();
+  const push = row=>{ row.id = 'sx-o'+idx; h += row.html.replace('class="sx-row', 'id="sx-o'+idx+'" data-i="'+idx+'" class="sx-row'); SX_ITEMS.push(row); idx++; };
+  const more = (label, fn)=>{ SX_ITEMS.push({id:'sx-o'+idx, go:fn, isMore:true}); h += '<div class="sx-more" role="option" id="sx-o'+idx+'" data-i="'+idx+'">'+label+'</div>'; idx++; };
+  if(SX_Q.length<2){
+    const rec = SX_RECENT.map(r=>r.k==='deal' ? {k:'deal', o:getOpp(r.id)} : {k:'acct', a:PROSPECTS[r.id]||PARTNERS[r.id]}).filter(x=>x.o||x.a);
+    if(rec.length){ h += '<div class="sx-gh">Recent</div>'; rec.forEach(it=>push(SX_ROW[it.k](it))); }
+    else {
+      h += '<div class="sx-gh">Your open deals</div><div class="sx-note">Nothing opened yet this session. Closing soonest first.</div>';
+      allOpps().filter(o=>o.bdoId===CURRENT_BDO_ID && o.outcome==='open').sort((a,b)=>a.expectedCloseDate.localeCompare(b.expectedCloseDate)).slice(0,5)
+        .forEach(o=>push(sxDealRow({k:'deal', o})));
+    }
+  } else {
+    const R = sxSearch(SX_Q), order = ['deal','acct','contact','lien'];
+    order.sort((a,b)=>(R[b].length?R[b][0].s:-1)-(R[a].length?R[a][0].s:-1));
+    const total = R.deal.length+R.acct.length+R.contact.length+R.lien.length;
+    counts = total ? total+(total===1?' result: ':' results: ')+order.filter(g=>R[g].length).map(g=>R[g].length+' '+(R[g].length===1?SX_GROUP[g][1]:SX_GROUP[g][2])).join(', ') : 'No results';
+    if(!total){
+      const nm = SX_Q.replace(/\b\w/g, c=>c.toUpperCase());
+      h += '<div class="sx-empty"><div class="sx-empty-t">No matches for “'+esc(SX_Q)+'”</div><div class="sx-empty-s">Check the spelling, or search by company, contact or lender name.</div></div>';
+      more('Create account “'+esc(nm)+'”', ()=>{ sxClose(false); sxClear(); resetQuickCreate(); setQcAccountName(nm); openModal('quickCreate'); });
+    }
+    let first = true;
+    order.forEach(g=>{
+      const arr = R[g]; if(!arr.length) return;
+      const cap = SX_EXPAND[g] ? arr.length : (first ? 4 : 3), shown = arr.slice(0,cap), tw = g==='deal' ? sxTwins(shown) : {};
+      h += '<div class="sx-gh" role="presentation">'+SX_GROUP[g][0]+' <span>'+arr.length+'</span></div>';
+      shown.forEach(it=>push(g==='deal' ? sxDealRow(it, tw[it.o.id]) : SX_ROW[g](it)));
+      if(arr.length>cap) more('Show all '+arr.length+' '+SX_GROUP[g][2], ()=>{ SX_EXPAND[g] = 1; sxRender(); });
+      first = false;
+    });
+  }
+  list.innerHTML = h;
+  if(SX_ACT>=SX_ITEMS.length) SX_ACT = Math.max(0, SX_ITEMS.length-1);
+  document.getElementById('sx-live').textContent = counts;
+  sxPaintAct(false);
+}
+function sxPaintAct(scroll){
+  if(!SX_DROP) return;
+  SX_DROP.querySelectorAll('.act').forEach(e=>{ e.classList.remove('act'); e.removeAttribute('aria-selected'); });
+  const it = SX_ITEMS[SX_ACT];
+  if(it){
+    const el = document.getElementById(it.id);
+    if(el){ el.classList.add('act'); el.setAttribute('aria-selected','true'); if(scroll) el.scrollIntoView({block:'nearest'}); }
+    sxInput().setAttribute('aria-activedescendant', it.id);
+  }
+  const k = x=>'<span class="sx-kbd">'+x+'</span>';
+  SX_DROP.querySelector('.sx-foot').innerHTML = '<span>'+k('↑')+k('↓')+'Move</span><span>'+k('Enter')+'Open</span><span class="sx-sp">'+k('Esc')+'Close</span>';
+  if(!it || !it.isMore) sxRenderPane();
+}
+/* S14 keys */
+function sxOnKey(e){
+  if(e.key==='ArrowDown'){ e.preventDefault(); if(!SX_DROP) sxOpen(); if(SX_ITEMS.length){ SX_ACT = (SX_ACT+1)%SX_ITEMS.length; sxPaintAct(true); } }
+  else if(e.key==='ArrowUp'){ e.preventDefault(); if(SX_ITEMS.length){ SX_ACT = (SX_ACT-1+SX_ITEMS.length)%SX_ITEMS.length; sxPaintAct(true); } }
+  else if(e.key==='Enter'){ e.preventDefault(); if(SX_DROP) sxChoose(); }
+  else if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); if(SX_DROP) sxClose(true); if(!SX_OPENER) sxInput().blur(); }
+  else if(e.key==='Tab') sxClose(false);
+}
+function sxChoose(){ const it = SX_ITEMS[SX_ACT]; if(it) it.go(); }
+function sxClear(){ SX_Q = ''; SX_EXPAND = {}; sxInput().value = ''; sxInput().blur(); }
+function sxGo(hash){ sxClose(false); sxClear(); if(SURF_EL) closeSurface(true); location.hash = hash; }
+(function sxInit(){
+  const tin = sxInput();
+  sxBox().querySelector('.sx-k').textContent = SX_MAC ? '⌘K' : 'Ctrl K';
+  const live = document.createElement('div'); live.className = 'sx-sr'; live.id = 'sx-live'; live.setAttribute('aria-live','polite');
+  document.body.appendChild(live);
+  tin.addEventListener('focus', ()=>sxOpen());
+  tin.addEventListener('input', ()=>{ SX_Q = sxNorm(tin.value).trim(); SX_EXPAND = {}; SX_ACT = 0; if(!SX_DROP) sxOpen(); else sxRender(); });
+  tin.addEventListener('keydown', sxOnKey);
+  /* S2: Ctrl/Cmd+K from anywhere focuses the box and selects its text; again closes. Not over an
+     open modal, which owns the keyboard (D350). */
+  document.addEventListener('keydown', e=>{
+    if(!(e.metaKey||e.ctrlKey) || (e.key!=='k' && e.key!=='K') || MODAL_OPEN_KEY) return;
+    e.preventDefault(); e.stopPropagation();
+    if(SX_DROP) sxClose(true); else { SX_OPENER = document.activeElement; tin.focus(); tin.select(); }
+  }, true);
+  window.addEventListener('resize', sxPlace);
+  window.addEventListener('hashchange', ()=>{ sxNoteRoute(); if(SX_DROP) sxClose(false); });
+  sxNoteRoute();
+})();
+
 window.openFullRecord = function(id){
   closeSurface(true);
   location.hash = '#/opp/'+id;
