@@ -106076,7 +106076,10 @@ function route(){
        the same fallback made explicit now that a second kind of call exists. Validated
        against OPP_SECTIONS rather than accepted as free text, so a typo'd or stale section name
        can't silently strand a reader on a section key with no matching tab. */
-    const section = OPP_SECTIONS.some(s=>s.key===parts[2]) ? parts[2] : null;
+    /* D345: on Back or Forward, the tab this entry was left on wins (recTabFromState()); on a fresh
+       navigation there is none, so the URL's section or Details. */
+    const leftOn = recTabFromState('opp', id);
+    const section = OPP_SECTIONS.some(s=>s.key===leftOn) ? leftOn : OPP_SECTIONS.some(s=>s.key===parts[2]) ? parts[2] : null;
     /* D106 parts (b)/(c)/D129, generalized by D146: LIST_RETURN_CTX only stays valid for the
        record it actually describes, checked by kind too now that it can point at either list.
        openPipelineRecord() and listStepRecord() both keep ctx.ids[ctx.index] in sync with whatever id
@@ -106114,7 +106117,7 @@ function route(){
        the valid tab set depends on the Account's own type/config (Prospect vs. Partner, plus a
        dual-type's extra 'secondary' tab), not one fixed list like OPP_SECTIONS this branch could
        check against up front. */
-    const section = parts[2] || null;
+    const section = recTabFromState('account', id) || parts[2] || null;   // D345, as the #/opp branch
     if(LIST_RETURN_CTX && (LIST_RETURN_CTX.kind!=='accounts' || LIST_RETURN_CTX.ids[LIST_RETURN_CTX.index] !== id)) LIST_RETURN_CTX = null;
     renderAccount(id, section, true); showView('view-account');
     titles.account = getAccount(id) && getAccount(id).accountTypes ? getAccount(id).name : 'Account';
@@ -108745,6 +108748,16 @@ window.openPipelineRecord = function(id){
 /* D317: the snapshot a row click left on this history entry, or null. Only a Back or Forward onto
    the list's own entry finds one; the nav rail, a Home stage click and the back link each push a
    fresh entry that carries none. */
+/* D345: the tab a record was left on, kept on its own history entry (replaceState on each tab switch,
+   the D317 pattern), so Back and Forward return to it. A fresh navigation makes an entry with no
+   state, so it lands on the URL's section or the record's first tab. */
+function recTabFromState(kind, id){
+  const t = history.state && history.state.recTab;
+  return t && t.kind===kind && t.id===id ? t.section : null;
+}
+function rememberRecTab(kind, id, section){
+  try{ history.replaceState(Object.assign({}, history.state||{}, {recTab:{kind, id, section}}), ''); }catch(e){}
+}
 function pipeHistoryRestore(){
   const st = history.state;
   return st && st.listReturn && st.listReturn.kind==='pipeline' ? st.listReturn : null;
@@ -108764,16 +108777,16 @@ window.listReturnToList = function(){
 /* Shared by the bar's arrow buttons and the j/k keyboard bindings. Mutates LIST_RETURN_CTX.index
    in place, rather than replacing it with a new object, so route()'s id-match checks (the #/opp
    and #/account branches) recognize the *next* target as still coming from this same list, not an
-   unrelated navigation. Section is carried through deliberately: stepping to the next record while
-   reviewing one section lands on that same section for the next record, not back on the default. */
+   unrelated navigation. D345: each step is a navigation to a record with no section, so the next
+   record lands on its first tab (reverses the earlier carry-through of the current section, which no
+   D-entry ruled; the brief for D345 names j/k stepping among the entry points). */
 window.listStepRecord = function(delta){
   const ctx = LIST_RETURN_CTX;
   if(!ctx) return;
   const next = ctx.index + delta;
   if(next < 0 || next >= ctx.ids.length) return; // the disabled arrow already prevents this; guard anyway
   ctx.index = next;
-  if(ctx.kind==='accounts') location.hash = '#/account/'+ctx.ids[next]+'/'+ACCOUNT_SECTION;
-  else location.hash = '#/opp/'+ctx.ids[next]+'/'+OPP_SECTION;
+  location.hash = (ctx.kind==='accounts' ? '#/account/' : '#/opp/')+ctx.ids[next];
 };
 /* Reorders the fresh table's rows to the captured snapshot (authoritative, independent of the
    comparator that produced it) and reapplies the sort indicator (cosmetic only, purely visual;
@@ -109989,7 +110002,9 @@ function renderAccount(id, section, isNav){
      re-render. Validated here, not in route(), since the valid tab set depends on the Account's
      own type/config rather than one fixed list route() could check against up front the way it
      checks #/opp against OPP_SECTIONS. */
-  const freshRecord = ACCOUNT_SECTION_FOR !== id;
+  /* D345: a navigation (isNav, route() is the only caller that passes it) is always a fresh landing,
+     even onto the record last shown; only a redraw on the page keeps the tab. */
+  const freshRecord = ACCOUNT_SECTION_FOR !== id || !!isNav;
   ACCOUNT_SECTION = section || (freshRecord ? sections[0].key : ACCOUNT_SECTION);
   if(!sections.some(s=>s.key===ACCOUNT_SECTION)) ACCOUNT_SECTION = sections[0].key;
   ACCOUNT_SECTION_FOR = id;
@@ -110056,7 +110071,7 @@ function renderAccount(id, section, isNav){
 }
 window.setAccountSection = function(key){
   ACCOUNT_SECTION = key;
-  if(ACCOUNT_SECTION_FOR) renderAccount(ACCOUNT_SECTION_FOR);
+  if(ACCOUNT_SECTION_FOR){ renderAccount(ACCOUNT_SECTION_FOR); rememberRecTab('account', ACCOUNT_SECTION_FOR, ACCOUNT_SECTION); }
 };
 
 /* ================================================================
@@ -110907,7 +110922,7 @@ let OPP_SECTION = 'details';
 let OPP_SECTION_FOR = null;
 window.setOppSection = function(key){
   OPP_SECTION = key;
-  if(OPP_SECTION_FOR) renderOpp(OPP_SECTION_FOR);
+  if(OPP_SECTION_FOR){ renderOpp(OPP_SECTION_FOR); rememberRecTab('opp', OPP_SECTION_FOR, OPP_SECTION); }
 };
 /* D107: WAI-ARIA APG's automatic-activation tabs pattern. ArrowLeft/ArrowRight both move focus
    and activate, wrapping at either end. renderOpp()/renderAccount() replace the whole panel on
@@ -111288,7 +111303,8 @@ function renderOpp(id, section, isNav){
   // first modal in the app where fields are actually editable inside it), refresh its body in
   // place too — otherwise a save made inside the modal would show stale data until it's reopened.
   EF_RERENDER = ()=>{ renderOpp(id); if(MODAL_OPEN_KEY) refreshModalIfOpen(MODAL_OPEN_KEY); };
-  const freshRecord = OPP_SECTION_FOR !== id;
+  // D345: a navigation (isNav) is always fresh, even onto the deal last shown; only a redraw keeps the tab.
+  const freshRecord = OPP_SECTION_FOR !== id || !!isNav;
   // D106 part (a): an explicit `section` (a real navigation, via route() or the D129 return
   // bar/keyboard) always wins. Absent (an EF_RERENDER edit re-render) falls back to Details on a
   // fresh record (landing on the overview, not wherever a previous unrelated deal happened to
