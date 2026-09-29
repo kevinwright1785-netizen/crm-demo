@@ -1801,6 +1801,10 @@ table.tbl{width:100%;border-collapse:collapse}
 .sx-pane .dd-head + .dd-block{border-top:none}
 .sx-pane-foot{margin-top:auto;padding:var(--s4) var(--s5) var(--s5)}
 .sx-pane-empty{padding:var(--s5);font-size:12px;color:var(--ink-3)}
+/* D355: a contact's Email and Phone sit one per row, full width; a value still too long ends in an
+   ellipsis, the full text in its title attribute. */
+.sx-pane .dd-facts.sx-one{grid-template-columns:minmax(0,1fr)}
+.sx-pane .dd-facts.sx-one .dd-fact-v{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* S7 groups */
 .sx-gh{display:flex;align-items:baseline;gap:var(--s2);font-size:11px;font-weight:500;color:var(--ink-3);padding:var(--s3) 0 var(--s1)}
 .sx-gh:first-child{padding-top:var(--s2)}
@@ -1817,6 +1821,12 @@ table.tbl{width:100%;border-collapse:collapse}
 .sx-n{font-size:13px;font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:18px}
 .sx-s{font-size:11px;color:var(--ink-3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:16px;display:flex;gap:var(--s1);align-items:center}
 .sx-s .sx-dot{color:var(--line-2)}
+/* D357: parts of the second line end in an ellipsis instead of being cut (a flex box never draws
+   one itself). sx-p0 never shrinks; sx-p1 grows from 0 to its own width, so it gives way first;
+   the rest shrink only when the kept parts alone overflow. */
+.sx-s .sx-p{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sx-s .sx-p0{flex-shrink:0}
+.sx-s .sx-p1{flex:1 0 0;max-width:max-content}
 .sx-s .tag,.sx-pr .tag{height:auto;padding:1px 6px;font-size:11px;margin:0;vertical-align:0}
 .sx-r{text-align:right;font-size:13px;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
 .sx-r.soft{font-size:12px;color:var(--ink-2)}
@@ -1892,7 +1902,7 @@ table.tbl{width:100%;border-collapse:collapse}
       <div class="topbar-spacer"></div>
       <div class="searchbox">
         <span aria-hidden="true">&#8981;</span>
-        <input type="text" placeholder="Search deals, accounts, contacts, liens" aria-label="Search"
+        <input type="text" placeholder="Search" aria-label="Search"
           role="combobox" aria-expanded="false" aria-controls="sx-listbox" aria-autocomplete="list">
         <span class="sx-k" aria-hidden="true">Ctrl K</span>
       </div>
@@ -107292,7 +107302,11 @@ window.openSnapshotPreview = function(id){
    live set. Recents are the records opened this session, in memory (D340: persistence is
    production). No motion (S15). */
 const SX_MAC = /Mac|iPhone|iPad/.test(navigator.platform||'');
-const SX_GROUP = {deal:['Deals','deal','deals'], acct:['Accounts','account','accounts'], contact:['Contacts','contact','contacts'], lien:['Liens','lien','liens']};
+/* D354: the resting box's input is 161.7px, too narrow for the full placeholder (239.9px), so it
+   reads "Search" at rest and names what is searched only while open (314.8px). D353: search's
+   copy names the object "opportunity", never "deal". */
+const SX_PH_OPEN = 'Search opportunities, accounts, contacts, liens';
+const SX_GROUP = {deal:['Opportunities','opportunity','opportunities'], acct:['Accounts','account','accounts'], contact:['Contacts','contact','contacts'], lien:['Liens','lien','liens']};
 const SX_ICON = {
   deal:'<path d="M4 8h16v11H4z"/><path d="M9 8V6a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M4 13h16"/>',
   acct:'<path d="M5 20V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v15"/><path d="M15 10h3a1 1 0 0 1 1 1v9"/><path d="M8 8h3M8 12h3M8 16h3M3 20h18"/>',
@@ -107378,33 +107392,51 @@ function sxNoteRoute(){
 }
 
 /* S8 to S11 rows */
+/* D357: a row's second line never cuts mid-word. Each part is its own span: "keep" parts never
+   shrink, the "first" part shrinks first (it grows from nothing up to its own width, so it takes
+   whatever the others leave), and the rest shrink only when the kept parts alone overflow; each ends
+   in an ellipsis. The full line is the title. A part is {h: html, t: text, k: 'keep'|'first'|'',
+   tag: true for a tag drawn as is}. */
+function sxLine(parts){
+  parts = parts.filter(x=>x.t);
+  return '<div class="sx-s" title="'+esc(parts.map(x=>x.t).join(' · '))+'">'+
+    parts.map((x,i)=>(i && !(x.tag && parts[i-1].tag) ? sxDot() : '')+
+      (x.tag ? x.h : '<span class="sx-p'+(x.k==='keep'?' sx-p0':x.k==='first'?' sx-p1':'')+'">'+x.h+'</span>')).join('')+'</div>';
+}
+function sxStageText(o){ return o.outcome==='won' ? 'Closed · Won' : o.outcome==='lost' ? 'Closed · Lost' : o.stage; }
 function sxDealRow(it, twin){
-  const o = it.o;
-  const sub = productTagHtml(o.productType)+stageTagHtml(o)+sxDot()+'<span>'+esc(ownerLabel(o.bdoId))+'</span>'+
-    (twin ? sxDot()+'<span>opened '+sxMonth(o.createdDate)+'</span>' : '');
-  return {html:'<div class="sx-row" role="option">'+sxIcon('deal')+'<div class="sx-l"><div class="sx-n">'+sxHl(o.name,SX_Q)+'</div><div class="sx-s">'+sub+'</div></div>'+
+  const o = it.o, own = ownerLabel(o.bdoId);
+  const sub = sxLine([{h:productTagHtml(o.productType), t:productLabel(o.productType), tag:true}, {h:stageTagHtml(o), t:sxStageText(o), tag:true},
+    {h:esc(own), t:own}, twin ? {h:'opened '+sxMonth(o.createdDate), t:'opened '+sxMonth(o.createdDate)} : {}]);
+  return {html:'<div class="sx-row" role="option">'+sxIcon('deal')+'<div class="sx-l"><div class="sx-n">'+sxHl(o.name,SX_Q)+'</div>'+sub+'</div>'+
     '<div class="sx-r">'+moneyShort(o.facilitySize)+'</div></div>', go:()=>sxGo('#/opp/'+o.id), it};
 }
 function sxAcctRow(it){
-  const a = it.a, isP = a.accountType==='Partner', kind = isP ? 'Partner' : 'Prospect', what = esc(isP ? (a.partnerType||'') : (a.industryName||''));
-  const parts = it.via==='loc' ? [kind, sxHl(a.location,SX_Q), what] : it.via==='dom' ? [kind, sxHl(a.domain,SX_Q), esc(a.location||'')] : [kind, what, esc(a.location||'')];
-  const n = SX_IDX.openBy[a.id]||0;
-  const r = isP ? (SX_IDX.refBy[a.id]||[]).length+' referrals' : (n ? n+' open deal'+(n>1?'s':'') : 'No open deals');
-  return {html:'<div class="sx-row" role="option">'+sxIcon('acct')+'<div class="sx-l"><div class="sx-n">'+sxHl(a.name,SX_Q)+'</div><div class="sx-s">'+parts.filter(Boolean).join(sxDot())+'</div></div>'+
+  const a = it.a, isP = a.accountType==='Partner', kind = isP ? 'Partner' : 'Prospect', what = isP ? (a.partnerType||'') : (a.industryName||''), loc = a.location||'';
+  const P = (h,t)=>({h, t});
+  const parts = it.via==='loc' ? [P(kind,kind), P(sxHl(loc,SX_Q),loc), P(esc(what),what)]
+    : it.via==='dom' ? [P(kind,kind), P(sxHl(a.domain,SX_Q),a.domain), P(esc(loc),loc)] : [P(kind,kind), P(esc(what),what), P(esc(loc),loc)];
+  /* the type never shrinks; the city gives way last, so on a city match (moved forward) the industry
+     or partner type gives way first */
+  parts[0].k = 'keep'; if(parts[1].t && parts[2].t) parts[it.via==='loc' ? 2 : 1].k = 'first';
+  const n = SX_IDX.openBy[a.id]||0, refs = (SX_IDX.refBy[a.id]||[]).length;
+  const r = isP ? refs+' referral'+(refs===1?'':'s') : (n ? n+' open opportunit'+(n>1?'ies':'y') : 'No open opportunities');
+  return {html:'<div class="sx-row" role="option">'+sxIcon('acct')+'<div class="sx-l"><div class="sx-n">'+sxHl(a.name,SX_Q)+'</div>'+sxLine(parts)+'</div>'+
     '<div class="sx-r soft">'+r+'</div></div>', go:()=>sxGo('#/account/'+a.id+'/summary'), it};
 }
 function sxContactRow(it){
   const c = it.c, a = getAccount(c.accountId);
-  return {html:'<div class="sx-row" role="option">'+sxIcon('contact')+'<div class="sx-l"><div class="sx-n">'+sxHl(c.name,SX_Q)+'</div><div class="sx-s">'+
-    esc(c.role)+sxDot()+esc(a.name)+(SX_Q.indexOf('@')>=0 ? sxDot()+sxHl(c.email,SX_Q) : '')+'</div></div><div class="sx-r soft"></div></div>',
+  const parts = [{h:esc(c.role), t:c.role, k:'keep'}, {h:esc(a.name), t:a.name, k:SX_Q.indexOf('@')>=0 ? 'first' : ''}].concat(SX_Q.indexOf('@')>=0 ? [{h:sxHl(c.email,SX_Q), t:c.email}] : []);
+  return {html:'<div class="sx-row" role="option">'+sxIcon('contact')+'<div class="sx-l"><div class="sx-n">'+sxHl(c.name,SX_Q)+'</div>'+sxLine(parts)+'</div><div class="sx-r soft"></div></div>',
     go:()=>sxGo('#/account/'+c.accountId+'/contacts'), it};
 }
 /* S11: the borrower leads (departs from RESEARCH_21 §9, D349 f) */
 function sxLienRow(it){
-  const l = it.l, a = getAccount(l.accountId);
-  const party = sxNorm(l.filingNumber).indexOf(SX_Q)>=0 ? esc(l.securedParty)+sxDot()+sxHl(l.filingNumber,SX_Q) : sxHl(l.securedParty,SX_Q);
-  return {html:'<div class="sx-row" role="option">'+sxIcon('lien')+'<div class="sx-l"><div class="sx-n">'+esc(a.name)+'</div><div class="sx-s">Lien'+sxDot()+party+sxDot()+
-    'filed '+sxMonth(l.filingDate)+sxDot()+(l.subordinated?'Subordinated':'Senior')+'</div></div><div class="sx-r soft"></div></div>',
+  const l = it.l, a = getAccount(l.accountId), byNo = sxNorm(l.filingNumber).indexOf(SX_Q)>=0;
+  const parts = [{h:'Lien', t:'Lien', k:'keep'}, {h:byNo ? esc(l.securedParty) : sxHl(l.securedParty,SX_Q), t:l.securedParty, k:'first'}]
+    .concat(byNo ? [{h:sxHl(l.filingNumber,SX_Q), t:l.filingNumber}] : [])
+    .concat([{h:'filed '+sxMonth(l.filingDate), t:'filed '+sxMonth(l.filingDate)}, {h:l.subordinated?'Subordinated':'Senior', t:l.subordinated?'Subordinated':'Senior'}]);
+  return {html:'<div class="sx-row" role="option">'+sxIcon('lien')+'<div class="sx-l"><div class="sx-n">'+esc(a.name)+'</div>'+sxLine(parts)+'</div><div class="sx-r soft"></div></div>',
     go:()=>sxGo('#/account/'+l.accountId+'/summary'), it};
 }
 const SX_ROW = {deal:sxDealRow, acct:sxAcctRow, contact:sxContactRow, lien:sxLienRow};
@@ -107418,6 +107450,7 @@ function sxTwins(list){
 
 /* S12 the preview pane, read-only, in the deal preview's own parts (D310) */
 function sxFact(k, v){ return '<div><div class="dd-fact-k">'+k+'</div><div class="dd-fact-v">'+v+'</div></div>'; }
+function sxFactOne(k, v){ return '<div><div class="dd-fact-k">'+k+'</div><div class="dd-fact-v" title="'+esc(v)+'">'+esc(v)+'</div></div>'; }
 function sxHead(t, s){ return '<div class="dd-head"><div class="dd-head-text"><div class="dd-title">'+esc(t)+'</div><div class="dd-scope">'+s+'</div></div></div>'; }
 function sxFoot(label){ return '<div class="sx-pane-foot"><button type="button" class="dd-open" data-pane-open="1">'+label+'</button></div>'; }
 function sxPr(l, r){ return '<div class="sx-pr"><div class="l">'+l+'</div><div class="r">'+r+'</div></div>'; }
@@ -107436,18 +107469,18 @@ function sxPaneAcct(a){
     return sxHead(a.name, 'Partner account · '+esc(a.location||''))+
       '<div class="dd-block"><div class="dd-facts">'+sxFact('Partner type', esc(a.partnerType))+sxFact('Referrals', (SX_IDX.refBy[a.id]||[]).length)+
         sxFact('Last referral', a.lastReferralDate ? fmtDate(a.lastReferralDate) : 'Not set')+sxFact('Segment', esc(a.segment||''))+'</div></div>'+
-      sxPrBlock('Referred deals', refs.map(o=>sxPr('<span class="n">'+esc(o.name)+'</span>'+stageTagHtml(o), moneyShort(o.facilitySize))))+sxFoot('Open account');
+      sxPrBlock('Referred opportunities', refs.map(o=>sxPr('<span class="n">'+esc(o.name)+'</span>'+stageTagHtml(o), moneyShort(o.facilitySize))))+sxFoot('Open account');
   }
   const deals = (SX_IDX.dealsBy[a.id]||[]).slice().sort(sxByOpenThenNewest).slice(0,5), liens = LIENS_BY_ACCT[a.id]||[];
   return sxHead(a.name, 'Prospect account · '+esc(a.location||''))+
     '<div class="dd-block"><div class="dd-facts">'+sxFact('Industry', esc(a.industryName))+sxFact('Revenue', moneyShort(a.annualRevenue))+
-      sxFact('Open deals', SX_IDX.openBy[a.id]||0)+sxFact('Liens on file', liens.length+(liens.some(l=>l.subordinated) ? ' <span class="sub">· subordinated</span>' : ''))+'</div></div>'+
-    sxPrBlock('Deals', deals.map(o=>sxPr(productTagHtml(o.productType)+stageTagHtml(o)+'<span class="o">'+esc(ownerLabel(o.bdoId))+'</span>', moneyShort(o.facilitySize))))+sxFoot('Open account');
+      sxFact('Open opportunities', SX_IDX.openBy[a.id]||0)+sxFact('Liens on file', liens.length+(liens.some(l=>l.subordinated) ? ' <span class="sub">· subordinated</span>' : ''))+'</div></div>'+
+    sxPrBlock('Opportunities', deals.map(o=>sxPr(productTagHtml(o.productType)+stageTagHtml(o)+'<span class="o">'+esc(ownerLabel(o.bdoId))+'</span>', moneyShort(o.facilitySize))))+sxFoot('Open account');
 }
 function sxPaneContact(c){
   const a = getAccount(c.accountId), others = (CONTACTS_BY_ACCT[c.accountId]||[]).filter(x=>x.id!==c.id);
   return sxHead(c.name, esc(c.role)+' · '+esc(a.name))+
-    '<div class="dd-block"><div class="dd-facts">'+sxFact('Email', esc(c.email))+sxFact('Phone', esc(c.phone))+'</div></div>'+
+    '<div class="dd-block"><div class="dd-facts sx-one">'+sxFactOne('Email', c.email)+sxFactOne('Phone', c.phone)+'</div></div>'+
     '<div class="dd-block"><div class="dd-sec">Others at '+esc(a.name)+'</div>'+(others.length ? others.map(sxContactLine).join('') : '<div class="dd-line muted">No other contacts on file</div>')+'</div>'+
     sxFoot('Open contacts');
 }
@@ -107472,7 +107505,7 @@ function sxRenderPane(){
 function sxOpen(){
   if(SX_DROP){ sxPlace(); return; }
   if(!SX_OPENER) SX_OPENER = document.activeElement;
-  sxBox().classList.add('sx-open'); sxInput().setAttribute('aria-expanded','true');
+  sxBox().classList.add('sx-open'); sxInput().setAttribute('aria-expanded','true'); sxInput().placeholder = SX_PH_OPEN;
   document.querySelector('.topbar').classList.add('sx-lift');
   SX_SCRIM = document.createElement('div'); SX_SCRIM.className = 'sx-scrim';
   SX_SCRIM.addEventListener('mousedown', e=>{ e.preventDefault(); sxClose(false); sxInput().blur(); });
@@ -107491,7 +107524,7 @@ function sxOpen(){
 function sxClose(restore){
   if(!SX_DROP) return;
   document.querySelector('.topbar').classList.remove('sx-lift');
-  sxBox().classList.remove('sx-open'); sxInput().setAttribute('aria-expanded','false'); sxInput().removeAttribute('aria-activedescendant');
+  sxBox().classList.remove('sx-open'); sxInput().setAttribute('aria-expanded','false'); sxInput().placeholder = 'Search'; sxInput().removeAttribute('aria-activedescendant');
   SX_DROP.remove(); SX_DROP = null; if(SX_SCRIM){ SX_SCRIM.remove(); SX_SCRIM = null; }
   const o = SX_OPENER; SX_OPENER = null;
   if(restore && o && o!==sxInput() && o.focus && document.contains(o)) o.focus();
@@ -107525,7 +107558,7 @@ function sxRender(){
     const rec = SX_RECENT.map(r=>r.k==='deal' ? {k:'deal', o:getOpp(r.id)} : {k:'acct', a:PROSPECTS[r.id]||PARTNERS[r.id]}).filter(x=>x.o||x.a);
     if(rec.length){ h += '<div class="sx-gh">Recent</div>'; rec.forEach(it=>push(SX_ROW[it.k](it))); }
     else {
-      h += '<div class="sx-gh">Your open deals</div><div class="sx-note">Nothing opened yet this session. Closing soonest first.</div>';
+      h += '<div class="sx-gh">Your open opportunities</div><div class="sx-note">Nothing opened yet this session. Closing soonest first.</div>';
       allOpps().filter(o=>o.bdoId===CURRENT_BDO_ID && o.outcome==='open').sort((a,b)=>a.expectedCloseDate.localeCompare(b.expectedCloseDate)).slice(0,5)
         .forEach(o=>push(sxDealRow({k:'deal', o})));
     }
