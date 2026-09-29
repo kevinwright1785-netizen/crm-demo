@@ -1490,13 +1490,17 @@ table.tbl{width:100%;border-collapse:collapse}
    (all:unset, same reset pattern .th-sort already uses), a roving tabindex (only the active
    tab is a Tab stop; ArrowLeft/ArrowRight move focus and activate, matching WAI-ARIA APG's
    automatic-activation tabs pattern), role="tablist"/"tab"/aria-selected reflecting real state. */
+/* D346: the left inset puts the first tab's label on the deal or account name and the card titles
+   below: a card's 1px border plus its --s5 padding, less the tab's own --s4 padding. The 1px is the
+   border width, not a spacing value, so the sum (9px) is off the 4pt scale by construction. */
 .section-nav{position:relative;display:flex;gap:var(--s1);border-bottom:1px solid var(--line);
-  margin-bottom:var(--s5);overflow-x:auto}
+  padding-left:calc(var(--s5) + 1px - var(--s4));margin-bottom:var(--s5);overflow-x:auto}
 /* D120: sliding active marker, replacing the per-item border-bottom this tab row used to draw
    for itself (the text colour change on the active tab, above, stays). position:absolute with
    bottom:0 set explicitly, its static position would otherwise place it after its last
    sibling in the flex row, throwing translateX off by the whole row's width. Recomputed on
-   click, resize, and font load; see positionTabMarker(). */
+   click, resize, and font load; see positionTabMarker(). D346: it spans the active tab's label
+   (text and count), not the tab's padding; positionSlidingMarker() measures the content box. */
 .section-nav-marker{position:absolute;bottom:0;left:0;height:2px;background:var(--brand);
   transition:transform var(--t-base) var(--ease),width var(--t-base) var(--ease)}
 /* D259, D261: the one spring, for sliding markers only (the tab marker above, the segmented
@@ -105769,8 +105773,14 @@ const UW_STATS = computeUnderwritingStats();
 function positionSlidingMarker(marker, activeEl, axis){
   if(!marker || !activeEl) return;
   if(axis==='x'){
-    marker.style.transform = 'translateX('+activeEl.offsetLeft+'px)';
-    marker.style.width = activeEl.offsetWidth+'px';
+    /* D346: the label only, the tab's content box, unrounded (offsetLeft/offsetWidth round to whole
+       pixels and include the padding). Measured against the marker's own row, so the row's scroll
+       and its left inset are both accounted for. */
+    const row = marker.parentNode, cs = getComputedStyle(activeEl);
+    const r = activeEl.getBoundingClientRect(), rr = row.getBoundingClientRect();
+    const pl = parseFloat(cs.paddingLeft), pr = parseFloat(cs.paddingRight);
+    marker.style.transform = 'translateX('+(r.left - rr.left - row.clientLeft + row.scrollLeft + pl)+'px)';
+    marker.style.width = Math.max(0, r.width - pl - pr)+'px';
   } else {
     marker.style.transform = 'translateY('+activeEl.offsetTop+'px)';
     marker.style.height = activeEl.offsetHeight+'px';
