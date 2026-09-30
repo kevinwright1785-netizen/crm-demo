@@ -984,11 +984,11 @@ body.snap-lead.panel-open #view-home .snapshot-panel{order:-1}
    the top once scrolled and over 40px at the bottom while more remains (fadeEdges() sets the two
    classes). A logged exception to the no-gradients rule, scoped to scroll edges (CLAUDE.md §4). The
    mask reads alpha only, so its opaque stop is a token rather than a colour keyword. */
-.dd-scroll,.modal-body,.kcol-body,.act-scroll{--fade-top:0px;--fade-bottom:0px;
+.dd-scroll,.modal-body,.kcol-body,.act-scroll,.act-up-scroll{--fade-top:0px;--fade-bottom:0px;
   -webkit-mask-image:linear-gradient(to bottom,transparent 0,var(--ink) var(--fade-top),var(--ink) calc(100% - var(--fade-bottom)),transparent 100%);
   mask-image:linear-gradient(to bottom,transparent 0,var(--ink) var(--fade-top),var(--ink) calc(100% - var(--fade-bottom)),transparent 100%)}
-.dd-scroll.fade-top,.modal-body.fade-top,.kcol-body.fade-top,.act-scroll.fade-top{--fade-top:var(--s5)}
-.dd-scroll.fade-bot,.modal-body.fade-bot,.kcol-body.fade-bot,.act-scroll.fade-bot{--fade-bottom:40px}
+.dd-scroll.fade-top,.modal-body.fade-top,.kcol-body.fade-top,.act-scroll.fade-top,.act-up-scroll.fade-top{--fade-top:var(--s5)}
+.dd-scroll.fade-bot,.modal-body.fade-bot,.kcol-body.fade-bot,.act-scroll.fade-bot,.act-up-scroll.fade-bot{--fade-bottom:40px}
 
 /* ---------- pipeline stage-filter chip (Pipeline view, arrived via a stage-bar click) ---------- */
 .stage-filter-clear{margin-left:var(--s1);background:none;border:none;color:var(--brand);
@@ -1699,6 +1699,12 @@ table.tbl{width:100%;border-collapse:collapse}
 .act-hist-head > .panel-scope{grid-area:2 / 1 / 3 / 3}
 .act-tab .panel-footer .btn{margin-left:auto}
 .act-scroll{overflow-y:auto;max-height:368px}
+/* D374 (Known issue 22, Kevin's option B): Upcoming and overdue never makes the row of two taller. Its
+   list has no height of its own (height 0, so it adds nothing to the row), grows into the height the
+   row gives the card, which is Log activity's natural height, and scrolls inside with the D312 fade.
+   In one column (1140px and below) it takes its own height, capped at History's 368px. */
+.act-tab .opp-details-rows > .panel > .panel-body.act-up-scroll{flex:1 1 auto;height:0;min-height:0;overflow-y:auto}
+@media (max-width:1140px){.act-tab .opp-details-rows > .panel > .panel-body.act-up-scroll{height:auto;max-height:368px}}
 .act-tab .feed-group{padding-top:var(--s4)}
 .act-tab .act-scroll > .feed-group:first-child{padding-top:0}
 .act-tab .feed-group + .feedrow{box-shadow:none}
@@ -138337,7 +138343,7 @@ let MODAL_OPEN_KEY = null;
 /* D312: the scroll-edge fade. Called after anything that renders a scrolling area inside a surface
    (a modal opening or refreshing, a drill-down surface, the Board); a scroll or a window resize
    re-checks it through the listeners below. */
-const FADE_SEL = '.dd-scroll, .modal-body, .kcol-body, .act-scroll';   // .act-scroll: History (D373)
+const FADE_SEL = '.dd-scroll, .modal-body, .kcol-body, .act-scroll, .act-up-scroll';   // History (D373), Upcoming (D374)
 function fadeEdges(el){
   if(!el) return;
   el.classList.toggle('fade-top', el.scrollTop > 0);
@@ -143416,7 +143422,8 @@ function actPinRows(c, f){
 }
 /* Upcoming row = the Home feed row (RESEARCH_08 §6); Overdue is a word, never colour alone (D361). */
 function actUpRow(c, u){
-  const od = u.date<TODAY, ct = u.contactId ? CONTACTS_BY_ID[u.contactId] : null, bits = [actDayLabel(u.date)];
+  // D374: a timed item reads its time after the day, formatted as BDO Home's Today card formats it (hhmm12)
+  const od = u.date<TODAY, ct = u.contactId ? CONTACTS_BY_ID[u.contactId] : null, bits = [actDayLabel(u.date)+(u.time ? ', '+hhmm12(u.time) : '')];
   if(u.bdoId!==CURRENT_BDO_ID) bits.push('by '+actInitialName(u.bdoId));
   if(ct) bits.push(ct.name);
   const lab = actLabel(c, u.opportunityId);
@@ -143473,17 +143480,20 @@ function actTabHtml(kind, rec){
     '<div class="panel-footer"><button type="button" class="btn'+(kind==='opp'?' primary':'')+'" data-act="log">'+   // D365
       (t==='Note' ? 'Save note' : 'Log '+t.toLowerCase())+'</button></div></div>';
   const up = '<div class="panel feed-panel">'+actHead('Upcoming and overdue', '', '')+
-    '<div class="panel-body flush">'+(c.up.length ? c.up.map(u=>actUpRow(c, u)).join('') : '<div class="empty">Nothing scheduled.</div>')+'</div></div>';
+    '<div class="panel-body flush act-up-scroll">'+(c.up.length ? c.up.map(u=>actUpRow(c, u)).join('') : '<div class="empty">Nothing scheduled.</div>')+'</div></div>';
   const f = actFilterOf(c);
   ACT_UI.filter[k] = f;
   const list = f==='All' ? c.acts : c.acts.filter(a=>a.type===f);
+  /* D374: a pinned item shows under Pinned only, not also in its day or month group (a heading left with
+     no row is not drawn, since actHistRows() draws headings from rows); the counts stay activity counts */
+  const pinned = new Set(c.pinIds), dated = list.filter(a=>!pinned.has(a.id));
   const have = new Set(c.acts.map(a=>a.type));
   const filter = c.acts.length ? actSeg('Filter by type', 'actFilter', [{v:'All', t:'All'}].concat(ACT_ALL_TYPES.filter(x=>have.has(x)).map(x=>({v:x, t:ACT_PLURAL[x]}))), f, 'filter') : '';
   const scope = actHistScope(c, list.length, f);
   const hist = '<div class="panel act-hist"><div class="panel-header stacked act-hist-head"><div class="panel-title">History</div>'+filter+
     (scope?'<div class="panel-scope toggle-scope" title="'+esc(scope)+'">'+esc(scope)+'</div>':'')+'</div>'+
     '<div class="panel-body"><div class="act-scroll" data-key="'+esc(k)+'">'+
-      (c.acts.length ? actPinRows(c, f)+actHistRows(c, list) : '<div class="empty">No activity yet. Log a call, meeting or note above.</div>')+
+      (c.acts.length ? actPinRows(c, f)+actHistRows(c, dated) : '<div class="empty">No activity yet. Log a call, meeting or note above.</div>')+
     '</div></div></div>';
   return '<div class="act-tab"><div class="opp-details-rows">'+log+up+'</div>'+hist+'</div>';
 }
@@ -143496,26 +143506,33 @@ function actAfterRender(){
     else if(ACT_UI.h[k]) sc.style.minHeight = ACT_UI.h[k]+'px';
     fadeEdges(sc);
   });
+  document.querySelectorAll('.view.active .act-up-scroll').forEach(fadeEdges);   // D374
 }
 window.addEventListener('resize', ()=>{ if(document.querySelector('.view.active .act-scroll')) actAfterRender(); });
+/* D374: Upcoming's scroll position survives a redraw and a re-render (Mark done, Undo). */
+function actUpScrollTop(){ const u = document.querySelector('.view.active .act-up-scroll'); return u ? u.scrollTop : 0; }
+function actUpScrollRestore(top){ const u = document.querySelector('.view.active .act-up-scroll'); if(u){ u.scrollTop = top; fadeEdges(u); } }
 function actRec(){ return ACT_LAST ? (ACT_LAST.kind==='opp' ? getOpp(ACT_LAST.id) : getAccount(ACT_LAST.id)) : null; }
 /* A change of view state (type, filter, a menu choice, a pin, the empty-summary state) redraws the tab
    in place, keeping History's scroll; a write re-renders the whole record (actRerender). */
 function actRedraw(focusSel){
   const wrap = document.querySelector('.view.active .act-tab'), rec = actRec();
   if(!wrap || !rec) return;
-  const sc = wrap.querySelector('.act-scroll'), top = sc ? sc.scrollTop : 0;
+  const sc = wrap.querySelector('.act-scroll'), top = sc ? sc.scrollTop : 0, upTop = actUpScrollTop();
   const tmp = document.createElement('div');
   tmp.innerHTML = actTabHtml(ACT_LAST.kind, rec);
   wrap.replaceWith(tmp.firstChild);
   const s2 = document.querySelector('.view.active .act-scroll');
   if(s2) s2.scrollTop = top;
   actAfterRender();
+  actUpScrollRestore(upTop);
   if(focusSel){ const el = document.querySelector('.view.active '+focusSel); if(el) el.focus({preventScroll:true}); }
 }
 function actRerender(focusSel){
   if(!ACT_LAST) return;
+  const upTop = actUpScrollTop();
   if(ACT_LAST.kind==='opp') window.setOppSection('activity'); else window.setAccountSection('activity');
+  actUpScrollRestore(upTop);
   if(focusSel){ const el = document.querySelector('.view.active '+focusSel); if(el) el.focus({preventScroll:true}); }
 }
 function actAdd(a){
