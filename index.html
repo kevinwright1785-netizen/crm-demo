@@ -1729,6 +1729,9 @@ table.tbl{width:100%;border-collapse:collapse}
 .act-sum.act-err{border-color:var(--neg)}
 .act-sum.act-err::placeholder{color:var(--neg-ink)}
 .act-tab .kv .ef{display:inline-block;cursor:pointer}
+/* D375: When is Expected close's control, so its cell is a block, as on the Deal card (its hover fill and
+   its 32px edit box match); With, On and Outcome keep the spec's inline cells. */
+.act-tab .kv .ef[data-key="act.when"]{display:block}
 .act-tab .kv .act-hide{visibility:hidden}
 .act-done:focus-visible,.act-tab .kv .ef:focus-visible,.act-sum:focus-visible,.act-pin:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
 .act-sum.act-err:focus-visible{outline-color:var(--neg)}
@@ -137256,7 +137259,7 @@ function controlHtml(def, elId, value){
       '</label>'
     ).join('')+'</div>';
   }
-  if(def.type==='date') return '<input type="date" id="'+elId+'" class="ef-input" value="'+esc(value||'')+'">';
+  if(def.type==='date') return '<input type="date" id="'+elId+'" class="ef-input" value="'+esc(value||'')+'"'+(def.max?' max="'+esc(def.max)+'"':'')+'>';   // D375: optional max
   if(def.type==='number'||def.type==='money'||def.type==='percent')
     return '<input type="number" id="'+elId+'" class="ef-input" value="'+(value==null?'':value)+'" step="any">';
   return '<input type="text" id="'+elId+'" class="ef-input" value="'+esc(value==null?'':value)+'">';
@@ -137316,6 +137319,7 @@ function findDef(recId, key){
    visible "Required" tag with nothing actually enforcing it, now a real commit-blocking rule.
    Returns an error string, or null when the value is valid. */
 function efValidate(def, obj, val){
+  if(def.validate){ const msg = def.validate(val, obj); if(msg) return msg; }   // D375: a def's own rule, opt-in
   if(def.type==='money' && (val==null || val<=0)) return 'Enter a number greater than 0.';
   if(def.key==='core.declineReasonDetail' && obj.declineReason && !String(val||'').trim())
     return 'Explanation required.';
@@ -137487,10 +137491,13 @@ function activateEdit(span){
   const isField = input && input.tagName!=='DIV';
   if(isField) input.focus();
   const session = {settled:false};
+  /* D375: a def may carry its own redraw (the Activity tab's When cell, in an unsaved form, on account
+     pages too, which set no EF_RERENDER); every other field keeps EF_RERENDER. */
+  const rerender = def.rerender || (()=>{ if(EF_RERENDER) EF_RERENDER(); });
   function revert(){
     if(session.settled) return;
     session.settled = true;
-    if(EF_RERENDER) EF_RERENDER();
+    rerender();
   }
   function commit(){
     if(session.settled) return;
@@ -137499,14 +137506,14 @@ function activateEdit(span){
     if(error){ efShowError(elId, error); return; } // stays in edit mode, nothing written
     session.settled = true;
     const oldVal = def.get(obj);
-    if(String(oldVal)===String(newVal)){ if(EF_RERENDER) EF_RERENDER(); return; } // no change: no write, no feedback
+    if(String(oldVal)===String(newVal)){ rerender(); return; } // no change: no write, no feedback
     /* D342 O2: a field whose pick is an action (the Stage field: a stage move, or the close or reopen
        dialog) writes nothing itself; the action does its own writes, Audit and toast. */
-    if(def.act){ if(EF_RERENDER) EF_RERENDER(); def.act(recId, newVal); return; }
+    if(def.act){ rerender(); def.act(recId, newVal); return; }
     def.set(obj, newVal);
     auditFieldEdit(recId, def, oldVal, newVal);
     efPushUndo(recId, def, oldVal, newVal);
-    if(EF_RERENDER) EF_RERENDER();
+    rerender();
     efConfirmSaved(recId, key, inModal);
   }
   if(isField){
@@ -143327,7 +143334,41 @@ const ACT_TYPES = ['Call','Meeting','Note'];
 const ACT_ALL_TYPES = ['Email','Call','Meeting','Note','Task'];
 const ACT_PLURAL = {Email:'Emails', Call:'Calls', Meeting:'Meetings', Note:'Notes', Task:'Tasks'};
 const ACT_OUTCOMES = ['Connected','Left voicemail','No answer'];   // D360: governed, optional
-const ACT_WHEN_DAYS = 5;    // Today plus the previous five weekdays
+/* D375 (Kevin, 2026-09-30): When is the inline-edit engine's own date cell, the control Expected close
+   uses. A value in an unsaved form, so its def acts (def.act: the engine writes no record, no Audit row,
+   no undo entry, no save confirmation), redraws the tab itself (def.rerender), allows today or earlier
+   (def.max, def.validate; weekends allowed, no earliest date) and reads "Today" or "Wed, Aug 12" at
+   rest (def.format). The form's record is {key}, registered per Activity tab. */
+const ACT_WHEN_DEF = {key:'act.when', label:'When', type:'date', max:TODAY,
+  get:o=>ACT_UI.when[o.key]||TODAY, set:()=>{},
+  format:v=>v===TODAY ? 'Today' : actWeekday(v),
+  validate:v=>(!v || v>TODAY) ? 'Pick today or an earlier date' : null,
+  rerender:()=>actWhenRest(),
+  act:(recId, v)=>{ ACT_UI.when[EF_STORE[recId].obj.key] = v; actWhenRest(); }};
+DEF_INDEX[ACT_WHEN_DEF.key] = ACT_WHEN_DEF;
+/* D376: committing or reverting When redraws only the When cell, never the rest of the tab, so a control
+   pressed while When was open is not replaced under the pointer. The cell also shrinks back from the
+   edit box (the card was ~17px taller while editing, D375), which would move everything below it under
+   the pointer too, so when a mouse button is down (the commit came from the press's own blur) the cell
+   is redrawn once that press's click has been handled. ACT_UI.when is set at once either way, so the
+   click reads the new date. Other engine fields are untouched. */
+let ACT_PRESSED = false;
+document.addEventListener('mousedown', ()=>{ ACT_PRESSED = true; }, true);
+document.addEventListener('mouseup', ()=>{ ACT_PRESSED = false; }, true);
+function actWhenRest(){
+  const cell = document.querySelector('.view.active .act-tab .ef[data-key="act.when"]');
+  const draw = ()=>{
+    // the click re-rendered the tab (a log, a type, a filter, a pin): its new When cell is already at rest
+    if(!cell || !cell.isConnected || !EF_STORE[cell.dataset.rec]) return;
+    const tmp = document.createElement('div');
+    tmp.innerHTML = efSpan(cell.dataset.rec, ACT_WHEN_DEF);
+    cell.replaceWith(tmp.firstChild);
+    document.querySelectorAll('.view.active .act-up-scroll').forEach(fadeEdges);
+    if(ACT_MENU) actMenuPlace();   // a With, On or Outcome menu opened by that click follows its field
+  };
+  if(ACT_PRESSED) window.addEventListener('mouseup', ()=>setTimeout(draw, 0), {once:true, capture:true});
+  else draw();
+}
 const ACT_ICON_PATHS = {
   Call:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/>',
   Meeting:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/>',
@@ -143444,12 +143485,6 @@ function actFilterOf(c){
 }
 function actDefaultOn(c){ return c.open.length===1 ? c.open[0].id : ''; }   // D363
 function actOnId(c){ return (c.key in ACT_UI.on) ? ACT_UI.on[c.key] : actDefaultOn(c); }
-function actWhenOptions(){
-  const out = [{v:TODAY, t:'Today'}];
-  let d = TODAY, n = 0;
-  while(n<ACT_WHEN_DAYS){ d = addDaysStr(d, -1); const w = toDateObj(d).getUTCDay(); if(w===0 || w===6) continue; out.push({v:d, t:actWeekday(d)}); n++; }
-  return out;
-}
 function actHead(title, scope, right){
   return '<div class="panel-header stacked"><div class="toggle-header-top"><div class="panel-title">'+esc(title)+'</div>'+(right||'')+'</div>'+
     (scope?'<div class="panel-scope" title="'+esc(scope)+'">'+esc(scope)+'</div>':'')+'</div>';
@@ -143464,9 +143499,9 @@ function actTabHtml(kind, rec){
   ACT_LAST = {kind, id:rec.id, key:k};
   const t = ACT_UI.type[k]||'Call', ct = ACT_UI.withC[k] ? CONTACTS_BY_ID[ACT_UI.withC[k]] : null;
   const oid = actOnId(c), o = oid ? getOpp(oid) : null, oc = ACT_UI.oc[k]||'', err = !!ACT_UI.err[k];
-  const when = ACT_UI.when[k]||TODAY;
+  const whenRec = registerRecord('actform:'+k, {key:k});
   const fields = '<dl class="kv kv-2col">'+
-    '<div><dt>When</dt><dd><span class="ef" data-act="menu" data-v="when" tabindex="0" role="button" aria-haspopup="menu">'+esc(when===TODAY?'Today':actWeekday(when))+'</span></dd></div>'+
+    '<div><dt>When</dt><dd>'+efSpan(whenRec, ACT_WHEN_DEF)+'</dd></div>'+
     '<div><dt>With</dt><dd><span class="ef'+(ct?'':' ef-empty')+'" data-act="menu" data-v="with" tabindex="0" role="button" aria-haspopup="menu">'+esc(ct?ct.name:'Add contact')+'</span></dd></div>'+
     (c.prospectAcct ? '<div><dt>On</dt><dd><span class="ef" data-act="menu" data-v="on" tabindex="0" role="button" aria-haspopup="menu">'+esc(o?actOppLabel(o):'Account only')+'</span></dd></div>' : '')+
     /* Outcome is a call's only; for a meeting or note its space is kept, hidden (R5) */
@@ -143630,7 +143665,6 @@ function actMenuOpen(anchor, which){
   actMenuClose();
   const k = ACT_LAST.key, c = actCtx(ACT_LAST.kind, actRec());
   let items = [];
-  if(which==='when') items = actWhenOptions().map(o=>({v:o.v, t:o.t, on:(ACT_UI.when[k]||TODAY)===o.v}));
   if(which==='with') items = (CONTACTS_BY_ACCT[c.acct.id]||[]).map(ct=>({v:ct.id, t:ct.name, s:ct.role, on:ACT_UI.withC[k]===ct.id}))
     .concat([{v:'', t:'No contact', on:!ACT_UI.withC[k]}]);
   if(which==='on'){ const cur = actOnId(c);
@@ -143648,7 +143682,6 @@ function actMenuOpen(anchor, which){
     const it = e.target.closest('.newmenu-item');
     if(!it) return;
     const v = items[+it.dataset.i].v;
-    if(which==='when') ACT_UI.when[k] = v;
     if(which==='with') ACT_UI.withC[k] = v;
     if(which==='on') ACT_UI.on[k] = v;
     if(which==='oc') ACT_UI.oc[k] = ACT_UI.oc[k]===v ? '' : v;   // the chosen outcome again clears it
