@@ -670,11 +670,6 @@ button.drill:focus-visible{outline:var(--focus) solid var(--brand);outline-offse
    flex-basis rule below. */
 .exec-grid > .home-col > .panel:last-child{flex:1 1 auto}
 .exec-grid + .exec-grid{margin-top:var(--s5)}
-/* N1 bullet graph (Few, RESEARCH_10 §3): single hue, bar = funded, dark tick = straight-line
-   pace for today, track end = annual goal. */
-.bullet{position:relative;height:6px;background:var(--brand-a15);border-radius:var(--r-s);margin-top:var(--s2)}
-.bullet-bar{position:absolute;left:0;top:0;bottom:0;background:var(--brand);border-radius:var(--r-s)}
-.bullet-pace{position:absolute;top:-4px;bottom:-4px;width:0;border-left:2px solid var(--ink)}
 /* N4 two-sided signal feed: "Going well" above "Needs attention" (RESEARCH_10 §4). */
 .feed-group{font-size:11px;font-weight:500;color:var(--ink-2);padding:var(--s3) 0 var(--s1)}
 .feed-group:first-child{padding-top:0}
@@ -685,10 +680,6 @@ button.drill:focus-visible{outline:var(--focus) solid var(--brand);outline-offse
 /* The mock's table ends at the card's own bottom edge (its body is flush); only the sides are inset
    here, for R3, so the card's height matches the spec's. */
 .panel-body.yield-body{padding-bottom:0}
-/* N12/N14 Open pipeline: its own total figure, then one row per stage, each a link to
-   Opportunities filtered to that stage (the existing #/pipeline/stage/X route). */
-.stage-total{margin-bottom:var(--s3)}
-.stage-total .met-figure{margin-top:0}
 a.stage-link{text-decoration:none;color:inherit;cursor:pointer}
 .stage-link .chev{margin-left:var(--s2);color:var(--ink-2)}
 .stage-link:hover .hbar-name{color:var(--brand)}
@@ -761,9 +752,8 @@ a.stage-link{text-decoration:none;color:inherit;cursor:pointer}
 @media (max-width:1140px){.home-calendar-panel{flex:0 0 auto}}
 
 /* ---------- Pipeline Snapshot's stage-mini row (D225): four columns, stage name / count+$ /
-   a thin single-hue bar sized by dollars relative to the largest stage, each clickable to the
-   same #/pipeline/stage/X route the retired standalone Pipeline-by-stage card used
-   (goToPipelineStage(), unchanged). Replaces that standalone card entirely; this is Home's own
+   a thin single-hue bar sized by dollars relative to the largest stage, each clickable to that
+   stage's drill-down (D377). Replaces the retired standalone Pipeline-by-stage card; this is Home's own
    consumer, not a fork of pipelineByStageHtml() (the old Exec Home's segbar/legend, retired D253), whose rendered
    shape is genuinely different (a four-column mini-card row, not a proportional segmented bar
    plus a legend list), so per D151 this is a new function, not a forced reuse. */
@@ -793,7 +783,11 @@ a.stage-link{text-decoration:none;color:inherit;cursor:pointer}
 .stage-mini-fill{display:block;height:100%;background:var(--brand)}
 /* D265: every home-page bar grows from its left edge on first landing (playHomeEntrance()). No
    effect at rest: nothing else transforms these. */
-.hbar-fill,.bullet-bar,.att-fill,.wfill,.stage-mini-fill{transform-origin:left center}
+.hbar-fill,.att-fill,.wfill,.stage-mini-fill{transform-origin:left center}
+/* D377 R2: a focusable stage takes the app's focus ring, as snapshot rows do. R3: the amber part of a
+   drill-down row's detail line (days in stage past typical, never the owner). */
+.stage-mini-item.clickable:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
+.dd-row-sub .t-warn{color:var(--warn-ink)}
 /* The stage-mini row is always first inside Snapshot's body, so the first real .snap-row below
    it is never actually :first-child (that's .stage-mini): its own top divider (box-shadow)
    was rendering anyway, stacked right under stage-mini's own border-bottom: a visible double
@@ -138309,10 +138303,13 @@ function pipelineSnapshotHtml(myOpen){
    (stage name, count, dollars, a thin single-hue bar sized by dollars relative to the largest
    stage), replacing both the retired standalone Pipeline-by-stage card and the footer's
    stage-mix summary line (stageMixSummary(), removed as this function's only caller). Each
-   column routes through the same goToPipelineStage() every other stage-click site already
-   uses. Not a fork of pipelineByStageHtml() (the old Exec Home's proportional segbar plus legend,
+   column opens that stage's drill-down (D377, below). Not a fork of pipelineByStageHtml() (the old Exec Home's proportional segbar plus legend,
    retired D253): the rendered shapes genuinely differ, so per D151 this is its own function. */
-function stageMiniHtml(myOpen){
+/* D377 (O3, O5): `set` names which drill-downs a stage opens: 'bdo', your open deals (BDO Home's card and
+   its Open pipeline drill-down), or 'exec', every open deal firm-wide (Exec Home's card and O2). A stage
+   opens that stage's drill-down (stageGroupDrill(), registered as the row renders, D326) instead of leaving
+   for the Opportunities list. */
+function stageMiniHtml(myOpen, set){
   const byStage = TRACK_STAGES.map(s=>{
     const g = myOpen.filter(o=>o.stage===s);
     return {stage:s, count:g.length, value:g.reduce((t,o)=>t+o.facilitySize,0)};
@@ -138320,7 +138317,8 @@ function stageMiniHtml(myOpen){
   const max = Math.max(1, ...byStage.map(b=>b.value));
   return '<div class="stage-mini">'+byStage.map(b=>
     '<div class="stage-mini-item'+(b.count?' clickable':'')+'"'+
-      (b.count?' onclick="goToPipelineStage(\''+b.stage+'\')"':'')+
+      (b.count?(k=>' tabindex="0" role="button" onclick="openStageDrill(\''+k+'\',event)" '+
+        'onkeydown="if(event.key===\'Enter\')openStageDrill(\''+k+'\',event)"')(stageGroupDrill(set, b.stage)):'')+
       tipAttr(b.stage, b.count+' deal'+(b.count===1?'':'s')+' · '+moneyShort(b.value),
         b.count?'click to view':'')+'>'+
       '<div class="stage-mini-k">'+b.stage+'</div>'+
@@ -139789,6 +139787,43 @@ window.openGroupDrill = function(key, ev){
   if(inPanel && SURF_KIND==='panel'){ PANEL_STACK.push({kind:'drill', key}); renderPanel(true); return; }
   openDrill(key);
 };
+/* D377 R1: a stage clicked on a Pipeline snapshot card that opens the side panel keeps the card leading the
+   one-column page, with "‹ Pipeline snapshot" as the back link, as a snapshot row does (D318, D319); inside
+   the panel a stage stacks (openGroupDrill); a pop-up (8 rows or fewer, D302) is unchanged; the same stage
+   again closes it (D304, in openDrill). */
+window.openStageDrill = function(key, ev){
+  const fromSnap = !!(ev && ev.target && ev.target.closest && ev.target.closest('.snapshot-panel'));
+  openGroupDrill(key, ev);
+  if(fromSnap && SURF_KIND==='panel' && PANEL_STACK.length===1 && PANEL_STACK[0].key===key){
+    document.body.classList.add('snap-lead');
+    PANEL_STACK[0].from = 'snapshot';
+    renderPanel(false);
+  }
+};
+/* D377 O3, O5: one stage's open deals, firm-wide ('exec') or yours ('bdo'). */
+function stageGroupDrill(set, st){
+  const key = (set==='exec' ? 'execStage_' : 'bdoStage_')+st;
+  if(DRILLS[key]) return key;
+  const pool = ()=>set==='exec' ? firmOpenBySize() : drillMyOpen();
+  DRILLS[key] = {count:()=>pool().filter(o=>o.stage===st).length, parts(){
+    const all = pool(), l = all.filter(o=>o.stage===st);
+    return set==='exec'
+      ? {title:st, scope:'Open deals in '+st+', firm-wide, '+drillAsOf(), lead: stageDrillLead(l, all, st),
+          body: l.map(o=>drillDealRow(o, drillDaysOwner(o), false, productTagHtml(o.productType))).join(''),
+          foot: drillListLink('Open in Opportunities', "drillToPipeline('allOpen','"+st+"')")}
+      : {title:st, scope:'Your open deals in '+st+', '+drillAsOf(), lead: stageDrillLead(l, all, st),
+          body: l.map(o=>drillDealRow(o, drillDaysSub(o), drillStale(o), productTagHtml(o.productType))).join(''),
+          foot: drillListLink('Open in Opportunities', "drillToPipeline('myOpen','"+st+"')")};
+  }};
+  return key;
+}
+function stageDrillLead(l, all, st){
+  const t = drillTotal(l), tot = drillTotal(all);
+  return drillFig(money(t))+'<div class="dd-lead-sub">'+dealsLabel(l.length)+' · '+pct(tot?t/tot:0)+' of open pipeline · typical '+STAGE_P75[st]+' days in stage</div>';
+}
+/* D377 R3: only the days in stage turn amber (past the stage's typical), never the owner's name. */
+function drillDaysOwner(o){ const d = drillDaysSub(o); return (drillStale(o) ? '<span class="t-warn">'+d+'</span>' : d)+' · '+ownerName(o); }
+function firmOpenBySize(){ return execFirmOpen().sort((a,b)=>b.facilitySize-a.facilitySize); }
 function closedOnLabel(o){ return fmtDateShort(closedDateOf(o) || o.fundedDate || ''); }
 /* Lost deals behind a row (Why we lose, BDO Home's Where we're losing). get() returns
    {title, list, scope, of (all dollars lost, for the share), competitor}. */
@@ -139822,7 +139857,7 @@ DRILLS.pipeline = {count:()=>drillMyOpen().length, parts(){
   const accts = new Set(l.map(o=>o.accountId)).size;
   return {title:'Open pipeline', scope:'Your open deals, every stage, '+drillAsOf(),
     lead: drillFig(money(t))+'<div class="dd-lead-sub">'+dealsLabel(l.length)+' across '+drillPlural(accts,'account')+' · average '+moneyShort(l.length?t/l.length:0)+'</div>',
-    pre: stageMiniHtml(l),
+    pre: stageMiniHtml(l, 'bdo'),
     body: l.map(o=>drillDealRow(o, drillDaysSub(o), drillStale(o))).join(''),
     foot: drillListLink('Open in Opportunities', "drillToPipeline('myOpen')")};
 }};
@@ -139938,7 +139973,7 @@ DRILLS.loss = {views:LOSS_VIEWS, count:v=>lossViewData(CURRENT_BDO_ID, v).rows.l
    stagger step are still read from --t-slow/--t-fast at call time (via getComputedStyle on
    :root), not hardcoded, so :root stays the only place those numbers are actually defined. */
 const ENTRANCE_SEEN = {bdo:false, exec:false};
-const HOME_BAR_SEL = '.hbar-fill, .bullet-bar, .att-fill, .wfill, .stage-mini-fill'; // D265
+const HOME_BAR_SEL = '.hbar-fill, .att-fill, .wfill, .stage-mini-fill'; // D265
 const ENTRANCE_ROW_PX = 8;   // card tops this close together are one row
 /* Visible cards group into rows by their tops (within ENTRANCE_ROW_PX); rows start top to bottom,
    one step apart, and every card in a row starts together. A card whose top is below the viewport
@@ -140099,7 +140134,7 @@ function renderHome(){
         '<div class="panel snapshot-panel">'+
           panelHeaderHtml('Pipeline snapshot', 'Top 5 by facility size · active opportunities',
             '<span class="drill" onclick="location.hash=\'#/pipeline\'">Opportunities &rsaquo;</span>')+
-          '<div class="panel-body flush">'+stageMiniHtml(myOpen)+pipelineSnapshotHtml(myOpen)+'</div>'+
+          '<div class="panel-body flush">'+stageMiniHtml(myOpen, 'bdo')+pipelineSnapshotHtml(myOpen)+'</div>'+
         '</div>'+
 
         '<div class="panel home-calendar-panel">'+
@@ -140180,14 +140215,6 @@ function execPushedIn(a, b){
     String(e.newValue).slice(0,7) > String(e.oldValue).slice(0,7)).map(e=>e.opportunityId));
   return Array.from(ids).map(getOpp).filter(Boolean);
 }
-/* Open on a past date: created by then, and not yet closed by then. */
-function execOpenOn(dateStr){
-  return Object.values(OPPS).filter(o=>{
-    if(!o.createdDate || o.createdDate>dateStr) return false;
-    const closed = o.outcome==='open' ? null : closedDateOf(o);
-    return !closed || closed>dateStr;
-  });
-}
 
 /* D322 O2: the count compared with the prior 30 days' count. */
 function changeWord(n, prior){ return n>prior ? 'up from ' : n<prior ? 'down from ' : 'level with '; }
@@ -140197,31 +140224,26 @@ function execPaceLine(g){
 }
 function execPriorSub(n, prior){ return dealsLabel(n)+' · 30 days before: '+moneyShort(sumFacility(prior))+', '+dealsLabel(prior.length); }
 /* D322: each cell is the figure plus one line, count and change (option A); each opens its
-   drill-down (metCellHtml()). The goal share lives in the bullet's tooltip and the drill-down. */
+   drill-down (metCellHtml()). The goal share lives in Funded YTD's drill-down. */
 function execStripHtml(){
-  const w = execWindows();
-  const g = execGoalStats(), pace = execPaceLine(g);
-  const bullet = '<div class="bullet"'+tipAttr('Annual goal', pct(g.ratio)+' of '+moneyShort(g.target),
-      'Pace line: '+pct(g.paceShare)+' of the year gone')+'>'+
-    '<div class="bullet-bar" style="width:'+(Math.min(1, g.ratio)*100).toFixed(1)+'%"></div>'+
-    '<div class="bullet-pace" style="left:'+(Math.min(1, g.paceShare)*100).toFixed(1)+'%"></div>'+
-  '</div>';
+  const w = execWindows(), g = execGoalStats(), pace = execPaceLine(g), open = execFirmOpen();
   const added = execAddedIn(w.start, w.end), addedPrior = execAddedIn(w.priorStart, w.priorEnd);
-  const funded = execFundedIn(w.start, w.end), fundedPrior = execFundedIn(w.priorStart, w.priorEnd);
   const pushed = execPushedIn(w.start, w.end), pushedPrior = execPushedIn(w.priorStart, w.priorEnd);
   const since = fmtDateShort(w.start);
   const sub = t=>'<div class="met-sub">'+t+'</div>';
   /* More slippage than the prior 30 days is the bad direction, so a rise in pushed dollars reads warn. */
   const pushedWorse = sumFacility(pushed) > sumFacility(pushedPrior);
+  /* D377 O7: Open pipeline, Added since, Close dates pushed since, Funded YTD; "Funded since" removed.
+     O1: Open pipeline firm-wide, its line the count only, as BDO Home's (D323). O8: Funded YTD has no
+     bullet graph; its pace stays on its line. */
   return '<div class="strip strip-4">'+
-    metCellHtml('execFundedYtd', 'Funded YTD', money(g.value), bullet,
-      sub(dealsLabel(g.count)+' · <span class="'+pace.cls+'">'+pace.txt+'</span>'))+
+    metCellHtml('execPipeline', 'Open pipeline', money(sumFacility(open)), '', sub(dealsLabel(open.length)))+
     metCellHtml('execAdded', 'Added since '+since, money(sumFacility(added)), '',
       sub(dealsLabel(added.length)+', '+changeWord(added.length, addedPrior.length)+addedPrior.length))+
-    metCellHtml('execFunded30', 'Funded since '+since, money(sumFacility(funded)), '',
-      sub(dealsLabel(funded.length)+', '+changeWord(funded.length, fundedPrior.length)+fundedPrior.length))+
     metCellHtml('execPushed', 'Close dates pushed since '+since, money(sumFacility(pushed)), '',
       sub(dealsLabel(pushed.length)+', <span class="'+(pushedWorse?'t-warn':'')+'">'+changeWord(pushed.length, pushedPrior.length)+pushedPrior.length+'</span>'))+
+    metCellHtml('execFundedYtd', 'Funded YTD', money(g.value), '',
+      sub(dealsLabel(g.count)+' · <span class="'+pace.cls+'">'+pace.txt+'</span>'))+
   '</div>';
 }
 
@@ -140274,11 +140296,14 @@ DRILLS.execAdded = {count:()=>{ const w = execWindows(); return execAddedIn(w.st
     pre: stageTodayBreakdownHtml(l),
     body: l.map(o=>drillDealRow(o, 'Created '+fmtDateShort(o.createdDate)+' · '+ownerName(o), false)).join('')};
 }};
-DRILLS.execFunded30 = {count:()=>{ const w = execWindows(); return execFundedIn(w.start, w.end).length; }, parts(){
-  const w = execWindows(), l = execFundedIn(w.start, w.end).sort((a,b)=>b.fundedDate.localeCompare(a.fundedDate) || b.facilitySize-a.facilitySize);
-  return {title:'Funded since '+fmtDateShort(w.start), scope:'Deals funded, firm-wide, '+drillAsOf(),
-    lead: drillFig(money(sumFacility(l)))+'<div class="dd-lead-sub">'+execPriorSub(l.length, execFundedIn(w.priorStart, w.priorEnd))+'</div>',
-    body: l.map(o=>drillDealRow(o, 'Funded '+fmtDateShort(o.fundedDate)+' · '+ownerName(o), false, productTagHtml(o.productType))).join('')};
+/* D377 O2: the firm-wide Open pipeline drill-down, BDO Home's Open pipeline drill-down for every BDO. */
+DRILLS.execPipeline = {count:()=>execFirmOpen().length, parts(){
+  const l = firmOpenBySize(), t = drillTotal(l), accts = new Set(l.map(o=>o.accountId)).size;
+  return {title:'Open pipeline', scope:'Every open deal, firm-wide, '+drillAsOf(),
+    lead: drillFig(money(t))+'<div class="dd-lead-sub">'+dealsLabel(l.length)+' across '+drillPlural(accts,'account')+' · average '+moneyShort(l.length?t/l.length:0)+'</div>',
+    pre: stageMiniHtml(l, 'exec'),
+    body: l.map(o=>drillDealRow(o, drillDaysOwner(o), false)).join(''),
+    foot: drillListLink('Open in Opportunities', "drillToPipeline('allOpen')")};
 }};
 
 /* Generic ranked-bar-list builder: the shared .hbar-row/.hbar-fill markup (D221, D231), one call
@@ -140302,29 +140327,14 @@ function hbarListHtml(rows, opts){
 
 /* ---------- Open pipeline, by stage (mock N12/N14) ---------- */
 window.goToOpenPipeline = function(){ PIPE_SEGMENT = 'allOpen'; location.hash = '#/pipeline'; };
+/* D377 O6: BDO Home's Pipeline snapshot card fed every open deal firm-wide: the same panel, stage row and
+   top-5 rows. A row opens the deal preview (D318), a stage that stage's firm-wide deals (O3). */
 function execOpenPipelinePanelHtml(){
   const open = execFirmOpen();
-  const total = sumFacility(open);
-  const w = execWindows();
-  const then = execOpenOn(w.priorEnd);
-  const thenVal = sumFacility(then);
-  const dir = changeWord(total, thenVal);
-  const rows = TRACK_STAGES.map(st=>{
-    const g = open.filter(o=>o.stage===st), v = sumFacility(g);
-    return {label:st, value:v, href:'#/pipeline/stage/'+st, rowCls:'stage-link',
-      display:g.length+' · '+moneyShort(v)+'<span class="chev">&rsaquo;</span>',
-      tip:tipAttr(st, dealsLabel(g.length)+' · '+moneyShort(v), pct(total?v/total:0)+' of open pipeline · click to view')};
-  });
-  return '<div class="panel" id="panel-exec-pipeline">'+
-    panelHeaderHtml('Open pipeline', 'By stage, firm-wide',
-      '<span class="drill" onclick="goToOpenPipeline()">All open deals &rsaquo;</span>')+
-    '<div class="panel-body">'+
-      '<div class="stage-total">'+
-        '<div class="met-figure">'+money(total)+'</div>'+
-        '<div class="met-sub">'+dealsLabel(open.length)+' · '+dir+moneyShort(thenVal)+' on '+fmtDateShort(w.priorEnd)+'</div>'+
-      '</div>'+
-      hbarListHtml(rows)+
-    '</div>'+
+  return '<div class="panel snapshot-panel" id="panel-exec-pipeline">'+
+    panelHeaderHtml('Pipeline snapshot', 'Top 5 by facility size · firm-wide',
+      '<span class="drill" onclick="goToOpenPipeline()">Opportunities &rsaquo;</span>')+
+    '<div class="panel-body flush">'+stageMiniHtml(open, 'exec')+pipelineSnapshotHtml(open)+'</div>'+
   '</div>';
 }
 
@@ -140877,7 +140887,6 @@ function renderPipeline(){
 window.setPipeSegment = function(key){ PIPE_SEGMENT=key; PIPE_STAGE_FILTER=null; renderPipeline(); };
 window.setPipeView = function(v){ PIPE_VIEW=v; renderPipeline(); };
 window.clearPipeStageFilter = function(){ PIPE_STAGE_FILTER=null; renderPipeline(); };
-window.goToPipelineStage = function(stage){ location.hash = '#/pipeline/stage/'+stage; };
 
 /* ---------- D106 parts (b)/(c) and D129: return bar and next/previous ----------
    Generalized to a second list by D146 (extending D106's scope from Pipeline to Accounts, per
