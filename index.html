@@ -1423,6 +1423,12 @@ table.tbl{width:100%;border-collapse:collapse}
 .feedrow:hover::before,.feedrow:hover + .feedrow::before,
 .snap-row:hover::before,.snap-row:hover + .snap-row::before,
 .agenda-row.next::before,.agenda-row.next + .agenda-row::before{opacity:0}
+/* D384 (spec attention-spec-mock-v2, O1, O4, O6): a deal or Signal that needs attention carries a 3px
+   --warn bar in the row's 8px hover-reach margin, inset --s2 top and bottom, square ends. Outside the
+   content inset: a logged R3 exception, the same shape as D305's fills. Hover is unchanged. */
+.snap-row.attn::after,.feedrow.attn::after{content:'';position:absolute;left:0;top:var(--s2);bottom:var(--s2);
+  width:3px;background:var(--warn)}
+.tag.attn-chip{white-space:nowrap}
 .acct-summary-row.clickable{margin-inline:calc(-1*var(--s2));padding-inline:var(--s2);border-radius:var(--r-s);position:relative}
 .acct-summary-row + .acct-summary-row.clickable{border-top-color:transparent}
 .acct-summary-row + .acct-summary-row.clickable::before{content:'';position:absolute;top:-1px;left:var(--s2);right:var(--s2);
@@ -138103,15 +138109,13 @@ function buildFeed(bdoId){
   // status." Details already surfaces the stage track and the strip's Days-in-Stage figure, so no
   // `section` override, since the omitted-section default is the right answer here, not a gap.
   myOpen.forEach(o=>{
-    const hist=getStageHistory(o.id);
-    const days=daysBetween(hist[hist.length-1].enteredDate,TODAY);
-    const thresh=Math.max(STAGE_P75[o.stage]||0,1);
-    if(days < thresh) return;
-    const over=days/thresh;
+    const st=attnStale(o);   // D384: the shared Stale rule
+    if(!st) return;
+    const days=st.days, thresh=st.typ, over=days/thresh;
     cand.push({
       type:'stall', score: 54 + sizeW(o) + Math.min(20,(over-1)*18), oppId:o.id,
       icon:'warn', glyph:feedIconSvg('alert'), action:'Nudge deal',
-      title:esc(getAccount(o.accountId).name)+' stalled in '+o.stage,
+      title:esc(getAccount(o.accountId).name)+' stale in '+o.stage,
       sub:daysText(days)+' in stage vs '+thresh+' typical · '+moneyPlain(o.facilitySize)+' facility'
     });
   });
@@ -138264,6 +138268,37 @@ document.addEventListener('mouseout', function(e){
 });
 window.addEventListener('hashchange', ()=>{ TIP_EL.style.display='none'; });
 
+/* ---------- Needs attention (D383 spec O2, built D384) ----------
+   The one home of the Stale, No activity and Past close rules (D383 ruling 2). Both Homes' Pipeline
+   snapshot, the deal preview and search's pane, the Details tab's Signals card, the Opportunities
+   "Stale deals" segment, BDO Home's feed, the drill-down stale rows and Exec Home's no-activity count
+   all read these; none keeps a copy. Open deals only. */
+function attnQuietDays(o){
+  /* days since the last activity (the live store, D373), or since creation when none is logged */
+  const last = (ACTS_BY_OPP[o.id]||[]).reduce((m,a)=>!m || a.date>m ? a.date : m, null);
+  return daysBetween(last || o.createdDate, TODAY);
+}
+function attnStale(o){
+  if(o.outcome!=='open') return null;
+  const days = currentDaysInStage(o), typ = Math.max(STAGE_P75[o.stage]||0, 1);
+  return days >= typ ? {days, typ} : null;
+}
+/* Every reason an open deal needs attention, most urgent first (O2): each with its chip (O3) and its
+   line (the tooltip and the preview, O3 and O7). */
+function attnReasons(o){
+  const r = [];
+  if(o.outcome!=='open') return r;
+  if(o.expectedCloseDate && o.expectedCloseDate < TODAY){
+    const d = daysBetween(o.expectedCloseDate, TODAY);
+    r.push({key:'pastClose', chip:'Past close '+d+'d', text:'Past close: '+fmtDateShort(o.expectedCloseDate)+', '+d+' day'+(d===1?'':'s')+' ago'});
+  }
+  const q = attnQuietDays(o);
+  if(q >= EXEC_STALL_DAYS) r.push({key:'noActivity', chip:'No activity '+q+'d', text:'No activity: '+q+' days'});
+  const st = attnStale(o);
+  if(st) r.push({key:'stale', chip:st.days+'d in stage', text:'Stale: '+st.days+' days in '+o.stage+', '+st.typ+' typical'});
+  return r;
+}
+
 /* Pipeline Snapshot: the BDO's biggest active deals, ranked by facility size. A genuine ranked
    list — ordering is the only "shape" here, and a reader can just read it — so it stays a list
    per the governing chart rule, not a funnel/chart rendering of the same four numbers. Each row
@@ -138273,14 +138308,14 @@ function pipelineSnapshotHtml(myOpen){
   const top = myOpen.slice().sort((a,b)=>b.facilitySize-a.facilitySize).slice(0,5);
   if(!top.length) return '<div class="empty">No open deals right now.</div>';
   return top.map(o=>{
-    const days = currentDaysInStage(o);
-    const stale = days >= Math.max(STAGE_P75[o.stage]||0,1);
+    const rs = attnReasons(o);
     const acct = getAccount(o.accountId);
     /* D228: product and stage as tags (the existing D103 colour layer, via productTagHtml()/
-       stageTagHtml(), reused verbatim), plus the stale chip only when it actually fires,
-       replacing the old grey "stage · product · owner" meta line. The owner name is dropped:
-       every row on this personal, single-BDO page is already this BDO's own. */
-    return '<div class="snap-row" tabindex="0" role="button" onclick="openSnapshotPreview(\''+o.id+'\')" '+
+       stageTagHtml(), reused verbatim), replacing the old grey "stage · product · owner" meta line.
+       The owner name is dropped: every row on this personal, single-BDO page is already this BDO's
+       own. D384 (O1, O3): a deal that needs attention carries the bar and one chip naming its first
+       reason; the tooltip lists the rest. Replaces the D228 "{N}d" stale chip. */
+    return '<div class="snap-row'+(rs.length?' attn':'')+'" tabindex="0" role="button" onclick="openSnapshotPreview(\''+o.id+'\')" '+
         'onkeydown="if(event.key===\'Enter\')openSnapshotPreview(\''+o.id+'\')">'+
       '<div class="snap-main">'+
         '<div class="snap-name-line">'+
@@ -138288,10 +138323,9 @@ function pipelineSnapshotHtml(myOpen){
         '</div>'+
         '<div class="snap-sub">'+
           productTagHtml(o.productType)+stageTagHtml(o)+
-          (stale ? '<span class="tag fig warn"'+
-            tipAttr(o.stage, days+' day'+(days===1?'':'s')+' in stage',
-              'Stale · beyond the '+Math.max(STAGE_P75[o.stage]||0,1)+'d typical for '+o.stage)+
-            '>'+days+'d</span>' : '')+
+          (rs.length ? '<span class="tag fig warn attn-chip"'+
+            tipAttr('Needs attention', esc(rs[0].text), rs.slice(1).map(x=>x.text).join(' · '))+
+            '>'+rs[0].chip+'</span>' : '')+
         '</div>'+
       '</div>'+
       '<div class="snap-size">'+moneyPlain(o.facilitySize)+'</div>'+
@@ -138956,10 +138990,10 @@ function previewDetails(o, ro){
   const acct = getAccount(o.accountId), days = o.outcome==='open' ? currentDaysInStage(o) : null;
   const liens = LIENS_BY_ACCT[o.accountId] || [], edges = EDGES_BY_ACCT[o.accountId] || [];
   const wonEdges = edges.filter(e=>CLOSED_WON_ACCT_IDS.has(e.fromAccountId===o.accountId ? e.toAccountId : e.fromAccountId));
-  const sigs = [];
+  /* D384 (O7): every Needs attention reason first, in its line words and order, then the others */
+  const sigs = attnReasons(o).map(x=>'<div class="dd-sig"><span class="dd-dot warn"></span>'+esc(x.text)+'</div>');
   if(liens.some(l=>l.subordinated)) sigs.push('<div class="dd-sig"><span class="dd-dot warn"></span>Subordinated lien on file</div>');
   if(wonEdges.length) sigs.push('<div class="dd-sig"><span class="dd-dot pos"></span>Trade ties to '+drillPlural(wonEdges.length,'Closed-Won account')+'</div>');
-  if(drillStale(o)) sigs.push('<div class="dd-sig"><span class="dd-dot warn"></span>Longer in '+o.stage+' than most open deals</div>');
   const contacts = (CONTACTS_BY_ACCT[o.accountId]||[]).slice(0,3);
   const ed = ro ? k=>(k==='bdoId' ? esc(ownerLabel(o.bdoId)) : displayValue(DEF_INDEX['core.'+k], o[k]))
     : (rec=>k=>efSpan(rec, DEF_INDEX['core.'+k]))(registerRecord(o.id, o));
@@ -139728,7 +139762,7 @@ function myOpps(){ return Object.values(OPPS).filter(o=>o.bdoId===CURRENT_BDO_ID
    `views`; their count takes a view. Every figure is read live from OPPS, so in-session edits show. */
 const DRILLS = {};
 function drillTotal(l){ return l.reduce((s,o)=>s+o.facilitySize,0); }
-function drillStale(o){ return o.outcome==='open' && currentDaysInStage(o) >= (STAGE_P75[o.stage]||Infinity); }
+function drillStale(o){ return !!attnStale(o); }   // D384: the shared Stale rule
 function drillAsOf(){ return 'as of '+fmtDate(TODAY); }
 function drillPlural(n, one, many){ return n+' '+(n===1 ? one : (many || one+'s')); }
 function drillMyOpen(){ return myOpps().filter(o=>o.outcome==='open').sort((a,b)=>b.facilitySize-a.facilitySize); }
@@ -140421,10 +140455,11 @@ DRILLS.execBdos = {count:()=>execBdoAttainment().length, parts(){
 const EXEC_LARGE_DEAL = 20000000;
 const EXEC_STALL_DAYS = 30;
 function execStalledDeals(){
-  // D373: the live store, so an activity logged in the session reaches the count and its drill-down
+  // D373: the live store, so an activity logged in the session reaches the count and its drill-down.
+  // D384: the shared No activity rule (attnQuietDays()), with its created-date floor.
   const lastAct = {};
   execFirmOpen().forEach(o=>(ACTS_BY_OPP[o.id]||[]).forEach(a=>{ if(!lastAct[o.id] || a.date>lastAct[o.id]) lastAct[o.id] = a.date; }));
-  return execFirmOpen().filter(o=>!lastAct[o.id] || daysBetween(lastAct[o.id], TODAY)>=EXEC_STALL_DAYS)
+  return execFirmOpen().filter(o=>attnQuietDays(o)>=EXEC_STALL_DAYS)
     .map(o=>({o, last:lastAct[o.id]||null}));
 }
 function execNewLargeDeals(){
@@ -140479,21 +140514,21 @@ function execSignals(){
     const worst = TRACK_STAGES.map(st=>{ const g = stalled.filter(o=>o.stage===st); return {st, n:g.length, v:sumFacility(g)}; })
       .sort((a,b)=>b.v-a.v)[0];
     bad.push({icon:'warn', glyph:feedIconSvg('alert'), action:'See deals', onclick:"openDrill('execStalled')",
-      title: dealsLabel(stalled.length)+' stalled, no activity in '+EXEC_STALL_DAYS+'+ days',
+      title: dealsLabel(stalled.length)+' with no activity in '+EXEC_STALL_DAYS+'+ days',
       sub: moneyShort(sumFacility(stalled))+' total · '+worst.n+' of them ('+moneyShort(worst.v)+') in '+worst.st});
   }
   const dormant = execDormantPartner();
   if(dormant){
     const days = dormant.p.lastReferralDate ? daysBetween(dormant.p.lastReferralDate, TODAY) : null;
-    bad.push({icon:'neg', glyph:feedIconSvg('pulse'), action:'Open partner', onclick:"location.hash='#/account/"+dormant.p.id+"/summary'",
+    bad.push({icon:'warn', glyph:feedIconSvg('pulse'), action:'Open partner',   // D384 (O5): dormant is warn (DESIGN_STANDARDS §2a) onclick:"location.hash='#/account/"+dormant.p.id+"/summary'",
       title: esc(dormant.p.name)+' has gone quiet',
       sub: moneyShort(dormant.value)+' across '+dormant.deals.length+' referred deal'+(dormant.deals.length===1?'':'s')+' · '+
         (days!=null ? 'no referral in '+daysText(days) : 'no referral on record')});
   }
   return {good, bad};
 }
-function execSignalRowHtml(c){
-  return '<div class="feedrow" onclick="'+c.onclick+'">'+
+function execSignalRowHtml(c, attn){
+  return '<div class="feedrow'+(attn?' attn':'')+'" onclick="'+c.onclick+'">'+
     '<div class="feed-icon '+c.icon+'">'+c.glyph+'</div>'+
     '<div class="feed-main"><div class="feed-title">'+c.title+'</div><div class="feed-sub">'+c.sub+'</div></div>'+
     '<div class="feed-action">'+c.action+'<span class="arrow">&rsaquo;</span></div>'+
@@ -140501,9 +140536,10 @@ function execSignalRowHtml(c){
 }
 function execSignalsPanelHtml(){
   const sig = execSignals();
-  const group = (label, items) => items.length ? '<div class="feed-group">'+label+'</div>'+items.map(execSignalRowHtml).join('') : '';
+  /* D384 (O4): every Needs attention item carries the attention bar */
+  const group = (label, items, attn) => items.length ? '<div class="feed-group">'+label+'</div>'+items.map(c=>execSignalRowHtml(c, attn)).join('') : '';
   const body = (sig.good.length || sig.bad.length)
-    ? group('Going well', sig.good)+group('Needs attention', sig.bad)
+    ? group('Going well', sig.good, false)+group('Needs attention', sig.bad, true)
     : '<div class="empty">No firm-wide signals in the last 30 days.</div>';
   return '<div class="panel feed-panel" id="panel-exec-signals">'+
     panelHeaderHtml('Signals', 'Wins and risks, last 30 days', '')+
@@ -140528,8 +140564,8 @@ DRILLS.execPushed = {count:()=>{ const w = execWindows(); return execPushedIn(w.
 }};
 DRILLS.execStalled = {count:()=>execStalledDeals().length, parts(){
   const rows = execStalledDeals().slice().sort((a,b)=>b.o.facilitySize-a.o.facilitySize);
-  return {title:'Stalled deals', scope:'No activity in '+EXEC_STALL_DAYS+' days or more, firm-wide',
-    lead: drillFig(money(drillTotal(rows.map(x=>x.o))))+'<div class="dd-lead-sub">'+drillPlural(rows.length,'open deal')+' '+(rows.length===1?'has':'have')+' gone quiet</div>',
+  return {title:'No activity in '+EXEC_STALL_DAYS+'+ days', scope:'No activity in '+EXEC_STALL_DAYS+' days or more, firm-wide',
+    lead: drillFig(money(drillTotal(rows.map(x=>x.o))))+'<div class="dd-lead-sub">'+drillPlural(rows.length,'open deal')+' with no activity in '+EXEC_STALL_DAYS+'+ days</div>',
     body: rows.map(x=>drillDealRow(x.o, x.last ? daysText(daysBetween(x.last, TODAY))+' since activity' : 'No activity logged', true)).join('')};
 }};
 
@@ -140758,12 +140794,7 @@ const SEGMENTS = [
     const hist=getStageHistory(o.id); const term=hist[hist.length-1];
     return term.enteredDate.slice(0,4)===TODAY.slice(0,4);
   }},
-  {key:'stuck', label:'Stuck deals', grouping:'stage', filter:o=>{
-    if(o.outcome!=='open') return false;
-    const hist=getStageHistory(o.id); const term=hist[hist.length-1];
-    const days=daysBetween(term.enteredDate,TODAY);
-    return days >= Math.max(STAGE_P75[o.stage]||0,1);
-  }},
+  {key:'stuck', label:'Stale deals', grouping:'stage', filter:o=>!!attnStale(o)},   // D384: the shared Stale rule; key kept
   {key:'byProduct', label:'By product type', grouping:'product', filter:()=>true},
 ];
 let PIPE_SEGMENT = 'allOpen';
@@ -142965,7 +142996,7 @@ function oppMetricStripHtml(o, acct, recId){
     const closeDays = o.expectedCloseDate ? daysBetween(TODAY, o.expectedCloseDate) : null;
     const closeSub = closeDays==null ? ''
       : closeDays>=0 ? 'in '+closeDays+' day'+(closeDays===1?'':'s')
-      : Math.abs(closeDays)+' day'+(Math.abs(closeDays)===1?'':'s')+' overdue';
+      : '<span class="t-warn">'+Math.abs(closeDays)+' day'+(Math.abs(closeDays)===1?'':'s')+' overdue</span>';   // D384 (O8): warn ink
     second = met('Expected close', o.expectedCloseDate?fmtDate(o.expectedCloseDate):'–', closeSub);
   }
   return '<div class="strip strip-4">'+
@@ -143009,8 +143040,8 @@ function sectionSignalsCardHtml(o){
     const other = e.fromAccountId===o.accountId ? e.toAccountId : e.fromAccountId;
     return CLOSED_WON_ACCT_IDS.has(other);
   });
-  const days = o.outcome==='open' ? currentDaysInStage(o) : null;
-  const stale = days!=null && days >= (STAGE_P75[o.stage]||Infinity);
+  const st = attnStale(o), days = st ? st.days : null, stale = !!st;   // D384: the shared Stale rule
+  const staleLine = stale ? attnReasons(o).find(x=>x.key==='stale').text : '';
 
   /* D145 commit 2: each signal line with a home routes there directly (setOppSection(), the same
      mechanism the tabs themselves use), rather than one card-level control routing everything to
@@ -143028,7 +143059,7 @@ function sectionSignalsCardHtml(o){
      isn't actually there. */
   if(stale) rows.push('<div class="band-line"><span class="band-glyph warn">&#9888;</span>'+
     '<span'+tipAttr(o.stage, days+' day'+(days===1?'':'s')+' in stage',
-      'Beyond the '+Math.max(STAGE_P75[o.stage]||0,1)+'d typical for '+o.stage)+'>Longer in '+o.stage+' than most open deals</span></div>');
+      'Beyond the '+Math.max(STAGE_P75[o.stage]||0,1)+'d typical for '+o.stage)+'>'+esc(staleLine)+'</span></div>');
 
   /* Capped at 3 + a remainder count (Pipeline Snapshot's pattern) — not because today's 3
      possible signal types can ever exceed 3, but so a future 4th signal type doesn't need a
