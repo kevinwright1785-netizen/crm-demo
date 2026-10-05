@@ -1,5 +1,5 @@
 <meta charset="utf-8">
-<title>Keystone — Ridgemark Capital</title>
+<title>CerveauX · Ridgemark Capital</title>
 <style>
 :root{
   --rail:#EFEEE8; --page:#F5F4EF; --paper:#FFFFFF; --sunken:#EBEAE4; --hover:#F0EFE9;
@@ -1920,7 +1920,7 @@ table.tbl{width:100%;border-collapse:collapse}
        parameterize. -->
   <nav class="rail">
     <div class="rail-header">
-      <div class="rail-mark" title="Ridgemark Capital, Keystone">K</div>
+      <div class="rail-mark" title="Ridgemark Capital, CerveauX">C</div>
     </div>
     <div class="rail-nav" id="rail-nav">
       <a class="rail-item" href="#/home" data-route="home">
@@ -2007,7 +2007,7 @@ table.tbl{width:100%;border-collapse:collapse}
 const DATASET = {
   "firm": {
     "name": "Ridgemark Capital",
-    "codename": "Keystone",
+    "codename": "CerveauX",
     "today": "2026-08-17",
     "historyStart": "2025-02-15",
     "hqCity": "Charlotte, NC"
@@ -137167,7 +137167,7 @@ const CORE_DEFS = [
   cdef('nextBestAction','Next Best Action','text',null,{emptyLabel:'Add next best action'}),
   /* D311 (amends D252): Yield gets a definition and is editable wherever it shows, first in the
      side panel's deal preview. One decimal and a percent sign. */
-  cdef('yieldPct','Yield','percent',null,{format:v=>v==null?'Not set':Number(v).toFixed(1)+'%'}),
+  cdef('yieldPct','Pricing','percent',null,{format:v=>v==null?'Not set':Number(v).toFixed(1)+'%'}),
   cdef('underwriterId','Underwriter',
     'select',[{value:'',label:'Unassigned'}].concat(D.bdos.map(b=>({value:b.id,label:b.name}))),
     {set:(o,v)=>{o.underwriterId=v||null;}}),
@@ -137978,7 +137978,7 @@ function route(){
   else if(view==='benchmarking'){ renderStub('view-benchmarking','Benchmarking','Cross-firm benchmarking is a phase-2 network-effect play with a real cold-start problem — shown to Dan as a vision panel, not a built feature.'); showView('view-benchmarking'); }
   else { location.hash='#/home'; return; }
 
-  document.getElementById('topbar-title').textContent = titles[view] || 'Keystone';
+  document.getElementById('topbar-title').textContent = titles[view] || 'CerveauX';
   window.scrollTo(0,0);
   /* D106 parts (b)/(c)/D129, generalized by D146: applied AFTER the scrollTo(0,0) above, or it
      would be immediately overwritten. Reordering the fresh table's rows and restoring scroll only
@@ -138944,7 +138944,7 @@ window.closeSurface = function(instant, keepOpener){
   if(!keepOpener){ if(instant) SURF_OPENER = null; else surfReturnFocus(); }
 };
 /* ---------- the deal preview (D310) ----------
-   Facility size, Owner, Expected close, Yield and Next best action edit in place through the
+   Facility size, Owner, Pricing (yieldPct, D379), Expected close and Next best action edit in place through the
    inline-edit engine; days in stage, signals, activity and contacts are read-only; Stage and
    Product type change on the full record. Two tabs, Details and Activity with its count. */
 function previewActHtml(a){
@@ -138967,10 +138967,10 @@ function previewDetails(o, ro){
       '<div class="dd-fig'+(ro?'':' dd-fig-edit')+'">'+ed('facilitySize')+'</div><div class="dd-lead-sub">Facility size · '+esc(acct.location||'')+'</div></div>'+
     '<div class="dd-block"><div class="dd-facts">'+
       '<div><div class="dd-fact-k">Owner</div><div class="dd-fact-v">'+ed('bdoId')+'</div></div>'+
+      '<div><div class="dd-fact-k">Pricing</div><div class="dd-fact-v">'+ed('yieldPct')+'</div></div>'+
       '<div><div class="dd-fact-k">'+(o.outcome==='open'?'Expected close':'Closed')+'</div><div class="dd-fact-v">'+
         (o.outcome==='open' ? ed('expectedCloseDate') : (o.fundedDate ? fmtDate(o.fundedDate) : 'Not set'))+'</div></div>'+
       '<div><div class="dd-fact-k">Days in stage</div><div class="dd-fact-v">'+(days!=null?days+' <span class="sub">· typical '+STAGE_P75[o.stage]+'</span>':'Closed')+'</div></div>'+
-      '<div><div class="dd-fact-k">Yield</div><div class="dd-fact-v">'+ed('yieldPct')+'</div></div>'+
     '</div></div>'+
     (ro ? '' : '<div class="dd-block"><div class="dd-sec">Next best action</div><div class="dd-line">'+ed('nextBestAction')+'</div></div>')+
     (sigs.length ? '<div class="dd-block"><div class="dd-sec">Signals</div>'+sigs.join('')+'</div>' : '')+
@@ -140555,9 +140555,9 @@ const YIELD_ROWS = [null, 'Factoring', 'TermLoan', 'ABL'];
 YIELD_ROWS.forEach(pt=>{
   DRILLS['yield_'+(pt||'all')] = {views:YIELD_VIEWS, count:v=>yieldList(pt, v).length, parts(v){
     const l = yieldList(pt, v).sort((a,b)=>b.facilitySize-a.facilitySize), y = weightedYield(l);
-    return {title:'Yield, '+(pt ? productLabel(pt) : 'all products'), scope:'Annualized, dollar-weighted, '+drillAsOf(),
+    return {title:'Pricing, '+(pt ? productLabel(pt) : 'all products'), scope:'Annualized, dollar-weighted, '+drillAsOf(),
       lead: drillFig(y==null ? '–' : y.toFixed(1)+'%')+'<div class="dd-lead-sub">'+dealsLabel(l.length)+' · '+moneyShort(sumFacility(l))+' in facility size</div>',
-      body: l.map(o=>drillDealRow(o, 'Yield '+(o.yieldPct!=null ? o.yieldPct.toFixed(1)+'%' : 'not set')+' · '+
+      body: l.map(o=>drillDealRow(o, 'Pricing '+(o.yieldPct!=null ? o.yieldPct.toFixed(1)+'%' : 'not set')+' · '+
         (v==='open' ? ownerName(o) : 'Funded '+fmtDateShort(o.fundedDate)), false, v==='open' ? null : productTagHtml(o.productType))).join('')};
   }};
 });
@@ -140575,7 +140575,7 @@ function execYieldPanelHtml(){
       rowOpenAttrs("openDrill('yield_"+(pt||'all')+"','ytd')")+'>'+labelHtml+'</td>'+
     YIELD_VIEWS.map(c=>cell(pt, c.key)).join('')+'</tr>';
   return '<div class="panel" id="panel-exec-yield">'+
-    panelHeaderHtml('Yield', 'Annualized, dollar-weighted', '')+
+    panelHeaderHtml('Pricing', 'Annualized, dollar-weighted', '')+
     '<div class="panel-body yield-body">'+
       '<div class="tbl-wrap"><table class="tbl price-tbl"><thead><tr>'+
         '<th>Product</th><th class="num">Funded YTD</th><th class="num">Open pipeline</th><th class="num">Funded '+prior+'</th>'+
@@ -142563,7 +142563,7 @@ function cdCloseHtml(o, acct){
     const need = [];
     if(CD.needSize) need.push(cdField('Facility size', '<input type="text" inputmode="numeric" data-cd="size" placeholder="Not on file" value="'+esc(CD.size)+'" '+
       'oninput="cdType(\'size\',this.value.replace(/[^0-9.]/g,\'\'))">', 'size'));
-    if(CD.needYld) need.push(cdField('Yield (%)', '<input type="text" inputmode="decimal" data-cd="yld" placeholder="Not on file" value="'+esc(CD.yld)+'" '+
+    if(CD.needYld) need.push(cdField('Pricing (%)', '<input type="text" inputmode="decimal" data-cd="yld" placeholder="Not on file" value="'+esc(CD.yld)+'" '+
       'oninput="cdType(\'yld\',this.value)">', 'yld'));
     if(need.length===2) body += '<div class="cd-2col">'+need.join('')+'</div>';
     else if(need.length) body += need[0];
@@ -142936,9 +142936,10 @@ function lienPanelHtml(o){
    the hover "view" affordance: clicking through isn't how this strip works, the fields below it
    on the page are the actual detail.
    ================================================================ */
-/* D330 (spec O2): Facility size (the inline-edit field the header's hero used to be), Expected
-   close, Yield (editable, D311) and Contacts. A closed deal's second figure is Funded (won) or Lost
-   at (lost); days in stage moves to the header's Status line (O1). */
+/* D330 (spec O2), reordered by D380 (spec O7): Facility size (the inline-edit field the header's
+   hero used to be), Pricing (yieldPct, editable, D311; the label is D379's), Expected close and
+   Contacts. A closed deal's third figure is Funded (won) or Lost at (lost); days in stage moves to
+   the header's Status line (O1). */
 function oppRateText(o){
   const f = o.productFields || {};
   if(o.productType==='Factoring') return f.discountFeePct!=null ? f.discountFeePct+'% discount fee' : '';
@@ -142969,8 +142970,8 @@ function oppMetricStripHtml(o, acct, recId){
   }
   return '<div class="strip strip-4">'+
     met('Facility size', efSpan(recId, DEF_INDEX['core.facilitySize']), productLabel(o.productType)+(rate?' · '+esc(rate):''), true)+
+    met('Pricing', efSpan(recId, DEF_INDEX['core.yieldPct']), oppProductYieldSub(o.productType), true)+
     second+
-    met('Yield', efSpan(recId, DEF_INDEX['core.yieldPct']), oppProductYieldSub(o.productType), true)+
     met('Contacts', contacts.length, 'stakeholder'+(contacts.length===1?'':'s')+' mapped')+
   '</div>';
 }
@@ -143789,7 +143790,7 @@ function sectionDocumentsHtml(docs, scopeNoun){
    every per-character wrapper, removed at the end, leaving the figure's DOM exactly as rendered.
    Reduced motion is checked in JS (element.animate() is outside the CSS rule, §11.7): no roll. */
 /* D330: the hero is gone, so the four strip figures are the whole set, in strip order; Facility size
-   and Yield hold edit fields, and the roll animates the characters inside them. */
+   and Pricing hold edit fields, and the roll animates the characters inside them. */
 let FIG_ROLL_LAST = null; // {id, texts:[strip 1..4]}
 function figRollEls(){
   return Array.from(document.getElementById('view-opp').querySelectorAll('.strip .met-figure'));
@@ -144379,7 +144380,7 @@ function drawIntakeStep(){
     }
     el.innerHTML =
       '<h1 class="page-heading">New opportunity</h1>'+
-      '<div class="page-sub">Drop borrower documents and Keystone builds the deal for you</div>'+
+      '<div class="page-sub">Drop borrower documents and CerveauX builds the deal for you</div>'+
       wizardBarHtml(0)+
       '<div class="dropzone" id="dropzone" onclick="document.getElementById(\'filepick\').click()">'+
         '<div class="dropzone-icon">&#8681;</div>'+
