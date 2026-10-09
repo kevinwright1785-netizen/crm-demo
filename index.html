@@ -1969,13 +1969,6 @@ a.ct-name:hover,a.ct-plink:hover{color:var(--brand)}
 .ct-card .tbl th:first-child,.ct-card .tbl td:first-child{padding-left:0}
 .ct-card .tbl th:last-child,.ct-card .tbl td:last-child{padding-right:0}
 .ct-card .tbl td.ct-c-menu .act-pin{margin-left:auto}
-/* C4: a person's row, arriving from search on the company's Contacts tab; cleared by the next press or key. The
-   account's Contacts table is flush (its cells carry the 24px), so the fill stops --s2 past the text (D305). */
-.tbl tr.ct-hl td{background:var(--brand-a15)}
-.panel-body.flush .tbl tr.ct-hl td:first-child{box-shadow:inset 0 1px 0 var(--row-sep),inset calc(var(--s5) - var(--s2)) 0 0 var(--paper)}
-.panel-body.flush .tbl tr.ct-hl td:last-child{box-shadow:inset 0 1px 0 var(--row-sep),inset calc(var(--s2) - var(--s5)) 0 0 var(--paper)}
-.panel-body.flush .tbl tbody tr.ct-hl:first-child td:first-child{box-shadow:inset calc(var(--s5) - var(--s2)) 0 0 var(--paper)}
-.panel-body.flush .tbl tbody tr.ct-hl:first-child td:last-child{box-shadow:inset calc(var(--s2) - var(--s5)) 0 0 var(--paper)}
 /* the add box and the sheets' inputs: the Activity tab's summary input (.act-sum: 13px, its error look), plus a
    search glyph in the add box */
 .ct-addrow{position:relative;margin-bottom:var(--s3)}
@@ -2020,6 +2013,56 @@ a.ct-name:hover,a.ct-plink:hover{color:var(--brand)}
 .ct-addrole:hover{background:var(--hover);color:var(--brand-2)}
 .ct-addrole svg{width:10px;height:10px}
 .ct-typetag{background:var(--sunken);color:var(--ink-2)}
+/* ---------- the contact page (O12 to O20, Direction B, D410; spec contacts-spec-mock-v2.html's mk-css) ----------
+   About and Companies left, open opportunities and Activity right, split 4 to 8. Literals kept from the spec,
+   none on the 4pt scale: the 32px activity tile and its 16px glyph (the Activity tab's feed icon, D373); 256px
+   (four rows: the Activity list's floor and the open-opportunities cap); 368px (History's cap in one column,
+   D364). Bottoms level (D411): the row is as tall as the taller column, the last card in each column takes the
+   rest, and the Activity list adds only its floor to the row (ctLevel()), scrolling inside with D312's fade. */
+.ct-two{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:var(--s5);align-items:stretch}
+.ct-col{display:flex;flex-direction:column;gap:var(--s5);min-width:0}
+.ct-col > .panel{margin:0}
+.ct-col > .panel:last-child{flex:1 1 auto}
+.kv > .ct-span2{grid-column:1 / -1}
+.ct-ell .ef{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ct-sec{font-size:11px;font-weight:500;color:var(--ink-3);margin:var(--s5) 0 var(--s3);padding-top:var(--s4);border-top:1px solid var(--line)}
+.ct-dealrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--s3);align-items:center;padding:var(--s3) 0;
+  box-shadow:inset 0 1px 0 var(--row-sep)}
+.ct-dealrow:first-child{box-shadow:none;padding-top:0}
+.ct-dealrow:last-child{padding-bottom:0}
+@media (max-width:640px){.ct-dealrow{grid-template-columns:minmax(0,1fr)}}   /* O17: the role drops under the deal on a phone */
+.ct-dealrow .ct-tags{display:flex;gap:var(--s1);margin-top:var(--s1);align-items:center}
+.ct-dealrow > .ct-gty{font-size:12px}
+.ct-fac{font-size:12px;color:var(--ink-2);margin-left:var(--s1)}
+.ct-ended .ct-name{color:var(--ink-2)}
+.ct-ended .ct-sub{color:var(--ink-3)}
+#view-contact .kv dd{min-width:0}
+/* Activity rows: History's row (D364), its tile sized so the glyph draws in every browser (O16) */
+.ct-acard{display:flex;flex-direction:column}
+.ct-acard .feedrow.act-row{align-items:center}
+.ct-acard .feed-icon{width:32px;height:32px;flex:0 0 32px}
+.ct-acard .feed-icon svg{width:16px;height:16px}
+.ct-acard .feed-group{padding-top:var(--s4)}
+.ct-acard .ct-ascroll > .feed-group:first-child{padding-top:0}
+.ct-acard .feed-group + .feedrow{box-shadow:none}
+.ct-acard > .panel-body{flex:1 1 auto;display:flex;flex-direction:column;min-height:0}
+.ct-awrap{flex:1 1 auto;position:relative}
+/* O17: a partner can sit on many open opportunities; the list stops at four rows and scrolls inside */
+.ct-oscroll{max-height:256px}
+.ct-ascroll{position:absolute;inset:0}
+.ct-ascroll,.ct-oscroll{overflow-y:auto;--fade-top:0px;--fade-bottom:0px;
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0,var(--ink) var(--fade-top),var(--ink) calc(100% - var(--fade-bottom)),transparent 100%);
+  mask-image:linear-gradient(to bottom,transparent 0,var(--ink) var(--fade-top),var(--ink) calc(100% - var(--fade-bottom)),transparent 100%)}
+.ct-ascroll.fade-top,.ct-oscroll.fade-top{--fade-top:var(--s5)}
+.ct-ascroll.fade-bot,.ct-oscroll.fade-bot{--fade-bottom:40px}
+@media (max-width:1140px){   /* O13: one column, Activity capped */
+  .ct-two{grid-template-columns:minmax(0,1fr)}
+  .ct-awrap{position:static}
+  .ct-ascroll{position:static;max-height:368px}
+}
+/* O18: the Log activity sheet */
+.ct-log .kv{margin-top:0}
+.ct-log .viewtoggle{align-self:flex-start}
 </style>
 
 <div class="app">
@@ -175569,10 +175612,7 @@ function sxContactRow(it){
   const c = it.c, a = getAccount(c.accountId);
   const parts = [{h:esc(c.role), t:c.role, k:'keep'}, {h:esc(a.name), t:a.name, k:SX_Q.indexOf('@')>=0 ? 'first' : ''}].concat(SX_Q.indexOf('@')>=0 ? [{h:sxHl(c.email,SX_Q), t:c.email}] : []);
   return {html:'<div class="sx-row" role="option">'+sxIcon('contact')+'<div class="sx-l"><div class="sx-n">'+sxHl(c.name,SX_Q)+'</div>'+sxLine(parts)+'</div><div class="sx-r soft"></div></div>',
-    go:()=>{   // D422 (Kevin, 2026-10-09): until the contact page, the company's Contacts tab with the person's row highlighted
-      if(CT_CONTACT_PAGE) return sxGo('#/contact/'+c.id);
-      const h = '#/account/'+c.accountId+'/contacts', same = location.hash===h;
-      CT_HL = c.id; sxGo(h); if(same) route(); }, it};
+    go:()=>sxGo('#/contact/'+c.id), it};   // O11 (D391): the contact page
 }
 /* S11: the borrower leads (departs from RESEARCH_21 §9, D349 f) */
 function sxLienRow(it){
@@ -178652,7 +178692,6 @@ function renderAccount(id, section, isNav){
   if(!isNav) positionTabMarker();
   // D373: History's R5 height and fade; again once a navigation has shown the view (it renders hidden)
   if(ACCOUNT_SECTION==='activity'){ actAfterRender(); setTimeout(actAfterRender, 0); }
-  if(CT_HL) ctHlApply();
 }
 window.setAccountSection = function(key){
   ACCOUNT_SECTION = key;
@@ -180157,8 +180196,9 @@ document.addEventListener('click', e=>{
 });
 
 /* ================================================================
-   CONTACTS (D410 to D417; spec Other/mocks/contacts-spec-mock-v2.html, its mk-css block and its
-   "CONTACTS SPEC MOCK v2" script, D415). Part 1: the opportunity's Contacts tab, O1 to O11. Every
+   CONTACTS (D410 to D417, D423, D428; spec Other/mocks/contacts-spec-mock-v2.html, its mk-css block and its
+   "CONTACTS SPEC MOCK v2" script, D415, as corrected by contacts-correction-mock-v1.html, D423). Part 1:
+   the opportunity's Contacts tab, O1 to O11. Part 2: the contact page, O12 to O20. Every
    write goes to the live stores below (copies of the dataset, as OPPS, D278); the record re-renders,
    so the tab count, the strip, the deal preview and the Audit tab each show it. Reload resets.
    ================================================================ */
@@ -180196,6 +180236,9 @@ let CT_SHEET = null;                         // the open Create person / Create 
 
 function ctParties(oid){ return PARTIES_BY_OPP[oid] = PARTIES_BY_OPP[oid] || []; }
 function ctPartyById(pid){ for(const k in PARTIES_BY_OPP){ const p = PARTIES_BY_OPP[k].find(x=>x.id===pid); if(p) return p; } return null; }
+function ctAffById(id){ for(const k in AFFS_BY_CONTACT){ const a = AFFS_BY_CONTACT[k].find(x=>x.id===id); if(a) return a; } return null; }
+function ctPrimaryAff(c){ return (AFFS_BY_CONTACT[c.id]||[]).find(a=>a.isPrimary && !a.endDate) || null; }
+function ctPartiesOfContact(cid){ const out = []; for(const k in PARTIES_BY_OPP) PARTIES_BY_OPP[k].forEach(p=>{ if(p.contactId===cid) out.push(p); }); return out; }
 function ctPName(p){ return p.partyKind==='account' ? getAccount(p.accountId).name : CONTACTS_BY_ID[p.contactId].name; }
 function ctOrder(roles){ return roles.slice().sort((x,y)=>CT_ROLE_ORDER.indexOf(x)-CT_ROLE_ORDER.indexOf(y)); }
 function ctGuarantor(p){ return p.roles.includes('Personal guarantor') || p.roles.includes('Corporate guarantor'); }
@@ -180211,30 +180254,17 @@ function ctSuggest(o){
 }
 function ctObj(rec){
   const i = rec.indexOf(':'), k = rec.slice(0, i), id = rec.slice(i+1);
-  return k==='party' ? ctPartyById(id) : k==='contact' ? CONTACTS_BY_ID[id] : null;
+  return k==='party' ? ctPartyById(id) : k==='contact' ? CONTACTS_BY_ID[id] : k==='aff' ? ctAffById(id) : null;
 }
-/* D422 (Kevin, 2026-10-09): until the contact page is built, a person's name is plain text everywhere O11
-   lists, in the same class so it looks the same at rest. Companies keep their links. Part 2 sets this true. */
-const CT_CONTACT_PAGE = false;
+/* D422, D424: a person's name was plain text until the contact page was built; part 2 built it (D428), so
+   names link again. Companies always link. */
+const CT_CONTACT_PAGE = true;
 /* A person's name (O11): the opportunity's tab, the deal preview, Key contacts, the account's Contacts tab,
    search, the Activity tab's rows, a partner's primary contact. A link to their contact page once it is built. */
 function ctLink(c, cls){
   return CT_CONTACT_PAGE ? '<a class="'+(cls||'ct-plink')+'" href="#/contact/'+c.id+'">'+esc(c.name)+'</a>'
     : '<span class="'+(cls||'ct-plink')+'" data-cid="'+c.id+'">'+esc(c.name)+'</span>';
 }
-/* search's landing (D422): the person's row on their company's Contacts tab, highlighted until the next press or
-   key. The table's row, never the partner band's primary contact. */
-let CT_HL = null;
-function ctHlApply(){
-  const id = CT_HL; CT_HL = null;
-  setTimeout(()=>{ const el = document.querySelector('#view-account td [data-cid="'+id+'"]'), tr = el && el.closest('tr'); if(!tr) return;
-    tr.classList.add('ct-hl');
-    const r = tr.getBoundingClientRect(); if(r.top < 64 || r.bottom > innerHeight-80) tr.scrollIntoView({block:'center'});
-  }, 0);
-}
-function ctHlClear(){ document.querySelectorAll('tr.ct-hl').forEach(t=>t.classList.remove('ct-hl')); }
-document.addEventListener('pointerdown', ctHlClear, true);
-document.addEventListener('keydown', ctHlClear, true);
 function ctRerender(){ if(EF_RERENDER) EF_RERENDER(); }
 /* O8: every party change writes the opportunity's Audit trail, in the field-edit shape the Audit tab reads. */
 function ctAudit(oid, label, was, now){ auditFieldEdit(oid, {key:'ct.party', label}, was, now); }
@@ -180249,9 +180279,41 @@ DEF_INDEX['ct.cauth'] = {key:'ct.cauth', label:'Credit authorization', type:'dat
   set:(p,v)=>{ const was = p.creditAuthorizationDate; p.creditAuthorizationDate = v||null;
     ctAudit(p.opportunityId, 'Credit authorization: '+ctPName(p), was ? fmtDateShort(was) : '', v ? fmtDateShort(v) : ''); },
   format:v=>ctLocked(v ? fmtDateShort(v) : 'Add date')};
+/* the contact page's text fields (O14): the inline-edit engine; Ownership is restricted (D405, D413) */
+Object.assign(DEF_INDEX, {
+  'ct.email': {key:'ct.email', label:'Email', type:'text', get:c=>c.email, set:(c,v)=>{ c.email = String(v).trim(); }, validate:(v, c)=>ctEmailCheck(v, c)},
+  'ct.phone': {key:'ct.phone', label:'Phone', type:'text', get:c=>c.phone, set:(c,v)=>{ c.phone = String(v).trim(); }, emptyLabel:'Add phone'},
+  'ct.linkedin': {key:'ct.linkedin', label:'LinkedIn', type:'text', get:c=>c.linkedinUrl, set:(c,v)=>{ c.linkedinUrl = String(v).trim()||null; }, emptyLabel:'Add LinkedIn URL'},
+  'ct.ownership': {key:'ct.ownership', label:'Ownership', type:'percent', get:a=>a.ownershipPct, set:(a,v)=>{ a.ownershipPct = v; },
+    validate:v=>v==null ? null : (v<0 || v>100 ? 'Enter 0 to 100.' : null),
+    format:v=>ctLocked(v==null ? 'Add' : esc(String(v))+'%')}
+});
 const CT_MENUS = {
   'ct.gty': {label:'Guaranty', restricted:true, get:p=>p.guarantyType, set:(p,v)=>{ p.guarantyType = v; }, empty:'Add guaranty',
-    items:p=>CT_GTY[p.partyKind].map(v=>({v, t:v}))}
+    items:p=>CT_GTY[p.partyKind].map(v=>({v, t:v}))},
+  /* the contact page's picklists (O14, D390); Reports to links to that person (D407) */
+  'ct.ctype': {label:'Contact type', get:c=>c.contactType, set:(c,v)=>{ c.contactType = v; },
+    items:()=>['Borrower contact','Referral partner','Professional advisor','Other'].map(v=>({v, t:v}))},
+  'ct.owner': {label:'Owner', get:c=>c.ownerBdoId, set:(c,v)=>{ c.ownerBdoId = v; }, show:v=>v&&BDOS[v] ? BDOS[v].name : '',
+    items:()=>Object.keys(BDOS).map(v=>({v, t:BDOS[v].name, s:BDOS[v].title}))},
+  'ct.reports': {label:'Reports to', get:c=>c.reportsToContactId, set:(c,v)=>{ c.reportsToContactId = v||null; },
+    show:v=>v&&CONTACTS_BY_ID[v] ? CONTACTS_BY_ID[v].name : '', empty:'Add', link:v=>'#/contact/'+v,
+    items:c=>(CONTACTS_BY_ACCT[c.accountId]||[]).filter(x=>x.id!==c.id).map(x=>({v:x.id, t:x.name, s:x.role})).concat([{v:'', t:'No one'}])},
+  'ct.auth': {label:'Decision authority', get:c=>c.decisionAuthority, set:(c,v)=>{ c.decisionAuthority = v; }, empty:'Add',
+    items:()=>['Approves','Recommends','Informs'].map(v=>({v, t:v}))},
+  'ct.tier': {label:'Partner tier', get:c=>c.partnerTier, set:(c,v)=>{ c.partnerTier = v; }, empty:'Add', items:()=>['Tier 1','Tier 2','Tier 3'].map(v=>({v, t:v}))},
+  'ct.focus': {label:'Product focus', get:c=>c.productFocus, set:(c,v)=>{ c.productFocus = v; }, empty:'Add', show:v=>v ? productLabel(v) : '',
+    items:()=>['Factoring','ABL','TermLoan'].map(v=>({v, t:productLabel(v)}))},
+  'ct.agree': {label:'Referral agreement on file', get:c=>c.referralAgreementOnFile==null ? '' : (c.referralAgreementOnFile ? 'Yes' : 'No'),
+    set:(c,v)=>{ c.referralAgreementOnFile = v==='Yes'; }, empty:'Add', items:()=>['Yes','No'].map(v=>({v, t:v}))},
+  'ct.kind': {label:'Advisor kind', get:c=>c.advisorKind, set:(c,v)=>{ c.advisorKind = v; }, empty:'Add',
+    items:()=>['CPA','Attorney','Appraiser','Field examiner'].map(v=>({v, t:v}))},
+  'ct.rel': {label:'Relationship to borrower', get:a=>a.relationshipToBorrower, set:(a,v)=>{ a.relationshipToBorrower = v; }, empty:'Add',
+    items:()=>['Owner','Officer','Employee'].map(v=>({v, t:v}))},
+  'ct.control': {label:'Control person', restricted:true, get:a=>a.controlPerson==null ? '' : (a.controlPerson ? 'Yes' : 'No'),
+    set:(a,v)=>{ a.controlPerson = v==='Yes'; }, empty:'Add', items:()=>['Yes','No'].map(v=>({v, t:v}))},
+  'ct.kyc': {label:'KYC status', restricted:true, get:a=>a.kycStatus, set:(a,v)=>{ a.kycStatus = v; }, empty:'Add',
+    items:()=>['Verified','In progress','Not started'].map(v=>({v, t:v}))}
 };
 function ctMenuCell(rec, key){
   const m = CT_MENUS[key], obj = ctObj(rec), raw = m.get(obj);
@@ -180568,9 +180630,13 @@ function ctSheetDraw(focusKey){
   if(!CT_SHEET || !SURF_EL) return;
   const s = CT_SHEET, box = SURF_EL.querySelector('.dd-pop');
   const fk = focusKey || (document.activeElement && box.contains(document.activeElement) ? document.activeElement.dataset.cts : null);
-  const o = getOpp(s.oid), acct = getAccount(o.accountId);
   let head, body, go;
-  if(s.kind==='person'){
+  if(s.kind==='log'){   // O18
+    head = drillHeadHtml({title:'Log activity', scope:'With '+esc(CONTACTS_BY_ID[s.cid].name)}, true);
+    body = ctLogBody(s);
+    go = s.type==='Note' ? 'Save note' : 'Log '+s.type.toLowerCase();
+  } else if(s.kind==='person'){
+    const o = getOpp(s.oid), acct = getAccount(o.accountId);
     const co = getAccount(s.acctId);
     head = drillHeadHtml({title:'New contact', scope:'Added to '+esc(acct.name)+' · '+esc(productLabel(o.productType))}, true);
     body = '<div class="cd-body"><div class="cd-2col">'+
@@ -180582,7 +180648,7 @@ function ctSheetDraw(focusKey){
       ctField('Contact type', '<div class="cd-static">'+esc(ctTypeFor(co))+'</div>')+'</div></div>';
     go = 'Add contact';
   } else {
-    const hit = ctExactAccount(s.name);
+    const o = getOpp(s.oid), acct = getAccount(o.accountId), hit = ctExactAccount(s.name);
     head = drillHeadHtml({title:'New company', scope:'Added to '+esc(acct.name)+' · '+esc(productLabel(o.productType))}, true);
     body = '<div class="cd-body">'+ctField('Company name', ctIn('name', s.name, 'Legal name'), s.errors.name,
       hit ? 'Already an account: <a class="drill" href="#/account/'+hit.id+'/summary">'+esc(hit.name)+'</a>. The existing account is added.' : 'Added as a not-yet-approached account.')+'</div>';
@@ -180594,6 +180660,7 @@ function ctSheetDraw(focusKey){
 }
 function ctSheetGo(){
   const s = CT_SHEET; if(!s) return;
+  if(s.kind==='log') return ctLogGo(s);
   const o = getOpp(s.oid);
   if(s.kind==='person'){
     s.errors = {};
@@ -180663,6 +180730,14 @@ document.addEventListener('click', e=>{
     return menuFloatOpen(t, [{v:b.id, t:b.name, s:'Borrower', on:CT_SHEET.acctId===b.id}, {sep:true}, {head:'Partner and advisor firms'}]
       .concat(firms.map(f=>({v:f.id, t:f.name, s:f.partnerType||'Partner', on:CT_SHEET.acctId===f.id}))), it=>{ CT_SHEET.acctId = it.v; ctSheetDraw(); }); }
   if(k==='sgo') return ctSheetGo();
+  /* the contact page (O18, O19) */
+  if(k==='addopp') return ctAddOppMenu(t);
+  if(k==='log'){ const c = CONTACTS_BY_ID[ctContactId()], open = ctOpenOppsOf(c.id);
+    return ctSheetOpen({kind:'log', cid:c.id, type:'Call', sum:'', when:TODAY, on: open.length===1 ? open[0].id : '', oc:'', err:false, errors:{}, back:'[data-ct="log"]'}); }
+  if(k==='ltype'){ CT_SHEET.type = t.dataset.v; CT_SHEET.err = false; return ctSheetDraw(); }
+  if(k==='lon') return menuFloatOpen(t, ctOpenOppsOf(CT_SHEET.cid).map(x=>({v:x.id, t:actOppLabel(x)+' · '+getAccount(x.accountId).name, s:moneyShort(x.facilitySize), on:CT_SHEET.on===x.id}))
+    .concat([{v:'', t:'Account only', on:!CT_SHEET.on}]), it=>{ CT_SHEET.on = it.v; ctSheetDraw(); });
+  if(k==='loc') return menuFloatOpen(t, ACT_OUTCOMES.map(x=>({v:x, t:x, on:CT_SHEET.oc===x})), it=>{ CT_SHEET.oc = CT_SHEET.oc===it.v ? '' : it.v; ctSheetDraw(); });
 });
 document.addEventListener('mousedown', e=>{   // the add list closes when a press lands elsewhere
   if(CT_ADD.open && !e.target.closest('[data-ct-addrow]')){ CT_ADD.open = false; ctAddRedraw(); }
@@ -180687,24 +180762,148 @@ document.addEventListener('keydown', e=>{
     else if(e.key==='Enter' && !t.matches('.ct-chip-x, .ct-addrole')){ e.preventDefault(); ctRedCommit(); }
     return;
   }
-  if((e.key==='Enter' || e.key===' ') && t.matches && t.matches('[data-ct="menu"], [data-ct="roles"], [data-ct="sco"]')){ e.preventDefault(); t.click(); }
+  if((e.key==='Enter' || e.key===' ') && t.matches && t.matches('[data-ct="menu"], [data-ct="roles"], [data-ct="sco"], [data-ct="lon"], [data-ct="loc"]')){ e.preventDefault(); t.click(); }
 }, true);
 
-/* ---------- the contact page's route (#/contact/{id}). Part 1 draws its header only (O12's identity line),
-   so every name link lands somewhere real; Part 2 builds the page (O12 to O20). ---------- */
+/* ---------- the contact page (#/contact/{id}), O12 to O20 (D428; spec contacts-spec-mock-v2.html, Direction B,
+   D410): a header, then About and Companies left, On open opportunities and Activity right. The header is not
+   editable (D415's note); Owner shows in its line and as About's field (D392). ---------- */
+const CT_FLOOR = 256;   // the Activity list's floor: four rows (D411)
+function ctContactActs(cid){
+  const out = []; for(const k in ACTS_BY_ACCT) ACTS_BY_ACCT[k].forEach(a=>{ if(a.contactId===cid) out.push(a); });
+  return out.sort(actNewestFirst);
+}
+function ctKv(rows){ return '<dl class="kv kv-2col">'+rows.map(([k,v,cls])=>'<div'+(cls?' class="'+cls+'"':'')+'><dt>'+k+'</dt><dd>'+v+'</dd></div>').join('')+'</dl>'; }
+/* O14: Email on its own full-width line; the type section and "At {company}" follow (D390: sections never hide) */
+function ctAbout(c){
+  const rc = 'contact:'+c.id;
+  let html = ctKv([['Email', ctEf(rc, 'ct.email').replace('title="Click to edit"', 'title="'+esc(c.email||'')+'"'), 'ct-span2 ct-ell'], ['Phone', ctEf(rc, 'ct.phone')],
+    ['Contact type', ctMenuCell(rc, 'ct.ctype')], ['Owner', ctMenuCell(rc, 'ct.owner')], ['LinkedIn', ctEf(rc, 'ct.linkedin')]]);
+  if(c.contactType==='Borrower contact') html += '<div class="ct-sec">Borrower details</div>'+ctKv([['Reports to', ctMenuCell(rc, 'ct.reports')], ['Decision authority', ctMenuCell(rc, 'ct.auth')]]);
+  else if(c.contactType==='Referral partner') html += '<div class="ct-sec">Partner details</div>'+ctKv([['Partner tier', ctMenuCell(rc, 'ct.tier')], ['Product focus', ctMenuCell(rc, 'ct.focus')], ['Referral agreement on file', ctMenuCell(rc, 'ct.agree')]]);
+  else if(c.contactType==='Professional advisor') html += '<div class="ct-sec">Advisor details</div>'+ctKv([['Advisor kind', ctMenuCell(rc, 'ct.kind')]]);
+  const a = ctPrimaryAff(c);
+  if(a && c.contactType==='Borrower contact'){
+    const ra = 'aff:'+a.id;
+    html += '<div class="ct-sec">At '+esc(getAccount(a.accountId).name)+'</div>'+ctKv([['Ownership', ctEf(ra, 'ct.ownership', true)], ['Control person', ctMenuCell(ra, 'ct.control')],
+      ['Relationship to borrower', ctMenuCell(ra, 'ct.rel')], ['KYC status', ctMenuCell(ra, 'ct.kyc')]]);
+  }
+  return html;
+}
+function ctMonth(s){ return toDateObj(s).toLocaleDateString('en-US',{month:'short', year:'numeric', timeZone:'UTC'}); }
+/* D406: one Companies list, current first, ended rows muted with "Ended {Mon YYYY}" */
+function ctCompanies(c){
+  const list = (AFFS_BY_CONTACT[c.id]||[]).slice().sort((x,y)=>(x.endDate?1:0)-(y.endDate?1:0) || (y.isPrimary?1:0)-(x.isPrimary?1:0));
+  if(!list.length) return '<div class="band-empty">No company on file.</div>';
+  return list.map(a=>{ const ac = getAccount(a.accountId), ended = !!a.endDate;
+    const own = a.ownershipPct!=null && !ended ? (CT_GUARANTOR_ACCESS ? '<span class="ct-gty">'+ctLocked(esc(String(a.ownershipPct))+'% owner')+'</span>' : ctRestrictedRO()) : '';
+    return '<div class="ct-dealrow'+(ended?' ct-ended':'')+'"><div class="ct-min0"><a class="ct-name" href="#/account/'+ac.id+'/summary">'+esc(ac.name)+'</a>'+
+      (a.isPrimary && !ended ? '<span class="tag brand ct-prim">Primary</span>' : '')+
+      '<div class="ct-sub">'+esc(a.role||'')+(ended ? ' · Ended '+ctMonth(a.endDate) : ' · since '+ctMonth(a.startDate))+'</div></div>'+own+'</div>'; }).join('');
+}
+/* O17, D416: largest facility first; one role then "+n", the opportunity tab's roles editor */
+function ctOpenRows(c){
+  const list = ctPartiesOfContact(c.id).filter(p=>{ const o = getOpp(p.opportunityId); return o && o.outcome==='open'; })
+    .sort((a,b)=>getOpp(b.opportunityId).facilitySize-getOpp(a.opportunityId).facilitySize);
+  if(!list.length) return '<div class="band-empty">Not on any open opportunity.</div>';
+  return '<div class="ct-oscroll">'+list.map(p=>{ const o = getOpp(p.opportunityId);
+    return '<div class="ct-dealrow"><div class="ct-min0"><a class="ct-name" href="#/opp/'+o.id+'/contacts">'+esc(getAccount(o.accountId).name)+'</a>'+
+      (p.isPrimary ? '<span class="tag brand ct-prim">Primary</span>' : '')+
+      '<div class="ct-tags">'+productTagHtml(o.productType)+stageTagHtml(o)+'<span class="ct-fac">'+esc(moneyShort(o.facilitySize))+'</span></div></div>'+
+      ctRolesCell(p, 1)+'</div>'; }).join('')+'</div>';
+}
+/* O16: History's rows and groups (D362, D364): day headings for the last 30 days, month headings after */
+function ctActRow(a, inMonth){
+  const o = a.opportunityId ? getOpp(a.opportunityId) : null, who = actWho(a), bits = [];
+  if(who) bits.push(who);
+  if(inMonth) bits.push(fmtDateShort(a.date));
+  let line2 = a.body || '';
+  if(a.session){ const l = []; if(a.outcome) l.push(a.outcome); if(!l.length) l.push(a.type==='Note' ? 'Note' : a.type+' logged'); line2 = l.join(' · '); }
+  return '<div class="feedrow static act-row"><div class="feed-icon">'+actIcon(a.type)+'</div>'+
+    '<div class="feed-main"><div class="feed-title">'+esc(a.subject)+(bits.length?'<span class="act-meta">'+esc(bits.join(' · '))+'</span>':'')+'</div>'+
+    (line2?'<div class="feed-sub">'+esc(line2)+'</div>':'')+'</div>'+
+    (o?'<div class="act-tags">'+productTagHtml(o.productType)+stageTagHtml(o)+'</div>':'')+'</div>';
+}
+function ctActRows(c, acts){
+  if(!acts.length) return '<div class="band-empty">No activity with '+esc(c.name.split(' ')[0])+' yet.</div>';   // O20
+  const cut = addDaysStr(TODAY, -29), out = []; let cur = null;
+  acts.forEach(a=>{ const recent = a.date>=cut, g = recent ? a.date : a.date.slice(0,7);
+    if(g!==cur){ cur = g; out.push('<div class="feed-group">'+esc(recent ? actDayLabel(a.date) : toDateObj(a.date).toLocaleDateString('en-US',{month:'long', year:'numeric', timeZone:'UTC'}))+'</div>'); }
+    out.push(ctActRow(a, !recent)); });
+  return out.join('');
+}
+function ctPanel(t, body, cls){ return '<div class="panel'+(cls?' '+cls:'')+'"><div class="panel-header"><div class="panel-header-text"><div class="panel-title">'+t+'</div></div></div><div class="panel-body">'+body+'</div></div>'; }
+/* O12 */
 function ctContactHeaderHtml(c){
   const owner = BDOS[c.ownerBdoId], acct = getAccount(c.accountId);
   const meta = [esc(c.role||''), '<span class="drill" onclick="location.hash=\'#/account/'+acct.id+'/summary\'">'+esc(acct.name)+'</span>', 'Owner: '+esc(owner?owner.name:'None')]
     .join('<span class="acct-header-meta-dot">&middot;</span>');
   return '<div class="opp-header"><div class="acct-header-row"><div class="acct-header-left">'+
     '<div class="acct-title-row"><span class="acct-title">'+esc(c.name)+'</span><span class="tag ct-typetag">'+esc(c.contactType||'Other')+'</span></div>'+
-    '<div class="acct-header-meta">'+meta+'</div></div></div></div>';
+    '<div class="acct-header-meta">'+meta+'</div>'+
+    '<div class="acct-header-actions"><button type="button" class="btn primary" data-ct="log">Log activity</button>'+
+    '<button type="button" class="btn" data-ct="addopp" aria-haspopup="menu">Add to opportunity</button></div></div></div></div>';
 }
+function ctContactId(){ return (location.hash.match(/^#\/contact\/([^/?]+)/)||[])[1]; }
 function renderContact(id){
   const c = CONTACTS_BY_ID[id], el = document.getElementById('view-contact');
   if(!c){ el.innerHTML = '<div class="empty">Contact not found.</div>'; return; }
   EF_RERENDER = ()=>renderContact(id);
-  el.innerHTML = ctContactHeaderHtml(c);
+  const old = el.querySelector('.ct-ascroll'), top = old && old.dataset.cid===id ? old.scrollTop : 0;
+  el.innerHTML = ctContactHeaderHtml(c)+'<div class="ct-two">'+
+    '<div class="ct-col">'+ctPanel('About', ctAbout(c))+ctPanel('Companies', ctCompanies(c))+'</div>'+
+    '<div class="ct-col">'+ctPanel('On open opportunities', ctOpenRows(c))+
+      ctPanel('Activity', '<div class="ct-awrap"><div class="ct-ascroll" data-cid="'+esc(c.id)+'">'+ctActRows(c, ctContactActs(c.id))+'</div></div>', 'ct-acard')+'</div></div>';
+  const sc = el.querySelector('.ct-ascroll'); if(sc) sc.scrollTop = top;
+  ctLevel();
+}
+/* D411: the Activity list adds the smaller of its own height and four rows to the row; the rest of its column
+   is the card's, and the list scrolls inside it. One column (1140 and under): capped at 368px by the CSS. */
+function ctLevel(){
+  const two = document.querySelector('#view-contact .ct-two'); if(!two) return;
+  const wrap = two.querySelector('.ct-awrap'), list = two.querySelector('.ct-ascroll'); if(!list) return;
+  wrap.style.minHeight = '';
+  fadeEdges(two.querySelector('.ct-oscroll'));
+  if(!window.matchMedia('(max-width:1140px)').matches) wrap.style.minHeight = Math.min(list.scrollHeight, CT_FLOOR)+'px';
+  fadeEdges(list);
+}
+window.addEventListener('resize', ()=>{ if(ctContactId()) ctLevel(); });
+document.addEventListener('scroll', e=>{ if(e.target.classList && (e.target.classList.contains('ct-ascroll') || e.target.classList.contains('ct-oscroll'))) fadeEdges(e.target); }, true);
+/* O19: open opportunities at the contact's company (a partner's: those its firm referred) they are not on yet */
+function ctAddOppMenu(anchor){
+  const c = CONTACTS_BY_ID[ctContactId()];
+  const on = new Set(ctPartiesOfContact(c.id).map(p=>p.opportunityId)), isP = c.contactType==='Referral partner';
+  const opps = allOpps().filter(o=>o.outcome==='open' && !on.has(o.id) && (isP ? o.referralPartnerId===c.accountId : o.accountId===c.accountId));
+  const items = opps.length ? opps.map(o=>({v:o.id, t:getAccount(o.accountId).name, s:productLabel(o.productType)+' · '+o.stage+' · '+moneyShort(o.facilitySize)}))
+    : [{v:'', t:'No other open opportunities', s:isP ? 'None referred by '+getAccount(c.accountId).name : 'None at '+getAccount(c.accountId).name, dis:true}];
+  menuFloatOpen(anchor, items, it=>ctAddParty(getOpp(it.v), {partyKind:'contact', contactId:c.id, accountId:null}));
+}
+function ctOpenOppsOf(cid){ return ctPartiesOfContact(cid).map(p=>getOpp(p.opportunityId)).filter(x=>x && x.outcome==='open'); }
+/* O18: the Activity tab's When (D375): today or earlier, "Today" or the weekday; a pick redraws the sheet only */
+DEF_INDEX['ct.when'] = {key:'ct.when', label:'When', type:'date', max:TODAY, get:o=>o.when||TODAY, set:()=>{},
+  format:v=>v===TODAY ? 'Today' : actWeekday(v), validate:v=>(!v || v>TODAY) ? 'Pick today or an earlier date' : null,
+  rerender:()=>ctSheetDraw(), act:(recId, v)=>{ if(CT_SHEET){ CT_SHEET.when = v; ctSheetDraw(); } }};
+function ctLogBody(s){
+  const c = CONTACTS_BY_ID[s.cid], o = s.on ? getOpp(s.on) : null;
+  const seg = '<div class="viewtoggle seg" data-seg="ctLogType" role="group" aria-label="What to log">'+SEG_THUMB_HTML+['Call','Meeting','Note'].map(t=>
+    '<button type="button" class="'+(s.type===t?'active':'')+'" aria-pressed="'+(s.type===t)+'" data-ct="ltype" data-v="'+t+'">'+t+'</button>').join('')+'</div>';
+  const ph = s.err ? 'Add a one-line summary first' : (s.type==='Note' ? 'Write a note' : 'One-line summary of the '+s.type.toLowerCase());
+  registerRecord('ctlog', s);
+  return '<div class="cd-body ct-log">'+seg+'<input class="ct-input plain'+(s.err?' act-err':'')+'"'+(s.err?' aria-invalid="true"':'')+' type="text" data-cts="sum" aria-label="Summary" value="'+esc(s.sum||'')+'" placeholder="'+esc(ph)+'">'+
+    ctKv([['When', efSpan('ctlog', DEF_INDEX['ct.when'])], ['With', '<span class="cd-static">'+esc(c.name)+'</span>'],
+      ['On', '<span class="ef" data-ct="lon" tabindex="0" role="button" aria-haspopup="menu">'+esc(o ? actOppLabel(o)+' · '+getAccount(o.accountId).name : 'Account only')+'</span>'],
+      [s.type==='Call' ? 'Outcome' : '', s.type==='Call' ? '<span class="ef'+(s.oc?'':' ef-empty')+'" data-ct="loc" tabindex="0" role="button" aria-haspopup="menu">'+esc(s.oc||'Choose an outcome')+'</span>' : '', s.type==='Call' ? '' : 'act-hide']])+'</div>';
+}
+function ctLogGo(s){
+  const sum = (s.sum||'').trim();
+  if(!sum){ s.err = true; ctSheetDraw('sum'); return; }
+  const c = CONTACTS_BY_ID[s.cid], o = s.on ? getOpp(s.on) : null;
+  const a = {id:actNextId(), opportunityId:o ? o.id : null, accountId:o ? o.accountId : c.accountId, bdoId:CURRENT_BDO_ID, type:s.type, date:s.when||TODAY,
+    subject:sum.charAt(0).toUpperCase()+sum.slice(1), source:'logged', contactId:c.id, outcome:s.type==='Call' ? (s.oc||'') : '', session:true};
+  actAdd(a);
+  closeSurface(); ctRerender();
+  toastShow({icon:'check', title:(s.type==='Note' ? 'Note saved' : s.type+' logged'), line:a.subject, action:'Undo', ms:TOAST_UNDO_MS,
+    onAction: t=>{ actRemove(a); ctRerender(); toastUpdate(t, {icon:'check', title:'Undone', line:a.subject, ms:TOAST_MS}); }});
 }
 
 /* `scopeNoun` defaults to 'the deal' (every existing #/opp call site is unchanged); renderAccount()
