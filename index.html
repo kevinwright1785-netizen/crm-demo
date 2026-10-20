@@ -174377,6 +174377,7 @@ function route(){
   else if(view==='contact' && id){
     CT_OPP = null;
     renderContact(id); showView('view-contact');
+    ctLevel();   // D432: rendered while hidden, so the Activity floor is measured only now (as showView's fades, D312)
     titles.contact = CONTACTS_BY_ID[id] ? CONTACTS_BY_ID[id].name : 'Contact';
   }
   else if(view==='intake'){ renderIntake(id); showView('view-intake'); }
