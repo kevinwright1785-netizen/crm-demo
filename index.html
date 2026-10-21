@@ -2037,6 +2037,17 @@ a.ct-name:hover,a.ct-plink:hover{color:var(--brand)}
 .ct-ended .ct-name{color:var(--ink-2)}
 .ct-ended .ct-sub{color:var(--ink-3)}
 #view-contact .kv dd{min-width:0}
+/* The D437 correction: an edit box fills its own cell and never more (the engine's .ef-input keeps its intrinsic
+   width and a 140px floor, which ran past a half-width cell into the next field); and D430's message (D438) sits
+   under the box in the row gap, so showing it does not change the row's height. Contact page only. */
+#view-contact .kv .ef-editing{display:flex}
+#view-contact .kv .ef-input{width:100%;min-width:0}
+#view-contact .kv > div:not(.ct-span2) .ef-error{position:absolute;left:0;top:100%;line-height:1;white-space:nowrap}
+/* The D439 correction: the full-width Email row clips its cell (.ct-ell), so an absolute message there was hidden;
+   its messages (D394) stay in the cell's flow, as before D439, and wrap within the row's width. The engine's
+   display:block outranks [hidden], so a hidden one would still add its margin to the editing row: removed here. */
+#view-contact .ct-ell .ef-error{white-space:normal}
+#view-contact .ct-ell .ef-error[hidden]{display:none}
 /* Activity rows: History's row (D364), its tile sized so the glyph draws in every browser (O16) */
 .ct-acard{display:flex;flex-direction:column}
 .ct-acard .feedrow.act-row{align-items:center}
@@ -180269,6 +180280,20 @@ function ctLink(c, cls){
 function ctRerender(){ if(EF_RERENDER) EF_RERENDER(); }
 /* O8: every party change writes the opportunity's Audit trail, in the field-edit shape the Audit tab reads. */
 function ctAudit(oid, label, was, now){ auditFieldEdit(oid, {key:'ct.party', label}, was, now); }
+/* D429: an Ownership, Control person or KYC status edit on the contact page writes one row, "{Field}: {name}", on
+   every open opportunity the person is a party to; none when there is no open one. No other contact-page field
+   writes Audit rows. */
+function ctAuditPerson(cid, label, was, now){
+  const name = CONTACTS_BY_ID[cid].name, done = new Set();
+  ctPartiesOfContact(cid).forEach(p=>{ const o = getOpp(p.opportunityId);
+    if(o && o.outcome==='open' && !done.has(o.id)){ done.add(o.id); ctAudit(o.id, label+': '+name, was, now); } });
+}
+/* D430: the company's ownership total over its current affiliations, with this one at v */
+function ctOwnTotal(a, v){
+  let n = v||0;
+  for(const k in AFFS_BY_CONTACT) AFFS_BY_CONTACT[k].forEach(x=>{ if(x!==a && x.accountId===a.accountId && !x.endDate) n += x.ownershipPct||0; });
+  return Math.round(n*100)/100;
+}
 
 /* ---------- restricted values (D405, D408, D413) ---------- */
 function ctRestrictedRO(){ return '<span class="ct-gty" title="'+CT_RESTRICT_TIP+'">'+CT_SVG.lock+'Restricted</span>'; }
@@ -180285,16 +180310,18 @@ Object.assign(DEF_INDEX, {
   'ct.email': {key:'ct.email', label:'Email', type:'text', get:c=>c.email, set:(c,v)=>{ c.email = String(v).trim(); }, validate:(v, c)=>ctEmailCheck(v, c)},
   'ct.phone': {key:'ct.phone', label:'Phone', type:'text', get:c=>c.phone, set:(c,v)=>{ c.phone = String(v).trim(); }, emptyLabel:'Add phone'},
   'ct.linkedin': {key:'ct.linkedin', label:'LinkedIn', type:'text', get:c=>c.linkedinUrl, set:(c,v)=>{ c.linkedinUrl = String(v).trim()||null; }, emptyLabel:'Add LinkedIn URL'},
-  'ct.ownership': {key:'ct.ownership', label:'Ownership', type:'percent', get:a=>a.ownershipPct, set:(a,v)=>{ a.ownershipPct = v; },
-    validate:v=>v==null ? null : (v<0 || v>100 ? 'Enter 0 to 100.' : null),
+  /* set writes the Audit rows (D429), so Ctrl/Cmd+Z, which calls set with the old value, writes the reversal */
+  'ct.ownership': {key:'ct.ownership', label:'Ownership', type:'percent', get:a=>a.ownershipPct,
+    set:(a,v)=>{ const pct = x=>x==null ? '' : x+'%', was = a.ownershipPct; a.ownershipPct = v; ctAuditPerson(a.contactId, 'Ownership', pct(was), pct(v)); },
+    validate:(v, a)=>{ if(v==null) return null; if(v<0 || v>100) return 'Enter 0 to 100.';
+      const n = ctOwnTotal(a, v); return n>100 ? 'Total would be '+n+'%.' : null; },   // D438: the heading names the company
     format:v=>ctLocked(v==null ? 'Add' : esc(String(v))+'%')}
 });
 const CT_MENUS = {
   'ct.gty': {label:'Guaranty', restricted:true, get:p=>p.guarantyType, set:(p,v)=>{ p.guarantyType = v; }, empty:'Add guaranty',
     items:p=>CT_GTY[p.partyKind].map(v=>({v, t:v}))},
-  /* the contact page's picklists (O14, D390); Reports to links to that person (D407) */
-  'ct.ctype': {label:'Contact type', get:c=>c.contactType, set:(c,v)=>{ c.contactType = v; },
-    items:()=>['Borrower contact','Referral partner','Professional advisor','Other'].map(v=>({v, t:v}))},
+  /* the contact page's picklists (O14, D390); Reports to links to that person (D407). Contact type is not one:
+     the company sets it (D386), so the page shows it as plain text (D431). `audit` marks D429's fields. */
   'ct.owner': {label:'Owner', get:c=>c.ownerBdoId, set:(c,v)=>{ c.ownerBdoId = v; }, show:v=>v&&BDOS[v] ? BDOS[v].name : '',
     items:()=>Object.keys(BDOS).map(v=>({v, t:BDOS[v].name, s:BDOS[v].title}))},
   'ct.reports': {label:'Reports to', get:c=>c.reportsToContactId, set:(c,v)=>{ c.reportsToContactId = v||null; },
@@ -180311,9 +180338,9 @@ const CT_MENUS = {
     items:()=>['CPA','Attorney','Appraiser','Field examiner'].map(v=>({v, t:v}))},
   'ct.rel': {label:'Relationship to borrower', get:a=>a.relationshipToBorrower, set:(a,v)=>{ a.relationshipToBorrower = v; }, empty:'Add',
     items:()=>['Owner','Officer','Employee'].map(v=>({v, t:v}))},
-  'ct.control': {label:'Control person', restricted:true, get:a=>a.controlPerson==null ? '' : (a.controlPerson ? 'Yes' : 'No'),
+  'ct.control': {label:'Control person', restricted:true, audit:true, get:a=>a.controlPerson==null ? '' : (a.controlPerson ? 'Yes' : 'No'),
     set:(a,v)=>{ a.controlPerson = v==='Yes'; }, empty:'Add', items:()=>['Yes','No'].map(v=>({v, t:v}))},
-  'ct.kyc': {label:'KYC status', restricted:true, get:a=>a.kycStatus, set:(a,v)=>{ a.kycStatus = v; }, empty:'Add',
+  'ct.kyc': {label:'KYC status', restricted:true, audit:true, get:a=>a.kycStatus, set:(a,v)=>{ a.kycStatus = v; }, empty:'Add',
     items:()=>['Verified','In progress','Not started'].map(v=>({v, t:v}))}
 };
 function ctMenuCell(rec, key){
@@ -180337,7 +180364,9 @@ function ctMenuPick(anchor){
     const was = m.get(obj);
     if(String(was==null?'':was)===String(it.v)) return;
     m.set(obj, it.v);
-    if(rec.indexOf('party:')===0){ const show = v=>v==null||v==='' ? '' : String(v); ctAudit(obj.opportunityId, m.label+': '+ctPName(obj), show(was), show(it.v)); }
+    const show = v=>v==null||v==='' ? '' : String(v);
+    if(rec.indexOf('party:')===0) ctAudit(obj.opportunityId, m.label+': '+ctPName(obj), show(was), show(it.v));
+    if(m.audit) ctAuditPerson(obj.contactId, m.label, show(was), show(m.get(obj)));
     ctRerender();
     efConfirmSaved(rec, key, false);
   });
@@ -180779,7 +180808,7 @@ function ctKv(rows){ return '<dl class="kv kv-2col">'+rows.map(([k,v,cls])=>'<di
 function ctAbout(c){
   const rc = 'contact:'+c.id;
   let html = ctKv([['Email', ctEf(rc, 'ct.email').replace('title="Click to edit"', 'title="'+esc(c.email||'')+'"'), 'ct-span2 ct-ell'], ['Phone', ctEf(rc, 'ct.phone')],
-    ['Contact type', ctMenuCell(rc, 'ct.ctype')], ['Owner', ctMenuCell(rc, 'ct.owner')], ['LinkedIn', ctEf(rc, 'ct.linkedin')]]);
+    ['Contact type', esc(c.contactType||'')], ['Owner', ctMenuCell(rc, 'ct.owner')], ['LinkedIn', ctEf(rc, 'ct.linkedin')]]);
   if(c.contactType==='Borrower contact') html += '<div class="ct-sec">Borrower details</div>'+ctKv([['Reports to', ctMenuCell(rc, 'ct.reports')], ['Decision authority', ctMenuCell(rc, 'ct.auth')]]);
   else if(c.contactType==='Referral partner') html += '<div class="ct-sec">Partner details</div>'+ctKv([['Partner tier', ctMenuCell(rc, 'ct.tier')], ['Product focus', ctMenuCell(rc, 'ct.focus')], ['Referral agreement on file', ctMenuCell(rc, 'ct.agree')]]);
   else if(c.contactType==='Professional advisor') html += '<div class="ct-sec">Advisor details</div>'+ctKv([['Advisor kind', ctMenuCell(rc, 'ct.kind')]]);
