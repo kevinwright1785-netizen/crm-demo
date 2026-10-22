@@ -2048,6 +2048,53 @@ a.ct-name:hover,a.ct-plink:hover{color:var(--brand)}
    display:block outranks [hidden], so a hidden one would still add its margin to the editing row: removed here. */
 #view-contact .ct-ell .ef-error{white-space:normal}
 #view-contact .ct-ell .ef-error[hidden]{display:none}
+/* The company page's Contacts tab (Contacts part 3, D426, D435; spec account-contacts-spec-mock-v1.html O1 to O13,
+   D441): the deal tab's card (.panel.ct-card, .tbl, .ct-who, .ct-tile, .ct-name, .ct-sub), with fixed columns whose
+   first two match the deal tab's Name and Roles (O2), and Former, collapsed (O7, D406). */
+.cta-card .tbl td.cta-sec{color:var(--ink-2);font-size:12px;white-space:nowrap}
+.cta-card .sec{color:var(--ink-3)}
+.cta-card .cta-deal{display:flex;gap:var(--s1);align-items:center;white-space:nowrap}
+.cta-card .cta-deal .tag.more{background:transparent;color:var(--ink-2);padding:0 var(--s1)}
+.cta-card .cta-dname{font-size:12px;color:var(--ink);margin-right:var(--s1)}
+.cta-former-row td{padding-top:var(--s3);padding-bottom:var(--s3)}
+.cta-former-btn{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:var(--s2);font-size:12px;font-weight:500;color:var(--ink-2)}
+.cta-former-btn:hover{color:var(--ink)}
+.cta-former-btn:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
+.cta-former-btn svg{width:12px;height:12px;transition:transform var(--t-fast) var(--ease)}
+.cta-former-btn[aria-expanded="true"] svg{transform:rotate(90deg)}
+.cta-ended .ct-name{color:var(--ink-2)}
+.cta-ended .ct-sub,.cta-ended td.cta-sec{color:var(--ink-3)}
+.cta-ended .ct-tile{opacity:.6}
+.cta-card table.cta-fixed{table-layout:fixed;width:100%}
+.cta-card col.cta-c1{width:29.82%}
+.cta-card col.cta-c2{width:39.19%}
+.cta-card col.cta-c3{width:17.5%}
+.cta-card col.cta-c4{width:8.25%}
+.cta-card col.cta-c5{width:5.24%}
+.cta-card td.cta-em{overflow:hidden;text-overflow:ellipsis}
+.cta-card a.cta-tags{display:inline-flex;gap:var(--s1);text-decoration:none}
+.cta-card a.cta-dname{text-decoration:none}
+.cta-card a.cta-dname:hover{color:var(--brand)}
+/* O5: Email and Phone through the inline-edit engine. At rest an email runs to the cell's edge and ends in an
+   ellipsis there, the pencil getting its room on hover; a phone keeps the deal tab's cell, as the spec draws it. An edit box fills its cell (D439); a message wraps in the
+   cell and a hidden one takes no space (D440). */
+.cta-card td.cta-em .ef{display:block}   /* the deal tab's cells are inline-flex; Email spans its cell, to end in "…" at its edge */
+.cta-card td.cta-em .ef:not(.editing){overflow:hidden;text-overflow:ellipsis;padding-right:var(--s2)}
+.cta-card td.cta-em .ef:not(.editing):hover{padding-right:var(--s5)}
+.cta-card .ef-editing{display:flex}
+.cta-card .ef-input{width:100%;min-width:0}
+.cta-card .ef-error{white-space:normal}
+.cta-card .ef-error[hidden]{display:none}
+.ct-dd .cta-open{margin-left:auto;font-size:12px;color:var(--brand)}
+@media (max-width:1140px){.cta-card .cta-em,.cta-card .cta-ph{display:none}.cta-card table.cta-fixed{table-layout:auto}.cta-card table.cta-fixed col{width:auto}}
+@media (max-width:600px){.cta-card table.cta-fixed,.cta-card table.cta-fixed tbody{display:block}.cta-card table.cta-fixed thead,.cta-card table.cta-fixed colgroup{display:none}
+.cta-card table.cta-fixed tr{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center}
+.cta-card table.cta-fixed td{display:block;box-shadow:none}
+.cta-card table.cta-fixed tbody tr + tr{box-shadow:inset 0 1px 0 var(--row-sep)}
+.cta-card table.cta-fixed tr > td:nth-child(2){grid-column:1;grid-row:2;padding-top:0;padding-left:calc(26px + var(--s3))}
+.cta-card table.cta-fixed td.ct-c-menu{grid-column:2;grid-row:1 / span 2}
+.cta-card table.cta-fixed td.cta-em,.cta-card table.cta-fixed td.cta-ph{display:none}
+.cta-card table.cta-fixed tr.cta-former-row td,.cta-card table.cta-fixed tr.cta-ended td.cta-sec{grid-column:1}}
 /* Activity rows: History's row (D364), its tile sized so the glyph draws in every browser (O16) */
 .ct-acard{display:flex;flex-direction:column}
 .ct-acard .feedrow.act-row{align-items:center}
@@ -174375,6 +174422,7 @@ function route(){
        dual-type's extra 'secondary' tab), not one fixed list like OPP_SECTIONS this branch could
        check against up front. */
     const section = recTabFromState('account', id) || parts[2] || null;   // D345, as the #/opp branch
+    CT_OPP = null; CTA = {add:{open:false, q:'', i:0}, former:false};   // O7, O8 (D441): own state, reset on navigation
     if(LIST_RETURN_CTX && (LIST_RETURN_CTX.kind!=='accounts' || LIST_RETURN_CTX.ids[LIST_RETURN_CTX.index] !== id)) LIST_RETURN_CTX = null;
     renderAccount(id, section, true); showView('view-account');
     titles.account = getAccount(id) && getAccount(id).accountTypes ? getAccount(id).name : 'Account';
@@ -175622,7 +175670,8 @@ function sxAcctRow(it){
 }
 function sxContactRow(it){
   const c = it.c, a = getAccount(c.accountId);
-  const parts = [{h:esc(c.role), t:c.role, k:'keep'}, {h:esc(a.name), t:a.name, k:SX_Q.indexOf('@')>=0 ? 'first' : ''}].concat(SX_Q.indexOf('@')>=0 ? [{h:sxHl(c.email,SX_Q), t:c.email}] : []);
+  const left = ctLeftAcct(c) ? 'Left ' : '';   // O12 (D442)
+  const parts = [{h:esc(c.role), t:c.role, k:'keep'}, {h:left+esc(a.name), t:left+a.name, k:SX_Q.indexOf('@')>=0 ? 'first' : ''}].concat(SX_Q.indexOf('@')>=0 ? [{h:sxHl(c.email,SX_Q), t:c.email}] : []);
   return {html:'<div class="sx-row" role="option">'+sxIcon('contact')+'<div class="sx-l"><div class="sx-n">'+sxHl(c.name,SX_Q)+'</div>'+sxLine(parts)+'</div><div class="sx-r soft"></div></div>',
     go:()=>sxGo('#/contact/'+c.id), it};   // O11 (D391): the contact page
 }
@@ -175675,7 +175724,7 @@ function sxPaneAcct(a){
 }
 function sxPaneContact(c){
   const a = getAccount(c.accountId), others = (CONTACTS_BY_ACCT[c.accountId]||[]).filter(x=>x.id!==c.id);
-  return sxHead(c.name, esc(c.role)+' · '+esc(a.name))+
+  return sxHead(c.name, esc(c.role)+' · '+(ctLeftAcct(c) ? 'Left ' : '')+esc(a.name))+
     '<div class="dd-block"><div class="dd-facts sx-one">'+sxFactOne('Email', c.email)+sxFactOne('Phone', c.phone)+'</div></div>'+
     '<div class="dd-block"><div class="dd-sec">Others at '+esc(a.name)+'</div>'+(others.length ? others.map(sxContactLine).join('') : '<div class="dd-line muted">No other contacts on file</div>')+'</div>'+
     sxFoot('Open contacts');
@@ -177822,6 +177871,7 @@ function accountConfig(a){
     const ownerOpp = openOpps.slice().sort((x,y)=>y.facilitySize-x.facilitySize)[0]
       || allOpps().filter(o=>o.accountId===a.id).slice().sort((x,y)=>y.createdDate.localeCompare(x.createdDate))[0];
     const owner = ownerOpp ? BDOS[ownerOpp.bdoId] : null;
+    cfg.ownerId = ownerOpp ? ownerOpp.bdoId : null;   // O9 (D441): a person created here takes the owner the header shows
     /* D151 correction pass: mock's "Liens on file" strip cell, real LIENS_BY_ACCT data (already
        used by the Opportunity's own Intelligence tab, lienPanelHtml()), never fabricated. */
     const acctLiens = LIENS_BY_ACCT[a.id]||[];
@@ -177937,6 +177987,7 @@ function accountConfig(a){
     const daysSinceReferral = lastReferralDate ? daysBetween(lastReferralDate, TODAY) : null;
     const recentReferred = referred.slice().sort((x,y)=>y.createdDate.localeCompare(x.createdDate))[0];
     const owner = recentReferred ? BDOS[recentReferred.bdoId] : null;
+    cfg.ownerId = recentReferred ? recentReferred.bdoId : null;   // O9 (D441)
     const contact = profile.primaryContactId ? CONTACTS_BY_ID[profile.primaryContactId] : null;
     const partnerAvg = referred.length ? lifetimeValue/referred.length : null;
     /* D151 correction pass: mock's "Win rate on referrals" strip cell, real closed-referral
@@ -178642,6 +178693,7 @@ function renderAccount(id, section, isNav){
   ACCOUNT_SECTION = section || (freshRecord ? sections[0].key : ACCOUNT_SECTION);
   if(!sections.some(s=>s.key===ACCOUNT_SECTION)) ACCOUNT_SECTION = sections[0].key;
   ACCOUNT_SECTION_FOR = id;
+  EF_RERENDER = ()=>renderAccount(id);   // O5 (D441): an inline edit redraws the account page, as the deal and contact pages do
 
   let sectionBody;
   if(ACCOUNT_SECTION==='summary') sectionBody = cfg.primaryType==='Prospect'
@@ -178651,7 +178703,7 @@ function renderAccount(id, section, isNav){
   else if(ACCOUNT_SECTION==='network') sectionBody = acctStubTabHtml('The trade-relationship graph, and the D143 factoring-debtor overlay, land in pass 3.');
   else if(ACCOUNT_SECTION==='opportunities') sectionBody = acctDealsTabHtml(acctOpps.slice().sort((x,y)=>y.createdDate.localeCompare(x.createdDate)), 'Opportunities', 'opportunities');
   else if(ACCOUNT_SECTION==='referrals') sectionBody = acctDealsTabHtml(referredOpps.slice().sort((x,y)=>y.createdDate.localeCompare(x.createdDate)), 'Referrals', 'referrals');
-  else if(ACCOUNT_SECTION==='contacts') sectionBody = sectionContactsHtml(contacts);
+  else if(ACCOUNT_SECTION==='contacts') sectionBody = ctaTabHtml(a);
   else if(ACCOUNT_SECTION==='activity') sectionBody = actTabHtml('acct', a);
   else if(ACCOUNT_SECTION==='documents') sectionBody = sectionDocumentsHtml(docs, 'the account');
   else if(ACCOUNT_SECTION==='audit') sectionBody = acctAuditTabHtml(auditOpps);
@@ -179759,19 +179811,6 @@ function sectionNetworkHtml(o){
   return networkPanelHtml(o)+
     '<div class="velocity-note">This list is the real signal today — round 3 adds the full trade-relationship graph explorer on top of it.</div>';
 }
-function sectionContactsHtml(contacts){
-  const contactsHtml = contacts.length
-    ? '<div class="tbl-wrap"><table class="tbl"><thead><tr>'+
-        sortableTh('Name',{type:'text'})+sortableTh('Role',{type:'text'})+
-        sortableTh('Email',{type:'text'})+sortableTh('Phone',{type:'text'})+
-        '</tr></thead><tbody>'+
-        contacts.map(c=>'<tr><td class="name">'+ctLink(c, 'ct-name')+'</td><td class="sec">'+esc(c.role)+'</td><td class="sec">'+esc(c.email)+'</td><td class="sec">'+esc(c.phone)+'</td></tr>').join('')+
-      '</tbody></table></div>'
-    : '<div class="empty">No contacts on record.</div>';
-  return '<div class="panel"><div class="panel-header"><div class="panel-header-text">'+
-      '<div class="panel-title">Contacts</div><div class="panel-scope">'+contacts.length+' stakeholder'+(contacts.length===1?'':'s')+' with roles</div>'+
-    '</div></div><div class="panel-body flush">'+contactsHtml+'</div></div>';
-}
 /* ================================================================
    THE ACTIVITY TAB (D373; rulings D359 to D369; spec Other/mocks/activity-tab-spec-v3.html, its
    mk4-css and mk4-js, direction 1 with History version C). Second on every record (D359). A row of
@@ -180242,6 +180281,7 @@ const AFFS_BY_CONTACT = {};
 (D.affiliations||[]).forEach(a=>{ (AFFS_BY_CONTACT[a.contactId]=AFFS_BY_CONTACT[a.contactId]||[]).push(Object.assign({}, a)); });
 let CT_SEQ = 0;                              // session ids: party_s0001, contact_s0001, …
 let CT_OPP = null;                           // the opportunity whose Contacts tab state is held
+let CTA = {add:{open:false, q:'', i:0}, former:false};   // the account Contacts tab (D441 O7, O8): its own add box and Former
 let CT_RED = null;                           // the roles editor: {pid, draft, orig}
 let CT_ADD = {open:false, q:'', i:0};        // the add box
 let CT_SHEET = null;                         // the open Create person / Create company sheet
@@ -180251,6 +180291,11 @@ function ctPartyById(pid){ for(const k in PARTIES_BY_OPP){ const p = PARTIES_BY_
 function ctAffById(id){ for(const k in AFFS_BY_CONTACT){ const a = AFFS_BY_CONTACT[k].find(x=>x.id===id); if(a) return a; } return null; }
 function ctPrimaryAff(c){ return (AFFS_BY_CONTACT[c.id]||[]).find(a=>a.isPrimary && !a.endDate) || null; }
 function ctPartiesOfContact(cid){ const out = []; for(const k in PARTIES_BY_OPP) PARTIES_BY_OPP[k].forEach(p=>{ if(p.contactId===cid) out.push(p); }); return out; }
+/* O12 (D442): the company a person has left, when they have no current link to it (their record keeps it) */
+function ctLeftAcct(c){ return (AFFS_BY_CONTACT[c.id]||[]).some(x=>x.accountId===c.accountId && !x.endDate) ? null : getAccount(c.accountId); }
+/* O12: the current people at a company are those with a current link to it, in the dataset's order, so an Undo
+   puts a list back exactly */
+function ctReindexAcct(acctId){ CONTACTS_BY_ACCT[acctId] = D.contacts.filter(c=>(AFFS_BY_CONTACT[c.id]||[]).some(x=>x.accountId===acctId && !x.endDate)); }
 function ctPName(p){ return p.partyKind==='account' ? getAccount(p.accountId).name : CONTACTS_BY_ID[p.contactId].name; }
 function ctOrder(roles){ return roles.slice().sort((x,y)=>CT_ROLE_ORDER.indexOf(x)-CT_ROLE_ORDER.indexOf(y)); }
 function ctGuarantor(p){ return p.roles.includes('Personal guarantor') || p.roles.includes('Corporate guarantor'); }
@@ -180452,8 +180497,9 @@ function ctAddItems(o){
   if(!sug.length && !q) out.push({none:'Everyone at '+acct.name+' is already on this opportunity.'});
   sug.slice(0, 6).forEach(c=>out.push({kind:'person', c, sub:c.role+' · '+acct.name}));
   if(q){
-    const ppl = D.contacts.filter(c=>c.accountId!==o.accountId && !on.has(c.id) && (hit(c.name) || hit(c.email))).slice(0, 5);
-    if(ppl.length){ out.push({head:'People'}); ppl.forEach(c=>out.push({kind:'person', c, sub:c.role+' · '+getAccount(c.accountId).name})); }
+    const sugIds = new Set(ctSuggest(o).map(c=>c.id));   // O12 (D442): someone who left the borrower is found here
+    const ppl = D.contacts.filter(c=>!sugIds.has(c.id) && (c.accountId!==o.accountId || ctLeftAcct(c)) && !on.has(c.id) && (hit(c.name) || hit(c.email))).slice(0, 5);
+    if(ppl.length){ out.push({head:'People'}); ppl.forEach(c=>out.push({kind:'person', c, sub:c.role+' · '+(ctLeftAcct(c) ? 'Left ' : '')+getAccount(c.accountId).name})); }
     const cos = allAccounts().filter(a=>a.id!==o.accountId && !on.has(a.id) && hit(a.name)).slice(0, 3);
     if(cos.length){ out.push({head:'Companies'}); cos.forEach(a=>out.push({kind:'company', a, sub:'Company'+(a.notYetApproached?' · not yet approached':'')})); }
   }
@@ -180557,6 +180603,7 @@ function ctPartyName(p){
 function ctPartySub(p, o){
   if(p.partyKind==='account') return 'Company'+(p.relationshipToBorrower ? ' · '+esc(p.relationshipToBorrower) : '');
   const c = CONTACTS_BY_ID[p.contactId];
+  if(ctLeftAcct(c)) return esc(c.role||'')+' · Left '+esc(getAccount(c.accountId).name);   // O12 (D442): the record keeps them, and says so
   return esc(c.role||'')+(c.accountId!==o.accountId ? ' · '+esc(getAccount(c.accountId).name) : '');
 }
 /* O4: Guaranty and Credit authorization show only for guarantors (or where a value is already on file) */
@@ -180666,15 +180713,15 @@ function ctSheetDraw(focusKey){
     body = ctLogBody(s);
     go = s.type==='Note' ? 'Save note' : 'Log '+s.type.toLowerCase();
   } else if(s.kind==='person'){
-    const o = getOpp(s.oid), acct = getAccount(o.accountId);
-    const co = getAccount(s.acctId);
-    head = drillHeadHtml({title:'New contact', scope:'Added to '+esc(acct.name)+' · '+esc(productLabel(o.productType))}, true);
+    /* O9 (D441): from a company page there is no deal; the company is fixed, shown as text */
+    const o = s.oid ? getOpp(s.oid) : null, co = getAccount(s.acctId);
+    head = drillHeadHtml({title:'New contact', scope:'Added to '+(o ? esc(getAccount(o.accountId).name)+' · '+esc(productLabel(o.productType)) : esc(co.name))}, true);
     body = '<div class="cd-body"><div class="cd-2col">'+
       ctField('Name', ctIn('name', s.name, 'First and last name'), s.errors.name, '<span data-cth="name">'+ctNameHint(s)+'</span>')+
       ctField('Title', ctIn('title', s.title, 'CFO, Controller…'))+
       ctField('Email', ctIn('email', s.email, 'name@company.com'), s.errors.email)+
       ctField('Phone', ctIn('phone', s.phone, ''), null, '<span data-cth="phone">'+ctPhoneHint(s)+'</span>')+'</div>'+
-      '<div class="cd-2col">'+ctField('Company', '<span class="ef" data-ct="sco" tabindex="0" role="button" aria-haspopup="menu" aria-label="Company">'+esc(co.name)+'</span>')+
+      '<div class="cd-2col">'+ctField('Company', o ? '<span class="ef" data-ct="sco" tabindex="0" role="button" aria-haspopup="menu" aria-label="Company">'+esc(co.name)+'</span>' : '<div class="cd-static">'+esc(co.name)+'</div>')+
       ctField('Contact type', '<div class="cd-static">'+esc(ctTypeFor(co))+'</div>')+'</div></div>';
     go = 'Add contact';
   } else {
@@ -180691,7 +180738,7 @@ function ctSheetDraw(focusKey){
 function ctSheetGo(){
   const s = CT_SHEET; if(!s) return;
   if(s.kind==='log') return ctLogGo(s);
-  const o = getOpp(s.oid);
+  const o = s.oid ? getOpp(s.oid) : null;
   if(s.kind==='person'){
     s.errors = {};
     if(!s.name.trim()) s.errors.name = 'Enter a name.';
@@ -180702,12 +180749,13 @@ function ctSheetGo(){
     if(Object.keys(s.errors).length){ ctSheetDraw(s.errors.name ? 'name' : 'email'); return; }
     const co = getAccount(s.acctId);
     const c = {id:'contact_s'+String(++CT_SEQ).padStart(4,'0'), accountId:co.id, name:s.name.trim(), role:s.title.trim(), email:em, phone:s.phone.trim(),
-      contactType:ctTypeFor(co), ownerBdoId:o.bdoId, linkedinUrl:null, reportsToContactId:null, decisionAuthority:null, partnerTier:null, productFocus:null,
+      contactType:ctTypeFor(co), ownerBdoId:o ? o.bdoId : (accountConfig(co).ownerId || CURRENT_BDO_ID), linkedinUrl:null, reportsToContactId:null, decisionAuthority:null, partnerTier:null, productFocus:null,
       referralAgreementOnFile:null, advisorKind:null};
     D.contacts.push(c); CONTACTS_BY_ID[c.id] = c; (CONTACTS_BY_ACCT[co.id]=CONTACTS_BY_ACCT[co.id]||[]).push(c);
     AFFS_BY_CONTACT[c.id] = [{id:'affil_s'+String(CT_SEQ).padStart(4,'0'), contactId:c.id, accountId:co.id, isPrimary:true, role:c.role, startDate:TODAY, endDate:null,
       ownershipPct:null, controlPerson:null, relationshipToBorrower:null, kycStatus:null}];
     CT_SHEET = null; closeSurface(true);
+    if(!o) return ctaCreated(c, co);   // O9: a person and their current link, on no opportunity
     ctAddParty(o, {partyKind:'contact', contactId:c.id, accountId:null});
     return;
   }
@@ -180866,7 +180914,7 @@ function ctPanel(t, body, cls){ return '<div class="panel'+(cls?' '+cls:'')+'"><
 /* O12 */
 function ctContactHeaderHtml(c){
   const owner = BDOS[c.ownerBdoId], acct = getAccount(c.accountId);
-  const meta = [esc(c.role||''), '<span class="drill" onclick="location.hash=\'#/account/'+acct.id+'/summary\'">'+esc(acct.name)+'</span>', 'Owner: '+esc(owner?owner.name:'None')]
+  const meta = [esc(c.role||''), (ctLeftAcct(c) ? 'Left ' : '')+'<span class="drill" onclick="location.hash=\'#/account/'+acct.id+'/summary\'">'+esc(acct.name)+'</span>', 'Owner: '+esc(owner?owner.name:'None')]
     .join('<span class="acct-header-meta-dot">&middot;</span>');
   return '<div class="opp-header"><div class="acct-header-row"><div class="acct-header-left">'+
     '<div class="acct-title-row"><span class="acct-title">'+esc(c.name)+'</span><span class="tag ct-typetag">'+esc(c.contactType||'Other')+'</span></div>'+
@@ -180935,6 +180983,199 @@ function ctLogGo(s){
   toastShow({icon:'check', title:(s.type==='Note' ? 'Note saved' : s.type+' logged'), line:a.subject, action:'Undo', ms:TOAST_UNDO_MS,
     onAction: t=>{ actRemove(a); ctRerender(); toastUpdate(t, {icon:'check', title:'Undone', line:a.subject, ms:TOAST_MS}); }});
 }
+
+/* ---------- the company page's Contacts tab (Contacts part 3, D426, named by D435; spec
+   account-contacts-spec-mock-v1.html, O1 to O13, D441): the deal tab's card, add box, tile, name lines and row
+   menu, with what matters at company level: open opportunities, email, phone; and Former (D406). ---------- */
+const CTA_CHEV = '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+function ctaAcct(){ return getAccount(ACCOUNT_SECTION_FOR); }
+/* O3 (D171): Owner / CEO, then CFO, then Controller, then everyone else by name, Key contacts' order. Not
+   sortable, deliberately (CLAUDE.md §4's opt-out): the order is the decision-makers-first ruling, and edits never
+   reorder rows. */
+function ctaSorted(a){
+  return (CONTACTS_BY_ACCT[a.id]||[]).slice().sort((x,y)=>{
+    const xi = CONTACT_DECISION_MAKER_ORDER.indexOf(x.role), yi = CONTACT_DECISION_MAKER_ORDER.indexOf(y.role);
+    if((xi!==-1) !== (yi!==-1)) return xi!==-1 ? -1 : 1;
+    if(xi!==-1 && yi!==-1) return xi-yi;
+    return x.name.localeCompare(y.name);
+  });
+}
+/* O7: links to this company that have ended, most recent first */
+function ctaFormer(a){
+  const out = []; for(const k in AFFS_BY_CONTACT) AFFS_BY_CONTACT[k].forEach(x=>{ if(x.accountId===a.id && x.endDate) out.push({c:CONTACTS_BY_ID[x.contactId], aff:x}); });
+  return out.sort((x,y)=>y.aff.endDate.localeCompare(x.aff.endDate) || x.c.name.localeCompare(y.c.name));
+}
+function ctaWho(c, sub){ return '<div class="ct-who"><div class="ct-tile">'+esc(initials(c.name))+'</div><div class="ct-min0"><div>'+ctLink(c, 'ct-name')+'</div><div class="ct-sub">'+esc(sub)+'</div></div></div>'; }
+function ctaMenuBtn(c, k, v){ return '<td class="ct-c-menu"><button type="button" class="act-pin" data-ct="'+k+'" data-v="'+esc(v)+'" aria-label="More for '+esc(c.name)+'" aria-haspopup="menu">'+CT_SVG.dots+'</button></td>'; }
+/* O4: the person's own open opportunities, largest first; one shown, then "+n" with the rest in its tooltip */
+function ctaDealCell(c, partner){
+  const os = ctOpenOppsOf(c.id).sort((x,y)=>y.facilitySize-x.facilitySize); if(!os.length) return '<span class="sec">None</span>';
+  const o = os[0], lab = x=>(partner ? getAccount(x.accountId).name+' · ' : '')+productLabel(x.productType)+' · '+x.stage+' · '+moneyShort(x.facilitySize);
+  const more = os.length>1 ? '<span class="tag more" title="'+esc(os.slice(1).map(lab).join(', '))+'">+'+(os.length-1)+'</span>' : '';
+  if(partner) return '<span class="cta-deal"><a class="cta-dname" href="#/opp/'+o.id+'/contacts">'+esc(getAccount(o.accountId).name)+'</a>'+more+'</span>';
+  return '<span class="cta-deal"><a class="cta-tags" href="#/opp/'+o.id+'/contacts">'+productTagHtml(o.productType)+stageTagHtml(o)+'</a>'+more+'</span>';
+}
+/* O5: Email and Phone are the contact page's own fields; the email's full value is its tooltip */
+function ctaRowHtml(c, partner){
+  const rc = 'contact:'+c.id;
+  return '<tr data-cid="'+c.id+'"><td>'+ctaWho(c, c.role||'')+'</td><td>'+ctaDealCell(c, partner)+'</td>'+
+    '<td class="cta-sec cta-em">'+ctEf(rc, 'ct.email').replace('title="Click to edit"', 'title="'+esc(c.email||'')+'"')+'</td>'+
+    '<td class="cta-sec cta-ph">'+ctEf(rc, 'ct.phone')+'</td>'+ctaMenuBtn(c, 'arow', c.id)+'</tr>';
+}
+/* O7 (D406): "Former · n", collapsed on arrival; open through redraws on this page, reset on navigation */
+function ctaFormerRows(a){
+  const f = ctaFormer(a); if(!f.length) return '';
+  let h = '<tr class="cta-former-row"><td colspan="5"><button type="button" class="cta-former-btn" data-ct="afmr" aria-expanded="'+CTA.former+'">'+CTA_CHEV+'Former · '+f.length+'</button></td></tr>';
+  if(CTA.former) h += f.map(x=>{ const now = (AFFS_BY_CONTACT[x.c.id]||[]).find(y=>!y.endDate && y.accountId!==a.id);
+    return '<tr class="cta-ended" data-aff="'+x.aff.id+'"><td>'+ctaWho(x.c, x.aff.role||x.c.role||'')+'</td><td class="cta-sec" colspan="3">Ended '+ctMonth(x.aff.endDate)+
+      (now ? ' · now at '+esc(getAccount(now.accountId).name) : '')+'</td>'+ctaMenuBtn(x.c, 'afrow', x.aff.id)+'</tr>'; }).join('');
+  return h;
+}
+/* O1, O2, O13 */
+function ctaTabHtml(a){
+  const partner = !!PARTNERS[a.id], cs = ctaSorted(a);
+  const body = (cs.length ? cs.map(c=>ctaRowHtml(c, partner)).join('') : '<tr><td colspan="5" class="ct-empty">No current contacts at '+esc(a.name)+'.</td></tr>')+ctaFormerRows(a);
+  return '<div class="panel ct-card cta-card"><div class="panel-header"><div class="panel-header-text"><div class="panel-title">Contacts</div></div></div><div class="panel-body">'+ctaAddBox(a)+
+    '<div class="tbl-wrap"><table class="tbl cta-fixed"><colgroup><col class="cta-c1"><col class="cta-c2"><col class="cta-c3 cta-em"><col class="cta-c4 cta-ph"><col class="cta-c5"></colgroup>'+
+    '<thead><tr><th>Name</th><th>On open opportunities</th><th class="cta-em">Email</th><th class="cta-ph">Phone</th><th><span class="sr-only">Actions</span></th></tr></thead><tbody>'+body+'</tbody></table></div></div></div>';
+}
+
+/* O8: "Add a person to {company}". Nothing shows until you type; then people on file whose name matches and who
+   are not current here ("Open" goes to their page, so no duplicate is made), then Create person. */
+function ctaAddItems(a){
+  const q = CTA.add.q.trim().toLowerCase(); if(!q) return [];
+  const cur = new Set((CONTACTS_BY_ACCT[a.id]||[]).map(c=>c.id)), out = [];
+  const ppl = D.contacts.filter(c=>!cur.has(c.id) && c.name.toLowerCase().indexOf(q)>=0).slice(0, 5);
+  if(ppl.length){ out.push({head:'Already on file'}); ppl.forEach(c=>out.push({kind:'person', c, sub:(c.role||'')+' · '+(ctLeftAcct(c) ? 'Left ' : '')+getAccount(c.accountId).name})); out.push({sep:true}); }
+  out.push({kind:'newp', t:'Create person', sub:'at '+a.name});
+  return out;
+}
+function ctaAddPickables(a){ return ctaAddItems(a).filter(x=>x.kind); }
+function ctaAddDrop(a){
+  let n = -1;
+  return '<div class="newmenu ct-dd" role="listbox" id="cta-add-list" tabindex="-1">'+ctaAddItems(a).map(it=>{
+    if(it.head) return '<div class="ct-dd-h">'+esc(it.head)+'</div>';
+    if(it.sep) return '<div class="ct-dd-sep"></div>';
+    n++;
+    const opt = '<div class="newmenu-item ct-dd-i'+(n===CTA.add.i ? ' on' : '')+'" role="option" id="cta-add-'+n+'" aria-selected="'+(n===CTA.add.i)+'" data-ct="apick" data-n="'+n+'">';
+    const txt = '<div class="ct-min0"><div class="newmenu-item-title">'+esc(it.kind==='person' ? it.c.name : it.t)+'</div><div class="newmenu-item-sub">'+esc(it.sub)+'</div></div>';
+    return it.kind==='person' ? opt+'<div class="ct-tile">'+esc(initials(it.c.name))+'</div>'+txt+'<span class="cta-open">Open</span></div>' : opt+'<div class="ct-tile">'+CT_SVG.plus+'</div>'+txt+'</div>';
+  }).join('')+'</div>';
+}
+function ctaAddBox(a){
+  const open = CTA.add.open && !!CTA.add.q.trim();
+  return '<div class="ct-addrow" data-cta-addrow>'+CT_SVG.srch+'<input class="ct-input" data-ct="aaddq" type="text" autocomplete="off" placeholder="Add a person to '+esc(a.name)+'" aria-label="Add a person to '+esc(a.name)+'" '+
+    'role="combobox" aria-autocomplete="list" aria-controls="cta-add-list" aria-expanded="'+open+'"'+(open ? ' aria-activedescendant="cta-add-'+CTA.add.i+'"' : '')+' value="'+esc(CTA.add.q)+'">'+(open ? ctaAddDrop(a) : '')+'</div>';
+}
+function ctaAddRedraw(){
+  const row = document.querySelector('[data-cta-addrow]'), a = ctaAcct(); if(!row || !a) return;
+  const old = row.querySelector('.ct-dd'), open = CTA.add.open && !!CTA.add.q.trim();
+  if(old) old.remove();
+  if(open) row.insertAdjacentHTML('beforeend', ctaAddDrop(a));
+  const inp = row.querySelector('.ct-input');
+  if(inp){ inp.setAttribute('aria-expanded', open); if(open) inp.setAttribute('aria-activedescendant', 'cta-add-'+CTA.add.i); else inp.removeAttribute('aria-activedescendant'); }
+  const on = row.querySelector('.ct-dd-i.on'); if(on) on.scrollIntoView({block:'nearest'});
+}
+function ctaAddPick(a, it){
+  if(!it) return;
+  const q = CTA.add.q.trim();
+  CTA.add = {open:false, q:'', i:0};
+  if(it.kind==='person'){ location.hash = '#/contact/'+it.c.id; return; }
+  ctaAddRedraw();
+  const inp = document.querySelector('[data-ct="aaddq"]'); if(inp) inp.value = '';
+  ctSheetOpen({kind:'person', oid:null, acctId:a.id, name:q, title:'', email:'', phone:'', errors:{}, back:'[data-ct="aaddq"]'});
+}
+/* O9, O13: created from the company page: no opportunity, so no Audit row. Undo removes the person, their link and
+   every index the app keeps of them (search reads CONTACTS_BY_ID). */
+function ctaCreated(c, co){
+  ctRerender();
+  const inp = document.querySelector('[data-ct="aaddq"]'); if(inp) inp.focus({preventScroll:true});
+  toastShow({icon:'check', title:'Person added', line:c.name+' at '+co.name, action:'Undo', ms:TOAST_UNDO_MS,
+    onAction: t=>{
+      ctPartiesOfContact(c.id).forEach(p=>{ const ps = ctParties(p.opportunityId); ps.splice(ps.indexOf(p), 1); ctAudit(p.opportunityId, 'Contacts', c.name, ''); });
+      const i = D.contacts.indexOf(c); if(i>=0) D.contacts.splice(i, 1);
+      delete CONTACTS_BY_ID[c.id]; delete AFFS_BY_CONTACT[c.id]; delete EF_STORE['contact:'+c.id]; ctReindexAcct(co.id);
+      if(location.hash==='#/contact/'+c.id) location.hash = '#/account/'+co.id+'/contacts'; else ctRerender();
+      toastUpdate(t, {icon:'check', title:'Undone', line:c.name+' removed', ms:TOAST_MS}); }});
+}
+/* O10, O11: Open contact page · Add to opportunity (not for an advisor firm's people) · Mark as left {company} */
+function ctaRowMenu(anchor, cid){
+  const c = CONTACTS_BY_ID[cid], a = ctaAcct(), items = [{v:'open', t:'Open contact page'}];
+  if(ctTypeFor(a)!=='Professional advisor') items.push({v:'addopp', t:'Add to opportunity'});
+  items.push({v:'left', t:'Mark as left '+a.name});
+  menuFloatOpen(anchor, items, it=>{
+    if(it.v==='open'){ location.hash = '#/contact/'+cid; return; }
+    if(it.v==='left') return ctaLeave(a, cid);
+    ctaAddOppMenu(anchor, c, a);
+  });
+}
+/* O11: a second menu from the same button: open opportunities at this company the person is not on (a partner
+   firm's: those it referred). A pick opens that opportunity's Contacts tab with the new row's roles editor open. */
+function ctaAddOppMenu(anchor, c, a){
+  const on = new Set(ctPartiesOfContact(c.id).map(p=>p.opportunityId)), isP = !!PARTNERS[a.id];
+  const opps = allOpps().filter(o=>o.outcome==='open' && !on.has(o.id) && (isP ? o.referralPartnerId===a.id : o.accountId===a.id)).sort((x,y)=>y.facilitySize-x.facilitySize);
+  const items = opps.length ? opps.map(o=>({v:o.id, t:getAccount(o.accountId).name, s:productLabel(o.productType)+' · '+o.stage+' · '+moneyShort(o.facilitySize)}))
+    : [{v:'', t:'No other open opportunities', s:isP ? 'None referred by '+a.name : 'None at '+a.name, dis:true}];
+  menuFloatOpen(anchor, items, it=>{
+    const o = getOpp(it.v);
+    history.pushState(null, '', '#/opp/'+o.id+'/contacts'); route();   // no hashchange: route() once, then the row arrives with its editor open
+    ctAddParty(o, {partyKind:'contact', contactId:c.id, accountId:null});
+  });
+}
+function ctaFocus(sel){ const el = document.querySelector('#view-account '+sel); if(el) el.focus({preventScroll:true}); }
+/* O12 (D442): ends the link today. Lists of current people drop them (they read CONTACTS_BY_ACCT); records that
+   point at them keep them and say "Left {company}". An Audit row on each open opportunity they are a party to.
+   Ownership, Control person and KYC are kept, not edited, so no D429 rows. */
+function ctaLeave(a, cid){
+  const c = CONTACTS_BY_ID[cid], aff = (AFFS_BY_CONTACT[cid]||[]).find(x=>x.accountId===a.id && !x.endDate); if(!aff) return;
+  const list = ctaSorted(a), next = list[list.indexOf(c)+1] || null;
+  const set = (end, was, now)=>{ aff.endDate = end; ctReindexAcct(a.id); ctAuditPerson(cid, 'Left '+a.name, was, now); ctRerender(); };
+  set(TODAY, 'Current', 'Left');
+  ctaFocus(next ? '[data-ct="arow"][data-v="'+next.id+'"]' : '[data-ct="afmr"]');
+  toastShow({icon:'check', title:'Marked as left', line:c.name+' left '+a.name, action:'Undo', ms:TOAST_UNDO_MS,
+    onAction: t=>{ set(null, 'Left', 'Current'); toastUpdate(t, {icon:'check', title:'Undone', line:c.name+' is current at '+a.name, ms:TOAST_MS}); }});   // D443: always exact
+}
+/* O7, O12, D443: Mark as current from Former; refused when their ownership would take the company past 100% */
+function ctaRestore(a, affId){
+  const aff = ctAffById(affId), c = CONTACTS_BY_ID[aff.contactId], was = aff.endDate;
+  const n = ctOwnTotal(aff, aff.ownershipPct||0);
+  if(aff.ownershipPct!=null && n>100) return toastShow({icon:'alert', title:'Not marked as current', line:'Ownership at '+a.name+' would total '+n+'%.', ms:TOAST_MS});
+  const set = (end, from, to)=>{ aff.endDate = end; ctReindexAcct(a.id); ctAuditPerson(c.id, 'Left '+a.name, from, to); ctRerender(); };
+  set(null, 'Left', 'Current');
+  ctaFocus('[data-ct="arow"][data-v="'+c.id+'"]');
+  toastShow({icon:'check', title:'Marked as current', line:c.name+' at '+a.name, action:'Undo', ms:TOAST_UNDO_MS,
+    onAction: t=>{ set(was, 'Current', 'Left'); toastUpdate(t, {icon:'check', title:'Undone', line:c.name+' is back in Former', ms:TOAST_MS}); }});
+}
+function ctaFormerMenu(anchor, affId){
+  const aff = ctAffById(affId), a = ctaAcct();
+  menuFloatOpen(anchor, [{v:'open', t:'Open contact page'}, {v:'cur', t:'Mark as current'}], it=>{
+    if(it.v==='open'){ location.hash = '#/contact/'+aff.contactId; return; }
+    ctaRestore(a, affId);
+  });
+}
+document.addEventListener('click', e=>{
+  const t = e.target.closest('[data-ct]'); if(!t) return;
+  const k = t.dataset.ct, a = ctaAcct();
+  if(k==='afmr'){ CTA.former = !CTA.former; ctRerender(); return ctaFocus('[data-ct="afmr"]'); }
+  if(k==='arow') return ctaRowMenu(t, t.dataset.v);
+  if(k==='afrow') return ctaFormerMenu(t, t.dataset.v);
+  if(k==='apick' && a) return ctaAddPick(a, ctaAddPickables(a)[+t.dataset.n]);
+});
+/* O8: the add box's keys and focus, as the deal tab's (Arrow keys, Enter, Escape), on its own state */
+document.addEventListener('mousedown', e=>{ if(CTA.add.open && !e.target.closest('[data-cta-addrow]')){ CTA.add.open = false; ctaAddRedraw(); } }, true);
+document.addEventListener('focusout', e=>{
+  if(!CTA.add.open || !e.target.matches || !e.target.matches('[data-ct="aaddq"]')) return;
+  setTimeout(()=>{ const x = document.activeElement; if(CTA.add.open && !(x && x.closest && x.closest('[data-cta-addrow]'))){ CTA.add.open = false; ctaAddRedraw(); } }, 0);
+});
+document.addEventListener('focusin', e=>{ if(e.target.matches && e.target.matches('[data-ct="aaddq"]') && !CTA.add.open){ CTA.add.open = true; CTA.add.i = 0; ctaAddRedraw(); } });
+document.addEventListener('input', e=>{ if(e.target.matches && e.target.matches('[data-ct="aaddq"]')){ CTA.add.q = e.target.value; CTA.add.open = true; CTA.add.i = 0; ctaAddRedraw(); } });
+document.addEventListener('keydown', e=>{
+  const t = e.target; if(!(t.matches && t.matches('[data-ct="aaddq"]'))) return;
+  const a = ctaAcct(), n = ctaAddPickables(a).length;
+  if(e.key==='ArrowDown' || e.key==='ArrowUp'){ e.preventDefault(); if(!n) return; CTA.add.open = true; CTA.add.i = (CTA.add.i+(e.key==='ArrowDown'?1:n-1))%n; ctaAddRedraw(); }
+  else if(e.key==='Enter'){ e.preventDefault(); if(CTA.add.open && n) ctaAddPick(a, ctaAddPickables(a)[CTA.add.i]); }
+  else if(e.key==='Escape'){ e.preventDefault(); CTA.add = {open:false, q:CTA.add.q, i:0}; ctaAddRedraw(); }
+}, true);
 
 /* `scopeNoun` defaults to 'the deal' (every existing #/opp call site is unchanged); renderAccount()
    passes 'the account' (D132: an Account's own document list, kept separate from any Opportunity's,
