@@ -128,6 +128,9 @@ html,body{margin:0;padding:0}
 /* Reserve the scrollbar gutter permanently so pinning the body during a modal can't shift the
    layout sideways when the scrollbar disappears. */
 html{scrollbar-gutter:stable}
+/* D452 (D51, Known issue 3; WCAG 2.4.11, RESEARCH_01 §1b): an element scrolled into view by Tab or
+   Shift-Tab stops below the sticky 57px .topbar plus --s4, never under it. */
+html{scroll-padding-top:calc(57px + var(--s4))}
 /* Body pinned while a modal is open — the inline top offset carries the scroll position. */
 body.scroll-locked{position:fixed;left:0;right:0;width:100%;overflow:hidden}
 /* D218: the WebKit subpixel anti-aliasing override removed, no replacement, left at the
@@ -311,8 +314,10 @@ h1,h2,h3,p,dl,dd{margin:0}
    focused cell's outline. */
 .strip .met:first-child{border-radius:var(--r-l) 0 0 var(--r-l)}
 .strip .met:last-child{border-radius:0 var(--r-l) var(--r-l) 0}
-/* D322 O10: a clickable cell's label stops short of the hover "View", so the two never overlap. */
-.strip .met.expandable .met-label{padding-right:var(--s5)}
+/* D322 O10: a clickable cell's label stops short of the hover "View", so the two never overlap. D450:
+   the --s5 is a margin, not padding, so the label's box (and the overflow it clips) ends before View
+   too, not just its text; the room for the text and the ellipsis point are unchanged. */
+.strip .met.expandable .met-label{margin-right:var(--s5)}
 /* D322 O7: a focused headline cell draws the app's focus ring, inset so the strip's neighbours and
    edge never cover it. */
 .strip .met.expandable:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:calc(var(--focus-offset) * -1)}
@@ -2121,6 +2126,62 @@ a.ct-name:hover,a.ct-plink:hover{color:var(--brand)}
 /* O18: the Log activity sheet */
 .ct-log .kv{margin-top:0}
 .ct-log .viewtoggle{align-self:flex-start}
+
+/* ---------- the three list pages (D455; spec Other/mocks/contacts-list-spec-mock-v1.html, D454) ----------
+   O10, D446: on the Opportunities, Accounts and Contacts lists the first column's text starts on the page
+   heading's left edge and the last column's text ends on the content's right edge. O11: the row's hover fill
+   reaches --s2 past the text at both ends, with --r-s corners (D305's allowance), and the dividers above and
+   below the hovered row hide. Separate borders (for the rounded ends) would make the header 1px taller, so its
+   top rule is drawn inside instead. */
+#view-accounts .tbl-wrap,#view-pipeline .tbl-wrap,#view-contacts .tbl-wrap{margin:0 calc(-1 * var(--s2));padding:0 var(--s2)}
+#view-accounts table.tbl,#view-pipeline table.tbl,#view-contacts table.tbl{border-collapse:separate;border-spacing:0}
+#view-accounts .tbl th,#view-pipeline .tbl th,#view-contacts .tbl th{border-top:0;box-shadow:inset 0 1px 0 var(--line)}
+#view-accounts .tbl th:first-child,#view-accounts .tbl td:first-child,
+#view-pipeline .tbl th:first-child,#view-pipeline .tbl td:first-child,
+#view-contacts .tbl th:first-child,#view-contacts .tbl td:first-child{padding-left:0}
+#view-accounts .tbl th:last-child,#view-accounts .tbl td:last-child,
+#view-pipeline .tbl th:last-child,#view-pipeline .tbl td:last-child,
+#view-contacts .tbl th:last-child,#view-contacts .tbl td:last-child{padding-right:0}
+#view-accounts .tbl.clickable tbody tr:hover td,#view-pipeline .tbl.clickable tbody tr:hover td,#view-contacts .tbl.clickable tbody tr:hover td{box-shadow:none}
+#view-accounts .tbl.clickable tbody tr:hover td:first-child,#view-pipeline .tbl.clickable tbody tr:hover td:first-child,#view-contacts .tbl.clickable tbody tr:hover td:first-child{
+  box-shadow:calc(-1 * var(--s2)) 0 0 var(--hover);border-radius:var(--r-s) 0 0 var(--r-s)}
+#view-accounts .tbl.clickable tbody tr:hover td:last-child,#view-pipeline .tbl.clickable tbody tr:hover td:last-child,#view-contacts .tbl.clickable tbody tr:hover td:last-child{
+  box-shadow:var(--s2) 0 0 var(--hover);border-radius:0 var(--r-s) var(--r-s) 0}
+#view-accounts .tbl.clickable tbody tr:hover + tr td,#view-pipeline .tbl.clickable tbody tr:hover + tr td,#view-contacts .tbl.clickable tbody tr:hover + tr td{box-shadow:none}
+
+/* O4: the Contacts list table. Fixed layout, so long emails and company names truncate rather than push columns;
+   at least 1240px wide, so no tag is cut (below that the wrap scrolls sideways, O12). */
+#view-contacts table.cl-tbl{table-layout:fixed;width:100%;min-width:1240px}
+#view-contacts .cl-tbl col.c-name{width:17%}
+#view-contacts .cl-tbl col.c-co{width:13%}
+#view-contacts .cl-tbl col.c-em{width:auto}
+#view-contacts .cl-tbl col.c-type{width:168px}
+#view-contacts .cl-tbl col.c-deal{width:232px}
+#view-contacts .cl-tbl col.c-last{width:132px}
+#view-contacts .cl-tbl col.c-own{width:140px}
+#view-contacts .cl-tbl td{overflow:hidden;text-overflow:ellipsis}
+#view-contacts .cl-tbl td.cl-who{padding-top:var(--s1);padding-bottom:var(--s1)}
+#view-contacts .cl-tbl .ct-who{min-width:0}
+#view-contacts .cl-tbl .ct-name{color:var(--ink);font-weight:500;text-decoration:none}
+#view-contacts .cl-tbl .ct-sub,#view-contacts .cl-tbl .ct-name{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#view-contacts .cl-tbl td .ef{display:inline-flex;max-width:100%}
+#view-contacts .cl-tbl td.cl-em .ef{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#view-contacts .cl-tbl td.cl-em .ef.ef-editing{overflow:visible}
+#view-contacts .cl-tbl td.cl-em .ef-input{width:100%;min-width:0}
+#view-contacts .cl-tbl .cl-deal{display:inline-flex;gap:var(--s1);align-items:center;white-space:nowrap}
+#view-contacts .cl-tbl .cl-deal .tag.more{background:transparent;color:var(--ink-2);padding:0 var(--s1)}
+#view-contacts .cl-tbl .cl-dname{font-size:12px;color:var(--ink)}
+#view-contacts .cl-tbl .sec{color:var(--ink-3)}
+/* O6: an editable cell edits (its whole box, padding included); the rest of the row opens the page */
+#view-contacts .cl-tbl td.cl-edit{cursor:pointer}
+#view-contacts .cl-tbl td.cl-tags{text-overflow:clip}
+/* O8: inside a hovered row, the editable cell's own hover fill is one step darker, so it still reads as editable */
+#view-contacts .cl-tbl tbody tr:hover td.cl-edit .ef:hover{background:var(--sunken)}
+/* O8: the email messages sit in the cell's flow and wrap, so the row grows while one shows (D440, as the company tab) */
+#view-contacts .cl-tbl td.cl-em .ef-error{white-space:normal;overflow-wrap:anywhere}
+#view-contacts .cl-tbl td.cl-em .ef-error[hidden]{display:none}
+/* O13: the app's focus ring on the name link and the editable cells */
+#view-contacts .cl-tbl a.ct-name:focus-visible,#view-contacts .cl-tbl .ef:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
 </style>
 
 <div class="app">
@@ -2148,6 +2209,10 @@ a.ct-name:hover,a.ct-plink:hover{color:var(--brand)}
       <a class="rail-item" href="#/accounts" data-route="accounts">
         <svg class="rail-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v17"/><path d="M12 21v-8a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v8"/><path d="M4 21h16"/><path d="M7 7h1"/><path d="M7 11h1"/><path d="M7 15h1"/><path d="M15 13h1"/><path d="M15 17h1"/></svg>
         <span class="rail-label">Accounts</span>
+      </a>
+      <a class="rail-item" href="#/contacts" data-route="contacts">
+        <svg class="rail-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20.5c0-3.6 3.1-6.5 7-6.5s7 2.9 7 6.5"/></svg>
+        <span class="rail-label">Contacts</span>
       </a>
       <a class="rail-item inert" href="#/network" data-route="network" title="Network · soon" aria-label="Network · soon">
         <svg class="rail-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.3 11l7.4-4"/><path d="M8.3 13l7.4 4"/></svg>
@@ -2207,6 +2272,7 @@ a.ct-name:hover,a.ct-plink:hover{color:var(--brand)}
       <div class="view" id="view-opp"></div>
       <div class="view" id="view-intake"></div>
       <div class="view" id="view-accounts"></div>
+      <div class="view" id="view-contacts"></div>
       <div class="view" id="view-account"></div>
       <div class="view" id="view-network"></div>
       <div class="view" id="view-bdoperf"></div>
@@ -173957,22 +174023,26 @@ function activateEdit(span){
     session.settled = true;
     rerender();
   }
-  function commit(){
+  function commit(viaBlur){
     if(session.settled) return;
+    /* D457: a blur commit can run after its edit box has left the page (a redraw replaced it while it had focus;
+       Chromium fires focusout on the removed input). Nothing to read, so nothing is written or drawn; a save this
+       field already made stands. */
+    if(!document.getElementById(elId)){ session.settled = true; return; }
     const newVal = controlValue(def, elId);
     const error = efValidate(def, obj, newVal);
     if(error){ efShowError(elId, error); return; } // stays in edit mode, nothing written
     session.settled = true;
     const oldVal = def.get(obj);
-    if(String(oldVal)===String(newVal)){ rerender(); return; } // no change: no write, no feedback
+    const redraw = then=>efRedraw(span, viaBlur===true, rerender, then);
+    if(String(oldVal)===String(newVal)){ redraw(); return; } // no change: no write, no feedback
     /* D342 O2: a field whose pick is an action (the Stage field: a stage move, or the close or reopen
        dialog) writes nothing itself; the action does its own writes, Audit and toast. */
     if(def.act){ rerender(); def.act(recId, newVal); return; }
     def.set(obj, newVal);
     auditFieldEdit(recId, def, oldVal, newVal);
     efPushUndo(recId, def, oldVal, newVal);
-    rerender();
-    efConfirmSaved(recId, key, inModal);
+    redraw(()=>efConfirmSaved(recId, key, inModal));
   }
   if(isField){
     input.addEventListener('keydown', e=>{
@@ -173984,7 +174054,7 @@ function activateEdit(span){
     });
     input.addEventListener('input', ()=>efClearError(elId));
     if(def.type==='select') input.addEventListener('change', commit);
-    input.addEventListener('focusout', ()=>{ setTimeout(commit, 0); });
+    input.addEventListener('focusout', ()=>{ setTimeout(()=>commit(true), 0); });
   } else {
     // multiselect: `input` here is controlHtml()'s wrapping <div id=elId>, not itself focusable.
     input.addEventListener('keydown', e=>{ if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); revert(); } });
@@ -173992,9 +174062,76 @@ function activateEdit(span){
     input.addEventListener('focusout', ()=>{
       setTimeout(()=>{
         if(session.settled || input.contains(document.activeElement)) return;
-        commit();
+        commit(true);
       }, 0);
     });
+  }
+}
+/* D449 (Known issue 27), D376's approach made the engine's: a commit made by a press's own blur (a
+   mouse button is down) writes at once, but the cell and its page are redrawn only once that press's
+   click has been handled, so the control pressed is still the one under the pointer when the button
+   comes up (in WebKit too, where a pressed button never takes focus and the input simply blurs). If
+   the click left the page (a route change, or the cell's page no longer showing) or re-rendered the
+   cell's page itself, that render already reads the written value and nothing more is drawn; a cell
+   inside the Deal modal or the side panel always redraws, since the page behind it still shows the old
+   value. Otherwise the page is redrawn keeping what the click opened: focus, the Won/Lost menu and the
+   float menu move to their redrawn controls (efRedrawKeeping). The save confirmation plays after that
+   redraw, on whichever copy of the cell is then showing. Enter, Tab, a select's change and Escape do
+   not involve a press and redraw at once, as before. A key clears the flag too, since a native picker
+   can swallow the mouseup (not a change event: a text input's change fires on that same blur). */
+let EF_PRESSED = false;
+document.addEventListener('mousedown', ()=>{ EF_PRESSED = true; }, true);
+['mouseup', 'keydown'].forEach(t=>document.addEventListener(t, ()=>{ EF_PRESSED = false; }, true));
+function efAfterPress(fn){
+  if(EF_PRESSED) window.addEventListener('mouseup', ()=>setTimeout(fn, 0), {once:true, capture:true});
+  else fn();
+}
+function efRedraw(span, viaBlur, rerender, then){
+  if(!viaBlur || !EF_PRESSED){ rerender(); if(then) then(); return; }
+  const hash = location.hash, inOverlay = !!span.closest('.modal, .dd-panel');
+  const view = span.closest('.view') || document.querySelector('.view.active');
+  efAfterPress(()=>{
+    const stays = location.hash===hash && (!view || view.classList.contains('active'));
+    if(stays && (span.isConnected || inOverlay)) efRedrawKeeping(rerender);
+    if(then) then();
+  });
+}
+/* An element's place in the page, by child index from its nearest ancestor with an id, so its redrawn
+   counterpart can be found again; checked by tag and first class before it is used. */
+function efNodeKey(el){
+  if(!el || !el.isConnected || el===document.body) return null;
+  const p = [];
+  let n = el;
+  while(n.parentElement && !n.id){ p.unshift(Array.prototype.indexOf.call(n.parentElement.children, n)); n = n.parentElement; }
+  return n.id ? {id:n.id, p, tag:el.tagName, cls:el.classList[0]||''} : null;
+}
+function efNodeFind(k){
+  if(!k) return null;
+  let n = document.getElementById(k.id);
+  for(const i of k.p) n = n && n.children[i];
+  return n && n.tagName===k.tag && (n.classList[0]||'')===k.cls ? n : null;
+}
+function efRedrawKeeping(rerender){
+  const had = document.activeElement, focusKey = efNodeKey(had);
+  const cm = CLOSE_MENU, cmKey = cm && efNodeKey(cm.anchor), cmR = cm && cm.anchor.getBoundingClientRect();
+  const am = ACT_MENU, amKey = am && efNodeKey(am.anchor);
+  CLOSE_MENU = null;   // renderOpp() closes the Won/Lost menu (D342); this one was opened by the press, so it moves instead
+  rerender();
+  if(had && !had.isConnected){ const f = efNodeFind(focusKey); if(f) f.focus({preventScroll:true}); }
+  if(cm){
+    const a = efNodeFind(cmKey);
+    CLOSE_MENU = cm;
+    if(!a){ closeMenuClose(); }
+    else if(a!==cm.anchor){
+      const r = a.getBoundingClientRect();
+      cm.el.style.left = Math.round(parseFloat(cm.el.style.left)+r.left-cmR.left)+'px';
+      cm.el.style.top = Math.round(parseFloat(cm.el.style.top)+r.top-cmR.top)+'px';
+      cm.anchor = a;
+    }
+  }
+  if(am && ACT_MENU===am && !am.anchor.isConnected){
+    const a = efNodeFind(amKey);
+    if(a){ am.anchor = a; actMenuPlace(); } else actMenuClose();
   }
 }
 document.addEventListener('click', function(e){
@@ -174337,6 +174474,7 @@ function route(){
     bdoperf: 'BDO Performance',
     benchmarking: 'Benchmarking',
     contact: 'Contact',
+    contacts: 'Contacts',
   };
 
   if(view==='home'){ showView('view-home'); renderHome(); }
@@ -174435,9 +174573,17 @@ function route(){
   }
   else if(view==='contact' && id){
     CT_OPP = null;
+    /* D455 (O7): a contact page reached from the Contacts list keeps that list's context only while it is the row
+       the list points at; a list context of another kind is left alone (a deal reached from it keeps its bar). */
+    if(LIST_RETURN_CTX && LIST_RETURN_CTX.kind==='contacts' && LIST_RETURN_CTX.ids[LIST_RETURN_CTX.index] !== id) LIST_RETURN_CTX = null;
     renderContact(id); showView('view-contact');
     ctLevel();   // D432: rendered while hidden, so the Activity floor is measured only now (as showView's fades, D312)
     titles.contact = CONTACTS_BY_ID[id] ? CONTACTS_BY_ID[id].name : 'Contact';
+    if(LIST_KEYBOARD_STEP_PENDING){   // O7: after j or k, focus lands on Log activity
+      LIST_KEYBOARD_STEP_PENDING = false;
+      const log = document.querySelector('#view-contact [data-ct="log"]');
+      if(log) log.focus();
+    }
   }
   else if(view==='intake'){ renderIntake(id); showView('view-intake'); }
   else if(view==='accounts'){
@@ -174446,6 +174592,11 @@ function route(){
        the same persists-until-changed behavior PIPE_SEGMENT already has on a plain #/pipeline. */
     if(LIST_PENDING_RESTORE && LIST_PENDING_RESTORE.kind==='accounts') ACCT_TYPE_FILTER = LIST_PENDING_RESTORE.typeFilter;
     renderAccounts(); showView('view-accounts');
+  }
+  else if(view==='contacts'){
+    // D455 (O3): the tab persists until changed; a return from the bar puts back the one the row was clicked on
+    if(LIST_PENDING_RESTORE && LIST_PENDING_RESTORE.kind==='contacts') CL_FILTER = LIST_PENDING_RESTORE.filter;
+    renderContacts(); showView('view-contacts');
   }
   else if(view==='network'){ renderStub('view-network','Network','The full trade-relationship graph explorer. This pass wires network insight into the Opportunity record only; the standalone explorer is next.'); showView('view-network'); }
   else if(view==='bdoperf'){ renderStub('view-bdoperf','BDO Performance','Rep-level created/lost/won/activity intelligence — exec-only. Not built in this skeleton pass.'); showView('view-bdoperf'); }
@@ -174459,7 +174610,7 @@ function route(){
      make sense once the rest of route() (including that reset) has already run. Table selector is
      picked by kind since the two lists live in different views. */
   if(LIST_PENDING_RESTORE){
-    restoreListTableState(LIST_PENDING_RESTORE.kind==='accounts' ? '#view-accounts table.tbl' : '#view-pipeline table.tbl', LIST_PENDING_RESTORE);
+    restoreListTableState(LIST_KINDS[LIST_PENDING_RESTORE.kind].table, LIST_PENDING_RESTORE);
     LIST_PENDING_RESTORE = null;
   }
 }
@@ -174937,7 +175088,7 @@ document.addEventListener('click', function(e){
   const withKeys = Array.from(tbody.querySelectorAll(':scope > tr')).map(tr=>{
     const td = tr.children[colIndex];
     if(type==='text'){
-      const t = td ? td.textContent.trim() : '';
+      const t = td ? (td.dataset.sortText!=null ? td.dataset.sortText : td.textContent).trim() : '';
       return {tr, empty: t===''||t==='—', key: t.toLowerCase()};
     }
     const raw = td ? td.dataset.sort : undefined;
@@ -177294,6 +177445,13 @@ let LIST_PENDING_RESTORE = null;
    the intent across that gap to the one place (route()) that knows for certain the new render has
    actually finished. */
 let LIST_KEYBOARD_STEP_PENDING = false;
+/* D455: the three lists the return bar serves (D106, D146, and the Contacts list, D454 O7): for each kind, the
+   list's route, its table, the record route and view, and the noun in the bar's arrow labels. */
+const LIST_KINDS = {
+  pipeline:{list:'#/pipeline', table:'#view-pipeline table.tbl', rec:'#/opp/', view:'view-opp', noun:'deal'},
+  accounts:{list:'#/accounts', table:'#view-accounts table.tbl', rec:'#/account/', view:'view-account', noun:'account'},
+  contacts:{list:'#/contacts', table:'#view-contacts table.tbl', rec:'#/contact/', view:'view-contact', noun:'contact'},
+};
 
 function currentDaysInStage(o){
   const hist=getStageHistory(o.id); const term=hist[hist.length-1];
@@ -177408,7 +177566,7 @@ function captureListReturnCtx(kind, clickedId, tableSelector, label, extra){
   const ths = Array.from(table.querySelectorAll('thead th'));
   const sortedTh = ths.find(th=>th.hasAttribute('aria-sort'));
   return Object.assign({
-    kind, // 'pipeline' | 'accounts': which list, and by extension which record route/return hash
+    kind, // 'pipeline' | 'accounts' | 'contacts': which list, and by extension which record route/return hash (LIST_KINDS)
     label,
     ids: ids,
     index: ids.indexOf(clickedId),
@@ -177455,7 +177613,7 @@ function pipeHistoryRestore(){
 window.listReturnToList = function(){
   if(!LIST_RETURN_CTX) return;
   LIST_PENDING_RESTORE = LIST_RETURN_CTX;
-  location.hash = LIST_RETURN_CTX.kind==='accounts' ? '#/accounts' : '#/pipeline';
+  location.hash = LIST_KINDS[LIST_RETURN_CTX.kind].list;
 };
 /* Shared by the bar's arrow buttons and the j/k keyboard bindings. Mutates LIST_RETURN_CTX.index
    in place, rather than replacing it with a new object, so route()'s id-match checks (the #/opp
@@ -177469,7 +177627,7 @@ window.listStepRecord = function(delta){
   const next = ctx.index + delta;
   if(next < 0 || next >= ctx.ids.length) return; // the disabled arrow already prevents this; guard anyway
   ctx.index = next;
-  location.hash = (ctx.kind==='accounts' ? '#/account/' : '#/opp/')+ctx.ids[next];
+  location.hash = LIST_KINDS[ctx.kind].rec+ctx.ids[next];
 };
 /* Reorders the fresh table's rows to the captured snapshot (authoritative, independent of the
    comparator that produced it) and reapplies the sort indicator (cosmetic only, purely visual;
@@ -177501,7 +177659,7 @@ function restoreListTableState(tableSelector, ctx){
 function listReturnBarHtml(){
   if(!LIST_RETURN_CTX) return '';
   const ctx = LIST_RETURN_CTX;
-  const noun = ctx.kind==='accounts' ? 'account' : 'deal';
+  const noun = LIST_KINDS[ctx.kind].noun;
   const atStart = ctx.index<=0, atEnd = ctx.index>=ctx.ids.length-1;
   return '<div class="pipe-return-bar">'+
     '<span class="drill" onclick="listReturnToList()">Back to '+esc(ctx.label)+'</span>'+
@@ -177606,7 +177764,7 @@ function renderAccounts(){
         '<td class="sec">'+industryOrType+'</td>'+
         '<td class="num" data-sort="'+stats.openValue+'">'+stats.openCount+' &middot; '+moneyShort(stats.openValue)+'</td>'+
         '<td class="num" data-sort="'+stats.secondaryFigure+'">'+moneyShort(stats.secondaryFigure)+'</td>'+
-        '<td class="sec" data-sort="'+esc(stats.lastTouch||'')+'">'+fmtDate(stats.lastTouch)+'</td>'+
+        '<td class="sec" data-sort="'+esc(stats.lastTouch||'')+'">'+(stats.lastTouch ? fmtDate(stats.lastTouch) : 'None')+'</td>'+   // O9 (D455)
         '<td class="sec">'+esc(owner?owner.name:'–')+'</td>'+
       '</tr>';
     }).join('')+
@@ -177634,6 +177792,97 @@ window.openAccountRow = function(id){
   LIST_RETURN_CTX = captureListReturnCtx('accounts', id, '#view-accounts table.tbl', label, {typeFilter:ACCT_TYPE_FILTER});
   location.hash = '#/account/'+id;
 };
+
+/* ================================================================
+   CONTACTS LIST (D455; spec Other/mocks/contacts-list-spec-mock-v1.html, legend O1 to O13, D454). Contacts part 4
+   (D427). One row per person, everyone A to Z on arrival (Kevin, 2026-10-27), tabs by owner and contact type
+   (O3). Email and Owner are the contact page's own fields, edited in the row (O8); the name and every other cell
+   open the contact page with the list's return bar (O6, O7), through the same captureListReturnCtx()/
+   LIST_RETURN_CTX/listReturnBarHtml() machinery the other two lists use (LIST_KINDS).
+   ================================================================ */
+let CL_FILTER = 'all';   // O3: 'all' | 'mine' | 'borrowers' | 'partners' | 'advisors'; persists until changed
+const CL_TYPES = {borrowers:'Borrower contact', partners:'Referral partner', advisors:'Professional advisor'};
+const CL_LABEL = {all:'all contacts', mine:'my contacts', borrowers:'borrower contacts', partners:'partner contacts', advisors:'advisors'};
+const CL_NOUN = {all:'contacts', mine:'contacts you own', borrowers:'borrower contacts', partners:'partner contacts', advisors:'advisors'};
+// O5: each person's last activity, one pass over the live activity store
+function clLastActs(){
+  const m = {};
+  for(const k in ACTS_BY_ACCT) ACTS_BY_ACCT[k].forEach(a=>{ if(a.contactId && (!m[a.contactId] || a.date>m[a.contactId])) m[a.contactId] = a.date; });
+  return m;
+}
+function clPeople(){
+  const all = Object.values(CONTACTS_BY_ID);
+  const list = CL_FILTER==='all' ? all : CL_FILTER==='mine' ? all.filter(c=>c.ownerBdoId===CURRENT_BDO_ID) : all.filter(c=>c.contactType===CL_TYPES[CL_FILTER]);
+  return list.slice().sort((x,y)=>x.name.localeCompare(y.name));
+}
+/* O4: the first open opportunity, largest first, as the company Contacts tab draws it (ctaDealCell(), D441 O4),
+   then "+n" with the rest in its tooltip; a referral partner's row leads with the borrower's name. Not a link (O6). */
+function clDealCell(c){
+  const os = ctOpenOppsOf(c.id).sort((x,y)=>y.facilitySize-x.facilitySize);
+  if(!os.length) return '<td data-sort="0"><span class="sec">None</span></td>';
+  const partner = c.contactType==='Referral partner', o = os[0];
+  const lab = x=>(partner ? getAccount(x.accountId).name+' · ' : '')+productLabel(x.productType)+' · '+x.stage+' · '+moneyShort(x.facilitySize);
+  const more = os.length>1 ? '<span class="tag more" title="'+esc(os.slice(1).map(lab).join(', '))+'">+'+(os.length-1)+'</span>' : '';
+  const lead = partner ? '<span class="cl-dname">'+esc(getAccount(o.accountId).name)+'</span>' : productTagHtml(o.productType)+stageTagHtml(o);
+  return '<td class="cl-tags" data-sort="'+os.length+'" title="'+esc(lab(o))+'"><span class="cl-deal">'+lead+more+'</span></td>';
+}
+function clRowHtml(c, last){
+  const rc = 'contact:'+c.id, co = getAccount(c.accountId), owner = BDOS[c.ownerBdoId], la = last[c.id]||'';
+  return '<tr data-id="'+c.id+'">'+
+    '<td class="cl-who" data-sort-text="'+esc(c.name)+'"><div class="ct-who"><div class="ct-tile">'+esc(initials(c.name))+'</div><div class="ct-min0">'+ctLink(c, 'ct-name')+'<div class="ct-sub">'+esc(c.role||'')+'</div></div></div></td>'+
+    '<td class="sec" title="'+esc(co?co.name:'')+'">'+esc(co?co.name:'')+'</td>'+
+    '<td class="cl-edit cl-em">'+ctEf(rc, 'ct.email').replace('title="Click to edit"', 'title="'+esc(c.email||'')+'"')+'</td>'+
+    '<td class="cl-tags"><span class="tag ct-typetag">'+esc(c.contactType||'Other')+'</span></td>'+
+    clDealCell(c)+
+    '<td class="sec" data-sort="'+esc(la)+'">'+(la ? fmtDate(la) : 'None')+'</td>'+   // O9
+    '<td class="cl-edit" data-sort-text="'+esc(owner?owner.name:'')+'">'+ctMenuCell(rc, 'ct.owner')+'</td>'+
+  '</tr>';
+}
+/* keep: an inline edit's redraw keeps the rows shown, their order, the sort indicator and the scroll; a row that no
+   longer fits the tab (an Owner change on My contacts) stays until the tab is chosen again (O8). */
+function renderContacts(keep){
+  const el = document.getElementById('view-contacts');
+  let order = null, sortI = null, sortD = null;
+  if(keep){
+    const t = el.querySelector('table.tbl');
+    if(t){
+      order = Array.from(t.querySelectorAll('tbody > tr')).map(tr=>tr.dataset.id);
+      const ths = Array.from(t.querySelectorAll('thead th')), s = ths.find(h=>h.hasAttribute('aria-sort'));
+      if(s){ sortI = ths.indexOf(s); sortD = s.getAttribute('aria-sort'); }
+    }
+  }
+  const list = order ? order.map(id=>CONTACTS_BY_ID[id]).filter(Boolean) : clPeople(), last = clLastActs();
+  const b = (k,t)=>'<button class="'+(CL_FILTER===k?'active':'')+'" aria-pressed="'+(CL_FILTER===k)+'" onclick="setContactsFilter(\''+k+'\')">'+t+'</button>';
+  const table = list.length ? '<div class="tbl-wrap"><table class="tbl clickable cl-tbl"><colgroup><col class="c-name"><col class="c-co"><col class="c-em"><col class="c-type"><col class="c-deal"><col class="c-last"><col class="c-own"></colgroup><thead><tr>'+
+      sortableTh('Name',{type:'text'})+sortableTh('Company',{type:'text'})+sortableTh('Email',{type:'text'})+sortableTh('Type',{type:'text'})+
+      sortableTh('On open opportunities',{type:'num'})+sortableTh('Last activity',{type:'date'})+sortableTh('Owner',{type:'text'})+
+    '</tr></thead><tbody>'+list.map(c=>clRowHtml(c, last)).join('')+'</tbody></table></div>'
+    : '<div class="empty">No '+CL_NOUN[CL_FILTER]+' on file.</div>';   // O12
+  el.innerHTML = '<h1 class="page-heading">Contacts</h1>'+
+    '<div class="page-sub">'+list.length+' '+(list.length===1?'contact':'contacts')+'</div>'+
+    '<div class="pipe-toolbar"><div class="viewtoggle" data-seg="setContactsFilter">'+SEG_THUMB_HTML+
+      b('all','All')+b('mine','My contacts')+b('borrowers','Borrowers')+b('partners','Partners')+b('advisors','Advisors')+'</div></div>'+table;
+  if(order){
+    const tb = el.querySelector('tbody');
+    if(tb){ const by = {}; Array.from(tb.children).forEach(tr=>by[tr.dataset.id]=tr); order.forEach(id=>{ if(by[id]) tb.appendChild(by[id]); }); }
+    if(sortI!=null){ const th = el.querySelectorAll('thead th')[sortI]; if(th) th.setAttribute('aria-sort', sortD); }
+  }
+  EF_RERENDER = ()=>renderContacts(true);
+}
+window.setContactsFilter = function(key){ CL_FILTER = key; renderContacts(); };
+/* O6: an editable cell edits, a click on its padding included; anywhere else on the row, the name included, opens the
+   contact page with the return bar (O7). A Ctrl, Cmd or Shift click on the name opens it in a new tab. */
+document.addEventListener('click', e=>{
+  const v = document.getElementById('view-contacts');
+  if(!v.contains(e.target)) return;
+  const tr = e.target.closest('tbody tr[data-id]'); if(!tr) return;
+  const ec = e.target.closest('td.cl-edit');
+  if(ec){ if(!e.target.closest('.ef, input, select')){ const ef = ec.querySelector('.ef'); if(ef) ef.click(); } return; }
+  if(e.target.closest('a') && (e.metaKey || e.ctrlKey || e.shiftKey)) return;
+  e.preventDefault();
+  LIST_RETURN_CTX = captureListReturnCtx('contacts', tr.dataset.id, '#view-contacts table.tbl', CL_LABEL[CL_FILTER], {filter:CL_FILTER});
+  location.hash = '#/contact/'+tr.dataset.id;
+});
 
 /* ================================================================
    ACCOUNT 360 RECORD (D54). ONE renderAccount() fed by ONE accountConfig() (branches inside,
@@ -178920,6 +179169,9 @@ function toastStageMoved(oppId, fromStage, toStage){
     onAction: t=>{
       if(!o || o.outcome!=='open' || o.stage!==toStage){ toastDismiss(t); return; }
       moveOppStage(oppId, fromStage, 'undo');
+      /* D456 (D451's precedent): pressed from another page, the move back redraws whichever page is showing.
+         On the deal's own page moveOppStage() has already redrawn it, with its stage travel (D266). */
+      if(!(OPP_SECTION_FOR===oppId && document.getElementById('view-opp').classList.contains('active'))) rerenderShowing();
       toastUpdate(t, {icon:'check', title:'Stage move undone', line:name+' is back in '+fromStage, ms:TOAST_MS});
     }});
 }
@@ -179160,6 +179412,19 @@ window.cdSubmit = function(){
   if(CD.mode==='close') cdCommitClose(); else cdCommitReopen();
 };
 function cdRerender(o){ if(OPP_SECTION_FOR===o.id && EF_RERENDER) EF_RERENDER(); }
+/* D451 (Known issue 31): the close's Undo can be pressed from any page (the toast outlives the route),
+   so it redraws whichever page is showing, with route()'s own render for it, and an open side panel,
+   not only the deal's page. A record page redraws through its EF_RERENDER (the page's, not the side
+   panel's deal editor). Home's entrance plays on first landing only (D118), so a redraw shows none. */
+function rerenderShowing(){
+  const v = document.querySelector('.view.active'), id = v && v.id;
+  const page = SURF_KIND==='panel' && EF_RERENDER===panelEditRerender ? PANEL_PRIOR_RERENDER : EF_RERENDER;
+  if(id==='view-home') renderHome();
+  else if(id==='view-pipeline') renderPipeline();
+  else if(id==='view-accounts') renderAccounts();
+  else if((id==='view-opp' || id==='view-account' || id==='view-contact') && page) page();
+  if(SURF_EL && SURF_KIND==='panel' && PANEL_STACK.length) renderPanel();
+}
 function cdCommitClose(){
   const o = OPPS[CD.oppId], hist = STAGEHIST[o.id], d = CD, name = getAccount(o.accountId).name;
   const snap = {o:JSON.parse(JSON.stringify(o)), hist:JSON.parse(JSON.stringify(hist||[]))}, from = o.stage;
@@ -179195,7 +179460,7 @@ function cdCommitClose(){
       Object.assign(o, snap.o);
       STAGEHIST[o.id] = snap.hist;
       auditFieldEdit(o.id, CLOSE_UNDO_DEF, closedAs, from);
-      cdRerender(o);
+      rerenderShowing();
       toastUpdate(t, {icon:'check', title:'Close undone', line:name+' is back in '+from, ms:TOAST_MS});
     }});
 }
@@ -179659,7 +179924,7 @@ document.addEventListener('keydown', function(e){
   const ctx = LIST_RETURN_CTX;
   if(!ctx) return;
   if(MODAL_OPEN_KEY) return;
-  const activeViewId = ctx.kind==='accounts' ? 'view-account' : 'view-opp';
+  const activeViewId = LIST_KINDS[ctx.kind].view;
   if(!document.getElementById(activeViewId).classList.contains('active')) return;
   const tag = e.target.tagName;
   if(tag==='INPUT' || tag==='TEXTAREA' || tag==='SELECT' || e.target.isContentEditable) return;
@@ -179853,10 +180118,8 @@ DEF_INDEX[ACT_WHEN_DEF.key] = ACT_WHEN_DEF;
    edit box (the card was ~17px taller while editing, D375), which would move everything below it under
    the pointer too, so when a mouse button is down (the commit came from the press's own blur) the cell
    is redrawn once that press's click has been handled. ACT_UI.when is set at once either way, so the
-   click reads the new date. Other engine fields are untouched. */
-let ACT_PRESSED = false;
-document.addEventListener('mousedown', ()=>{ ACT_PRESSED = true; }, true);
-document.addEventListener('mouseup', ()=>{ ACT_PRESSED = false; }, true);
+   click reads the new date. Since D449 the press flag and the wait are the engine's (EF_PRESSED,
+   efAfterPress()), shared with every other field. */
 function actWhenRest(){
   const cell = document.querySelector('.view.active .act-tab .ef[data-key="act.when"]');
   const draw = ()=>{
@@ -179868,8 +180131,7 @@ function actWhenRest(){
     document.querySelectorAll('.view.active .act-up-scroll').forEach(fadeEdges);
     if(ACT_MENU) actMenuPlace();   // a With, On or Outcome menu opened by that click follows its field
   };
-  if(ACT_PRESSED) window.addEventListener('mouseup', ()=>setTimeout(draw, 0), {once:true, capture:true});
-  else draw();
+  efAfterPress(draw);
 }
 const ACT_ICON_PATHS = {
   Call:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/>',
@@ -180928,7 +181190,8 @@ function renderContact(id){
   if(!c){ el.innerHTML = '<div class="empty">Contact not found.</div>'; return; }
   EF_RERENDER = ()=>renderContact(id);
   const old = el.querySelector('.ct-ascroll'), top = old && old.dataset.cid===id ? old.scrollTop : 0;
-  el.innerHTML = ctContactHeaderHtml(c)+'<div class="ct-two">'+
+  // O7 (D455): the Contacts list's return bar, above the header, only when the page was reached from that list
+  el.innerHTML = (LIST_RETURN_CTX && LIST_RETURN_CTX.kind==='contacts' ? listReturnBarHtml() : '')+ctContactHeaderHtml(c)+'<div class="ct-two">'+
     '<div class="ct-col">'+ctPanel('About', ctAbout(c))+ctPanel('Companies', ctCompanies(c))+'</div>'+
     '<div class="ct-col">'+ctPanel('On open opportunities', ctOpenRows(c))+
       ctPanel('Activity', '<div class="ct-awrap"><div class="ct-ascroll" data-cid="'+esc(c.id)+'">'+ctActRows(c, ctContactActs(c.id))+'</div></div>', 'ct-acard')+'</div></div>';
