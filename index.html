@@ -1130,6 +1130,12 @@ table.tbl{width:100%;border-collapse:collapse}
 .tbl th[aria-sort] .th-sort::after{opacity:1;color:var(--ink)}
 .tbl th[aria-sort="ascending"] .th-sort::after{content:'\2191'}
 .tbl th[aria-sort="descending"] .th-sort::after{content:'\2193'}
+/* D459, D462 (spec mock list-pagination-spec-mock-v1, P15): on a right-aligned number header (sortableTh's num:true)
+   the arrow sits LEFT of the label, so the label ends over its figures; text headers keep it on the right. The arrow
+   box plus its gap is --s4, the same width the right padding reserved, so no column changes width and every text
+   header's label stays where it was. The label is anchored right, so a glyph change never moves it. */
+th.num .th-sort{display:flex;justify-content:flex-end;align-items:center;gap:var(--s1);padding-right:0}
+th.num .th-sort::after{position:static;transform:none;order:-1;flex:none;width:var(--s3);text-align:right}
 
 /* ---------- stage node track ----------
    Equal-width columns so every label sits below its own node at full column width and can
@@ -2182,6 +2188,74 @@ a.ct-name:hover,a.ct-plink:hover{color:var(--brand)}
 #view-contacts .cl-tbl td.cl-em .ef-error[hidden]{display:none}
 /* O13: the app's focus ring on the name link and the editable cells */
 #view-contacts .cl-tbl a.ct-name:focus-visible,#view-contacts .cl-tbl .ef:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
+
+/* ---------- list pagination (D460, D461, D467; spec Other/mocks/list-pagination-spec-mock-v1.html P1 to P14) ----------
+   P3: the bar under the table, on the heading's left edge and the table's right edge (D446), --s3 under the table,
+   in three columns so the pages sit in the true middle whatever the range and size read. */
+.lp-bar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:var(--s4);margin-top:var(--s3);min-height:var(--h);
+  font-size:12px;color:var(--ink-2)}
+.lp-range{justify-self:start;white-space:nowrap}
+.lp-pages{display:flex;align-items:center;gap:var(--s1)}
+.lp-size{justify-self:end}
+/* Below 900px (the app's narrow breakpoint) the three columns do not fit: the range and rows per page share the first
+   row and the pages sit centred under them, so the page never scrolls sideways (judgment; the spec draws 1440, 1728). */
+@media (max-width:900px){.lp-bar{grid-template-columns:1fr auto}.lp-pages{grid-column:1 / -1;grid-row:2;justify-self:center}}
+/* P4: the arrows are the return bar's own control (.pipe-return-arrow, D129), unchanged; the page numbers are the same
+   24px family, and the current page is the arrows' bordered box. */
+.lp-num{all:unset;box-sizing:border-box;min-width:24px;height:24px;padding:0 var(--s1);border:1px solid transparent;border-radius:var(--r-s);
+  display:inline-flex;align-items:center;justify-content:center;color:var(--ink-2);font-size:12px;cursor:pointer;
+  transition:background var(--t-fast) var(--ease)}
+.lp-num:hover{background:var(--hover)}
+.lp-num.on{border-color:var(--line-2);background:var(--paper);color:var(--ink);font-weight:500;cursor:default}
+.lp-num:focus-visible,.lp-trig:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
+.lp-gap{min-width:var(--s4);text-align:center;color:var(--ink-3)}
+/* P2: the rows-per-page trigger, the same 24px family; it opens the app's float menu (D418 edge). The caret is drawn,
+   not a 9px glyph under the 11px type floor. */
+.lp-trig{all:unset;box-sizing:border-box;height:24px;padding:0 var(--s2);border:1px solid var(--line-2);border-radius:var(--r-s);
+  display:inline-flex;align-items:center;gap:var(--s1);color:var(--ink);font-size:12px;cursor:pointer;transition:background var(--t-fast) var(--ease)}
+.lp-trig:hover{background:var(--hover)}
+.lp-car{width:var(--s2);height:var(--s2);fill:currentColor;color:var(--ink-3)}
+.newmenu.act-float.lp-menu{min-width:140px}
+/* D468: the Accounts and Opportunities lists keep their columns still across pages and sorts. Fixed layout, each
+   column's share of the table taken from today's full-list widths at 1440 (all rows drawn, D455's build). D469: the
+   table is no narrower than the narrowest width at which, with these shares, no cell of the full list is cut in any
+   segment or tab at the default sort, the rule Contacts' 1240px follows (D455): measured 908px for Opportunities
+   (narrower cuts "Closed · Won") and 1130px for Accounts (narrower cuts "Castellano Manufacturing"), set on the 4px
+   grid as 908 and 1132. Below it the table scrolls sideways inside its card (D466). A cell longer than its column
+   ends in an ellipsis, the name and industry carrying their full text as a tooltip. The last column takes what the
+   shares leave. */
+#view-accounts table.lp-fixed,#view-pipeline table.lp-fixed{table-layout:fixed;width:100%}
+#view-accounts table.lp-fixed{min-width:1132px}
+#view-pipeline table.lp-fixed{min-width:908px}
+#view-accounts table.lp-fixed td,#view-pipeline table.lp-fixed td{overflow:hidden;text-overflow:ellipsis}
+#view-accounts .acct-tbl col.c1{width:14.121%}
+#view-accounts .acct-tbl col.c2{width:14.356%}
+#view-accounts .acct-tbl col.c3{width:23.173%}
+#view-accounts .acct-tbl col.c4{width:11.543%}
+#view-accounts .acct-tbl col.c5{width:16.068%}
+#view-accounts .acct-tbl col.c6{width:10.57%}
+#view-accounts .acct-tbl col.c7{width:auto}
+#view-pipeline .pipe-tbl col.c1{width:17.676%}
+#view-pipeline .pipe-tbl col.c2{width:15.384%}
+#view-pipeline .pipe-tbl col.c3{width:12.76%}
+#view-pipeline .pipe-tbl col.c4{width:14.066%}
+#view-pipeline .pipe-tbl col.c5{width:13.23%}
+#view-pipeline .pipe-tbl col.c6{width:15.273%}
+#view-pipeline .pipe-tbl col.c7{width:auto}
+/* P9, D466: the header row stays visible under the top bar while the page scrolls, only where the table fits its card
+   (lpFit() measures that once the list is showing): the wrap then stops scrolling sideways. Where it does not fit, the
+   wrap keeps its sideways scroll and the header scrolls away. top is the top bar's height, read by lpFit() into
+   --lp-top on the list's view, not a literal. Its z-index of 2 is local and must stay under the top bar's raw 5
+   (Known issue 1's retrofit debt); --z-sticky (100) would paint over the top bar. The background is low specificity
+   so a hovered sortable header still shows --hover. */
+.tbl-wrap.lp-stick{overflow-x:visible}
+.tbl-wrap.lp-stick th{position:sticky;top:var(--lp-top);z-index:2;background:var(--page)}
+/* The strips beside the pinned header, where a hovered row's fill reaches --s2 past the text (D305), are covered with
+   --page, keeping the header's top hairline. */
+#view-accounts .tbl-wrap.lp-stick th:first-child,#view-pipeline .tbl-wrap.lp-stick th:first-child,#view-contacts .tbl-wrap.lp-stick th:first-child{
+  box-shadow:inset 0 1px 0 var(--line),calc(-1 * var(--s2)) 0 0 var(--page)}
+#view-accounts .tbl-wrap.lp-stick th:last-child,#view-pipeline .tbl-wrap.lp-stick th:last-child,#view-contacts .tbl-wrap.lp-stick th:last-child{
+  box-shadow:inset 0 1px 0 var(--line),var(--s2) 0 0 var(--page)}
 </style>
 
 <div class="app">
@@ -174449,6 +174523,7 @@ function route(){
   actMenuClose();   // D373
   if(CT_RED) ctRedCommit(true);   // O3: leaving the page keeps the roles draft, committed, nothing drawn
   CT_ADD = {open:false, q:'', i:0};
+  document.documentElement.style.scrollPaddingTop = '';   // D466: a pinned list's padding, put back by lpFit() if needed
   const hash = location.hash || '#/home';
   const parts = hash.replace('#/','').split('/');
   const view = parts[0] || 'home';
@@ -174490,7 +174565,7 @@ function route(){
        clicking a firm-wide finding ("Proposal is where deals die most often") landed on one demo
        BDO's own Proposal deals instead of the firm-wide set the item was actually about. There is
        no "my deals" for the exec persona, so exec always gets the firm-wide segment. */
-    if(!LIST_PENDING_RESTORE) LIST_PENDING_RESTORE = pipeHistoryRestore();   // D317: browser Back
+    if(!LIST_PENDING_RESTORE) LIST_PENDING_RESTORE = listHistoryRestore('pipeline');   // D317: browser Back
     if(LIST_PENDING_RESTORE && LIST_PENDING_RESTORE.kind==='pipeline'){
       /* D106 parts (b)/(c)/D129: listReturnToList() set this before navigating here (or D317's
          browser Back found it on the list's history entry). Restoring segment/filter before
@@ -174502,12 +174577,15 @@ function route(){
       PIPE_SEGMENT = LIST_PENDING_RESTORE.segment;
       PIPE_STAGE_FILTER = LIST_PENDING_RESTORE.stageFilter;
       PIPE_VIEW = 'list';
+      lpFromCtx('pipeline', LIST_PENDING_RESTORE);   // D467 (P11): page, order, sort and rows per page as left
     } else if(parts[1]==='stage' && parts[2]){
       PIPE_STAGE_FILTER = parts[2];
       PIPE_SEGMENT = ROLE==='exec' ? 'allOpen' : 'myOpen';
       PIPE_VIEW = 'list';
+      lpReset('pipeline');
     } else {
       PIPE_STAGE_FILTER = null;
+      lpReset('pipeline');   // D467: a fresh landing is page 1, the default order, the page size kept
     }
     renderPipeline(); showView('view-pipeline');
   }
@@ -174590,12 +174668,20 @@ function route(){
     /* D146: restoring the type filter on return mirrors the pipeline branch's own segment
        restore above. A plain #/accounts navigation leaves ACCT_TYPE_FILTER exactly where it was,
        the same persists-until-changed behavior PIPE_SEGMENT already has on a plain #/pipeline. */
-    if(LIST_PENDING_RESTORE && LIST_PENDING_RESTORE.kind==='accounts') ACCT_TYPE_FILTER = LIST_PENDING_RESTORE.typeFilter;
+    if(!LIST_PENDING_RESTORE) LIST_PENDING_RESTORE = listHistoryRestore('accounts');   // D464: browser Back
+    if(LIST_PENDING_RESTORE && LIST_PENDING_RESTORE.kind==='accounts'){
+      ACCT_TYPE_FILTER = LIST_PENDING_RESTORE.typeFilter;
+      lpFromCtx('accounts', LIST_PENDING_RESTORE);
+    } else lpReset('accounts');
     renderAccounts(); showView('view-accounts');
   }
   else if(view==='contacts'){
     // D455 (O3): the tab persists until changed; a return from the bar puts back the one the row was clicked on
-    if(LIST_PENDING_RESTORE && LIST_PENDING_RESTORE.kind==='contacts') CL_FILTER = LIST_PENDING_RESTORE.filter;
+    if(!LIST_PENDING_RESTORE) LIST_PENDING_RESTORE = listHistoryRestore('contacts');   // D464: browser Back
+    if(LIST_PENDING_RESTORE && LIST_PENDING_RESTORE.kind==='contacts'){
+      CL_FILTER = LIST_PENDING_RESTORE.filter;
+      lpFromCtx('contacts', LIST_PENDING_RESTORE);
+    } else lpReset('contacts');
     renderContacts(); showView('view-contacts');
   }
   else if(view==='network'){ renderStub('view-network','Network','The full trade-relationship graph explorer. This pass wires network insight into the Opportunity record only; the standalone explorer is next.'); showView('view-network'); }
@@ -174605,12 +174691,11 @@ function route(){
 
   document.getElementById('topbar-title').textContent = titles[view] || 'CerveauX';
   window.scrollTo(0,0);
-  /* D106 parts (b)/(c)/D129, generalized by D146: applied AFTER the scrollTo(0,0) above, or it
-     would be immediately overwritten. Reordering the fresh table's rows and restoring scroll only
-     make sense once the rest of route() (including that reset) has already run. Table selector is
-     picked by kind since the two lists live in different views. */
+  /* D106 parts (b)/(c)/D129, generalized by D146: applied AFTER the scrollTo(0,0) above, or it would be immediately
+     overwritten. The list already drew the page holding the record (lpFromCtx()); lpLand() puts the scroll back and
+     starts the row's flash (P11). */
   if(LIST_PENDING_RESTORE){
-    restoreListTableState(LIST_KINDS[LIST_PENDING_RESTORE.kind].table, LIST_PENDING_RESTORE);
+    lpLand(LIST_PENDING_RESTORE);
     LIST_PENDING_RESTORE = null;
   }
 }
@@ -174618,6 +174703,7 @@ function showView(id){
   const v = document.getElementById(id);
   v.classList.add('active');
   v.querySelectorAll(FADE_SEL).forEach(fadeEdges); // rendered while hidden, so measured only now (D312)
+  lpFitShowing();   // D466: likewise, a list's header pin is measured only once it is showing
 }
 window.addEventListener('hashchange', route);
 
@@ -175067,25 +175153,14 @@ function sortableTh(label, opts){
 
    Empty/null convention: a cell with no data-sort (numeric/date/currency) or no text (text) sorts
    to the END, regardless of direction — an unknown value is never "smallest" or "earliest," and
-   flipping direction shouldn't make missing data jump from last to first. */
-document.addEventListener('click', function(e){
-  const btn = e.target.closest('.th-sort');
-  if(!btn) return;
-  const th = btn.closest('th');
-  const table = btn.closest('table');
-  const theadRow = table && table.querySelector('thead tr');
-  const tbody = table && table.querySelector('tbody');
-  if(!th || !theadRow || !tbody) return;
+   flipping direction shouldn't make missing data jump from last to first.
 
-  const ths = Array.from(theadRow.children);
-  const colIndex = ths.indexOf(th);
-  const type = th.dataset.sortType || 'text';
-  const dir = th.getAttribute('aria-sort')==='ascending' ? 'descending' : 'ascending';
-  ths.forEach(h=>{ if(h!==th) h.removeAttribute('aria-sort'); });
-  th.setAttribute('aria-sort', dir);
-
+   D467: the three paged lists (Opportunities, Accounts, Contacts) hold more rows than they draw, so a header click
+   there sorts the whole list in lpSort(), with this same comparator (sortRowsByColumn()), then shows page 1 (P6).
+   Every other table sorts its own rows here, as before. */
+function sortRowsByColumn(rows, colIndex, type, dir){
   const dirMul = dir==='ascending' ? 1 : -1;
-  const withKeys = Array.from(tbody.querySelectorAll(':scope > tr')).map(tr=>{
+  const withKeys = rows.map(tr=>{
     const td = tr.children[colIndex];
     if(type==='text'){
       const t = td ? (td.dataset.sortText!=null ? td.dataset.sortText : td.textContent).trim() : '';
@@ -175105,7 +175180,25 @@ document.addEventListener('click', function(e){
     if(type==='text') return a.key.localeCompare(b.key) * dirMul;
     return (a.key - b.key) * dirMul;
   });
-  withKeys.forEach(w=>tbody.appendChild(w.tr));
+  return withKeys.map(w=>w.tr);
+}
+document.addEventListener('click', function(e){
+  const btn = e.target.closest('.th-sort');
+  if(!btn) return;
+  const th = btn.closest('th');
+  const table = btn.closest('table');
+  const theadRow = table && table.querySelector('thead tr');
+  const tbody = table && table.querySelector('tbody');
+  if(!th || !theadRow || !tbody) return;
+  const paged = lpKindOf(table);
+  if(paged){ lpSort(paged, th); return; }
+
+  const ths = Array.from(theadRow.children);
+  const dir = th.getAttribute('aria-sort')==='ascending' ? 'descending' : 'ascending';
+  ths.forEach(h=>{ if(h!==th) h.removeAttribute('aria-sort'); });
+  th.setAttribute('aria-sort', dir);
+  sortRowsByColumn(Array.from(tbody.querySelectorAll(':scope > tr')), ths.indexOf(th), th.dataset.sortType || 'text', dir)
+    .forEach(tr=>tbody.appendChild(tr));
 });
 
 window.openModal = function(key){
@@ -177448,14 +177541,223 @@ let LIST_KEYBOARD_STEP_PENDING = false;
 /* D455: the three lists the return bar serves (D106, D146, and the Contacts list, D454 O7): for each kind, the
    list's route, its table, the record route and view, and the noun in the bar's arrow labels. */
 const LIST_KINDS = {
-  pipeline:{list:'#/pipeline', table:'#view-pipeline table.tbl', rec:'#/opp/', view:'view-opp', noun:'deal'},
-  accounts:{list:'#/accounts', table:'#view-accounts table.tbl', rec:'#/account/', view:'view-account', noun:'account'},
-  contacts:{list:'#/contacts', table:'#view-contacts table.tbl', rec:'#/contact/', view:'view-contact', noun:'contact'},
+  pipeline:{list:'#/pipeline', lview:'view-pipeline', table:'#view-pipeline table.tbl', rec:'#/opp/', view:'view-opp', noun:'deal'},
+  accounts:{list:'#/accounts', lview:'view-accounts', table:'#view-accounts table.tbl', rec:'#/account/', view:'view-account', noun:'account'},
+  contacts:{list:'#/contacts', lview:'view-contacts', table:'#view-contacts table.tbl', rec:'#/contact/', view:'view-contact', noun:'contact'},
 };
+
+/* ---------- list pagination (D460, D461, D467; spec Other/mocks/list-pagination-spec-mock-v1.html P1 to P14) ----------
+   The three lists show one page of rows and draw only that page (P14). Each list's state (LP): the page, rows per page
+   (remembered for each list in this browser, P2), the full displayed order as ids, the sorted column, and `land`, a
+   record whose page to show on the next draw (a return, P11). The list's render orders its records through
+   lpOrder() and draws lpSlice(); every other table in the app keeps the shared sort and draws all its rows (P1).
+   A fresh landing (the side menu, a plain hash, a tab, segment or stage-filter change) starts at page 1 in the list's
+   default order, page size kept (lpReset); a redraw inside the list (an edit, an Undo, a page change) keeps it all. */
+const LP_SIZES = [25, 50, 100];
+const LP_NOUN = {pipeline:['opportunity','opportunities','Opportunities'], accounts:['account','accounts','Accounts'], contacts:['contact','contacts','Contacts']};
+// a page, sort or size change keeps a Contacts row that no longer fits its tab, as an edit's redraw does (O8)
+const LP_RENDER = {pipeline:()=>renderPipeline(), accounts:()=>renderAccounts(), contacts:()=>renderContacts(true)};
+const LP_CARET = '<svg class="lp-car" viewBox="0 0 8 8" aria-hidden="true" focusable="false"><path d="M1 2.5h6L4 6z"/></svg>';
+const LP = {};
+let LP_TOKEN = 0;   // each captured return context's own number, so browser Back can tell the live one (D465)
+Object.keys(LIST_KINDS).forEach(k=>{
+  let size = 50;
+  try{ const v = +localStorage.getItem('lp.size.'+k); if(LP_SIZES.includes(v)) size = v; }catch(e){}
+  LP[k] = {page:1, size, ids:null, sortI:null, sortDir:null, land:null, recs:[], row:null};
+});
+function lpReset(k){ Object.assign(LP[k], {page:1, ids:null, sortI:null, sortDir:null, land:null}); }
+/* The records in display order: the kept order first (ids), then any record new to the list at the end. `keepGone`
+   looks up a kept id no longer in the list, so an edit's redraw keeps a row that no longer fits its tab (Contacts O8). */
+function lpOrder(k, recs, keepGone){
+  const st = LP[k];
+  if(st.ids){
+    const by = {}, kept = new Set(st.ids);
+    recs.forEach(r=>{ by[r.id] = r; });
+    recs = st.ids.map(id=>by[id] || (keepGone ? keepGone(id) : null)).filter(Boolean).concat(recs.filter(r=>!kept.has(r.id)));
+  }
+  st.ids = recs.map(r=>r.id);
+  st.recs = recs;
+  if(st.land){ const i = st.ids.indexOf(st.land); if(i>=0) st.page = Math.floor(i/st.size)+1; st.land = null; }
+  st.page = Math.min(Math.max(1, st.page), lpPages(k));
+  return recs;
+}
+function lpPages(k){ return Math.max(1, Math.ceil(LP[k].ids.length/LP[k].size)); }
+function lpSlice(k){ const st = LP[k], a = (st.page-1)*st.size; return st.recs.slice(a, a+st.size); }
+// P3, P4, P5, P13: the range on the left, the pages in the middle (previous, numbers, next), rows per page on the right
+function lpBarHtml(k){
+  const st = LP[k], n = st.ids.length, P = lpPages(k), cur = st.page, a = (cur-1)*st.size, N = LP_NOUN[k];
+  const want = new Set([1, P, cur-1, cur, cur+1]);
+  if(cur<=3) [2,3,4].forEach(x=>want.add(x));
+  if(cur>=P-2) [P-1,P-2,P-3].forEach(x=>want.add(x));
+  let nums = '', last = 0;
+  Array.from(want).filter(x=>x>=1 && x<=P).sort((x,y)=>x-y).forEach(p=>{
+    if(p-last>1) nums += '<span class="lp-gap" aria-hidden="true">…</span>';
+    nums += '<button type="button" class="lp-num'+(p===cur?' on':'')+'" data-lpn="'+p+'" aria-label="Page '+p+'"'+(p===cur?' aria-current="page"':'')+'>'+p+'</button>';
+    last = p;
+  });
+  return '<nav class="lp-bar" data-lp-kind="'+k+'" aria-label="'+N[2]+' pages">'+
+    '<span class="lp-range">'+lpRange(k)+'</span>'+
+    '<span class="lp-pages">'+
+      '<button type="button" class="pipe-return-arrow" data-lp="prev" aria-label="Previous page"'+(cur<=1?' disabled':'')+'>&lsaquo;</button>'+nums+
+      '<button type="button" class="pipe-return-arrow" data-lp="next" aria-label="Next page"'+(cur>=P?' disabled':'')+'>&rsaquo;</button>'+
+    '</span>'+
+    '<span class="lp-size"><button type="button" class="lp-trig" data-lpm="size" aria-haspopup="menu">'+st.size+' per page'+LP_CARET+'</button></span>'+
+  '</nav>';
+}
+function lpRange(k){
+  const st = LP[k], n = st.ids.length, a = (st.page-1)*st.size, N = LP_NOUN[k];
+  return (a+1)+'–'+Math.min(a+st.size, n)+' of '+n+' '+(n===1?N[0]:N[1]);
+}
+/* P5: the range is announced when it changes, from one live region that outlives the bar's redraws */
+function lpAnnounce(k){
+  let el = document.getElementById('lp-live');
+  if(!el){ el = document.createElement('div'); el.id = 'lp-live'; el.className = 'sr-only'; el.setAttribute('aria-live', 'polite'); document.body.appendChild(el); }
+  el.textContent = lpRange(k);
+}
+/* After a list's draw: its sort indicator, a running flash dropped with the old rows, and the header pin once showing */
+function lpDrawn(k){
+  lpFlashStop();
+  const st = LP[k], t = document.querySelector(LIST_KINDS[k].table);
+  if(t && st.sortI!=null){ const th = t.querySelectorAll('thead th')[st.sortI]; if(th) th.setAttribute('aria-sort', st.sortDir); }
+  lpFit(k);
+}
+function lpTopbarH(){ const b = document.querySelector('.topbar'); return b ? b.getBoundingClientRect().height : 0; }
+/* D466: the header row is pinned only where the table fits its card. Measured with the pin off, only once the list is
+   showing (route() draws while the view is hidden, where every width reads 0), and again on every draw, a resize and
+   the fonts loading. While pinned, a control reached by Tab stops below the top bar and the header plus --s4 (D452's
+   rule extended); otherwise D452's own padding stands. */
+function lpFit(k){
+  const v = document.getElementById(LIST_KINDS[k].lview), html = document.documentElement;
+  if(!v || !v.classList.contains('active')) return;
+  html.style.scrollPaddingTop = '';
+  const w = v.querySelector('.tbl-wrap'), t = w && w.querySelector('table.tbl');
+  if(!t) return;
+  w.classList.remove('lp-stick');
+  const cs = getComputedStyle(w), room = w.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+  if(t.getBoundingClientRect().width > room + 0.5) return;
+  const top = lpTopbarH();
+  v.style.setProperty('--lp-top', top+'px');
+  w.classList.add('lp-stick');
+  html.style.scrollPaddingTop = (top + t.tHead.getBoundingClientRect().height + parseFloat(getComputedStyle(html).getPropertyValue('--s4')))+'px';
+}
+function lpFitShowing(){ Object.keys(LIST_KINDS).forEach(lpFit); }
+window.addEventListener('resize', lpFitShowing);
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(lpFitShowing);
+/* P6, P7, D460 item 5: when the table's top is above the window, bring it back to just under the top bar */
+function lpToTop(k){
+  const t = document.querySelector(LIST_KINDS[k].table);
+  if(!t) return;
+  const y = t.getBoundingClientRect().top + window.scrollY - lpTopbarH() - parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--s4'));
+  if(window.scrollY > y) window.scrollTo(0, Math.max(0, y));
+}
+/* A change of what the list holds or how it is ordered leaves the list's history entry without its return snapshot,
+   so a later Back onto it does not replay a state the list has since left. */
+function lpDropSnapshot(){
+  try{ if(history.state && history.state.listReturn) history.replaceState(Object.assign({}, history.state, {listReturn:null}), ''); }catch(e){}
+}
+/* A tab, segment, stage filter or List/Board change: page 1, the default order, the top of the table (D460 item 5) */
+function lpChange(k){ lpReset(k); lpDropSnapshot(); LP_RENDER[k](); lpToTop(k); }
+function lpGo(k, page, focusSel){
+  LP[k].page = page; lpDropSnapshot(); LP_RENDER[k](); lpToTop(k); lpAnnounce(k);
+  // P7: focus stays on the control pressed (the page number once an arrow is off at either end)
+  const f = focusSel && document.querySelector('#'+LIST_KINDS[k].lview+' .lp-bar '+focusSel);
+  if(f && !f.disabled) f.focus({preventScroll:true});
+}
+/* P6: a header click on one of the three lists sorts the whole list with the shared sort's comparator (empties last),
+   then shows page 1. Every row is drawn off the page to read its sort key the way the shared sort reads a cell. */
+function lpKindOf(table){ return Object.keys(LIST_KINDS).find(k=>document.querySelector(LIST_KINDS[k].table)===table) || null; }
+function lpSort(k, th){
+  const st = LP[k], ths = Array.from(th.parentNode.children), ci = ths.indexOf(th);
+  const dir = st.sortI===ci && st.sortDir==='ascending' ? 'descending' : 'ascending';
+  const had = document.activeElement===th.querySelector('.th-sort');
+  const tb = document.createElement('tbody');
+  tb.innerHTML = st.recs.map(st.row).join('');
+  st.ids = sortRowsByColumn(Array.from(tb.children), ci, th.dataset.sortType||'text', dir).map(tr=>tr.dataset.id);
+  st.sortI = ci; st.sortDir = dir; st.page = 1;
+  lpDropSnapshot(); LP_RENDER[k](); lpToTop(k); lpAnnounce(k);
+  if(had){ const b = document.querySelector(LIST_KINDS[k].table+' thead th:nth-child('+(ci+1)+') .th-sort'); if(b) b.focus({preventScroll:true}); }
+}
+// P3, P7, P8: the bar's controls
+document.addEventListener('click', e=>{
+  const bar = e.target.closest('.lp-bar');
+  if(!bar) return;
+  const k = bar.dataset.lpKind, st = LP[k];
+  const a = e.target.closest('[data-lp]');
+  if(a){
+    if(a.disabled) return;
+    const d = a.dataset.lp, np = st.page + (d==='next' ? 1 : -1);
+    lpGo(k, np, np<=1 || np>=lpPages(k) ? '[data-lpn="'+np+'"]' : '[data-lp="'+d+'"]');
+    return;
+  }
+  const n = e.target.closest('[data-lpn]');
+  if(n){ const p = +n.dataset.lpn; if(p!==st.page) lpGo(k, p, '[data-lpn="'+p+'"]'); return; }
+  const m = e.target.closest('[data-lpm]');
+  if(!m) return;
+  menuFloatOpen(m, LP_SIZES.map(s=>({v:s, t:s+' per page', on:s===st.size})), it=>{
+    const first = (st.page-1)*st.size;   // P8: the page holding the first row you were looking at
+    st.size = it.v;
+    try{ localStorage.setItem('lp.size.'+k, it.v); }catch(err){}
+    st.page = Math.floor(first/st.size)+1;
+    lpDropSnapshot(); LP_RENDER[k](); lpAnnounce(k);
+    const t = document.querySelector('#'+LIST_KINDS[k].lview+' .lp-bar [data-lpm="size"]');
+    if(t) t.focus({preventScroll:true});
+  });
+  if(ACT_MENU && ACT_MENU.anchor===m){ ACT_MENU.el.classList.add('lp-menu'); actMenuPlace(); }
+});
+/* P11: on a return, the row opened (or the last one stepped to) flashes: its cells fill with --brand-a15 over --t-fast,
+   hold EF_SAVE_HOLD_MS (the save confirmation's hold, D256), then clear over --t-base, all linear (D256's rule), the
+   tokens read from :root at call time (efConfirmSaved()'s pattern). Reduced motion: the fill shows at once, holds the
+   full hold and clears at once. Started on the fresh row, found by id, from a frame after the list is showing, so the
+   hold runs from the first paint; any later draw of the list cancels it with the rows it replaces. */
+let LP_FLASH = [];
+function lpFlashStop(){ LP_FLASH.forEach(an=>an.cancel()); LP_FLASH = []; }
+function lpFlash(k, id){
+  lpFlashStop();
+  const tr = document.querySelector(LIST_KINDS[k].table+' tbody tr[data-id="'+id+'"]');
+  if(!tr || typeof tr.animate!=='function') return;
+  const root = getComputedStyle(document.documentElement), fill = root.getPropertyValue('--brand-a15').trim(), hold = EF_SAVE_HOLD_MS;
+  const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const fast = parseFloat(root.getPropertyValue('--t-fast')), base = parseFloat(root.getPropertyValue('--t-base')), total = fast+hold+base;
+  const frames = reduced ? [{backgroundColor:fill}, {backgroundColor:fill}]
+    : [{backgroundColor:'transparent', offset:0}, {backgroundColor:fill, offset:fast/total},
+       {backgroundColor:fill, offset:(fast+hold)/total}, {backgroundColor:'transparent', offset:1}];
+  Array.from(tr.children).forEach(td=>LP_FLASH.push(td.animate(frames, {duration: reduced ? hold : total, easing:'linear'})));
+}
+/* A return (the return bar's back link, or browser Back onto the list's entry): the list state before it draws */
+function lpFromCtx(k, ctx){
+  Object.assign(LP[k], {ids:ctx.ids.slice(), sortI:ctx.sortColIndex, sortDir:ctx.sortDir, size:ctx.size||LP[k].size,
+    page:ctx.page||1, land:ctx.ids[ctx.index]});
+}
+/* ...and after it is showing: the scroll (P11: kept if it is the page left, else the row mid-window), then the flash */
+function lpLand(ctx){
+  const k = ctx.kind, st = LP[k], id = ctx.ids[ctx.index];
+  if(!document.getElementById(LIST_KINDS[k].lview).classList.contains('active')) return;
+  const tr = document.querySelector(LIST_KINDS[k].table+' tbody tr[data-id="'+id+'"]');
+  if(st.page===ctx.page && st.size===ctx.size) window.scrollTo(0, ctx.scrollY);
+  else if(tr){ const r = tr.getBoundingClientRect(); window.scrollTo(0, Math.max(0, r.top + window.scrollY - window.innerHeight/2 + r.height/2)); }
+  if(tr) requestAnimationFrame(()=>lpFlash(k, id));
+}
 
 function currentDaysInStage(o){
   const hist=getStageHistory(o.id); const term=hist[hist.length-1];
   return daysBetween(term.enteredDate,TODAY);
+}
+
+/* One Opportunities list row. data-id lets captureListReturnCtx() and lpLand() find a row by record; the onclick
+   carries only the id, never an index, since the list's order lives in LP.pipeline.ids (D467) and a row's place in
+   it changes with every sort. openPipelineRecord() captures the list's context before navigating. */
+function pipeRowHtml(o){
+  const owner=BDOS[o.bdoId];
+  const days = o.outcome==='open' ? currentDaysInStage(o) : null;
+  return '<tr data-id="'+o.id+'" onclick="openPipelineRecord(\''+o.id+'\')">'+
+    '<td class="name" title="'+esc(o.name)+'">'+esc(o.name)+'</td>'+
+    '<td class="sec">'+esc(owner?owner.name:'')+'</td>'+
+    '<td class="sec">'+productTagHtml(o.productType)+'</td>'+
+    '<td class="sec">'+stageTagHtml(o)+'</td>'+
+    '<td class="num" data-sort="'+o.facilitySize+'">'+moneyPlain(o.facilitySize)+'</td>'+
+    '<td class="sec" data-sort="'+esc(o.expectedCloseDate||'')+'">'+fmtDate(o.expectedCloseDate)+'</td>'+
+    '<td class="num"'+(days!=null?' data-sort="'+days+'"':'')+'>'+(days!=null?days:'—')+'</td>'+
+  '</tr>';
 }
 
 function renderPipeline(){
@@ -177494,36 +177796,17 @@ function renderPipeline(){
     '</div>';
   }).join('')+'</div>';
 
-  const sorted = opps.slice().sort((a,b)=>b.facilitySize-a.facilitySize);
-  const listHtml = '<div class="tbl-wrap"><table class="tbl clickable"><thead><tr>'+
+  /* P1, P14: List view orders the whole set and draws one page; an empty set shows its empty state and no bar (P5,
+     DESIGN_STANDARDS §7a). Board is not paged. */
+  const listed = PIPE_VIEW==='list' ? lpOrder('pipeline', opps.slice().sort((a,b)=>b.facilitySize-a.facilitySize)) : [];
+  LP.pipeline.row = pipeRowHtml;
+  const listHtml = !listed.length ? '<div class="empty">No opportunities'+(PIPE_STAGE_FILTER ? ' in '+esc(PIPE_STAGE_FILTER) : '')+' for '+esc(seg.label)+'.</div>' :
+    '<div class="tbl-wrap"><table class="tbl clickable lp-fixed pipe-tbl"><colgroup><col class="c1"><col class="c2"><col class="c3"><col class="c4"><col class="c5"><col class="c6"><col class="c7"></colgroup><thead><tr>'+
     sortableTh('Deal',{type:'text'})+sortableTh('Owner',{type:'text'})+
     sortableTh('Product',{type:'text'})+sortableTh('Stage',{type:'text'})+
     sortableTh('Facility size',{num:true,type:'currency'})+sortableTh('Expected close',{type:'date'})+
     sortableTh('Days in stage',{num:true,type:'number'})+
-    '</tr></thead><tbody>'+
-    sorted.map(o=>{
-      const owner=BDOS[o.bdoId];
-      const days = o.outcome==='open' ? currentDaysInStage(o) : null;
-      /* D106 parts (b)/(c)/D129: data-id lets captureListReturnCtx() and restoreListTableState()
-         read/reorder the literal displayed row order straight from the DOM, without re-parsing
-         each row's own onclick string. openPipelineRecord() captures the list's full context
-         (segment, filter, this exact row order, scroll position) before navigating, since that's
-         the last moment the list is still on screen to read from. No index is baked into the
-         onclick itself: the D84 sortable-table listener reorders rows via plain DOM
-         appendChild() without rewriting any onclick attribute, so a literal index here would go
-         stale the moment a column is sorted; captureListReturnCtx() derives the clicked row's
-         index fresh from wherever it actually sits in the DOM at click time instead. */
-      return '<tr data-id="'+o.id+'" onclick="openPipelineRecord(\''+o.id+'\')">'+
-        '<td class="name">'+esc(o.name)+'</td>'+
-        '<td class="sec">'+esc(owner?owner.name:'')+'</td>'+
-        '<td class="sec">'+productTagHtml(o.productType)+'</td>'+
-        '<td class="sec">'+stageTagHtml(o)+'</td>'+
-        '<td class="num" data-sort="'+o.facilitySize+'">'+moneyPlain(o.facilitySize)+'</td>'+
-        '<td class="sec" data-sort="'+esc(o.expectedCloseDate||'')+'">'+fmtDate(o.expectedCloseDate)+'</td>'+
-        '<td class="num"'+(days!=null?' data-sort="'+days+'"':'')+'>'+(days!=null?days:'—')+'</td>'+
-      '</tr>';
-    }).join('')+
-    '</tbody></table></div>';
+    '</tr></thead><tbody>'+lpSlice('pipeline').map(pipeRowHtml).join('')+'</tbody></table></div>'+lpBarHtml('pipeline');
 
   document.getElementById('view-pipeline').innerHTML =
     '<h1 class="page-heading">Opportunities</h1>'+
@@ -177542,12 +177825,13 @@ function renderPipeline(){
     '</div>'+
     (PIPE_VIEW==='kanban' ? kanbanHtml : listHtml);
   document.querySelectorAll('#view-pipeline .kcol-body').forEach(fadeEdges);
+  lpDrawn('pipeline');
 }
 /* Changing segment swaps the underlying deal set, so any stage drill-down from BDO Home no
    longer applies — cleared here. Toggling List/Board keeps it: same deals, different presentation. */
-window.setPipeSegment = function(key){ PIPE_SEGMENT=key; PIPE_STAGE_FILTER=null; renderPipeline(); };
-window.setPipeView = function(v){ PIPE_VIEW=v; renderPipeline(); };
-window.clearPipeStageFilter = function(){ PIPE_STAGE_FILTER=null; renderPipeline(); };
+window.setPipeSegment = function(key){ PIPE_SEGMENT=key; PIPE_STAGE_FILTER=null; lpChange('pipeline'); };
+window.setPipeView = function(v){ PIPE_VIEW=v; lpChange('pipeline'); };
+window.clearPipeStageFilter = function(){ PIPE_STAGE_FILTER=null; lpChange('pipeline'); };
 
 /* ---------- D106 parts (b)/(c) and D129: return bar and next/previous ----------
    Generalized to a second list by D146 (extending D106's scope from Pipeline to Accounts, per
@@ -177559,36 +177843,40 @@ window.clearPipeStageFilter = function(){ PIPE_STAGE_FILTER=null; renderPipeline
    reset-on-rebuild rule for tables generally. This capture is additive to that rule, not an
    exception to it: a plain segment/filter switch or view toggle still resets to default order
    exactly as before; only this one dedicated return path replays a snapshot. */
-function captureListReturnCtx(kind, clickedId, tableSelector, label, extra){
-  const table = document.querySelector(tableSelector);
-  if(!table) return null;
-  const ids = Array.from(table.querySelectorAll('tbody > tr')).map(tr=>tr.dataset.id);
-  const ths = Array.from(table.querySelectorAll('thead th'));
-  const sortedTh = ths.find(th=>th.hasAttribute('aria-sort'));
+/* D467 (P10): the whole list, every page, in the order shown (LP), with the page and rows per page, so the bar
+   counts the whole list and the stepper crosses pages. `token` tells this capture apart from any other (D465). */
+function captureListReturnCtx(kind, clickedId, label, extra){
+  const st = LP[kind];
+  if(!st.ids) return null;
   return Object.assign({
     kind, // 'pipeline' | 'accounts' | 'contacts': which list, and by extension which record route/return hash (LIST_KINDS)
     label,
-    ids: ids,
-    index: ids.indexOf(clickedId),
-    sortColIndex: sortedTh ? ths.indexOf(sortedTh) : null,
-    sortDir: sortedTh ? sortedTh.getAttribute('aria-sort') : null,
+    ids: st.ids.slice(),
+    index: st.ids.indexOf(clickedId),
+    sortColIndex: st.sortI,
+    sortDir: st.sortDir,
+    page: st.page,
+    size: st.size,
     scrollY: window.scrollY,
+    token: ++LP_TOKEN,
   }, extra);
 }
-/* A list row goes straight to the full record (D317, reversing D310's list preview), however the
-   list was reached. The snapshot is also written onto the list's own history entry, so the
-   browser's Back restores segment, stage filter, row order, sort and scroll exactly as the return
-   bar's back link does; route() reads it through pipeHistoryRestore(). */
+/* A list row goes straight to the full record (D317, reversing D310's list preview), however the list was reached.
+   D464: on all three lists the snapshot is also written onto the list's own history entry, so the browser's Back
+   restores the list exactly as the return bar's back link does; route() reads it through listHistoryRestore(). */
+function listOpenRecord(kind, id, label, extra){
+  LIST_RETURN_CTX = captureListReturnCtx(kind, id, label, extra);
+  try{ history.replaceState(Object.assign({}, history.state||{}, {listReturn:LIST_RETURN_CTX}), ''); }catch(e){}
+  location.hash = LIST_KINDS[kind].rec+id;
+}
 window.openPipelineRecord = function(id){
   const seg = SEGMENTS.find(s=>s.key===PIPE_SEGMENT);
-  LIST_RETURN_CTX = captureListReturnCtx('pipeline', id, '#view-pipeline table.tbl',
-    seg ? seg.label.toLowerCase() : 'the list', {segment:PIPE_SEGMENT, stageFilter:PIPE_STAGE_FILTER});
-  try{ history.replaceState({listReturn:LIST_RETURN_CTX}, ''); }catch(e){}
-  location.hash = '#/opp/'+id;
+  listOpenRecord('pipeline', id, seg ? seg.label.toLowerCase() : 'the list', {segment:PIPE_SEGMENT, stageFilter:PIPE_STAGE_FILTER});
 };
-/* D317: the snapshot a row click left on this history entry, or null. Only a Back or Forward onto
-   the list's own entry finds one; the nav rail, a Home stage click and the back link each push a
-   fresh entry that carries none. */
+/* D317, D464: the snapshot a row click left on this history entry, or null. Only a Back or Forward onto the list's own
+   entry finds one; the nav rail, a Home stage click and the back link each push a fresh entry that carries none.
+   D465: stepping replaces the record's entry rather than adding one, so the live context, whose index has moved with
+   each step, is returned in place of the snapshot it was captured as: Back lands on the last record viewed. */
 /* D345: the tab a record was left on, kept on its own history entry (replaceState on each tab switch,
    the D317 pattern), so Back and Forward return to it. A fresh navigation makes an entry with no
    state, so it lands on the URL's section or the record's first tab. */
@@ -177599,9 +177887,10 @@ function recTabFromState(kind, id){
 function rememberRecTab(kind, id, section){
   try{ history.replaceState(Object.assign({}, history.state||{}, {recTab:{kind, id, section}}), ''); }catch(e){}
 }
-function pipeHistoryRestore(){
-  const st = history.state;
-  return st && st.listReturn && st.listReturn.kind==='pipeline' ? st.listReturn : null;
+function listHistoryRestore(kind){
+  const snap = history.state && history.state.listReturn;
+  if(!snap || snap.kind!==kind) return null;
+  return LIST_RETURN_CTX && LIST_RETURN_CTX.token===snap.token ? LIST_RETURN_CTX : snap;
 }
 /* The back-link and the arrows both funnel through here, for either list. Returning is a one-shot
    instruction (LIST_PENDING_RESTORE) consumed by route()'s own pipeline/accounts branch right
@@ -177621,33 +177910,18 @@ window.listReturnToList = function(){
    unrelated navigation. D345: each step is a navigation to a record with no section, so the next
    record lands on its first tab (reverses the earlier carry-through of the current section, which no
    D-entry ruled; the brief for D345 names j/k stepping among the entry points). */
+/* D465: a step replaces the current history entry instead of adding one, so Back after stepping goes straight to the
+   list. The replaced entry starts with no state, so D345's tab memory starts afresh for the record stepped to (each
+   tab switch writes it again); the hashchange is raised by hand, since replaceState fires none. */
 window.listStepRecord = function(delta){
   const ctx = LIST_RETURN_CTX;
   if(!ctx) return;
   const next = ctx.index + delta;
   if(next < 0 || next >= ctx.ids.length) return; // the disabled arrow already prevents this; guard anyway
   ctx.index = next;
-  location.hash = LIST_KINDS[ctx.kind].rec+ctx.ids[next];
+  try{ history.replaceState(null, '', LIST_KINDS[ctx.kind].rec+ctx.ids[next]); }catch(e){ location.hash = LIST_KINDS[ctx.kind].rec+ctx.ids[next]; return; }
+  window.dispatchEvent(new HashChangeEvent('hashchange'));
 };
-/* Reorders the fresh table's rows to the captured snapshot (authoritative, independent of the
-   comparator that produced it) and reapplies the sort indicator (cosmetic only, purely visual;
-   the row order above is what's actually shown either way). Scroll restoration happens after
-   route()'s own trailing window.scrollTo(0,0), or it would be immediately overwritten. */
-function restoreListTableState(tableSelector, ctx){
-  const table = document.querySelector(tableSelector);
-  if(table){
-    const tbody = table.querySelector('tbody');
-    const rowsById = {};
-    Array.from(tbody.querySelectorAll(':scope > tr')).forEach(tr=>{ rowsById[tr.dataset.id]=tr; });
-    ctx.ids.forEach(id=>{ const tr=rowsById[id]; if(tr) tbody.appendChild(tr); });
-    if(ctx.sortColIndex!=null){
-      const ths = Array.from(table.querySelectorAll('thead th'));
-      const th = ths[ctx.sortColIndex];
-      if(th) th.setAttribute('aria-sort', ctx.sortDir);
-    }
-  }
-  window.scrollTo(0, ctx.scrollY);
-}
 /* The bar itself: a slim strip above the record card, outside it (D129), never inside the header,
    which is already an approved, closed surface Kevin chose not to redraw. Renders nothing at all
    when LIST_RETURN_CTX is absent (a direct hash, a reload, a bookmark) rather than a disabled or
@@ -177736,39 +178010,41 @@ function accountRowStats(a){
   return {primary, openCount:openOpps.length, openValue, secondaryFigure, lastTouch, ownerId};
 }
 
+/* One Accounts list row (D467: drawn only for the page showing, and off the page when a header sorts the list) */
+function acctRowHtml(a){
+  const stats = accountRowStats(a);
+  const owner = stats.ownerId ? BDOS[stats.ownerId] : null;
+  const industryOrType = stats.primary==='Prospect' ? esc(a.industryName||'')
+    : esc(a.partnerType || (a.partnerProfile && a.partnerProfile.partnerType) || '');
+  /* D106/D129/D146: data-id + openAccountRow() capture list-return context exactly the way
+     Pipeline's own rows do; see pipeRowHtml() for why no index is baked into the onclick. */
+  return '<tr data-id="'+a.id+'" onclick="openAccountRow(\''+a.id+'\')">'+
+    '<td class="name" title="'+esc(a.name)+'">'+esc(a.name)+'</td>'+
+    '<td class="sec">'+accountTypeTagsHtml(a)+'</td>'+
+    '<td class="sec" title="'+industryOrType+'">'+industryOrType+'</td>'+
+    '<td class="num" data-sort="'+stats.openValue+'">'+stats.openCount+' &middot; '+moneyShort(stats.openValue)+'</td>'+
+    '<td class="num" data-sort="'+stats.secondaryFigure+'">'+moneyShort(stats.secondaryFigure)+'</td>'+
+    '<td class="sec" data-sort="'+esc(stats.lastTouch||'')+'">'+(stats.lastTouch ? fmtDate(stats.lastTouch) : 'None')+'</td>'+   // O9 (D455)
+    '<td class="sec">'+esc(owner?owner.name:'–')+'</td>'+
+  '</tr>';
+}
+
 function renderAccounts(){
   const all = allAccounts();
   const filtered = ACCT_TYPE_FILTER==='prospects' ? all.filter(a=>a.accountTypes.includes('Prospect'))
     : ACCT_TYPE_FILTER==='partners' ? all.filter(a=>a.accountTypes.includes('Partner'))
     : all;
-  const rows = filtered.map(a=>({a, stats:accountRowStats(a)}))
-    .sort((x,y)=>x.a.name.localeCompare(y.a.name));
+  /* P1, P14: the whole set ordered, one page drawn; a row's figures are worked out only for the rows drawn */
+  const rows = lpOrder('accounts', filtered.slice().sort((x,y)=>x.name.localeCompare(y.name)));
+  LP.accounts.row = acctRowHtml;
 
-  const tableHtml = rows.length ? '<div class="tbl-wrap"><table class="tbl clickable"><thead><tr>'+
+  const tableHtml = rows.length ? '<div class="tbl-wrap"><table class="tbl clickable lp-fixed acct-tbl"><colgroup><col class="c1"><col class="c2"><col class="c3"><col class="c4"><col class="c5"><col class="c6"><col class="c7"></colgroup><thead><tr>'+
       sortableTh('Account',{type:'text'})+sortableTh('Type',{type:'text'})+
       sortableTh('Industry / partner type',{type:'text'})+
       sortableTh('Open pipeline',{num:true,type:'currency'})+
       sortableTh('Exposure / referred TTM',{num:true,type:'currency'})+
       sortableTh('Last touch',{type:'date'})+sortableTh('Owner',{type:'text'})+
-    '</tr></thead><tbody>'+
-    rows.map(({a,stats})=>{
-      const owner = stats.ownerId ? BDOS[stats.ownerId] : null;
-      const industryOrType = stats.primary==='Prospect' ? esc(a.industryName||'')
-        : esc(a.partnerType || (a.partnerProfile && a.partnerProfile.partnerType) || '');
-      /* D106/D129/D146: data-id + openAccountRow() capture list-return context exactly the way
-         Pipeline's own rows do; see that section's own comment for why no index is baked into
-         the onclick (the D84 sort listener reorders rows without rewriting it). */
-      return '<tr data-id="'+a.id+'" onclick="openAccountRow(\''+a.id+'\')">'+
-        '<td class="name">'+esc(a.name)+'</td>'+
-        '<td class="sec">'+accountTypeTagsHtml(a)+'</td>'+
-        '<td class="sec">'+industryOrType+'</td>'+
-        '<td class="num" data-sort="'+stats.openValue+'">'+stats.openCount+' &middot; '+moneyShort(stats.openValue)+'</td>'+
-        '<td class="num" data-sort="'+stats.secondaryFigure+'">'+moneyShort(stats.secondaryFigure)+'</td>'+
-        '<td class="sec" data-sort="'+esc(stats.lastTouch||'')+'">'+(stats.lastTouch ? fmtDate(stats.lastTouch) : 'None')+'</td>'+   // O9 (D455)
-        '<td class="sec">'+esc(owner?owner.name:'–')+'</td>'+
-      '</tr>';
-    }).join('')+
-    '</tbody></table></div>'
+    '</tr></thead><tbody>'+lpSlice('accounts').map(acctRowHtml).join('')+'</tbody></table></div>'+lpBarHtml('accounts')
     /* D51: states what's absent and why, scoped to the filter that produced it. */
     : '<div class="empty">No '+(ACCT_TYPE_FILTER==='all'?'accounts':ACCT_TYPE_FILTER)+' on file.</div>';
 
@@ -177783,14 +178059,14 @@ function renderAccounts(){
       '</div>'+
     '</div>'+
     tableHtml;
+  lpDrawn('accounts');
 }
 /* Mirrors setPipeSegment(): changing the filter swaps the underlying set, no stale sort/scroll
    worth preserving across that (§7b's own reset-on-rebuild rule). */
-window.setAcctTypeFilter = function(key){ ACCT_TYPE_FILTER=key; renderAccounts(); };
+window.setAcctTypeFilter = function(key){ ACCT_TYPE_FILTER=key; lpChange('accounts'); };
 window.openAccountRow = function(id){
   const label = ACCT_TYPE_FILTER==='prospects' ? 'prospects' : ACCT_TYPE_FILTER==='partners' ? 'partners' : 'all accounts';
-  LIST_RETURN_CTX = captureListReturnCtx('accounts', id, '#view-accounts table.tbl', label, {typeFilter:ACCT_TYPE_FILTER});
-  location.hash = '#/account/'+id;
+  listOpenRecord('accounts', id, label, {typeFilter:ACCT_TYPE_FILTER});
 };
 
 /* ================================================================
@@ -177838,38 +178114,27 @@ function clRowHtml(c, last){
     '<td class="cl-edit" data-sort-text="'+esc(owner?owner.name:'')+'">'+ctMenuCell(rc, 'ct.owner')+'</td>'+
   '</tr>';
 }
-/* keep: an inline edit's redraw keeps the rows shown, their order, the sort indicator and the scroll; a row that no
-   longer fits the tab (an Owner change on My contacts) stays until the tab is chosen again (O8). */
+/* Every draw keeps the list's page, order and sort (LP.contacts, D467). keep: an inline edit's redraw (EF_RERENDER)
+   also keeps a row that no longer fits the tab (an Owner change on My contacts) until the tab is chosen again (O8,
+   P12); the scroll stays, since the page's height does not change. */
 function renderContacts(keep){
   const el = document.getElementById('view-contacts');
-  let order = null, sortI = null, sortD = null;
-  if(keep){
-    const t = el.querySelector('table.tbl');
-    if(t){
-      order = Array.from(t.querySelectorAll('tbody > tr')).map(tr=>tr.dataset.id);
-      const ths = Array.from(t.querySelectorAll('thead th')), s = ths.find(h=>h.hasAttribute('aria-sort'));
-      if(s){ sortI = ths.indexOf(s); sortD = s.getAttribute('aria-sort'); }
-    }
-  }
-  const list = order ? order.map(id=>CONTACTS_BY_ID[id]).filter(Boolean) : clPeople(), last = clLastActs();
+  const list = lpOrder('contacts', clPeople(), keep ? id=>CONTACTS_BY_ID[id] : null), last = clLastActs();
+  LP.contacts.row = c=>clRowHtml(c, last);
   const b = (k,t)=>'<button class="'+(CL_FILTER===k?'active':'')+'" aria-pressed="'+(CL_FILTER===k)+'" onclick="setContactsFilter(\''+k+'\')">'+t+'</button>';
   const table = list.length ? '<div class="tbl-wrap"><table class="tbl clickable cl-tbl"><colgroup><col class="c-name"><col class="c-co"><col class="c-em"><col class="c-type"><col class="c-deal"><col class="c-last"><col class="c-own"></colgroup><thead><tr>'+
       sortableTh('Name',{type:'text'})+sortableTh('Company',{type:'text'})+sortableTh('Email',{type:'text'})+sortableTh('Type',{type:'text'})+
       sortableTh('On open opportunities',{type:'num'})+sortableTh('Last activity',{type:'date'})+sortableTh('Owner',{type:'text'})+
-    '</tr></thead><tbody>'+list.map(c=>clRowHtml(c, last)).join('')+'</tbody></table></div>'
+    '</tr></thead><tbody>'+lpSlice('contacts').map(LP.contacts.row).join('')+'</tbody></table></div>'+lpBarHtml('contacts')
     : '<div class="empty">No '+CL_NOUN[CL_FILTER]+' on file.</div>';   // O12
   el.innerHTML = '<h1 class="page-heading">Contacts</h1>'+
     '<div class="page-sub">'+list.length+' '+(list.length===1?'contact':'contacts')+'</div>'+
     '<div class="pipe-toolbar"><div class="viewtoggle" data-seg="setContactsFilter">'+SEG_THUMB_HTML+
       b('all','All')+b('mine','My contacts')+b('borrowers','Borrowers')+b('partners','Partners')+b('advisors','Advisors')+'</div></div>'+table;
-  if(order){
-    const tb = el.querySelector('tbody');
-    if(tb){ const by = {}; Array.from(tb.children).forEach(tr=>by[tr.dataset.id]=tr); order.forEach(id=>{ if(by[id]) tb.appendChild(by[id]); }); }
-    if(sortI!=null){ const th = el.querySelectorAll('thead th')[sortI]; if(th) th.setAttribute('aria-sort', sortD); }
-  }
+  lpDrawn('contacts');
   EF_RERENDER = ()=>renderContacts(true);
 }
-window.setContactsFilter = function(key){ CL_FILTER = key; renderContacts(); };
+window.setContactsFilter = function(key){ CL_FILTER = key; lpChange('contacts'); };
 /* O6: an editable cell edits, a click on its padding included; anywhere else on the row, the name included, opens the
    contact page with the return bar (O7). A Ctrl, Cmd or Shift click on the name opens it in a new tab. */
 document.addEventListener('click', e=>{
@@ -177880,8 +178145,7 @@ document.addEventListener('click', e=>{
   if(ec){ if(!e.target.closest('.ef, input, select')){ const ef = ec.querySelector('.ef'); if(ef) ef.click(); } return; }
   if(e.target.closest('a') && (e.metaKey || e.ctrlKey || e.shiftKey)) return;
   e.preventDefault();
-  LIST_RETURN_CTX = captureListReturnCtx('contacts', tr.dataset.id, '#view-contacts table.tbl', CL_LABEL[CL_FILTER], {filter:CL_FILTER});
-  location.hash = '#/contact/'+tr.dataset.id;
+  listOpenRecord('contacts', tr.dataset.id, CL_LABEL[CL_FILTER], {filter:CL_FILTER});
 });
 
 /* ================================================================
@@ -182575,9 +182839,12 @@ function renderStub(viewId, title, note){
 const railAvatarEl = document.getElementById('rail-avatar');
 railAvatarEl.textContent = initials(BDOS[CURRENT_BDO_ID].name);
 railAvatarEl.title = BDOS[CURRENT_BDO_ID].name+', '+BDOS[CURRENT_BDO_ID].title;
-/* D317: a reload starts the list fresh, as D129 already rules for the record's return bar; only a
+/* D317, D464: a reload starts any list fresh, as D129 already rules for the record's return bar; only a
    Back or Forward within the session replays a snapshot. */
-try{ if(pipeHistoryRestore()) history.replaceState(null, ''); }catch(e){}
+try{ if(history.state && history.state.listReturn) history.replaceState(null, ''); }catch(e){}
+/* D467: the app sets every page's scroll itself (route() scrolls to the top; a list's return puts its own back, P11),
+   so the browser's own restore on Back, which lands after route() and would undo P11's placement, is turned off. */
+try{ history.scrollRestoration = 'manual'; }catch(e){}
 route();
 
 })();
