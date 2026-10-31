@@ -2256,6 +2256,299 @@ a.ct-name:hover,a.ct-plink:hover{color:var(--brand)}
   box-shadow:inset 0 1px 0 var(--line),calc(-1 * var(--s2)) 0 0 var(--page)}
 #view-accounts .tbl-wrap.lp-stick th:last-child,#view-pipeline .tbl-wrap.lp-stick th:last-child,#view-contacts .tbl-wrap.lp-stick th:last-child{
   box-shadow:inset 0 1px 0 var(--line),var(--s2) 0 0 var(--page)}
+/* ---------- Reports (D482 to D499; spec Other/mocks/report-run-builder-spec-v1.html, D492). The run page is one white
+   sheet 24px from the rail; report pages drop the 1504px page cap (D488). ---------- */
+body.rp-wide .viewport{max-width:none}
+#view-reports{--rp-top:105px;--rp-ch:313px}
+.rp-ico{width:16px;height:16px;display:block;flex:none}
+.rp-btn{all:unset;cursor:pointer;box-sizing:border-box;height:var(--h);display:inline-flex;align-items:center;gap:var(--s2);padding:0 var(--s3);
+  border:1px solid var(--line-2);border-radius:var(--r-s);background:var(--paper);font-size:13px;font-weight:500;color:var(--ink);white-space:nowrap}
+.rp-btn:hover{background:var(--hover)}
+.rp-btn.pri{background:var(--brand);border-color:var(--brand);color:var(--paper)}
+.rp-btn.pri:hover{background:var(--brand-2);border-color:var(--brand-2)}
+.rp-btn.icon{width:var(--h);padding:0;justify-content:center;color:var(--ink-2)}
+.rp-btn.icon.on{background:var(--brand-soft);color:var(--brand-ink);border-color:var(--brand-a30)}
+.rp-btn[aria-disabled="true"]{color:var(--ink-3);cursor:default;background:var(--paper)}
+.rp-btn:focus-visible,.rp-pick:focus-visible,.rp-tog:focus-visible,.rp-star:focus-visible,.rp-th:focus-visible,.rp-gt:focus-visible,.rp-fcard:focus-visible,
+.rp-ct:focus-visible,.rp-x:focus-visible,.rp-input:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
+.rp-input{box-sizing:border-box;height:var(--h);padding:0 var(--s3);border:1px solid var(--line-2);border-radius:var(--r-s);background:var(--paper);font:inherit;font-size:13px;color:var(--ink);outline:none}
+.rp-input::placeholder{color:var(--ink-3)}
+.rp-q{width:200px}
+.rp-chev{font-size:11px;color:var(--ink-3)}
+.rp-grow{flex:1}
+/* the header's title block */
+.rp-hl{min-width:0;flex:1}
+.rp-tblock{min-width:0}
+.rp-eyebrow{font-size:12px;color:var(--ink-3);line-height:16px}
+.rp-title{display:flex;align-items:center;gap:var(--s2);font-size:20px;font-weight:500;letter-spacing:-.01em;color:var(--ink);line-height:28px}
+.rp-star{all:unset;cursor:pointer;width:24px;height:24px;display:grid;place-items:center;border-radius:var(--r-s);color:var(--ink-3)}
+.rp-star:hover{background:var(--hover)}
+.rp-star.on{color:var(--brand)}
+.rp-star svg{width:16px;height:16px}
+.rp-tools{display:flex;align-items:center;gap:var(--s2)}
+.rp-tools .rp-chbtn{min-width:136px;justify-content:center}
+.rp-fsent{font-size:12px;color:var(--ink-3);margin-top:var(--s1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.rp-fbtn{position:relative}
+.rp-fbadge{position:absolute;top:-6px;right:-6px;min-width:16px;height:16px;padding:0 var(--s1);box-sizing:border-box;border-radius:var(--r-s);background:var(--brand);color:var(--paper);
+  font-size:11px;font-weight:500;display:grid;place-items:center;font-variant-numeric:tabular-nums}
+/* the sheet: fixed to the bottom of the window, the grid scrolls inside (O56); a chart adds its own height (Known issue 62) */
+.rp-sheet{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-m);display:flex;flex-direction:column;overflow:hidden;height:calc(100vh - var(--rp-top))}
+.rp-sheet.has-chart{height:calc(100vh - var(--rp-top) + var(--rp-ch))}
+.rp-head{display:flex;align-items:center;gap:var(--s4);padding:var(--s4) var(--s5);border-bottom:1px solid var(--line);flex:none}
+.rp-body{flex:1;display:flex;min-height:0}
+.rp-main{flex:1;min-width:0;display:flex;flex-direction:column}
+.rp-gridwrap{flex:1;overflow:auto;min-height:0;position:relative}
+.rp-foot{flex:none;display:flex;align-items:center;gap:var(--s5);height:44px;padding:0 var(--s5);border-top:1px solid var(--line-2);background:var(--paper);font-size:12px;color:var(--ink-2)}
+.rp-foot .rp-count{color:var(--ink-3)}
+.rp-tog{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:var(--s2);border-radius:var(--r-s)}
+.rp-tog .sw{width:28px;height:16px;border-radius:var(--r-s);background:var(--line-2);position:relative;flex:none;transition:background var(--t-fast) var(--ease)}
+.rp-tog .sw::after{content:'';position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:var(--r-s);background:var(--paper);transition:left var(--t-fast) var(--ease)}
+.rp-tog.on .sw{background:var(--brand)}
+.rp-tog.on .sw::after{left:14px}
+/* the filter panel opens on the left, in the space the builder's Fields tab and Outline panel take (D488) */
+.rp-fpanel{width:322px;flex:none;border-right:1px solid var(--line);display:flex;flex-direction:column;background:var(--paper)}
+.rp-fpanel-h{display:flex;align-items:center;justify-content:space-between;height:44px;flex:none;box-sizing:border-box;padding:0 var(--s3) 0 var(--s5);border-bottom:1px solid var(--line)}
+.rp-fpanel-h b{font-size:13px;font-weight:500}
+.rp-fpanel-h .rp-link{margin-right:var(--s2);font-size:12px}
+.rp-fpanel-b{flex:1;overflow:auto;padding:var(--s4) var(--s5)}
+.rp-x{all:unset;cursor:pointer;width:24px;height:24px;display:grid;place-items:center;border-radius:var(--r-s);color:var(--ink-3);font-size:12px}
+.rp-x:hover{background:var(--hover);color:var(--ink)}
+.rp-fcard{all:unset;cursor:pointer;box-sizing:border-box;display:block;width:100%;border:1px solid var(--line-2);border-radius:var(--r-s);padding:var(--s2) var(--s3);margin-bottom:var(--s2);background:var(--paper)}
+.rp-fcard:hover{border-color:var(--brand-a65)}
+.rp-fcard .k{font-size:12px;color:var(--ink-3)}
+.rp-fcard .v{font-size:13px;color:var(--ink);margin-top:2px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* the report grid: a spreadsheet (D487, D499) */
+.rp-grid{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;color:var(--ink);background:var(--paper)}
+.rp-grid th{position:sticky;top:0;z-index:2;background:var(--sunken);font-weight:500;font-size:12px;color:var(--ink-2);text-align:left;height:34px;padding:0;
+  border-bottom:1px solid var(--line-2);border-right:1px solid var(--line);white-space:nowrap}
+.rp-thw{display:flex;align-items:center;height:34px;position:relative}
+.rp-th{all:unset;cursor:pointer;box-sizing:border-box;display:flex;align-items:center;gap:var(--s1);flex:1;min-width:0;height:34px;padding:0 var(--s3);user-select:none;-webkit-user-select:none}
+.rp-thw:hover{background:var(--hover)}
+.rp-th .ar.idle{visibility:hidden;color:var(--ink-3)}
+.rp-thw:hover .ar.idle,.rp-th:focus-visible .ar.idle{visibility:visible}
+.rp-grid th.sorted{color:var(--ink)}
+.rp-thm{all:unset;cursor:pointer;flex:none;width:22px;height:22px;margin-right:var(--s1);display:grid;place-items:center;border-radius:var(--r-s);font-size:11px;color:var(--ink-3);opacity:0}
+.rp-thw:hover .rp-thm,.rp-thm:focus-visible,.rp-thm[aria-expanded="true"]{opacity:1}
+.rp-thm:hover{background:var(--line);color:var(--ink)}
+.rp-thm:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:0}
+.rp-th .lab{flex:1;overflow:hidden;text-overflow:ellipsis}
+.rp-grid th.num .rp-th .lab{flex:none}
+.rp-th .ar{font-size:11px;color:var(--brand-ink);width:10px;text-align:center;flex:none}
+.rp-grid th.num .lab{text-align:right}
+.rp-grid th:last-child,.rp-grid td:last-child{border-right:none}
+.rp-grid td{height:32px;padding:0 var(--s3);border-bottom:1px solid var(--line);border-right:1px solid var(--line);white-space:nowrap;max-width:280px;overflow:hidden;text-overflow:ellipsis}
+.rp-grid td.num{text-align:right;font-variant-numeric:tabular-nums}
+/* a nested level steps in 20px (O36) */
+.rp-grid td.rp-l1{padding-left:calc(var(--s3) + var(--s5) - var(--s1))}
+.rp-grid td.rp-l2{padding-left:calc(var(--s3) + 2*(var(--s5) - var(--s1)))}
+.rp-grid td.rp-l3{padding-left:calc(var(--s3) + 3*(var(--s5) - var(--s1)))}
+.rp-grid tr.d:hover td{background:var(--hover)}
+.rp-gt{all:unset;cursor:pointer;display:inline-flex;align-items:center;white-space:nowrap;border-radius:var(--r-s);max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.rp-gt .tw{display:inline-block;width:12px;margin-right:var(--s2);font-size:11px;color:var(--ink-3);transition:transform var(--t-fast) var(--ease)}
+.rp-gt.shut .tw{transform:rotate(-90deg)}
+.rp-gt .gn{color:var(--ink-3);font-weight:400;margin-left:var(--s1)}
+/* group rows stick under the column headers while their rows scroll, two levels at most (O36) */
+.rp-grid tr.g td{position:sticky;z-index:1;font-weight:500;background:var(--paper)}
+.rp-grid tr.g0 td{top:34px;z-index:2;background:var(--page);border-top:2px solid var(--line-2)}
+.rp-grid tbody tr.g0:first-child td{border-top:none}
+.rp-grid tr.g1 td{top:66px}
+.rp-grid tr.g2 td{position:static}
+.rp-grid tr.tot td{position:sticky;bottom:0;z-index:1;font-weight:500;background:var(--sunken);border-top:1px solid var(--line-2);border-bottom:none}
+.rp-grid a{color:var(--brand);text-decoration:none}
+.rp-grid a:hover{text-decoration:underline}
+.rp-grid td.empty{height:96px;text-align:center;color:var(--ink-3);font-weight:400;background:var(--paper)}
+
+/* the optional chart (D485) */
+.rp-chart{flex:none;height:var(--rp-ch);box-sizing:border-box;border-bottom:1px solid var(--line);display:flex;flex-direction:column}
+.rp-ctool{display:flex;align-items:center;gap:var(--s2);height:48px;padding:0 var(--s5);flex:none}
+.rp-ctypes{display:flex;gap:var(--s1);margin-right:var(--s3)}
+.rp-ct{all:unset;cursor:pointer;width:30px;height:30px;display:grid;place-items:center;border-radius:var(--r-s);color:var(--ink-2);border:1px solid transparent}
+.rp-ct:hover{background:var(--hover)}
+.rp-ct.on{background:var(--brand-soft);color:var(--brand-ink);border-color:var(--brand-a30)}
+.rp-ct[aria-disabled="true"]{color:var(--line-2);cursor:default;background:none}
+.rp-plab{font-size:12px;color:var(--ink-3);margin-left:var(--s3)}
+.rp-pick{all:unset;cursor:pointer;box-sizing:border-box;height:30px;display:inline-flex;align-items:center;gap:var(--s2);padding:0 var(--s2) 0 var(--s3);
+  border:1px solid var(--line-2);border-radius:var(--r-s);background:var(--paper);font-size:12px;font-weight:500;color:var(--ink)}
+.rp-pick:hover{background:var(--hover)}
+.rp-plot{flex:1;min-height:0;display:flex;padding:0 var(--s5) var(--s3)}
+.rp-plotin{flex:1;min-width:0;display:flex;flex-direction:column}
+.rp-cempty{margin:auto;font-size:13px;color:var(--ink-3)}
+.rp-plot svg{display:block}
+.rp-svg text{font-family:var(--ui);font-size:11px;fill:var(--ink-2)}
+.rp-svg .gl{stroke:var(--line);stroke-width:1}
+.rp-svg .vl{fill:var(--ink);font-size:12px;font-variant-numeric:tabular-nums}
+.rp-svg .at{fill:var(--ink-3);font-size:11px}
+.rp-svg .kt{fill:var(--ink)}
+.rp-svg .c0{fill:var(--brand)}
+.rp-svg .c1{fill:var(--brand-a65)}
+.rp-svg .c2{fill:var(--brand-a30)}
+.rp-svg .c3{fill:var(--brand-a15)}
+.rp-svg .co{fill:var(--line-2)}
+.rp-svg .ln{fill:none;stroke:var(--brand);stroke-width:2}
+.rp-svg .dt{fill:var(--paper);stroke:var(--brand);stroke-width:2}
+.rp-svg rect,.rp-svg path.sl{stroke:var(--paper);stroke-width:1}
+.rp-svg rect:hover,.rp-svg path.sl:hover{opacity:.85}
+.rp-svg .dc{fill:var(--ink);font-size:20px;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.rp-key{display:flex;gap:var(--s4);font-size:12px;color:var(--ink-2);margin-left:auto}
+.rp-key i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:var(--s1);vertical-align:-1px}
+.rp-key .k0{background:var(--brand)}.rp-key .k1{background:var(--brand-a65)}.rp-key .k2{background:var(--brand-a30)}.rp-key .k3{background:var(--brand-a15)}.rp-key .ko{background:var(--line-2)}
+
+/* the header figures (D493, D494; O1 to O22): a 12px label over an 18px figure, no dividers, dollars in full. Each is a
+   button whose text sits where a static figure would (its --s2 padding taken back from the strip), so the hover fill
+   reaches --s2 past the text (D305). */
+.rp-figs{position:relative;display:flex;align-items:center;flex-wrap:wrap;column-gap:var(--s6);row-gap:var(--s1);min-height:67px;box-sizing:border-box;
+  padding:var(--s2) var(--s5) var(--s2) var(--s4);border-bottom:1px solid var(--line);flex:none}
+.rp-figs.over{outline:2px dashed var(--brand);outline-offset:-4px;border-radius:var(--r-s)}
+/* with a panel on their left (run page with Filters open, the builder) the figures line up on the table's first column text */
+.rpk-preview .rp-figs,.rp-fpanel + .rp-main .rp-figs{padding-left:var(--s1)}
+.rp-fig{flex:none;min-width:0;max-width:240px}
+.rp-fig.drag{opacity:.4}
+.rp-fig.out{opacity:.2}
+.rp-figb{all:unset;cursor:pointer;box-sizing:border-box;display:block;max-width:240px;padding:var(--s1) var(--s2);border-radius:var(--r-s);user-select:none;-webkit-user-select:none;touch-action:none}
+.rp-figb:hover{background:var(--hover)}
+.rp-figb:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:0}
+.rp-fig-l{display:flex;align-items:center;gap:var(--s1);font-size:12px;color:var(--ink-3);line-height:16px;min-width:0}
+.rp-fig-l .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rp-fig-l .cv{flex:none;font-size:11px;color:var(--ink-3);visibility:hidden}
+.rp-figb:hover .cv,.rp-figb:focus-visible .cv{visibility:visible}
+.rp-figb:hover .rp-fig-l{color:var(--ink-2)}
+.rp-fig-v{display:block;font-size:18px;color:var(--ink);font-variant-numeric:tabular-nums;line-height:24px;margin-top:2px;white-space:nowrap}
+.rp-figempty{font-size:12px;color:var(--ink-2);padding:0 var(--s2)}
+/* the add control: a dashed box the height of a figure, 16px after the last figure (O6) */
+.rp-figadd{all:unset;cursor:pointer;flex:none;box-sizing:border-box;height:50px;display:inline-flex;align-items:center;gap:var(--s1);
+  padding:0 var(--s3);border:1px dashed var(--line-2);border-radius:var(--r-s);font-size:12px;color:var(--ink-2);margin-left:calc(var(--s4) - var(--s6))}
+.rp-figempty + .rp-figadd{margin-left:0}
+.rp-figadd .rp-ico{width:14px;height:14px}
+.rp-figadd:hover{border-color:var(--brand-a65);color:var(--brand-ink);background:var(--brand-a05)}
+.rp-figs.over .rp-figadd{border-color:var(--brand-a65)}
+.rp-figadd:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
+.rp-figline{position:absolute;width:2px;background:var(--brand);border-radius:var(--r-s);pointer-events:none}
+/* the drag chip (--lift): the column's name, why it can't land, or "Remove …" in red with an × (O5, O11, O14) */
+.rp-ghost{position:fixed;z-index:var(--z-tip);pointer-events:none;height:28px;display:flex;align-items:center;gap:var(--s1);padding:0 var(--s3);border-radius:var(--r-s);
+  background:var(--brand-soft);color:var(--brand-ink);font-size:13px;white-space:nowrap;box-shadow:var(--lift)}
+.rp-ghost .rp-ico{width:14px;height:14px}
+.rp-ghost.rm{background:var(--neg-soft);color:var(--neg-ink)}
+.rp-ghost.no{background:var(--sunken);color:var(--ink-2)}
+body.rp-dragging,body.rp-dragging *{cursor:grabbing!important;user-select:none!important;-webkit-user-select:none!important}
+body.rp-dragging #view-reports *{pointer-events:none}
+body.rp-dragging .rp-figb:hover .cv{visibility:hidden}
+body.rp-dragging .rp-figb:hover .rp-fig-l{color:var(--ink-3)}
+/* the builder (D484; O57 to O63) */
+.rp-pen{all:unset;cursor:pointer;width:24px;height:24px;display:grid;place-items:center;border-radius:var(--r-s);color:var(--ink-3)}
+.rp-pen:hover{background:var(--hover)}
+.rp-pen:focus-visible,.rp-fld:focus-visible,.rp-tab:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
+.rp-pill{display:inline-flex;align-items:center;height:20px;padding:0 var(--s2);border-radius:var(--r-s);background:var(--sunken);font-size:11px;font-weight:500;color:var(--ink-2)}
+.rp-rename{height:30px;font-size:18px;font-weight:500;width:360px}
+.rpk-head{display:flex;align-items:center;gap:var(--s4);padding:var(--s4) var(--s5);border-bottom:1px solid var(--line);flex:none}
+.rpk-fields{width:32px;flex:none;border-right:1px solid var(--line);background:var(--paper)}
+.rpk-fields button{all:unset;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:var(--s2);width:32px;padding:var(--s3) 0;color:var(--ink-2);font-size:12px}
+.rpk-fields button:hover{background:var(--hover)}
+.rpk-fields button:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:calc(-1 * var(--focus))}
+.rpk-fields span{writing-mode:vertical-rl;transform:rotate(180deg)}
+.rpk-fpane{width:250px;flex:none;border-right:1px solid var(--line);display:flex;flex-direction:column;background:var(--paper)}
+.rpk-fpane-h{display:flex;align-items:center;justify-content:space-between;height:44px;padding:0 var(--s3) 0 var(--s4);border-bottom:1px solid var(--line);font-size:13px;font-weight:500}
+.rpk-fpane .rp-input{margin:var(--s3) var(--s3) var(--s2);width:calc(100% - 24px)}
+.rpk-flist{flex:1;overflow:auto;padding:0 var(--s2) var(--s3)}
+.rpk-obj{font-size:12px;font-weight:500;color:var(--ink-3);padding:var(--s3) var(--s2) var(--s1)}
+.rp-fld{all:unset;-webkit-user-drag:element;cursor:grab;user-select:none;-webkit-user-select:none;box-sizing:border-box;display:flex;align-items:center;gap:var(--s2);width:100%;height:30px;padding:0 var(--s2);border-radius:var(--r-s);font-size:13px;color:var(--ink)}
+.rp-fld:hover{background:var(--hover)}
+.rp-fld .ty{width:22px;font-size:11px;color:var(--ink-3);text-align:center;flex:none}
+.rp-fld .in{margin-left:auto;font-size:11px;color:var(--ink-3)}
+.rpk-panel{width:290px;flex:none;border-right:1px solid var(--line);display:flex;flex-direction:column;background:var(--paper)}
+.rpk-tabs{display:flex;border-bottom:1px solid var(--line);flex:none}
+.rp-tab{all:unset;cursor:pointer;flex:1;height:44px;display:flex;align-items:center;justify-content:center;gap:var(--s2);font-size:13px;font-weight:500;color:var(--ink-2);border-bottom:2px solid transparent;box-sizing:border-box}
+.rp-tab:hover{color:var(--ink)}
+.rp-tab.on{color:var(--ink);border-bottom-color:var(--brand)}
+.rpk-badge{min-width:18px;height:18px;padding:0 5px;box-sizing:border-box;border-radius:var(--r-s);background:var(--brand);color:var(--paper);font-size:11px;display:inline-grid;place-items:center}
+.rpk-scroll{flex:1;overflow:auto}
+.rpk-sec{padding:var(--s4) var(--s5) var(--s3);border-bottom:1px solid var(--line)}
+.rpk-sec.last{border-bottom:none}
+.rpk-sec h4{margin:0 0 var(--s3);font-size:13px;font-weight:500;color:var(--ink)}
+.rpk-sub{font-size:12px;color:var(--ink-3);margin:0 0 var(--s2)}
+.rpk-zone{border-radius:var(--r-s);margin-bottom:var(--s3)}
+.rpk-zone.over{outline:2px dashed var(--brand);outline-offset:2px}
+.rpk-zone .rp-input{width:100%;margin-bottom:var(--s2)}
+.rp-chipz{position:relative;user-select:none;-webkit-user-select:none;display:flex;align-items:center;gap:var(--s2);height:30px;padding:0 var(--s1) 0 var(--s3);margin-bottom:var(--s1);border-radius:var(--r-s);background:var(--brand-soft);font-size:13px;color:var(--brand-ink);cursor:grab}
+.rp-chipz .lv{font-size:11px;color:var(--ink-3);width:12px}
+.rp-chipz .nm{flex:1}
+.rp-chipz .rp-sumtag{color:var(--ink-3)}
+.rp-chipz.drag{opacity:.4}
+.rp-chipz.ins-b::before,.rp-chipz.ins-a::after{content:'';position:absolute;left:0;right:0;height:2px;background:var(--brand);border-radius:var(--r-s);pointer-events:none}
+.rp-chipz.ins-b::before{top:-3px}
+.rp-chipz.ins-a::after{bottom:-3px}
+.rpk-cap{font-size:12px;color:var(--ink-3);margin:0 0 var(--s2)}
+.rpk-preview{flex:1;min-width:0;display:flex;flex-direction:column}
+/* a matrix (O62) */
+.rp-grid th.mx-c{padding:0 var(--s3);text-align:right}
+.rp-grid th.mx-g{text-align:left;padding:0 var(--s3);color:var(--ink-3);font-weight:400}
+.rp-grid th.mx-g .mx-m{color:var(--ink-2)}
+.rp-grid .mx-r{font-weight:500}
+.rp-grid .mx-n{color:var(--ink-3)}
+/* the type-ahead under "Add filter…" and the values list are the app's float menu (.newmenu, D418) */
+.newmenu.rp-ta{position:fixed;right:auto;z-index:var(--z-topbar);min-width:220px;max-height:300px;overflow:auto}
+.rp-ta .ct-mhead{padding:var(--s2) var(--s2) var(--s1)}
+.rp-ta-i{display:flex;align-items:center;gap:var(--s2);height:30px;padding:0 var(--s2);border-radius:var(--r-s);font-size:13px;color:var(--ink);cursor:pointer}
+.rp-ta-i .ty{width:22px;font-size:11px;color:var(--ink-3);text-align:center}
+.rp-ta-i.hi,.rp-ta-i:hover{background:var(--hover)}
+.rp-ta-none{padding:var(--s2);font-size:12px;color:var(--ink-3)}
+.newmenu.rp-pop{position:fixed;right:auto;z-index:var(--z-topbar);min-width:0;padding:0;display:flex;flex-direction:column;max-height:calc(100vh - 96px)}
+.rp-ms{width:280px}
+.rp-ms-s{padding:var(--s3) var(--s3) 0}
+.rp-ms-s .rp-input{width:100%}
+.rp-pop-f{display:flex;align-items:center;gap:var(--s2);padding:var(--s3) var(--s4);border-top:1px solid var(--line);flex:none}
+.rp-cklist{display:flex;flex-direction:column;overflow:auto;padding:var(--s2) var(--s3);max-height:300px}
+.rp-ck{all:unset;cursor:pointer;display:flex;align-items:center;gap:var(--s2);min-height:30px;padding:0 var(--s2);border-radius:var(--r-s);font-size:13px;color:var(--ink)}
+.rp-ck:hover{background:var(--hover)}
+.rp-ck:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:calc(-1 * var(--focus))}
+.rp-ck .bx{width:14px;height:14px;border:1.5px solid var(--line-2);border-radius:calc(var(--r-s) - 2px);flex:none;position:relative;box-sizing:border-box}
+.rp-ck.on .bx{background:var(--brand);border-color:var(--brand)}
+.rp-ck.on .bx::after{content:'';position:absolute;left:3.5px;top:0.5px;width:4px;height:8px;border:solid var(--paper);border-width:0 2px 2px 0;transform:rotate(45deg)}
+.rp-ck.fam{font-weight:500;margin-top:var(--s1)}
+.rp-ck.fam .n{color:var(--ink-3);font-weight:400}
+.rp-ck.fam ~ .rp-ck:not(.fam){padding-left:calc(var(--s2) + 20px)}
+
+/* filters: field, operator, value, edited in place (D489) */
+.rp-fadd{width:100%;margin:var(--s1) 0 var(--s3)}
+.rp-flogic{display:flex;align-items:center;gap:var(--s2);font-size:12px;color:var(--ink-2);margin:0 0 var(--s2)}
+.rp-pick.sm{height:26px;font-size:12px;padding:0 var(--s2);white-space:nowrap;flex:none}
+.rp-fgroup{border:1px solid var(--line-2);border-radius:var(--r-s);padding:var(--s3) var(--s3) var(--s2);margin-bottom:var(--s2);background:var(--page)}
+.rp-fgroup .rp-fcard{background:var(--paper)}
+.rp-fgroup-f{display:flex;justify-content:space-between}
+.rp-link{all:unset;cursor:pointer;font-size:12px;font-weight:500;color:var(--brand);padding:var(--s1) 0;border-radius:var(--r-s)}
+.rp-link:hover{text-decoration:underline}
+.rp-link:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
+.rp-fbtns{display:flex;gap:var(--s4);flex-wrap:wrap;margin-top:var(--s1)}
+.rp-vrow{display:flex;align-items:center;gap:var(--s2)}
+.rp-vrow .and{font-size:12px;color:var(--ink-3)}
+.rp-numin{position:relative;flex:1}
+.rp-numin .pre{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--ink-3)}
+.rp-numin .pre + input{padding-left:20px}
+.rp-numin .suf{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--ink-3);pointer-events:none}
+.rp-numin.has-suf input{padding-right:24px}
+.rp-cond,.rp-rel{border:1px solid var(--line-2);border-radius:var(--r-s);padding:var(--s2) var(--s2) var(--s2) var(--s3);margin-bottom:var(--s2);background:var(--paper);display:flex;flex-direction:column;gap:var(--s1)}
+.rp-cond.inc{border-style:dashed}
+.rp-cl1,.rp-cl2{display:flex;align-items:center;gap:var(--s2);min-width:0}
+.rp-cl1 .rp-x{margin-left:auto;flex:none;font-size:14px}
+.rp-fpick .t,.rp-cl2 .rp-pick.sm .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.rp-cl2 .rp-pick.sm{flex:0 1 auto;min-width:0;max-width:100%}
+.rp-fpick{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:var(--s1);min-width:0;font-size:12px;font-weight:500;color:var(--ink);border-radius:var(--r-s);padding:2px var(--s1);margin-left:calc(-1 * var(--s1))}
+.rp-fpick:hover{background:var(--hover)}
+.rp-fpick:focus-visible,.rp-vpick:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
+.rp-ccnt{margin-left:auto;font-size:12px;color:var(--ink-3);font-variant-numeric:tabular-nums;white-space:nowrap;padding-right:var(--s1)}
+.rp-cl3 .rp-input{width:100%;height:30px;font-size:12px}
+.rp-vpick{all:unset;cursor:pointer;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:var(--s2);width:100%;min-height:30px;padding:var(--s1) var(--s2) var(--s1) var(--s3);
+  border:1px solid var(--line-2);border-radius:var(--r-s);font-size:12px;color:var(--ink);background:var(--paper)}
+.rp-vrow .rp-vpick{width:auto;flex:1}
+.rp-vpick:hover{background:var(--hover)}
+.rp-vpick.empty{color:var(--ink-3)}
+.rp-cl3 .rp-nin,.rp-cl2 .rp-nin{width:56px;flex:none;text-align:right}
+.rp-cl2 .rp-nin{height:26px;font-size:12px}
+.rp-rel{background:var(--page)}
+.rp-rel-l{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;font-weight:500;color:var(--ink)}
+.rp-rel-w{border-left:2px solid var(--line-2);padding-left:var(--s2);margin:var(--s1) 0 0}
+.rp-rel-w .rp-flogic{margin:0 0 var(--s1)}
+.rp-rel .rp-link{align-self:flex-start}
 </style>
 
 <div class="app">
@@ -2287,6 +2580,10 @@ a.ct-name:hover,a.ct-plink:hover{color:var(--brand)}
       <a class="rail-item" href="#/contacts" data-route="contacts">
         <svg class="rail-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20.5c0-3.6 3.1-6.5 7-6.5s7 2.9 7 6.5"/></svg>
         <span class="rail-label">Contacts</span>
+      </a>
+      <a class="rail-item" href="#/reports" data-route="reports">
+        <svg class="rail-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 16v-3"/><path d="M12 16V9"/><path d="M16 16v-5"/></svg>
+        <span class="rail-label">Reports</span>
       </a>
       <a class="rail-item inert" href="#/network" data-route="network" title="Network · soon" aria-label="Network · soon">
         <svg class="rail-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.3 11l7.4-4"/><path d="M8.3 13l7.4 4"/></svg>
@@ -2352,6 +2649,7 @@ a.ct-name:hover,a.ct-plink:hover{color:var(--brand)}
       <div class="view" id="view-bdoperf"></div>
       <div class="view" id="view-benchmarking"></div>
       <div class="view" id="view-contact"></div>
+      <div class="view" id="view-reports"></div>
     </div>
   </div>
 </div>
@@ -174569,6 +174867,7 @@ function route(){
     if(isActive) el.setAttribute('aria-current','page'); else el.removeAttribute('aria-current');
   });
   document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.body.classList.toggle('rp-wide', view==='reports');   // D488: report pages drop the 1504px cap
 
   const titles = {
     home: ROLE==='bdo' ? 'BDO Home' : 'Exec Home',
@@ -174582,6 +174881,7 @@ function route(){
     benchmarking: 'Benchmarking',
     contact: 'Contact',
     contacts: 'Contacts',
+    reports: 'Reports',
   };
 
   if(view==='home'){ showView('view-home'); renderHome(); }
@@ -174716,6 +175016,7 @@ function route(){
     } else lpReset('contacts');
     renderContacts(); showView('view-contacts');
   }
+  else if(view==='reports'){ rpEnter(); showView('view-reports'); rpDraw('now'); }   // D500: the starter report, until Reports home is built
   else if(view==='network'){ renderStub('view-network','Network','The full trade-relationship graph explorer. This pass wires network insight into the Opportunity record only; the standalone explorer is next.'); showView('view-network'); }
   else if(view==='bdoperf'){ renderStub('view-bdoperf','BDO Performance','Rep-level created/lost/won/activity intelligence — exec-only. Not built in this skeleton pass.'); showView('view-bdoperf'); }
   else if(view==='benchmarking'){ renderStub('view-benchmarking','Benchmarking','Cross-firm benchmarking is a phase-2 network-effect play with a real cold-start problem — shown to Dan as a vision panel, not a built feature.'); showView('view-benchmarking'); }
@@ -179721,6 +180022,7 @@ function rerenderShowing(){
   else if(id==='view-pipeline') renderPipeline();
   else if(id==='view-accounts') renderAccounts();
   else if(id==='view-contacts') renderContacts();
+  else if(id==='view-reports') rpDraw();
   else if((id==='view-opp' || id==='view-account' || id==='view-contact') && page) page();
   if(SURF_EL && SURF_KIND==='panel' && PANEL_STACK.length) renderPanel();
 }
@@ -182863,6 +183165,1121 @@ function renderStub(viewId, title, note){
       '<div class="stub-sub">'+note+'</div>'+
     '</div>';
 }
+
+/* ================================================================
+   REPORTS (D482 to D499; spec Other/mocks/report-run-builder-spec-v1.html, spec lines O1 to O63, D492). The run page,
+   direction A (D483): one white sheet, 24px from the rail with no page cap (D488). Until Reports home is built,
+   #/reports opens the starter report "My open pipeline by stage" directly (interim, D500). The report is the demo
+   user's own, so every run-page change saves to it (O10, D496); a reload resets it.
+   ================================================================ */
+const RP_STATUS = {open:'Open', won:'Won', lost:'Lost'};
+const rpPros = o=>PROSPECTS[o.accountId]||{};
+const rpQtr = s=>{ if(!s) return ''; const p = s.split('-'); return 'Q'+(Math.floor((+p[1]-1)/3)+1)+' '+p[0]; };
+const rpQtrSort = (a,b)=>{ const pa = a.split(' '), pb = b.split(' '); return (+pa[1]-+pb[1]) || (pa[0]<pb[0]?-1:pa[0]>pb[0]?1:0); };
+/* the fields an Opportunities report can use, grouped by object as the Fields pane shows them; fields reached through a
+   relationship read by path (RESEARCH_17 §14, O46). Yield reads "Pricing" (D379, O23). */
+const RPF = {
+  name:{l:'Opportunity', o:'Opportunity', ty:'Abc', get:o=>o.name, link:o=>'#/opp/'+o.id},
+  stage:{l:'Stage', o:'Opportunity', ty:'Pick', g:1, get:o=>o.outcome==='open'?o.stage:RP_STATUS[o.outcome], order:TRACK_STAGES.concat(['Won','Lost'])},
+  product:{l:'Product', o:'Opportunity', ty:'Pick', g:1, get:o=>productLabel(o.productType), order:['Factoring','ABL','Term Loan']},
+  size:{l:'Facility size', o:'Opportunity', ty:'$', num:'money', get:o=>o.facilitySize},
+  close:{l:'Expected close', o:'Opportunity', ty:'Date', date:1, g:1, get:o=>o.expectedCloseDate},
+  days:{l:'Days in stage', o:'Opportunity', ty:'#', num:'int', get:o=>o.outcome==='open'?currentDaysInStage(o):null},
+  created:{l:'Created date', o:'Opportunity', ty:'Date', date:1, g:1, get:o=>o.createdDate},
+  yield:{l:'Pricing', o:'Opportunity', ty:'%', num:'pct', get:o=>o.yieldPct},
+  channel:{l:'Channel', o:'Opportunity', ty:'Pick', g:1, get:o=>o.channel},
+  loss:{l:'Closed lost reason', o:'Opportunity', ty:'Pick', g:1, get:o=>o.closedLostReason||''},
+  use:{l:'Use of proceeds', o:'Opportunity', ty:'Pick', g:1, get:o=>o.useOfProceeds},
+  status:{l:'Status', o:'Opportunity', ty:'Pick', g:1, get:o=>RP_STATUS[o.outcome], order:['Open','Won','Lost']},
+  owner:{l:'Owner', o:'Opportunity', ty:'Abc', g:1, get:o=>(BDOS[o.bdoId]||{}).name||''},
+  acct:{l:'Account > Name', s:'Name', o:'Account', ty:'Abc', get:o=>rpPros(o).name||'', link:o=>'#/account/'+o.accountId},
+  industry:{l:'Account > Industry', s:'Industry', o:'Account', ty:'Pick', g:1, get:o=>rpPros(o).industryName||''},
+  state:{l:'Account > State', s:'State', o:'Account', ty:'Pick', g:1, get:o=>((rpPros(o).location||'').split(', ')[1])||''},
+  revenue:{l:'Account > Annual revenue', s:'Annual revenue', o:'Account', ty:'$', num:'money', get:o=>rpPros(o).annualRevenue||null},
+  emp:{l:'Account > Employees', s:'Employees', o:'Account', ty:'#', num:'int', get:o=>rpPros(o).employeeCount||null},
+  partner:{l:'Referral partner > Name', s:'Name', o:'Referral partner', ty:'Abc', t:'lookup', g:1, get:o=>o.referralPartnerId?((PARTNERS[o.referralPartnerId]||{}).name||''):''},
+  ptype:{l:'Referral partner > Partner type', s:'Partner type', o:'Referral partner', ty:'Pick', g:1, get:o=>o.referralPartnerId?((PARTNERS[o.referralPartnerId]||{}).partnerType||''):''},
+};
+const RP_OBJS = ['Opportunity','Account','Referral partner'];
+const RP_SUMS = {sum:'Sum', avg:'Average', median:'Median', max:'Max', min:'Min'};
+const rpDefault = ()=>({title:'My open pipeline by stage', gr:['stage'], gc:[], cols:['name','product','close','days','size'], sum:{size:'sum'},
+  sort:{k:'size', d:-1}, gsort:{}, f:{owner:'me', root:{op:'and', items:[{field:'status', o:'in', v:['Open']}]}}, tog:{rc:true, det:true, sub:true, tot:true}, chart:null,
+  figs:[{k:'_rc'},{k:'size', how:'sum'}]});
+const rpClone = o=>JSON.parse(JSON.stringify(o));
+/* saved: the report; screen 'run' or 'build' (the builder edits a draft, with hist and fut for Undo and Redo); q the
+   search box; fpanel the filter panel; shut the collapsed groups; fields, tab and renaming the builder's panes */
+const RP = {screen:'run', saved:rpDefault(), draft:null, hist:[], fut:[], q:'', fpanel:false, shut:{}, fav:false, fields:false, tab:'outline', renaming:false};
+const rpC = ()=>RP.screen==='build' ? RP.draft : RP.saved;
+const rpView = ()=>document.getElementById('view-reports');
+
+/* ---------- data ---------- */
+function rpRows(c, q){
+  let r = allOpps().filter(o=>(c.f.owner==='all' || o.bdoId===CURRENT_BDO_ID) && rpTestGroup(o, c.f.root));
+  if(q){ const s = q.toLowerCase(); r = r.filter(o=>c.cols.concat(c.gr).some(k=>String(RPF[k].get(o)==null?'':RPF[k].get(o)).toLowerCase().includes(s))); }
+  if(c.sort && RPF[c.sort.k]){ const f = RPF[c.sort.k], d = c.sort.d;
+    r.sort((a,b)=>{ const x = f.get(a), y = f.get(b); if(x==null&&y==null) return 0; if(x==null) return 1; if(y==null) return -1;
+      return (typeof x==='number' ? x-y : String(x).localeCompare(String(y)))*d; }); }
+  return r;
+}
+const rpGval = (k,o)=>{ const f = RPF[k], v = f.get(o); return f.date ? rpQtr(v) : (v==null||v==='' ? 'None' : String(v)); };
+function rpGroupBy(list, k, dir){
+  const f = RPF[k], m = new Map();
+  list.forEach(o=>{ const v = rpGval(k,o); if(!m.has(v)) m.set(v, []); m.get(v).push(o); });
+  const keys = [...m.keys()];
+  if(f.order) keys.sort((a,b)=>{ const ia = f.order.indexOf(a), ib = f.order.indexOf(b); return (ia<0?99:ia)-(ib<0?99:ib); });
+  else if(f.date) keys.sort(rpQtrSort); else keys.sort((a,b)=>a.localeCompare(b));
+  if(dir===-1) keys.reverse();
+  return keys.map(v=>({v, list:m.get(v)}));
+}
+/* an Account field repeats on every opportunity of that account: each account counts once (O12) */
+const rpPerAcct = (list, k)=>{ if(RPF[k].o!=='Account') return list; const seen = new Set(); return list.filter(o=>!seen.has(o.accountId) && seen.add(o.accountId)); };
+function rpAgg(list, k, how){
+  const vals = rpPerAcct(list, k).map(o=>RPF[k].get(o)).filter(v=>v!=null);
+  if(!vals.length) return null;
+  if(how==='sum') return vals.reduce((s,v)=>s+v,0);
+  if(how==='avg') return vals.reduce((s,v)=>s+v,0)/vals.length;
+  if(how==='max') return Math.max(...vals);
+  if(how==='min') return Math.min(...vals);
+  if(how==='median'){ const v = vals.slice().sort((a,b)=>a-b), m = v.length>>1; return v.length%2 ? v[m] : (v[m-1]+v[m])/2; }
+  return null;
+}
+function rpFmt(k, v){
+  const f = RPF[k]; if(v==null || v==='') return '';
+  if(f.num==='money') return moneyPlain(v);
+  if(f.num==='int') return Math.round(v).toLocaleString('en-US');
+  if(f.num==='pct') return v.toFixed(2)+'%';
+  if(f.date) return fmtDate(v);
+  return esc(String(v));
+}
+const rpFmtAgg = (k, how, v)=>v==null ? '' : (RPF[k].num==='int' && (how==='avg' || (how==='median' && v%1))) ? v.toFixed(1) : rpFmt(k, v);
+
+/* ---------- the filter engine (RESEARCH_17 §7 and §14; D298, D489; O42 to O50). Condition rows of field, operator and
+   value, edited in place; related-record rows with their own conditions; All/Any groups nested to any depth. ---------- */
+const RP_FILT = {owner:{k:'Show me', opts:[['me','My opportunities'],['all','All opportunities']]}};
+const rpFLabel = (k,v)=>(RP_FILT[k].opts.find(x=>x[0]===v)||['',''])[1];
+const rpBdoName = id=>(BDOS[id]||{}).name||'';
+const RP_FIELD_NAMES = {expectedCloseDate:'Expected close', facilitySize:'Facility size', stage:'Stage', yieldPct:'Pricing', productType:'Product'};
+/* related records an opportunity reaches (RESEARCH_17 §14's object graph, O45), read from the live stores */
+const RP_REL = {
+  acts:{l:'Activities on the account', rows:o=>ACTS_BY_ACCT[o.accountId]||[], all:()=>Object.values(ACTS_BY_ACCT).flat(), f:{
+    date:{l:'Date', t:'date', get:r=>r.date}, type:{l:'Type', t:'pick', get:r=>r.type}, by:{l:'Logged by', t:'pick', get:r=>rpBdoName(r.bdoId)},
+    src:{l:'Source', t:'pick', get:r=>r.source==='captured'?'Captured':'Hand-logged'}}},
+  liens:{l:'Liens on the account', rows:o=>LIENS_BY_ACCT[o.accountId]||[], all:()=>D.liens, f:{
+    filed:{l:'Filing date', t:'date', get:r=>r.filingDate}, party:{l:'Secured party', t:'text', get:r=>r.securedParty},
+    rank:{l:'Priority rank', t:'num', num:'int', get:r=>r.priorityRank}, sub:{l:'Subordinated', t:'pick', get:r=>r.subordinated?'Yes':'No'}}},
+  docs:{l:'Documents', rows:o=>DOCS_BY_OPP[o.id]||[], all:()=>Object.values(DOCS_BY_OPP).flat(), f:{
+    type:{l:'Type', t:'pick', get:r=>r.type}, up:{l:'Uploaded', t:'date', get:r=>r.uploadedDate}}},
+  parties:{l:'Contacts on the opportunity', rows:o=>PARTIES_BY_OPP[o.id]||[], all:()=>Object.values(PARTIES_BY_OPP).flat(), f:{
+    roles:{l:'Role', t:'multi', get:r=>r.roles||[]}, gty:{l:'Guaranty type', t:'pick', get:r=>r.guarantyType||''}, kind:{l:'Party kind', t:'pick', get:r=>r.partyKind==='contact'?'Person':'Company'}}},
+  stages:{l:'Stage history', rows:o=>STAGEHIST[o.id]||[], all:()=>Object.values(STAGEHIST).flat(), f:{
+    stage:{l:'Stage', t:'pick', get:r=>r.stage, order:TRACK_STAGES}, in:{l:'Entered', t:'date', get:r=>r.enteredDate}, dur:{l:'Days in stage', t:'num', num:'int', get:r=>r.durationDays}}},
+  changes:{l:'Field changes', rows:o=>AUDIT_BY_OPP[o.id]||[], all:()=>Object.values(AUDIT_BY_OPP).flat(), f:{
+    field:{l:'Field', t:'pick', get:r=>RP_FIELD_NAMES[r.field]||r.field}, at:{l:'Changed', t:'date', get:r=>r.changedAt}, by:{l:'Changed by', t:'pick', get:r=>rpBdoName(r.changedBy)}}},
+};
+const rpDefs = ctx=>ctx ? RP_REL[ctx].f : RPF;
+const rpFtype = (k, ctx)=>{ const f = rpDefs(ctx)[k]; return f.t || (k==='owner' ? 'user' : f.num ? 'num' : f.date ? 'date' : f.ty==='Pick' ? 'pick' : 'text'); };
+/* operator wording is plain, "is equal to" and so on (D489); the set per type is RESEARCH_17 §7's table (O43) */
+const RP_OPS = {
+  text:[['eq','is equal to'],['neq','is not equal to'],['contains','contains'],['ncontains','does not contain'],['starts','starts with'],['empty','is blank'],['nempty','is not blank']],
+  pick:[['in','is equal to'],['nin','is not equal to'],['empty','is blank'],['nempty','is not blank']],
+  multi:[['in','includes'],['nin','does not include']],
+  lookup:[['in','is equal to'],['nin','is not equal to'],['empty','is blank'],['nempty','is not blank']],
+  user:[['me','is current user'],['team','is in my team'],['in','is equal to'],['nin','is not equal to']],
+  num:[['eq','is equal to'],['neq','is not equal to'],['gt','is greater than'],['gte','is greater than or equal to'],['lt','is less than'],['lte','is less than or equal to'],['between','is between'],['empty','is blank']],
+  date:[['rel','is in'],['on','is equal to'],['before','is before'],['after','is after'],['between','is between'],['empty','is blank']],
+};
+const RP_QUANT = [['any','has any'],['none','has none'],['atleast','has at least'],['atmost','has at most']];
+const RP_RELD = [['today','Today'],['thisw','This week'],['lastw','Last week'],['nextw','Next week'],['thism','This month'],['lastm','Last month'],['nextm','Next month'],
+  ['thisq','This quarter'],['lastq','Last quarter'],['nextq','Next quarter'],['thisfq','This fiscal quarter'],['lastfq','Last fiscal quarter'],['nextfq','Next fiscal quarter'],
+  ['thisy','This year'],['lasty','Last year'],['nexty','Next year'],['lastn','Last N days'],['nextn','Next N days']];
+const rpOpLabel = (k,o,ctx)=>(RP_OPS[rpFtype(k,ctx)].find(x=>x[0]===o)||['',o])[1];
+const rpNoValue = o=>o==='empty'||o==='nempty'||o==='me'||o==='team';
+const rpIso = d=>d.toISOString().slice(0,10);
+const rpDayAdd = (s,n)=>{ const d = new Date(s+'T00:00:00Z'); d.setUTCDate(d.getUTCDate()+n); return rpIso(d); };
+/* a relative date range; the fiscal quarter is the calendar quarter, since the data has no fiscal calendar (O43) */
+function rpRelRange(v){
+  const r = v&&v.r, n = Math.max(0, +(v&&v.n)||0), T = new Date(TODAY+'T00:00:00Z'), y = T.getUTCFullYear(), m = T.getUTCMonth(), q = Math.floor(m/3);
+  const mr = (yy,mm,len)=>[rpIso(new Date(Date.UTC(yy,mm,1))), rpIso(new Date(Date.UTC(yy,mm+len,0)))];
+  const wk = off=>{ const dow = (T.getUTCDay()+6)%7, a = rpDayAdd(TODAY, -dow+7*off); return [a, rpDayAdd(a,6)]; };
+  switch(r){
+    case 'today': return [TODAY, TODAY];
+    case 'thisw': return wk(0); case 'lastw': return wk(-1); case 'nextw': return wk(1);
+    case 'thism': return mr(y,m,1); case 'lastm': return mr(y,m-1,1); case 'nextm': return mr(y,m+1,1);
+    case 'thisq': case 'thisfq': return mr(y,q*3,3); case 'lastq': case 'lastfq': return mr(y,q*3-3,3); case 'nextq': case 'nextfq': return mr(y,q*3+3,3);
+    case 'thisy': return [y+'-01-01', y+'-12-31']; case 'lasty': return [(y-1)+'-01-01', (y-1)+'-12-31']; case 'nexty': return [(y+1)+'-01-01', (y+1)+'-12-31'];
+    case 'lastn': return [rpDayAdd(TODAY,-n), TODAY]; case 'nextn': return [TODAY, rpDayAdd(TODAY,n)];
+  }
+  return ['0000','9999'];
+}
+function rpPickVals(k, ctx){
+  const f = rpDefs(ctx)[k];
+  if(!ctx && k==='owner') return Object.values(BDOS).map(b=>b.name).sort();
+  if(!ctx && k==='partner') return Object.values(PARTNERS).map(p=>p.name).sort();
+  const set = new Set();
+  (ctx ? RP_REL[ctx].all() : allOpps()).forEach(r=>{ const v = f.get(r); (Array.isArray(v)?v:[v]).forEach(x=>{ if(x!=null && x!=='') set.add(x); }); });
+  const l = [...set];
+  if(f.order) l.sort((a,b)=>{ const ia = f.order.indexOf(a), ib = f.order.indexOf(b); return (ia<0?99:ia)-(ib<0?99:ib); }); else l.sort((a,b)=>String(a).localeCompare(String(b)));
+  return l;
+}
+/* a condition is complete when it has what its operator needs; an incomplete row is shown (dashed) but not applied */
+function rpComplete(cd, ctx){
+  if(rpNoValue(cd.o)) return true; const t = rpFtype(cd.field, ctx), v = cd.v;
+  if(t==='pick'||t==='lookup'||t==='user'||t==='multi') return (v||[]).length>0;
+  if(t==='num') return rpIsNum(v[0]) && (cd.o!=='between' || rpIsNum(v[1]));
+  if(t==='date') return cd.o==='rel' ? !!(v&&v.r) && (!/n$/.test(v.r) || +v.n>0) : !!(v&&v[0]) && (cd.o!=='between' || !!v[1]);
+  return rpSplit(v).length>0;
+}
+/* several text values in one box: split on commas outside double quotes; quotes wrap a value that contains a comma;
+   apostrophes are ordinary letters (D489, O49) */
+function rpSplit(str){
+  const out = []; let cur = '', q = false;
+  for(const ch of String(str||'')){ if(ch==='"'){ q = !q; continue; } if(ch===',' && !q){ out.push(cur); cur = ''; continue; } cur += ch; }
+  out.push(cur); return out.map(x=>x.trim()).filter(Boolean);
+}
+function rpTestCond(row, cd, ctx){
+  if(!rpComplete(cd, ctx)) return true;
+  const t = rpFtype(cd.field, ctx), raw = rpDefs(ctx)[cd.field].get(row), v = cd.v, empty = raw==null || raw==='' || (Array.isArray(raw) && !raw.length);
+  if(cd.o==='empty') return empty; if(cd.o==='nempty') return !empty;
+  if(t==='user'){ if(cd.o==='me') return row.bdoId===CURRENT_BDO_ID; if(cd.o==='team') return !!BDOS[row.bdoId]; const inn = v.includes(raw); return cd.o==='in' ? inn : !inn; }
+  if(t==='multi'){ const inn = (raw||[]).some(x=>v.includes(x)); return cd.o==='in' ? inn : !inn; }
+  if(t==='pick'||t==='lookup'){ const inn = v.includes(raw); return cd.o==='in' ? inn : !inn; }
+  if(t==='text'){ const a = String(raw||'').toLowerCase(), bs = rpSplit(v).map(x=>x.toLowerCase());
+    return cd.o==='contains' ? bs.some(b=>a.includes(b)) : cd.o==='ncontains' ? !bs.some(b=>a.includes(b)) : cd.o==='eq' ? bs.includes(a) :
+      cd.o==='neq' ? !bs.includes(a) : cd.o==='starts' ? bs.some(b=>a.startsWith(b)) : true; }
+  if(t==='num'){ if(empty) return false; const x = +raw, a = +v[0], b = +v[1];
+    return cd.o==='gt' ? x>a : cd.o==='gte' ? x>=a : cd.o==='lt' ? x<a : cd.o==='lte' ? x<=a : cd.o==='eq' ? x===a : cd.o==='neq' ? x!==a : cd.o==='between' ? x>=Math.min(a,b) && x<=Math.max(a,b) : true; }
+  if(t==='date'){ if(empty) return false;
+    if(cd.o==='rel'){ const r = rpRelRange(v); return raw>=r[0] && raw<=r[1]; }
+    return cd.o==='on' ? raw===v[0] : cd.o==='before' ? raw<v[0] : cd.o==='after' ? raw>v[0] : cd.o==='between' ? raw>=v[0] && raw<=v[1] : true; }
+  return true;
+}
+const rpRelComplete = nd=>(nd.q!=='atleast' && nd.q!=='atmost') || (nd.n!=='' && nd.n!=null && !isNaN(+nd.n));
+function rpTestNode(row, nd, ctx){
+  if(nd.rel){ if(!rpRelComplete(nd)) return true;
+    const n = RP_REL[nd.rel].rows(row).filter(r=>rpTestGroup(r, nd, nd.rel)).length;
+    return nd.q==='any' ? n>0 : nd.q==='none' ? n===0 : nd.q==='atleast' ? n>=+nd.n : n<=+nd.n; }
+  if(nd.items) return rpTestGroup(row, nd, ctx);
+  return rpTestCond(row, nd, ctx);
+}
+function rpTestGroup(row, g, ctx){ if(!g.items.length) return true;
+  return g.op==='or' ? g.items.some(it=>rpTestNode(row, it, ctx)) : g.items.every(it=>rpTestNode(row, it, ctx)); }
+const rpFmtNum = (k,x,ctx)=>{ const f = rpDefs(ctx)[k]; return x==null||x==='' ? '' : f.num==='money' ? moneyPlain(+x) : f.num==='pct' ? (+x)+'%' : (+x).toLocaleString('en-US'); };
+function rpValText(cd, ctx){
+  const t = rpFtype(cd.field, ctx), v = cd.v;
+  if(rpNoValue(cd.o)) return '';
+  if(t==='pick'||t==='lookup'||t==='user'||t==='multi'){ const l = v||[]; if(!l.length) return '';
+    if(cd.field==='loss' && !ctx){   // a whole loss-reason family reads as one, "Declined in credit (all)" (O44)
+      const fams = LOSS_GROUPS.filter(g=>Object.keys(LOSS_GROUP_OF).filter(r=>LOSS_GROUP_OF[r]===g).every(r=>l.includes(r)));
+      const parts = fams.map(g=>g+' (all)').concat(l.filter(r=>!fams.includes(LOSS_GROUP_OF[r])));
+      return parts.length<=2 ? parts.join(', ') : parts.slice(0,2).join(', ')+' +'+(parts.length-2); }
+    return l.length<=2 ? l.join(', ') : l.slice(0,2).join(', ')+' +'+(l.length-2); }
+  if(t==='num') return cd.o==='between' ? rpFmtNum(cd.field,v[0],ctx)+' and '+rpFmtNum(cd.field,v[1],ctx) : rpFmtNum(cd.field,v[0],ctx);
+  if(t==='date'){ if(cd.o==='rel'){ const r = (RP_RELD.find(x=>x[0]===(v&&v.r))||['',''])[1]; return /N days/.test(r) ? r.replace('N', v.n||'N').toLowerCase() : r.toLowerCase(); }
+    return cd.o==='between' ? fmtDate(v[0])+' and '+fmtDate(v[1]) : v&&v[0] ? fmtDate(v[0]) : ''; }
+  const l = rpSplit(v); return !l.length ? '' : l.length<=2 ? l.join(', ') : l.slice(0,2).join(', ')+' +'+(l.length-2);
+}
+const rpCondText = (cd, ctx)=>rpDefs(ctx)[cd.field].l+' '+rpOpLabel(cd.field, cd.o, ctx)+(rpNoValue(cd.o)?'':' '+rpValText(cd, ctx));
+const rpRelText = nd=>RP_REL[nd.rel].l+': '+(RP_QUANT.find(x=>x[0]===nd.q)||['',''])[1]+(nd.q==='atleast'||nd.q==='atmost'?' '+(nd.n||'N'):'')+
+  (nd.items.length ? ' where '+nd.items.filter(c=>!c.items).map(c=>rpCondText(c, nd.rel)).join(nd.op==='or'?' or ':' and ') : '');
+/* the whole filter read back as one sentence, count first (RESEARCH_17 §7, O50) */
+function rpNodeText(nd, ctx){
+  if(nd.rel) return rpRelText(nd);
+  if(nd.items){ const parts = nd.items.map(x=>rpNodeText(x, ctx)).filter(Boolean); return parts.length>1 ? '('+parts.join(nd.op==='or'?' or ':' and ')+')' : parts[0]||''; }
+  return rpComplete(nd, ctx) ? rpCondText(nd, ctx) : '';
+}
+function rpSentence(c){
+  const top = c.f.root, parts = top.items.map(x=>rpNodeText(x, null)).filter(Boolean), n = rpRows(c,'').length;
+  return n+' record'+(n===1?'':'s')+' · '+(c.f.owner==='me'?'Your':'All')+' opportunities'+(parts.length?' where '+parts.join(top.op==='or'?' or ':' and '):'');
+}
+const rpNodeAt = (root, path)=>path.reduce((n,i)=>n.items[i], root);
+const rpCtxAt = (root, path)=>{ let n = root, ctx = null; path.forEach(i=>{ if(n.rel) ctx = n.rel; n = n.items[i]; }); return ctx; };
+/* the filter icon's badge counts Show me plus every complete row; an incomplete row isn't applied (O26) */
+const rpCountF = g=>g.items.reduce((s,it)=>s+(it.rel ? (rpRelComplete(it)?1:0) : it.items ? rpCountF(it) : (rpComplete(it, null)?1:0)), 0);
+const rpNF = c=>1+rpCountF(c.f.root);
+const rpDefCond = (k, ctx)=>{ const t = rpFtype(k, ctx);
+  return t==='user' ? {field:k, o:'me', v:[]} : t==='pick'||t==='lookup'||t==='multi' ? {field:k, o:'in', v:[]} : t==='num' ? {field:k, o:'eq', v:['','']} :
+    t==='date' ? {field:k, o:'rel', v:{r:'thisq', n:30}} : {field:k, o:'eq', v:''}; };
+/* a change to the report: in the builder it goes through Undo (rpEdit); on the run page it saves to the report at once
+   (the owner's change, O10) */
+const rpSet = fn=>{ if(RP.screen==='build') rpEdit(fn); else { fn(RP.saved); rpDraw(); } };
+/* records a single top-level row lets through on its own (each row shows its own count, RESEARCH_17 §7) */
+function rpRowCount(nd){ const c = rpC(); return allOpps().filter(o=>(c.f.owner==='all' || o.bdoId===CURRENT_BDO_ID) && rpTestNode(o, nd, null)).length; }
+const RP_CHEV = '<span class="rp-chev">&#9660;</span>';
+const rpRecs = n=>n+' record'+(n===1?'':'s');
+
+/* one condition row: Field ▾ ⋯ / Operator ▾ count / value, all edited in place */
+function rpCondHtml(cd, p, ctx, top){
+  const f = rpDefs(ctx)[cd.field], t = rpFtype(cd.field, ctx), ok = rpComplete(cd, ctx), v = cd.v;
+  let val = '';
+  if(!rpNoValue(cd.o)){
+    if(t==='pick'||t==='lookup'||t==='user'||t==='multi') val = '<button class="rp-vpick'+(ok?'':' empty')+'" data-cvals="'+p+'" aria-haspopup="dialog">'+(ok?esc(rpValText(cd, ctx)):'Choose values')+RP_CHEV+'</button>';
+    else if(t==='num'){
+      const pre = f.num==='money'?'<span class="pre">$</span>':'', suf = f.num==='pct'?'<span class="suf">%</span>':'';
+      const inp = (i,ph)=>'<div class="rp-numin'+(suf?' has-suf':'')+'">'+pre+suf+'<input class="rp-input" id="cv-'+p+'-'+i+'" data-cnum="'+p+'" data-i="'+i+'" inputmode="decimal" placeholder="'+ph+'" value="'+
+        (v[i]===''||v[i]==null?'':esc(f.num==='money' && rpIsNum(v[i])?(+v[i]).toLocaleString('en-US'):String(v[i])))+'" aria-label="'+esc(f.l)+' '+ph+'"></div>';
+      val = cd.o==='between' ? '<div class="rp-vrow">'+inp(0,'From')+'<span class="and">and</span>'+inp(1,'To')+'</div>' : inp(0,'Value'); }
+    else if(t==='date'){
+      if(cd.o==='rel') val = '<div class="rp-vrow"><button class="rp-vpick" data-crel="'+p+'" aria-haspopup="menu">'+esc((RP_RELD.find(x=>x[0]===v.r)||['','Choose'])[1].replace(' N days',''))+RP_CHEV+'</button>'+
+        (/n$/.test(v.r) ? '<input class="rp-input rp-nin" id="cv-'+p+'-n" data-cn="'+p+'" inputmode="numeric" value="'+esc(String(v.n||''))+'" aria-label="Number of days"><span class="and">days</span>' : '')+'</div>';
+      else { const inp = (i,lab)=>'<input class="rp-input" type="date" id="cv-'+p+'-'+i+'" data-cdate="'+p+'" data-i="'+i+'" value="'+esc((v&&v[i])||'')+'" aria-label="'+lab+'">';   // Known issue 65
+        val = cd.o==='between' ? '<div class="rp-vrow">'+inp(0,'From')+'<span class="and">and</span>'+inp(1,'To')+'</div>' : inp(0,'Date'); } }
+    else val = '<input class="rp-input" id="cv-'+p+'-t" data-ctext="'+p+'" placeholder="One value, or several separated by commas" value="'+esc(v||'')+'" aria-label="'+esc(f.l)+' value">';
+  }
+  const n = top && ok ? rpRowCount(cd) : null;
+  /* the live count ends the operator line; when the operator is long it wraps under it, right-aligned (O25) */
+  return '<div class="rp-cond'+(ok?'':' inc')+'"><div class="rp-cl1"><button class="rp-fpick" data-cfield="'+p+'" aria-haspopup="menu" title="'+esc(f.l)+'"><span class="t">'+esc(f.l)+'</span>'+RP_CHEV+'</button>'+
+    '<button class="rp-x" data-cmenu="'+p+'" aria-label="More for '+esc(f.l)+'" aria-haspopup="menu">&#8943;</button></div>'+
+    '<div class="rp-cl2"><button class="rp-pick sm" data-cop="'+p+'" aria-haspopup="menu" title="'+esc(rpOpLabel(cd.field, cd.o, ctx))+'"><span class="t">'+esc(rpOpLabel(cd.field, cd.o, ctx))+'</span>'+RP_CHEV+'</button>'+
+    (n!=null?'<span class="rp-ccnt">'+rpRecs(n)+'</span>':'')+'</div>'+
+    (val?'<div class="rp-cl3">'+val+'</div>':'')+'</div>';
+}
+function rpRelHtml(nd, p, top){
+  const n = top && rpRelComplete(nd) ? rpRowCount(nd) : null, many = nd.q==='atleast'||nd.q==='atmost';
+  return '<div class="rp-rel"><div class="rp-cl1"><span class="rp-rel-l">'+esc(RP_REL[nd.rel].l)+'</span>'+
+    '<button class="rp-x" data-cmenu="'+p+'" aria-label="More for '+esc(RP_REL[nd.rel].l)+'" aria-haspopup="menu">&#8943;</button></div>'+
+    '<div class="rp-cl2"><button class="rp-pick sm" data-cq="'+p+'" aria-haspopup="menu">'+esc((RP_QUANT.find(x=>x[0]===nd.q)||['',''])[1])+RP_CHEV+'</button>'+
+    (many?'<input class="rp-input rp-nin" id="cv-'+p+'-q" data-cqn="'+p+'" inputmode="numeric" value="'+esc(String(nd.n==null?'':nd.n))+'" aria-label="How many">':'')+(n!=null?'<span class="rp-ccnt">'+rpRecs(n)+'</span>':'')+'</div>'+
+    (nd.items.length ? '<div class="rp-rel-w">'+(nd.items.length>1?'<div class="rp-flogic">where <button class="rp-pick sm" data-glogic="'+p+'" aria-haspopup="menu">'+(nd.op==='or'?'any':'all')+RP_CHEV+'</button> of these</div>':'<div class="rp-flogic">where</div>')+
+      nd.items.map((c,i)=>rpCondHtml(c, p+'.'+i, nd.rel, false)).join('')+'</div>' : '')+
+    '<button class="rp-link" data-radd="'+p+'" aria-haspopup="menu">+ Add condition</button></div>';
+}
+function rpTreeHtml(g, path){
+  const ps = path.join('.'), top = !path.length;
+  let h = '';
+  if(!top || g.items.length>1) h += '<div class="rp-flogic">'+(top?'Match ':'')+'<button class="rp-pick sm" data-glogic="'+ps+'" aria-haspopup="menu">'+(g.op==='or'?'Any':'All')+RP_CHEV+'</button> '+(top?'filters':'of these')+'</div>';
+  g.items.forEach((it,i)=>{ const p = path.concat(i).join('.');
+    if(it.rel) h += rpRelHtml(it, p, top);
+    else if(it.items) h += '<div class="rp-fgroup">'+rpTreeHtml(it, path.concat(i))+'<div class="rp-fgroup-f"><button class="rp-link" data-gadd="'+p+'" aria-haspopup="menu">+ Add filter</button><button class="rp-link" data-crm="'+p+'">Remove group</button></div></div>';
+    else h += rpCondHtml(it, p, null, top); });
+  return h;
+}
+function rpFilters(c){
+  return '<button class="rp-fcard" data-filt="owner" aria-haspopup="menu"><div class="k">Show me</div><div class="v">'+esc(rpFLabel('owner', c.f.owner))+'</div></button>'+
+    '<input class="rp-input rp-fadd" data-ta="filter" placeholder="Add filter…" aria-label="Add filter" autocomplete="off">'+
+    rpTreeHtml(c.f.root, [])+
+    '<div class="rp-fbtns"><button class="rp-link" data-act="addrel" aria-haspopup="menu">+ Add related records</button><button class="rp-link" data-act="addgroup" aria-haspopup="menu">+ Add group</button></div>';
+}
+/* the field menu for a row or a new filter: grouped by object, related records last */
+function rpFieldItems(withRel){
+  const items = [];
+  RP_OBJS.forEach(ob=>{ const ks = Object.keys(RPF).filter(k=>RPF[k].o===ob); if(!ks.length) return; items.push({head:ob}); ks.forEach(k=>items.push({v:k, t:RPF[k].s||RPF[k].l})); });
+  if(withRel){ items.push({head:'Related records'}); Object.keys(RP_REL).forEach(r=>items.push({v:'rel:'+r, t:RP_REL[r].l})); }
+  return items;
+}
+const rpNewNode = v=>v.startsWith('rel:') ? {rel:v.slice(4), q:'any', n:1, op:'and', items:[]} : rpDefCond(v, null);
+function rpFocusNew(path){
+  const p = path.join('.'), el = rpView().querySelector('[data-cvals="'+p+'"], #cv-'+CSS.escape(p)+'-0, #cv-'+CSS.escape(p)+'-t, [data-crel="'+p+'"], [data-cq="'+p+'"]');
+  if(el){ el.focus(); if(el.dataset.cvals!=null) rpValsOpen(el); }
+}
+function rpAddAt(path, v){ let at; rpSet(d=>{ const g = rpNodeAt(d.f.root, path); g.items.push(rpNewNode(v)); at = path.concat(g.items.length-1); }); rpFocusNew(at); }
+
+/* the value list for picklists, owners, partners and roles (.newmenu, D418): stays open while you tick, applies as you go */
+let RP_POP = null;
+function rpPopClose(){ if(RP_POP){ RP_POP.el.remove(); RP_POP = null; } }
+function rpValsOpen(btn){
+  if(RP_POP && RP_POP.p===btn.dataset.cvals){ rpPopClose(); return; }
+  rpPopClose(); actMenuClose();
+  const p = btn.dataset.cvals, path = p.split('.').map(Number), ctx = rpCtxAt(rpC().f.root, path), cd = rpNodeAt(rpC().f.root, path);
+  const el = document.createElement('div');
+  el.className = 'newmenu rp-pop rp-ms';
+  el.setAttribute('role','dialog'); el.setAttribute('aria-label', rpDefs(ctx)[cd.field].l+' values');
+  document.body.appendChild(el); RP_POP = {el, p, path, ctx, q:''};
+  rpValsDraw(); rpValsPlace(); const s = el.querySelector('input'); if(s) s.focus();
+}
+function rpValsDraw(){
+  const cd = rpNodeAt(rpC().f.root, RP_POP.path), vals = rpPickVals(cd.field, RP_POP.ctx), on = cd.v||[], q = RP_POP.q.toLowerCase();
+  const row = x=>'<button class="rp-ck'+(on.includes(x)?' on':'')+'" role="checkbox" aria-checked="'+on.includes(x)+'" data-ck="'+esc(x)+'"><span class="bx" aria-hidden="true"></span>'+esc(x)+'</button>';
+  let list;
+  if(cd.field==='loss' && !RP_POP.ctx) list = LOSS_GROUPS.map(g=>{ const rs = vals.filter(r=>LOSS_GROUP_OF[r]===g && r.toLowerCase().includes(q)); if(!rs.length) return '';
+      const all = rs.every(r=>on.includes(r)); return '<button class="rp-ck fam'+(all?' on':'')+'" role="checkbox" aria-checked="'+all+'" data-fam="'+esc(g)+'"><span class="bx" aria-hidden="true"></span>'+esc(g)+' <span class="n">(all)</span></button>'+rs.map(row).join(''); }).join('');
+  else list = vals.filter(x=>String(x).toLowerCase().includes(q)).map(row).join('');
+  RP_POP.el.innerHTML = (vals.length>8 ? '<div class="rp-ms-s"><input class="rp-input" placeholder="Search values" value="'+esc(RP_POP.q)+'" aria-label="Search values"></div>' : '')+
+    '<div class="rp-cklist">'+(list||'<div class="rp-ta-none">No values match</div>')+'</div>'+
+    '<div class="rp-pop-f"><button class="rp-link" data-pa="clear">Clear</button><span class="rp-grow"></span><button class="rp-btn" data-pa="done">Done</button></div>';
+}
+function rpValsPlace(){
+  if(!RP_POP) return; const a = rpView().querySelector('[data-cvals="'+RP_POP.p+'"]'); if(!a){ rpPopClose(); return; }
+  const r = a.getBoundingClientRect(), host = a.closest('.rp-fpanel, .rpk-panel'), edge = host ? host.getBoundingClientRect().right : r.right, w = RP_POP.el.offsetWidth, h = RP_POP.el.offsetHeight;
+  let left = Math.max(r.right, edge)+8; if(left+w > innerWidth-16) left = Math.max(16, r.left-w-12);
+  const top = Math.min(Math.max(72, r.top-8), innerHeight-h-16);
+  RP_POP.el.style.left = Math.round(left)+'px'; RP_POP.el.style.top = Math.round(top)+'px';
+}
+function rpValsSet(fn){ const path = RP_POP.path; rpSet(d=>{ const cd = rpNodeAt(d.f.root, path); cd.v = fn(cd.v||[]); }); }
+document.addEventListener('mousedown', e=>{ if(RP_POP && !RP_POP.el.contains(e.target) && !(e.target.closest && e.target.closest('[data-cvals="'+RP_POP.p+'"]'))) rpPopClose(); }, true);
+document.addEventListener('keydown', e=>{ if(RP_POP && e.key==='Escape'){ const p = RP_POP.p; rpPopClose(); const a = rpView().querySelector('[data-cvals="'+p+'"]'); if(a) a.focus(); } });
+window.addEventListener('hashchange', rpPopClose);
+document.addEventListener('click', e=>{
+  if(!RP_POP || !RP_POP.el.contains(e.target)) return; const b = e.target.closest('button'); if(!b) return;
+  if(b.dataset.pa==='done'){ const p = RP_POP.p; rpPopClose(); const a = rpView().querySelector('[data-cvals="'+p+'"]'); if(a) a.focus(); return; }
+  if(b.dataset.pa==='clear') return rpValsSet(()=>[]);
+  if(b.dataset.fam!=null){ const g = b.dataset.fam, rs = Object.keys(LOSS_GROUP_OF).filter(r=>LOSS_GROUP_OF[r]===g);
+    return rpValsSet(v=>rs.every(r=>v.includes(r)) ? v.filter(r=>!rs.includes(r)) : v.concat(rs.filter(r=>!v.includes(r)))); }
+  if(b.dataset.ck!=null){ const x = b.dataset.ck; return rpValsSet(v=>v.includes(x) ? v.filter(y=>y!==x) : v.concat([x])); }
+});
+document.addEventListener('input', e=>{
+  if(!RP_POP || !RP_POP.el.contains(e.target) || e.target.tagName!=='INPUT') return;
+  RP_POP.q = e.target.value; const pos = e.target.selectionStart; rpValsDraw();
+  const i = RP_POP.el.querySelector('input'); i.focus(); i.setSelectionRange(pos,pos);
+});
+
+/* clicks on filter rows; true when handled */
+function rpFilterClick(t){
+  const d = t.dataset, P = s=>s ? s.split('.').map(Number) : [], root = ()=>rpC().f.root;
+  if(d.cvals!=null) return rpValsOpen(t), true;
+  if(d.cfield!=null){ const path = P(d.cfield), ctx = rpCtxAt(root(), path);
+    const items = ctx ? Object.keys(RP_REL[ctx].f).map(k=>({v:k, t:RP_REL[ctx].f[k].l})) : rpFieldItems(false);
+    menuFloatOpen(t, items.map(x=>x.v===rpNodeAt(root(),path).field?Object.assign({},x,{on:true}):x), it=>{
+      rpSet(dd=>{ const g = rpNodeAt(dd.f.root, path.slice(0,-1)); g.items[path[path.length-1]] = rpDefCond(it.v, ctx); }); rpFocusNew(path); });
+    return true; }
+  if(d.cop!=null){ const path = P(d.cop), ctx = rpCtxAt(root(), path), cd = rpNodeAt(root(), path);
+    menuFloatOpen(t, RP_OPS[rpFtype(cd.field, ctx)].map(o=>({v:o[0], t:o[1], on:cd.o===o[0]})), it=>{
+      rpSet(dd=>{ const c2 = rpNodeAt(dd.f.root, path), was = c2.o, ty = rpFtype(c2.field, ctx); c2.o = it.v;
+        if(ty==='date'){ if(it.v==='rel' && was!=='rel') c2.v = {r:'thisq', n:30}; if(it.v!=='rel' && was==='rel') c2.v = ['','']; }
+        if((ty==='pick'||ty==='lookup'||ty==='user'||ty==='multi') && !Array.isArray(c2.v)) c2.v = []; });
+      rpFocusNew(path); });
+    return true; }
+  if(d.crel!=null){ const path = P(d.crel), cd = rpNodeAt(root(), path);
+    menuFloatOpen(t, RP_RELD.map(r=>({v:r[0], t:r[1], on:cd.v&&cd.v.r===r[0]})), it=>{
+      rpSet(dd=>{ const c2 = rpNodeAt(dd.f.root, path); c2.v = {r:it.v, n:(c2.v&&c2.v.n)||30}; });
+      if(/n$/.test(it.v)){ const n = rpView().querySelector('[data-cn="'+path.join('.')+'"]'); if(n){ n.focus(); n.select(); } } });
+    return true; }
+  if(d.cq!=null){ const path = P(d.cq), nd = rpNodeAt(root(), path);
+    menuFloatOpen(t, RP_QUANT.map(q=>({v:q[0], t:q[1], on:nd.q===q[0]})), it=>{ rpSet(dd=>{ const n2 = rpNodeAt(dd.f.root, path); n2.q = it.v; if(n2.n==null||n2.n==='') n2.n = 1; }); });
+    return true; }
+  if(d.cmenu!=null){ const path = P(d.cmenu), nd = rpNodeAt(root(), path), inRel = !!rpCtxAt(root(), path);
+    const items = (nd.rel||inRel ? [] : [{v:'group', t:'Convert to group', s:'Add filters that match any or all'}]).concat([{v:'rm', t:'Remove'}]);
+    menuFloatOpen(t, items, it=>{ rpSet(dd=>{ const g = rpNodeAt(dd.f.root, path.slice(0,-1)), i = path[path.length-1];
+      if(it.v==='rm') g.items.splice(i,1); else g.items[i] = {op:'or', items:[g.items[i]]}; }); });
+    return true; }
+  if(d.crm!=null){ const path = P(d.crm); rpSet(dd=>{ rpNodeAt(dd.f.root, path.slice(0,-1)).items.splice(path[path.length-1],1); }); return true; }
+  if(d.glogic!=null){ const path = P(d.glogic), g = rpNodeAt(root(), path);
+    menuFloatOpen(t, [{v:'and', t:'All', s:'Every filter must match'},{v:'or', t:'Any', s:'At least one filter matches'}].map(x=>Object.assign(x,{on:g.op===x.v})), it=>rpSet(dd=>{ rpNodeAt(dd.f.root, path).op = it.v; }));
+    return true; }
+  if(d.gadd!=null){ const path = P(d.gadd); menuFloatOpen(t, rpFieldItems(true), it=>rpAddAt(path, it.v)); return true; }
+  if(d.radd!=null){ const path = P(d.radd), nd = rpNodeAt(root(), path);
+    menuFloatOpen(t, Object.keys(RP_REL[nd.rel].f).map(k=>({v:k, t:RP_REL[nd.rel].f[k].l})), it=>{ let at;
+      rpSet(dd=>{ const n2 = rpNodeAt(dd.f.root, path); n2.items.push(rpDefCond(it.v, n2.rel)); at = path.concat(n2.items.length-1); }); rpFocusNew(at); });
+    return true; }
+  if(d.act==='addrel'){ menuFloatOpen(t, [{head:'Related records'}].concat(Object.keys(RP_REL).map(r=>({v:'rel:'+r, t:RP_REL[r].l}))), it=>rpAddAt([], it.v)); return true; }
+  if(d.act==='addgroup'){ menuFloatOpen(t, [{head:'First filter in the group'}].concat(rpFieldItems(true)), it=>{ let gp;
+    rpSet(dd=>{ dd.f.root.items.push({op:'or', items:[rpNewNode(it.v)]}); gp = [dd.f.root.items.length-1, 0]; }); rpFocusNew(gp); }); return true; }
+  return false;
+}
+/* a typed number (O24, D498): "$", "%", commas and spaces are ignored, so "10%" and "$5,000,000" both work; K, M, MM or B
+   multiply ("$5M", "$5MM"). Anything else is kept as typed, so the row shows as incomplete. */
+function rpNumIn(str){
+  const s0 = String(str).trim(), m = s0.replace(/[$,%\s]/g,'').match(/^(-?(?:\d+\.?\d*|\.\d+))(k|mm|m|b)?$/i);
+  if(!m) return s0;
+  return String(+m[1] * ({k:1e3, mm:1e6, m:1e6, b:1e9}[(m[2]||'').toLowerCase()] || 1));
+}
+const rpIsNum = v=>/^-?(?:\d+\.?\d*|\.\d+)$/.test(String(v));
+function rpFilterChange(e){
+  const t = e.target, d = t.dataset, P = s=>s.split('.').map(Number);
+  if(d.cnum!=null){ const path = P(d.cnum), i = +d.i, raw = rpNumIn(t.value); rpSet(dd=>{ const c2 = rpNodeAt(dd.f.root, path); if(!Array.isArray(c2.v)) c2.v = ['','']; c2.v[i] = raw; }); return true; }
+  if(d.cdate!=null){ const path = P(d.cdate), i = +d.i; rpSet(dd=>{ const c2 = rpNodeAt(dd.f.root, path); if(!Array.isArray(c2.v)) c2.v = ['','']; c2.v[i] = t.value; }); return true; }
+  if(d.ctext!=null){ const path = P(d.ctext); rpSet(dd=>{ rpNodeAt(dd.f.root, path).v = t.value; }); return true; }
+  if(d.cn!=null){ const path = P(d.cn); rpSet(dd=>{ const c2 = rpNodeAt(dd.f.root, path); c2.v = Object.assign({}, c2.v, {n:t.value.replace(/\D/g,'')}); }); return true; }
+  if(d.cqn!=null){ const path = P(d.cqn); rpSet(dd=>{ rpNodeAt(dd.f.root, path).n = t.value.replace(/\D/g,''); }); return true; }
+  return false;
+}
+
+/* ---------- icons ---------- */
+const rpSvg = (inner, extra)=>'<svg class="rp-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"'+(extra||'')+'>'+inner+'</svg>';
+const RP_IC = {
+  plus:rpSvg('<path d="M12 5v14M5 12h14"/>'),
+  x:'<svg class="rp-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  chart:rpSvg('<path d="M4 20h16M7 16v-4M12 16V7M17 16v-7"/>'),
+  hbar:rpSvg('<path d="M4 4v16M4 7h12M4 12h8M4 17h14"/>'),
+  vbar:rpSvg('<path d="M4 20h16M7 16v-4M12 16V7M17 16v-7"/>'),
+  line:rpSvg('<path d="M4 18l5-6 4 3 7-9"/>', ' stroke-linejoin="round"'),
+  donut:'<svg class="rp-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5"/><path d="M12 4v4.5"/></svg>',
+  filter:rpSvg('<path d="M4 5h16l-6 7v6l-4 2v-8z"/>', ' stroke-linejoin="round"'),
+  star:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8L3.5 9.7l5.9-.9z"/></svg>',
+  starOn:'<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8L3.5 9.7l5.9-.9z"/></svg>',
+  pen:rpSvg('<path d="M4 20h4L19 9l-4-4L4 16z"/>', ' stroke-linejoin="round"'),
+  undo:rpSvg('<path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/>', ' stroke-linejoin="round"'),
+  redo:rpSvg('<path d="M15 14l5-5-5-5"/><path d="M20 9H9a5 5 0 0 0 0 10h3"/>', ' stroke-linejoin="round"'),
+  fields:rpSvg('<path d="M9 6l6 6-6 6"/>'),
+};
+
+/* ---------- the grid (D487, D499: 32px rows, column rules, a gray sticky header; DESIGN_STANDARDS §7b sorting) ---------- */
+/* a header: the label sorts on click, ascending first, then flips (D84); plain at rest, ↕ on hover, ↑/↓ when sorted; on a
+   number column the arrow sits left of the label (D459). The ▾ menu holds report actions only, shown on hover (O41). */
+const rpHasColMenu = (c, k, where)=>where==='build' || (c.gr.length>0 && c.cols[0]===k);
+function rpThHtml(c, k, where){
+  const f = RPF[k], on = c.sort && c.sort.k===k, s = on ? (c.sort.d>0?'&#8593;':'&#8595;') : '&#8597;';
+  const ar = '<span class="ar'+(on?'':' idle')+'" aria-hidden="true">'+s+'</span>';
+  const lab = '<span class="lab">'+esc(f.l)+(c.sum[k] && c.sum[k]!=='sum' ? ' ('+RP_SUMS[c.sum[k]].toLowerCase()+')' : '')+'</span>';
+  const menu = rpHasColMenu(c, k, where) ? '<button class="rp-thm" data-col="'+k+'" data-where="'+where+'" aria-haspopup="menu" aria-label="'+esc(f.l)+' column options">&#9660;</button>' : '';
+  return '<th class="'+(f.num?'num':'')+(on?' sorted':'')+'"'+(on?' aria-sort="'+(c.sort.d>0?'ascending':'descending')+'"':'')+'><div class="rp-thw">'+
+    '<button class="rp-th" data-sort="'+k+'" data-where="'+where+'" aria-label="Sort by '+esc(f.l)+'">'+(f.num ? '<span class="rp-grow"></span>'+ar+lab : lab+ar)+'</button>'+menu+'</div></th>';
+}
+const rpEmptyLine = c=>'No opportunities match '+(c.f.owner==='me'?'your ':'')+'filters'+(RP.q && RP.screen==='run' ? ' and "'+esc(RP.q)+'"' : '');
+const rpOppN = n=>n+' opportunit'+(n===1?'y':'ies');
+/* grouped rows: each group is its own full-width row, chevron, value, count, and its totals on that row (D486, O36, O38).
+   The Subtotals switch shows or hides those totals; there are no separate Subtotal rows. Nested levels step in 20px. */
+function rpGridHtml(c, where){
+  const rows = rpRows(c, where==='run' ? RP.q : '');
+  if(c.gc.length) return rpMatrixHtml(c, rows);
+  const cols = c.cols, n = cols.length, sumCols = cols.filter(k=>c.sum[k]), G = c.gr.length;
+  let html = '<table class="rp-grid"><thead><tr>'+cols.map(k=>rpThHtml(c,k,where)).join('')+'</tr></thead><tbody>';
+  if(!rows.length) return html+'<tr><td class="empty" colspan="'+n+'">'+rpEmptyLine(c)+'</td></tr></tbody></table>';
+  const det = c.tog.det, lv = l=>' rp-l'+l;
+  /* a summary row is one band: its label cell runs up to the first summarized column, then one cell per column (O40) */
+  const fs = Math.max(1, cols.findIndex(k=>c.sum[k]));
+  const band = (lab, list, cls)=>'<td class="'+(cls||'')+'"'+(fs>1?' colspan="'+fs+'"':'')+'>'+lab+'</td>'+
+    cols.slice(fs).map(k=>'<td class="'+(RPF[k].num?'num':'')+'">'+(c.sum[k] ? rpFmtAgg(k, c.sum[k], rpAgg(list,k,c.sum[k])) : '')+'</td>').join('');
+  const detail = o=>'<tr class="d">'+cols.map((k,j)=>{ const f = RPF[k], v = f.get(o);
+    const inner = f.link && v ? '<a href="'+f.link(o)+'">'+esc(String(v))+'</a>' : rpFmt(k, v);
+    return '<td class="'+(f.num?'num':'')+(j===0&&G?lv(G):'')+'">'+inner+'</td>'; }).join('')+'</tr>';
+  function level(list, l, path){
+    if(l>=G){ if(det) list.forEach(o=>html += detail(o)); return; }
+    const k = c.gr[l];
+    rpGroupBy(list, k, (c.gsort||{})[k]).forEach(g=>{
+      const p = path+'|'+k+'='+g.v, shut = !!RP.shut[p];
+      const lab = '<button class="rp-gt'+(shut?' shut':'')+'" data-gp="'+esc(p)+'" aria-expanded="'+(!shut)+'"'+tipAttr(RPF[k].l, esc(g.v), rpOppN(g.list.length))+'>'+
+        '<span class="tw" aria-hidden="true">&#9660;</span>'+esc(g.v)+(c.tog.rc ? '<span class="gn">('+g.list.length+')</span>' : '')+'</button>';
+      const onRow = c.tog.sub || shut || !det;
+      html += '<tr class="g g'+Math.min(l,2)+'" aria-level="'+(l+1)+'">'+(onRow&&sumCols.length ? band(lab, g.list, lv(l)) : '<td class="'+lv(l)+'" colspan="'+n+'">'+lab+'</td>')+'</tr>';
+      if(!shut) level(g.list, l+1, p);
+    });
+  }
+  level(rows, 0, '');
+  if(c.tog.tot) html += '<tr class="tot">'+band('Total'+(c.tog.rc?' ('+rows.length+')':''), rows)+'</tr>';
+  return html+'</tbody></table>';
+}
+const rpTogHtml = (k, lab)=>{ const on = rpC().tog[k]; return '<button class="rp-tog'+(on?' on':'')+'" data-tog="'+k+'" role="switch" aria-checked="'+on+'"><span class="sw"></span>'+lab+'</button>'; };
+/* the four switches pinned at the bottom of the sheet, all on at load (D486, O39) */
+function rpFootHtml(where){
+  const c = rpC(), all = rpRows(c,'').length, shown = where==='run' && RP.q ? rpRows(c, RP.q).length : all;
+  return '<div class="rp-foot">'+rpTogHtml('rc','Row counts')+rpTogHtml('det','Detail rows')+rpTogHtml('sub','Subtotals')+rpTogHtml('tot','Grand total')+
+    '<span class="rp-grow"></span><span class="rp-count">'+(shown!==all ? shown+' of '+all : all)+' record'+(all===1?'':'s')+'</span></div>';
+}
+
+/* ---------- the optional chart (D485; O29 to O34): one per report, added by the user above the table ---------- */
+const rpViewOf = c=>c.chart.view || c.gr[0] || 'stage';
+function rpTypeOk(c, t){
+  const ch = c.chart, vf = RPF[rpViewOf(c)];
+  if(t==='line') return !!vf.date && !ch.seg;
+  if(t==='donut') return !ch.seg && rpGroupBy(rpRows(c,''), rpViewOf(c)).length<=4;
+  return true;
+}
+function rpChartHtml(c){
+  const ch = c.chart, vk = rpViewOf(c);
+  const types = [['hbar','Horizontal bar'],['vbar','Vertical bar'],['line','Line'],['donut','Donut']].map(t=>{
+    const ok = rpTypeOk(c, t[0]), why = t[0]==='line' ? 'Line needs a date to view by, with no segment' : 'Donut needs four groups or fewer, with no segment';
+    return '<button class="rp-ct'+(ch.type===t[0]?' on':'')+'" data-ctype="'+t[0]+'" aria-label="'+t[1]+'" aria-pressed="'+(ch.type===t[0])+'"'+(ok?'':' aria-disabled="true"')+tipAttr(t[1], ok?'':why, '')+'>'+RP_IC[t[0]]+'</button>'; }).join('');
+  return '<div class="rp-chart"><div class="rp-ctool"><div class="rp-ctypes" role="group" aria-label="Chart type">'+types+'</div>'+
+    '<span class="rp-plab">View by</span><button class="rp-pick" data-cpick="view" aria-haspopup="menu">'+esc(RPF[vk].l)+' '+RP_CHEV+'</button>'+
+    '<span class="rp-plab">Segment by</span><button class="rp-pick" data-cpick="seg" aria-haspopup="menu">'+(ch.seg?esc(RPF[ch.seg].l):'None')+' '+RP_CHEV+'</button>'+
+    '<span class="rp-plab">Measure</span><button class="rp-pick" data-cpick="measure" aria-haspopup="menu">'+(ch.measure==='count'?'Record count':'Facility size')+' '+RP_CHEV+'</button>'+
+    '<span class="rp-grow"></span><button class="rp-x" data-act="rmchart" aria-label="Remove chart"'+tipAttr('Remove chart','','')+'>&#10005;</button></div>'+
+    '<div class="rp-plot"><div class="rp-plotin"></div></div></div>';
+}
+function rpChartData(c){
+  const ch = c.chart, vk = rpViewOf(c), rows = rpRows(c,'');
+  const m = l=>ch.measure==='count' ? l.length : l.reduce((s,o)=>s+o.facilitySize,0);
+  let series = null;
+  if(ch.seg){ const sg = rpGroupBy(rows, ch.seg); series = sg.slice(0,4).map(g=>g.v); if(sg.length>4) series.push('Other'); }
+  const segOf = o=>{ const v = rpGval(ch.seg,o); return series.indexOf(v)>=0 && v!=='Other' ? v : 'Other'; };
+  return {vk, series, cats:rpGroupBy(rows, vk).map(g=>({v:g.v, n:g.list.length, t:m(g.list),
+      parts:series ? series.map(s=>{ const l = g.list.filter(o=>segOf(o)===s); return {s, val:m(l), n:l.length}; }) : null})),
+    fmtV:v=>ch.measure==='count'?String(v):moneyShort(v), fullV:v=>ch.measure==='count'?String(v):moneyPlain(v)};
+}
+const rpNice = max=>{ if(max<=0) return 1; const p = Math.pow(10, Math.floor(Math.log10(max))), r = max/p; return (r<=1?1:r<=2?2:r<=2.5?2.5:r<=5?5:10)*p; };
+const rpTick = (v, cnt)=>cnt ? String(Math.round(v)) : (v===0?'$0':moneyShort(v).replace('.0M','M').replace('.0K','K'));
+const rpSer = (s, series)=>s==='Other' ? 'co' : 'c'+series.indexOf(s);
+/* one hue and its tints; a key only when segmented; value labels on the bars; exact figures and the count in the
+   tooltip (O33, O34) */
+function rpDrawChart(host, c){
+  const d = rpChartData(c), ch = c.chart, cnt = ch.measure==='count';
+  const W = Math.max(320, host.clientWidth), H = Math.max(160, host.clientHeight), axisT = cnt ? 'Record count' : 'Facility size (sum)';
+  const key = d.series ? '<div class="rp-key">'+d.series.map(s=>'<span><i class="k'+(s==='Other'?'o':d.series.indexOf(s))+'"></i>'+esc(s)+'</span>').join('')+'</div>' : '';
+  const h = d.series ? H-22 : H;
+  if(!d.cats.length){ host.innerHTML = '<div class="rp-cempty">'+rpEmptyLine(c)+'</div>'; return; }
+  const max = rpNice(Math.max(...d.cats.map(x=>x.t)));
+  let s = '';
+  if(ch.type==='hbar'){
+    const L = Math.min(180, 24+Math.max(...d.cats.map(x=>x.v.length))*6.6), R = 64, T = 4, B = 40, pw = W-L-R, ph = h-T-B, rh = ph/d.cats.length, bh = Math.min(28, rh*.6);
+    s += '<svg class="rp-svg" width="'+W+'" height="'+h+'" viewBox="0 0 '+W+' '+h+'">';
+    for(let k=0;k<=4;k++){ const x = L+pw*k/4; s += '<line class="gl" x1="'+x+'" x2="'+x+'" y1="'+T+'" y2="'+(T+ph)+'"/><text x="'+x+'" y="'+(T+ph+16)+'" text-anchor="middle">'+rpTick(max*k/4,cnt)+'</text>'; }
+    s += '<text class="at" x="'+(L+pw/2)+'" y="'+(h-4)+'" text-anchor="middle">'+axisT+'</text>';
+    d.cats.forEach((g,i)=>{ const y = T+rh*i+(rh-bh)/2;
+      s += '<text x="'+(L-10)+'" y="'+(y+bh/2+4)+'" text-anchor="end">'+esc(g.v)+'</text>';
+      if(g.parts){ let acc = 0; g.parts.forEach(p=>{ if(!p.val) return; const x = L+pw*acc/max, w = pw*p.val/max; acc += p.val;
+        s += '<rect class="'+rpSer(p.s,d.series)+'" x="'+x+'" y="'+y+'" width="'+w+'" height="'+bh+'"'+tipAttr(g.v+' · '+p.s, d.fullV(p.val), rpOppN(p.n))+'/>'; }); }
+      else s += '<rect class="c0" x="'+L+'" y="'+y+'" width="'+(pw*g.t/max)+'" height="'+bh+'"'+tipAttr(g.v, d.fullV(g.t), rpOppN(g.n))+'/>';
+      s += '<text class="vl" x="'+(L+pw*g.t/max+8)+'" y="'+(y+bh/2+4)+'">'+d.fmtV(g.t)+'</text>'; });
+    s += '</svg>';
+  } else if(ch.type==='vbar' || ch.type==='line'){
+    /* vertical bars use the full width; a line gives each point at most 180px and sits centered */
+    const R = 8, T = 18, B = 40, line = ch.type==='line', pw = line ? Math.min(W-56-R, d.cats.length*180) : W-56-R, L = line ? Math.max(56, Math.round((W-pw)/2)) : 56;
+    const ph = h-T-B, cw = pw/d.cats.length, bw = Math.min(56, cw*.5), pts = [];
+    s += '<svg class="rp-svg" width="'+W+'" height="'+h+'" viewBox="0 0 '+W+' '+h+'">';
+    for(let k=0;k<=4;k++){ const y = T+ph*(1-k/4); s += '<line class="gl" x1="'+L+'" x2="'+(L+pw)+'" y1="'+y+'" y2="'+y+'"/><text x="'+(L-8)+'" y="'+(y+4)+'" text-anchor="end">'+rpTick(max*k/4,cnt)+'</text>'; }
+    s += '<text class="at" x="'+(L+pw/2)+'" y="'+(h-4)+'" text-anchor="middle">'+esc(RPF[d.vk].l)+(RPF[d.vk].date?' (quarter)':'')+' · '+axisT.toLowerCase()+'</text>';
+    d.cats.forEach((g,i)=>{ const cx = L+cw*(i+.5), x = cx-bw/2, yT = T+ph*(1-g.t/max);
+      if(line) pts.push([cx,yT,g]);
+      else if(g.parts){ let acc = 0; g.parts.forEach(p=>{ if(!p.val) return; const y1 = T+ph*(1-(acc+p.val)/max), hh = ph*p.val/max; acc += p.val;
+        s += '<rect class="'+rpSer(p.s,d.series)+'" x="'+x+'" y="'+y1+'" width="'+bw+'" height="'+hh+'"'+tipAttr(g.v+' · '+p.s, d.fullV(p.val), rpOppN(p.n))+'/>'; }); }
+      else s += '<rect class="c0" x="'+x+'" y="'+yT+'" width="'+bw+'" height="'+(T+ph-yT)+'"'+tipAttr(g.v, d.fullV(g.t), rpOppN(g.n))+'/>';
+      s += '<text class="vl" x="'+cx+'" y="'+(yT-(line?10:6))+'" text-anchor="middle">'+d.fmtV(g.t)+'</text>';
+      s += '<text x="'+cx+'" y="'+(T+ph+16)+'" text-anchor="middle">'+esc(g.v)+'</text>'; });
+    if(pts.length) s += '<path class="ln" d="M'+pts.map(p=>p[0]+' '+p[1]).join(' L')+'"/>'+pts.map(p=>'<circle class="dt" cx="'+p[0]+'" cy="'+p[1]+'" r="4"'+tipAttr(p[2].v, d.fullV(p[2].t), rpOppN(p[2].n))+'/>').join('');
+    s += '</svg>';
+  } else if(ch.type==='donut'){
+    /* restricted: four groups at most, no segment, never the default, largest first, value and share printed (D478) */
+    const cats = d.cats.slice().sort((a,b)=>b.t-a.t), tot = cats.reduce((x,g)=>x+g.t,0);
+    const r = Math.min(h/2-12, 96), ri = r*.6, groupW = 2*r+48+196, cx = Math.round((W-groupW)/2)+r, cy = h/2;
+    s += '<svg class="rp-svg" width="'+W+'" height="'+h+'" viewBox="0 0 '+W+' '+h+'">';
+    let a0 = -Math.PI/2;
+    cats.forEach((g,i)=>{ const a1 = a0+2*Math.PI*g.t/tot, big = a1-a0>Math.PI?1:0;
+      const p = (rr,a)=>[cx+rr*Math.cos(a), cy+rr*Math.sin(a)], A = p(r,a0), B2 = p(r,a1), Ci = p(ri,a1), Di = p(ri,a0);
+      s += '<path class="sl c'+i+'" d="M'+A+' A'+r+' '+r+' 0 '+big+' 1 '+B2+' L'+Ci+' A'+ri+' '+ri+' 0 '+big+' 0 '+Di+' Z"'+tipAttr(g.v, d.fullV(g.t), rpOppN(g.n)+' · '+Math.round(g.t/tot*100)+'%')+'/>';
+      a0 = a1; });
+    s += '<text class="dc" x="'+cx+'" y="'+(cy+2)+'" text-anchor="middle">'+d.fmtV(tot)+'</text><text class="at" x="'+cx+'" y="'+(cy+20)+'" text-anchor="middle">Total</text>';
+    const lx = cx+r+48;
+    cats.forEach((g,i)=>{ const y = cy-(cats.length-1)*14+i*28;
+      s += '<rect class="c'+i+'" x="'+lx+'" y="'+(y-9)+'" width="10" height="10" rx="2"/><text class="kt" x="'+(lx+18)+'" y="'+y+'">'+esc(g.v)+'</text>'+
+        '<text class="vl" x="'+(lx+150)+'" y="'+y+'" text-anchor="end">'+d.fmtV(g.t)+'</text><text x="'+(lx+196)+'" y="'+y+'" text-anchor="end">'+Math.round(g.t/tot*100)+'%</text>'; });
+    s += '</svg>';
+  }
+  host.innerHTML = key+s;
+}
+function rpDrawCharts(){ rpView().querySelectorAll('.rp-plotin').forEach(h=>rpDrawChart(h, rpC())); }
+
+/* ---------- the run page (direction A, D483; O28 to O56) ---------- */
+/* the title block: on the run page the favorite star; in the builder a pencil to rename and the type pill (O57) */
+function rpTitleHtml(c, eyebrow, edit){
+  const name = RP.renaming && edit ? '<input class="rp-input rp-rename" id="rp-rename" value="'+esc(c.title)+'" aria-label="Report name">' : '<span>'+esc(c.title)+'</span>';
+  const after = edit ? (RP.renaming ? '' : '<button class="rp-pen" data-act="rename" aria-label="Rename report">'+RP_IC.pen+'</button><span class="rp-pill">Opportunities</span>')
+    : '<button class="rp-star'+(RP.fav?' on':'')+'" data-act="fav" aria-pressed="'+RP.fav+'" aria-label="Favorite"'+tipAttr(RP.fav?'Remove from Favorites':'Add to Favorites','','')+'>'+(RP.fav?RP_IC.starOn:RP_IC.star)+'</button>';
+  return '<div class="rp-tblock"><div class="rp-eyebrow">'+eyebrow+'</div><div class="rp-title">'+name+after+'</div></div>';
+}
+/* Add chart and Remove chart take the same width, so the search box doesn't move (O29) */
+const rpChartBtn = c=>'<button class="rp-btn rp-chbtn" data-act="'+(c.chart?'rmchart':'addchart')+'">'+RP_IC.chart+(c.chart?'Remove chart':'Add chart')+'</button>';
+function rpRunHtml(){
+  const c = RP.saved, sent = rpSentence(c), nf = rpNF(c);   // the sentence and the badge together (D489)
+  return '<div class="rp-sheet'+(c.chart?' has-chart':'')+'"><div class="rp-head"><div class="rp-hl">'+rpTitleHtml(c, 'Report · Opportunities')+'<div class="rp-fsent" title="'+esc(sent)+'">'+esc(sent)+'</div></div>'+
+    '<div class="rp-tools"><input class="rp-input rp-q" id="rp-q" placeholder="Search report" value="'+esc(RP.q)+'" aria-label="Search report">'+rpChartBtn(c)+
+    '<button class="rp-btn icon rp-fbtn'+(RP.fpanel?' on':'')+'" data-act="fpanel" aria-label="Filters, '+nf+' applied" aria-pressed="'+RP.fpanel+'"'+tipAttr('Filters','','')+'>'+RP_IC.filter+'<span class="rp-fbadge" aria-hidden="true">'+nf+'</span></button>'+
+    '<button class="rp-btn" data-act="dash" aria-haspopup="menu">Add to dashboard</button><button class="rp-btn" data-act="export">Export</button><button class="rp-btn" data-act="edit">Edit</button></div></div>'+
+    '<div class="rp-body">'+
+    (RP.fpanel ? '<div class="rp-fpanel"><div class="rp-fpanel-h"><b>Filters</b><span class="rp-grow"></span><button class="rp-link" data-act="fclear">Clear all</button><button class="rp-x" data-act="fpanel" aria-label="Close filters">&#8249;</button></div><div class="rp-fpanel-b">'+rpFilters(c)+'</div></div>' : '')+
+    '<div class="rp-main">'+rpFigsHtml(c)+(c.chart?rpChartHtml(c):'')+'<div class="rp-gridwrap">'+rpGridHtml(c,'run')+'</div>'+rpFootHtml('run')+'</div>'+
+    '</div></div>';
+}
+
+
+/* ---------- custom header figures (D490, D493 to D495; O1 to O22). A strip of up to 8 figures under the title (RESEARCH_29
+   §1); the calculations are RESEARCH_17 §8's. Dragging a column header (or, in the builder, a field or a chip) into the
+   strip adds one; a figure drags along the strip to reorder, or out of it to remove; its click opens its settings (D495).
+   Figures are their own list, separate from the column subtotals (O17), and count the whole report with its filters
+   on, ignoring the search box (O18). ---------- */
+const RP_FIG_MAX = 8;
+const RP_FIG_CALC = {sum:'Sum', avg:'Average', median:'Median', min:'Min', max:'Max', count:'Count', unique:'Unique count', early:'Earliest', late:'Latest'};
+/* the calculations a field offers (O3): money and numbers six, a % no Sum, dates Earliest, Latest and Count, the rest
+   Count and Unique count */
+function rpFigCalcs(k){
+  if(k==='_rc') return [];
+  const f = RPF[k];
+  if(f.num==='pct') return ['avg','median','min','max','count'];
+  if(f.num) return ['sum','avg','median','min','max','count'];
+  if(f.date) return ['early','late','count'];
+  return ['count','unique'];
+}
+const rpFigDefault = k=>{ const f = RPF[k]; return f.num==='money' ? 'sum' : f.num ? 'avg' : f.date ? 'early' : k==='name' ? 'count' : 'unique'; };
+/* "Sum of facility size", "Earliest expected close", "Unique count of industry (account)", "Unique count of account" (O4, O12) */
+const rpFigName = k=>{ const f = RPF[k]; return f.s ? (f.s==='Name' ? f.o.toLowerCase() : f.s.toLowerCase()+' ('+f.o.toLowerCase()+')') : f.l.toLowerCase(); };
+function rpFigLabel(x){
+  if(x.k==='_rc') return 'Total records';
+  return x.how==='early' || x.how==='late' ? RP_FIG_CALC[x.how]+' '+rpFigName(x.k) : RP_FIG_CALC[x.how]+' of '+rpFigName(x.k);
+}
+/* a sum over no records reads $0 or 0; an average, median, min or max over none reads "None" (O13) */
+function rpFigValue(x, rows){
+  if(x.k==='_rc') return rows.length.toLocaleString('en-US');
+  const f = RPF[x.k], vals = rpPerAcct(rows, x.k).map(o=>f.get(o)).filter(v=>v!=null && v!=='');
+  if(x.how==='count') return vals.length.toLocaleString('en-US');
+  if(x.how==='unique') return new Set(vals.map(String)).size.toLocaleString('en-US');
+  if(x.how==='early' || x.how==='late'){ if(!vals.length) return 'None'; const v = vals.slice().sort(); return fmtDate(x.how==='early' ? v[0] : v[v.length-1]); }
+  const v = rpAgg(rows, x.k, x.how);
+  if(v==null) return x.how==='sum' ? rpFmt(x.k, 0) || '0' : 'None';
+  return rpFmtAgg(x.k, x.how, v);
+}
+const rpFigsOf = c=>c.figs || (c.figs = []);
+function rpFigsHtml(c){
+  const rows = rpRows(c,''), figs = rpFigsOf(c);
+  const items = figs.map((x,i)=>{ const lab = rpFigLabel(x), val = rpFigValue(x, rows);
+    return '<div class="rp-fig"><button class="rp-figb" data-fi="'+i+'" aria-haspopup="menu" aria-label="'+esc(lab)+', '+esc(val)+'. Figure options">'+
+      '<span class="rp-fig-l"><span class="t" title="'+esc(lab)+'">'+esc(lab)+'</span><span class="cv" aria-hidden="true">&#9660;</span></span>'+
+      '<span class="rp-fig-v">'+val+'</span></button></div>'; }).join('');
+  const empty = figs.length ? '' : '<span class="rp-figempty">Drag a column here or add a figure</span>';   // O16
+  /* the add control: a dashed box the height of a figure, which also reads as where a column can go (O6); hidden at 8 (O11) */
+  const add = figs.length>=RP_FIG_MAX ? '' : '<button class="rp-figadd" data-act="figadd" aria-haspopup="menu"'+tipAttr('Add a figure, or drag a column header here','','')+'>'+RP_IC.plus+'<span>Add figure</span></button>';
+  return '<div class="rp-figs" role="group" aria-label="Header figures">'+items+empty+add+'</div>';
+}
+/* the owner's change saves to the report at once on the run page; in the builder it goes through Undo (O20) */
+const rpFigSet = fn=>rpSet(d=>{ rpFigsOf(d); fn(d); });
+function rpFigFocus(i, menu){ const b = rpView().querySelector('.rp-figb[data-fi="'+i+'"]'); if(b){ b.focus({preventScroll:true}); if(menu) rpFigMenu(b); } }
+/* why a field can't be added now, or '': shown on the drag chip and as the menu item's note, never as a toast (O11, D497) */
+function rpFigBlock(k){
+  const figs = rpFigsOf(rpC());
+  if(figs.length>=RP_FIG_MAX) return 'Up to 8 figures';
+  if(k==='_rc') return figs.some(x=>x.k==='_rc') ? 'Already shown' : '';
+  const used = figs.filter(x=>x.k===k).map(x=>x.how);
+  return rpFigCalcs(k).every(h=>used.includes(h)) ? 'Every calculation shown' : '';
+}
+/* adds a figure with its starting calculation, or the next one not shown, and opens its menu (O5) */
+function rpFigAdd(k, at){
+  const figs = rpFigsOf(rpC());
+  if(rpFigBlock(k)) return;
+  let how = null;
+  if(k!=='_rc'){ const used = figs.filter(x=>x.k===k).map(x=>x.how), d = rpFigDefault(k); how = !used.includes(d) ? d : rpFigCalcs(k).find(h=>!used.includes(h)); }
+  const n = at==null ? figs.length : Math.max(0, Math.min(at, figs.length));
+  rpFigSet(d=>{ d.figs.splice(n, 0, k==='_rc' ? {k:'_rc'} : {k, how}); });
+  rpFigFocus(n, true);
+}
+function rpFigMove(i, to){
+  const figs = rpFigsOf(rpC()); if(to<0 || to>=figs.length || to===i) return;
+  rpFigSet(d=>{ const x = d.figs.splice(i,1)[0]; d.figs.splice(to,0,x); });
+  rpFigFocus(to);
+}
+/* removing shows a toast whose Undo puts back only that figure at its place, and only on the screen it left (O15) */
+function rpFigRemove(i){
+  const before = rpClone(rpFigsOf(rpC())), gone = before[i], lab = rpFigLabel(gone), scr = RP.screen;
+  rpFigSet(d=>{ d.figs.splice(i,1); });
+  const nb = rpView().querySelector('.rp-figb[data-fi="'+Math.min(i, before.length-2)+'"]') || rpView().querySelector('[data-act="figadd"]'); if(nb) nb.focus({preventScroll:true});
+  toastShow({icon:'check', title:'Figure removed', line:lab, action:'Undo', ms:TOAST_UNDO_MS, onAction:t=>{
+    const same = x=>x.k===gone.k && x.how===gone.how, figs = rpFigsOf(rpC());
+    if(RP.screen!==scr || figs.some(same) || figs.length>=RP_FIG_MAX){ toastDismiss(t); return; }
+    rpFigSet(d=>{ d.figs.splice(Math.min(i, d.figs.length), 0, rpClone(gone)); });
+    toastUpdate(t, {icon:'check', title:'Figure restored', line:lab, ms:TOAST_MS}); }});
+}
+/* a figure's menu (O9): Calculation (one another figure of the field already uses is grayed), Move left, Move right,
+   Remove figure */
+function rpFigMenu(btn){
+  const i = +btn.dataset.fi, figs = rpFigsOf(rpC()), x = figs[i], items = [], calcs = rpFigCalcs(x.k);
+  if(calcs.length){ items.push({head:'Calculation'}); calcs.forEach(h=>items.push({v:'c:'+h, t:RP_FIG_CALC[h], on:x.how===h,
+    dis:x.how!==h && figs.some((y,j)=>j!==i && y.k===x.k && y.how===h)})); items.push({sep:true}); }
+  items.push({v:'left', t:'Move left', dis:i===0},{v:'right', t:'Move right', dis:i===figs.length-1},{sep:true},{v:'rm', t:'Remove figure', s:'Or drag it out of the figures'});
+  menuFloatOpen(btn, items, it=>{
+    if(it.v==='left') return rpFigMove(i, i-1);
+    if(it.v==='right') return rpFigMove(i, i+1);
+    if(it.v==='rm') return rpFigRemove(i);
+    const h = it.v.slice(2); rpFigSet(d=>{ d.figs[i].how = h; }); rpFigFocus(i);
+  });
+}
+/* the add menu, the click path (O7): Total records, the report's own columns and groups, then every other field by object */
+function rpFigAddMenu(btn){
+  const c = rpC(), figs = rpFigsOf(c), items = [];
+  if(!figs.some(x=>x.k==='_rc')) items.push({v:'_rc', t:'Total records'},{sep:true});
+  const inRep = c.cols.concat(c.gr, c.gc).filter((k,j,a)=>a.indexOf(k)===j);
+  const it = (k, t)=>{ const why = rpFigBlock(k); return why ? {v:k, t, s:why, dis:true} : {v:k, t}; };
+  if(inRep.length){ items.push({head:'In this report'}); inRep.forEach(k=>items.push(it(k, RPF[k].l))); }
+  RP_OBJS.forEach(ob=>{ const ks = Object.keys(RPF).filter(k=>RPF[k].o===ob && !inRep.includes(k)); if(!ks.length) return;
+    items.push({sep:true},{head:ob}); ks.forEach(k=>items.push(it(k, RPF[k].s||RPF[k].l))); });
+  menuFloatOpen(btn, items, x=>rpFigAdd(x.v));
+}
+/* where a dragged item lands: in front of the first figure on a row below the pointer, or on the pointer's row with its
+   middle right of it; the strip wraps to a second line when the figures don't fit (O19) */
+function rpFigIns(strip, x, y){
+  const figs = [...strip.querySelectorAll('.rp-fig')];
+  const i = figs.findIndex(f=>{ const r = f.getBoundingClientRect(); return (y!=null && y < r.top - 2) || ((y==null || y <= r.bottom + 2) && x < r.left + r.width/2); });
+  return {figs, i: i<0 ? figs.length : i};
+}
+/* the landing line; the dashed outline only when something new comes in, not for a reorder (O5, O8) */
+function rpFigMark(strip, x, outline, from, y){
+  rpFigUnmark(); if(outline) strip.classList.add('over');
+  const {figs, i} = rpFigIns(strip, x, y); if(!figs.length) return i;
+  if(from!=null && (i===from || i===from+1)) return i;
+  const sr = strip.getBoundingClientRect(), gap = parseFloat(getComputedStyle(strip).columnGap) || 0;
+  /* at the end of a wrapped row (the next figure starts the row below the pointer), the line goes after the row's last */
+  const prevRow = i>0 && i<figs.length && y!=null && (()=>{ const a = figs[i-1].getBoundingClientRect(), b = figs[i].getBoundingClientRect(); return b.top > a.top + 2 && y <= a.bottom + 2; })();
+  const after = i>=figs.length || prevRow, fr = (after ? figs[i-1] : figs[i]).getBoundingClientRect();
+  const ln = document.createElement('div'); ln.className = 'rp-figline';
+  ln.style.left = Math.round(Math.max(4, (after ? fr.right + gap/2 : fr.left - gap/2) - sr.left - 1))+'px'; ln.style.top = Math.round(fr.top - sr.top)+'px'; ln.style.height = Math.round(fr.height)+'px';
+  strip.appendChild(ln);
+  return i;
+}
+function rpFigUnmark(){ rpView().querySelectorAll('.rp-figs.over').forEach(el=>el.classList.remove('over')); rpView().querySelectorAll('.rp-figline').forEach(el=>el.remove()); }
+const rpOverStrip = (strip, e)=>{ if(!strip) return false; const r = strip.getBoundingClientRect(); return e.clientX>=r.left && e.clientX<=r.right && e.clientY>=r.top-8 && e.clientY<=r.bottom+8; };
+
+/* ---------- the builder (D484; O57 to O63, O21): Edit opens it on a draft of the report; Run carries the draft to the
+   run page, Close discards it, Save keeps it and stays. Every change goes through Undo and Redo. ---------- */
+/* a matrix (a column group) takes one row group; a column group needs one row group or none (O62) */
+const rpCapGr = c=>c.gc.length ? 1 : 3, rpCapGc = c=>c.gr.length>1 ? 0 : 1;
+function rpChipsHtml(zone, list){
+  return list.map((k,i)=>'<div class="rp-chipz" draggable="true" data-zone="'+zone+'" data-i="'+i+'">'+(zone==='gr'?'<span class="lv">'+(i+1)+'</span>':'')+
+    '<span class="nm">'+esc(RPF[k].l)+(zone==='cols'&&RP.draft.sum[k]?' <span class="rp-sumtag">('+RP_SUMS[RP.draft.sum[k]].toLowerCase()+')</span>':'')+'</span>'+
+    '<button class="rp-x" data-rm="'+zone+'" data-i="'+i+'" aria-label="Remove '+esc(RPF[k].l)+'">&#10005;</button></div>').join('');
+}
+function rpZoneHtml(zone, sub, list, cap, ph){
+  return '<div class="rpk-zone" data-zone="'+zone+'">'+(sub?'<div class="rpk-sub">'+sub+'</div>':'')+
+    (list.length>=cap ? '' : '<input class="rp-input" data-ta="'+zone+'" placeholder="'+ph+'" aria-label="'+ph+'" autocomplete="off">')+rpChipsHtml(zone, list)+'</div>';
+}
+function rpBuilderHtml(){
+  const c = RP.draft, nf = rpNF(c);
+  const fieldsPane = RP.fields ? '<div class="rpk-fpane"><div class="rpk-fpane-h">Fields<button class="rp-x" data-act="fields" aria-label="Close fields">&#8249;</button></div>'+
+    '<input class="rp-input" id="rp-fq" placeholder="Search fields" aria-label="Search fields" autocomplete="off"><div class="rpk-flist" id="rp-flist">'+rpFlistHtml('')+'</div></div>'
+    : '<div class="rpk-fields"><button data-act="fields" aria-label="Open fields">'+RP_IC.fields+'<span>Fields</span></button></div>';
+  const outline = '<div class="rpk-sec"><h4>Groups</h4>'+rpZoneHtml('gr','Group rows', c.gr, rpCapGr(c), 'Add group…')+
+      (rpCapGc(c) ? rpZoneHtml('gc','Group columns', c.gc, rpCapGc(c), 'Add group…') : '<div class="rpk-sub">Group columns</div><div class="rpk-cap">Available with one row group</div>')+'</div>'+
+    '<div class="rpk-sec last"><h4>Columns</h4>'+rpZoneHtml('cols','', c.cols, 12, 'Add column…')+'</div>';
+  const filters = '<div class="rpk-sec last">'+rpFilters(c)+'</div>';
+  return '<div class="rp-sheet rpk"><div class="rpk-head">'+rpTitleHtml(c, 'Report', true)+'<span class="rp-grow"></span><div class="rp-tools">'+
+    '<button class="rp-btn icon" data-act="undo" aria-label="Undo"'+(RP.hist.length?'':' aria-disabled="true"')+tipAttr('Undo','','')+'>'+RP_IC.undo+'</button>'+
+    '<button class="rp-btn icon" data-act="redo" aria-label="Redo"'+(RP.fut.length?'':' aria-disabled="true"')+tipAttr('Redo','','')+'>'+RP_IC.redo+'</button>'+rpChartBtn(c)+
+    '<button class="rp-btn" data-act="saverun">Save &amp; run</button><button class="rp-btn" data-act="save">Save</button><button class="rp-btn" data-act="close">Close</button><button class="rp-btn pri" data-act="run">Run</button></div></div>'+
+    '<div class="rp-body">'+fieldsPane+'<div class="rpk-panel"><div class="rpk-tabs" role="tablist"><button class="rp-tab'+(RP.tab==='outline'?' on':'')+'" data-tab="outline" role="tab" aria-selected="'+(RP.tab==='outline')+'">Outline</button>'+
+      '<button class="rp-tab'+(RP.tab==='filters'?' on':'')+'" data-tab="filters" role="tab" aria-selected="'+(RP.tab==='filters')+'">Filters <span class="rpk-badge">'+nf+'</span></button></div>'+
+      '<div class="rpk-scroll">'+(RP.tab==='outline'?outline:filters)+'</div></div>'+
+    '<div class="rpk-preview">'+rpFigsHtml(c)+(c.chart?rpChartHtml(c):'')+'<div class="rp-gridwrap" id="rp-pv">'+rpGridHtml(c,'build')+'</div>'+rpFootHtml('build')+'</div></div></div>';
+}
+/* the Fields tab: searchable, grouped by object, type marks, a Column or Group tag on fields in use (O58) */
+function rpFlistHtml(q){
+  const s = q.toLowerCase(), c = RP.draft;
+  return RP_OBJS.map(ob=>{ const ks = Object.keys(RPF).filter(k=>RPF[k].o===ob && RPF[k].l.toLowerCase().includes(s)); if(!ks.length) return '';
+    return '<div class="rpk-obj">'+ob+'</div>'+ks.map(k=>{ const used = c.cols.includes(k) ? 'Column' : c.gr.includes(k)||c.gc.includes(k) ? 'Group' : '';
+      return '<div class="rp-fld" role="button" tabindex="0" draggable="true" data-fk="'+k+'" aria-haspopup="menu"><span class="ty">'+RPF[k].ty+'</span>'+esc(RPF[k].s||RPF[k].l)+(used?'<span class="in">'+used+'</span>':'')+'</div>'; }).join(''); }).join('') ||
+    '<div class="rp-ta-none">No fields match "'+esc(q)+'"</div>';
+}
+/* every builder change: history for Undo, then a redraw */
+function rpEdit(fn){ RP.hist.push(rpClone(RP.draft)); if(RP.hist.length>50) RP.hist.shift(); RP.fut = []; fn(RP.draft); rpDraw(); }
+/* where a field may go: a group takes a picklist, name or date field, not already there, within the cap; a column, any
+   field not already shown. A refused add says nothing in a toast (D497): the click paths only offer what fits. */
+function rpCanAdd(zone, k){
+  const c = RP.draft;
+  if(zone==='cols') return !c.cols.includes(k);
+  if(!RPF[k].g) return false;
+  return zone==='gr' ? !c.gr.includes(k) && c.gr.length<rpCapGr(c) : !c.gc.includes(k) && c.gc.length<rpCapGc(c);
+}
+function rpAddTo(zone, k){
+  if(!rpCanAdd(zone, k)) return false;
+  /* grouping by a field takes it out of Columns, as Salesforce does (O63) */
+  rpEdit(d=>{ if(zone==='cols'){ d.cols.push(k); if(RPF[k].num==='money' && !d.sum[k]) d.sum[k] = 'sum'; return; }
+    d.gr = d.gr.filter(x=>x!==k); d.gc = d.gc.filter(x=>x!==k); d.cols = d.cols.filter(x=>x!==k); d[zone].push(k);
+    if(d.chart && zone==='gr' && d.gr.length===1) d.chart.view = k; });
+  return true;
+}
+/* removing a group puts its field back as the second column (O63) */
+function rpRmFrom(zone, i){
+  rpEdit(d=>{ const k = d[zone][i]; d[zone].splice(i,1);
+    if(zone==='cols'){ delete d.sum[k]; if(d.sort && d.sort.k===k) d.sort = null; }
+    else if(!d.cols.includes(k)) d.cols.splice(1, 0, k); });
+}
+/* a matrix: rows by the row group, a column per value, a Total column and a Total row (O62). Its column headers are
+   group values, not fields, so they do not sort (Known issue 66). */
+function rpMatrixHtml(c, rows){
+  const rk = c.gr[0], ck = c.gc[0], mk = Object.keys(c.sum).find(k=>c.sum[k]) || null, how = mk ? c.sum[mk] : null;
+  const val = l=>mk ? rpFmtAgg(mk, how, rpAgg(l, mk, how)) : String(l.length);
+  const colsG = rpGroupBy(rows, ck), rowsG = rk ? rpGroupBy(rows, rk) : [{v:'All opportunities', list:rows}];
+  const measure = mk ? RP_SUMS[how]+' of '+RPF[mk].l.toLowerCase() : 'Record count';
+  let html = '<table class="rp-grid"><thead><tr><th class="mx-g">'+esc(rk?RPF[rk].l:'')+' &#8595; &nbsp;'+esc(RPF[ck].l)+' &#8594; &nbsp;<span class="mx-m">'+esc(measure)+'</span></th>'+
+    colsG.map(g=>'<th class="mx-c">'+esc(g.v)+'</th>').join('')+'<th class="mx-c">Total</th></tr></thead><tbody>';
+  if(!rows.length) return html+'<tr><td class="empty" colspan="'+(colsG.length+2)+'">'+rpEmptyLine(c)+'</td></tr></tbody></table>';
+  const cell = (l, t)=>'<td class="num"'+tipAttr(t, val(l)||'0', rpOppN(l.length))+'>'+(l.length ? val(l) : '')+'</td>';
+  rowsG.forEach(r=>{ html += '<tr class="d"><td><b class="mx-r">'+esc(r.v)+'</b>'+(c.tog.rc?' <span class="mx-n">('+r.list.length+')</span>':'')+'</td>'+
+    colsG.map(g=>cell(r.list.filter(o=>rpGval(ck,o)===g.v), r.v+' · '+g.v)).join('')+cell(r.list, r.v+' · Total')+'</tr>'; });
+  if(c.tog.tot) html += '<tr class="tot"><td>Total'+(c.tog.rc?' ('+rows.length+')':'')+'</td>'+colsG.map(g=>cell(g.list, 'Total · '+g.v)).join('')+cell(rows, 'Total')+'</tr>';
+  return html+'</tbody></table>';
+}
+/* leaving the builder: Run carries the draft, Close discards it (O20) */
+function rpToRun(keep){ if(keep) RP.saved = rpClone(RP.draft); RP.screen = 'run'; RP.draft = null; RP.renaming = false; rpDraw(); window.scrollTo(0,0); }
+
+/* ---------- the "Add filter…", "Add group…" and "Add column…" type-ahead (.newmenu, D418) ---------- */
+let RP_TA = null;
+function rpTaItems(zone, q){
+  const c = rpC(), s = q.toLowerCase();
+  if(zone==='filter') return Object.keys(RPF).filter(k=>RPF[k].l.toLowerCase().includes(s));
+  return Object.keys(RPF).filter(k=>(zone==='cols' ? !c.cols.includes(k) : RPF[k].g && !c.gr.includes(k) && !c.gc.includes(k)) && RPF[k].l.toLowerCase().includes(s));
+}
+function rpTaDraw(){
+  if(!RP_TA) return;
+  const ks = rpTaItems(RP_TA.zone, RP_TA.input.value); RP_TA.ks = ks; if(RP_TA.hi>=ks.length) RP_TA.hi = ks.length-1; if(RP_TA.hi<0 && ks.length) RP_TA.hi = 0;
+  let html = '', ob = '';
+  ks.forEach((k,i)=>{ if(RPF[k].o!==ob){ ob = RPF[k].o; html += '<div class="ct-mhead">'+ob+'</div>'; }
+    html += '<div class="rp-ta-i'+(i===RP_TA.hi?' hi':'')+'" role="option" data-k="'+k+'" aria-selected="'+(i===RP_TA.hi)+'"><span class="ty">'+RPF[k].ty+'</span>'+esc(RPF[k].s||RPF[k].l)+'</div>'; });
+  RP_TA.el.innerHTML = html || '<div class="rp-ta-none">No fields match</div>';
+  const r = RP_TA.input.getBoundingClientRect();
+  RP_TA.el.style.left = Math.round(r.left)+'px'; RP_TA.el.style.top = Math.round(r.bottom+4)+'px'; RP_TA.el.style.width = Math.round(Math.max(r.width, 220))+'px';
+  const hi = RP_TA.el.querySelector('.hi'); if(hi) hi.scrollIntoView({block:'nearest'});
+}
+function rpTaOpen(input){
+  rpTaClose();
+  const el = document.createElement('div');
+  el.className = 'newmenu rp-ta';
+  el.setAttribute('role','listbox');
+  document.body.appendChild(el); RP_TA = {input, el, zone:input.dataset.ta, hi:0, ks:[]};
+  /* picks on the press, so nothing has blurred and the redraw is at once (the press is spent here) */
+  el.addEventListener('mousedown', e=>{ e.preventDefault(); const it = e.target.closest('.rp-ta-i'); if(it){ EF_PRESSED = false; rpTaPick(it.dataset.k); } });
+  rpTaDraw();
+}
+function rpTaClose(){ if(RP_TA){ RP_TA.el.remove(); RP_TA = null; } }
+function rpTaPick(k){
+  const zone = RP_TA.zone, inp0 = RP_TA.input; rpTaClose();
+  if(zone==='filter'){ inp0.value = ''; return rpAddAt([], k); }
+  rpAddTo(zone, k); const inp = rpView().querySelector('[data-ta="'+zone+'"]'); if(inp) inp.focus();
+}
+
+/* ---------- menus ---------- */
+/* a column's ▾ menu: Collapse and Expand all groups on the first column; in the builder also Group rows by this field,
+   Summarize (Median joins it, O21) and Remove column (O61) */
+function rpColMenu(btn){
+  const k = btn.dataset.col, where = btn.dataset.where, c = rpC(), f = RPF[k], items = [];
+  if(c.gr.length && c.cols[0]===k) items.push({v:'collapse', t:'Collapse all groups'},{v:'expand', t:'Expand all groups'});
+  if(where==='build'){
+    if(f.g && !c.gr.includes(k)) items.push({sep:true},{v:'group', t:'Group rows by this field'});
+    if(f.num){ items.push({sep:true},{head:'Summarize'}); ['sum','avg','median','max','min'].forEach(h=>{ if(!(f.num==='pct'&&h==='sum')) items.push({v:'s:'+h, t:RP_SUMS[h], on:c.sum[k]===h}); }); items.push({v:'s:', t:'None', on:!c.sum[k]}); }
+    items.push({sep:true},{v:'rm', t:'Remove column'});
+  }
+  if(items[0] && items[0].sep) items.shift();
+  menuFloatOpen(btn, items, it=>{
+    const v = it.v;
+    if(v==='collapse' || v==='expand'){ RP.shut = {}; if(v==='collapse') rpGroupBy(rpRows(c,''), c.gr[0]).forEach(g=>{ RP.shut['|'+c.gr[0]+'='+g.v] = true; }); rpDraw(); return; }
+    if(v==='group') return rpAddTo('gr', k);
+    if(v==='rm') return rpRmFrom('cols', c.cols.indexOf(k));
+    const h = v.slice(2); rpSet(d=>{ if(h) d.sum[k] = h; else delete d.sum[k]; });
+  });
+}
+function rpShowMeMenu(btn){
+  const k = btn.dataset.filt, c = rpC();
+  menuFloatOpen(btn, RP_FILT[k].opts.map(o=>({v:o[0], t:o[1], on:c.f[k]===o[0]})), it=>rpSet(d=>{ d.f[k] = it.v; }));
+}
+function rpChartPick(btn){
+  const which = btn.dataset.cpick, c = rpC(), ch = c.chart, gks = Object.keys(RPF).filter(k=>RPF[k].g);
+  let items;
+  if(which==='view') items = gks.map(k=>({v:k, t:RPF[k].l, on:rpViewOf(c)===k}));
+  if(which==='seg') items = [{v:'', t:'None', on:!ch.seg},{sep:true}].concat(gks.filter(k=>k!==rpViewOf(c)).map(k=>({v:k, t:RPF[k].l, on:ch.seg===k})));
+  if(which==='measure') items = [{v:'size', t:'Facility size', s:'Sum', on:ch.measure!=='count'},{v:'count', t:'Record count', on:ch.measure==='count'}];
+  menuFloatOpen(btn, items, it=>rpSet(d=>{ d.chart[which] = it.v; if(which==='view' && d.chart.seg===it.v) d.chart.seg = '';
+    if(!rpTypeOk(d, d.chart.type)) d.chart.type = RPF[rpViewOf(d)].date ? 'vbar' : 'hbar'; }));
+}
+/* Add to dashboard: an existing or a new dashboard, then a toast; the tile lands at 4 of 12 columns (D478, O51). No
+   "Open dashboard": no dashboard page is built (D422). */
+function rpDashMenu(btn){
+  menuFloatOpen(btn, [{head:'Add to dashboard'},{v:'My dashboard', t:'My dashboard', s:'Personal'},{v:'Pipeline review', t:'Pipeline review', s:'Team'},{sep:true},{v:'new', t:'New dashboard'}], it=>{
+    toastShow({icon:'check', title:'Added to '+(it.v==='new' ? 'New dashboard' : it.v), line:'As a 4-column tile in the first free space'});
+  });
+}
+/* Export: a CSV of the rows on screen (O53), then a toast (D497) */
+function rpExport(){
+  const c = RP.saved, rows = rpRows(c, RP.q), ks = c.gr.concat(c.cols), q = v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+  const csv = [ks.map(k=>q(RPF[k].l)).join(',')].concat(rows.map(o=>ks.map(k=>q(RPF[k].get(o))).join(','))).join('\n');
+  try{ const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download = c.title.replace(/[^a-z0-9]+/gi,'-').toLowerCase()+'.csv';
+    document.body.appendChild(a); a.click(); a.remove(); }catch(e){}
+  toastShow({icon:'check', title:'Exported '+rows.length+' rows', line:'CSV, the details in this report'});
+}
+
+/* ---------- drawing ---------- */
+/* An edit box that saves when a press takes focus away (a filter value, the report name) changes the report at once, but
+   the redraw waits for that press's click, so the control pressed is still there when the button comes up (D449's
+   press flag, EF_PRESSED; O27, D498). An HTML drag never sends mouseup, so a drag starting ends the press. */
+let RP_PENDING = false;
+document.addEventListener('dragstart', ()=>{
+  EF_PRESSED = false;
+  if(RP_PENDING) setTimeout(()=>{ if(RP_PENDING){ RP_PENDING = false; rpDraw('now'); } }, 0);
+}, true);
+function rpDraw(how){
+  const view = rpView();
+  if(!view.classList.contains('active')) return;
+  if(EF_PRESSED && how!=='now'){
+    if(!RP_PENDING){ RP_PENDING = true; efAfterPress(()=>{ if(RP_PENDING){ RP_PENDING = false; rpDraw('now'); } }); }
+    return;
+  }
+  RP_PENDING = false;
+  rpTaClose();
+  const ae = document.activeElement, focusKey = ae && view.contains(ae) ? (ae.id ? '#'+ae.id : ae.dataset.act ? '[data-act="'+ae.dataset.act+'"]' : ae.dataset.tog ? '[data-tog="'+ae.dataset.tog+'"]' :
+    ae.dataset.ctype ? '[data-ctype="'+ae.dataset.ctype+'"]' : ae.dataset.tab ? '[data-tab="'+ae.dataset.tab+'"]' : null) : null;
+  const caret = ae && ae.id==='rp-q' ? ae.selectionStart : null;
+  const sc = view.querySelector('.rp-gridwrap'), st = sc ? sc.scrollTop : 0;
+  view.innerHTML = RP.screen==='build' ? rpBuilderHtml() : rpRunHtml();
+  rpDrawCharts();
+  if(RP_POP){ if(view.querySelector('[data-cvals="'+RP_POP.p+'"]')){ rpValsDraw(); rpValsPlace(); } else rpPopClose(); }
+  const sc2 = view.querySelector('.rp-gridwrap'); if(sc2) sc2.scrollTop = st;
+  if(focusKey){ const el = view.querySelector(focusKey); if(el){ el.focus({preventScroll:true}); if(caret!=null && el.setSelectionRange) el.setSelectionRange(caret, caret); } }
+  const rn = document.getElementById('rp-rename'); if(rn){ rn.focus(); rn.select(); }
+}
+/* route(): a landing on #/reports opens the saved report's run page; the search box and collapsed groups start fresh */
+function rpEnter(){ RP.screen = 'run'; RP.draft = null; RP.hist = []; RP.fut = []; RP.renaming = false; RP.q = ''; RP.shut = {}; }
+let RP_RZ = null;
+window.addEventListener('resize', ()=>{ clearTimeout(RP_RZ); RP_RZ = setTimeout(()=>{ if(rpView().classList.contains('active')) rpDrawCharts(); }, 120); });
+window.addEventListener('scroll', ()=>{ if(RP_TA) rpTaDraw(); }, true);
+window.addEventListener('hashchange', rpTaClose);
+
+/* ---------- events ---------- */
+rpView().addEventListener('click', e=>{
+  const view = rpView(), t = e.target.closest('button, a, .rp-fld'); if(!t || !view.contains(t)) return;
+  if(RP_FIG_SKIP){ RP_FIG_SKIP = false; return; }   // the click that ends a pointer drag
+  if(t.getAttribute('aria-disabled')==='true') return;
+  const a = t.dataset.act;
+  if(t.dataset.fi!=null) return rpFigMenu(t);
+  if(a==='figadd') return rpFigAddMenu(t);
+  if(t.dataset.sort){ const k = t.dataset.sort; rpSet(d=>{ d.sort = d.sort && d.sort.k===k ? {k, d:-d.sort.d} : {k, d:1}; });
+    const b2 = view.querySelector('[data-sort="'+k+'"]'); if(b2) b2.focus({preventScroll:true}); return; }
+  if(t.dataset.col) return rpColMenu(t);
+  if(t.dataset.filt) return rpShowMeMenu(t);
+  if(rpFilterClick(t)) return;
+  if(t.dataset.cpick) return rpChartPick(t);
+  if(t.dataset.ctype) return rpSet(d=>{ d.chart.type = t.dataset.ctype; });
+  if(t.dataset.tog){ const k = t.dataset.tog; return rpSet(d=>{ d.tog[k] = !d.tog[k]; }); }
+  if(t.dataset.gp!=null){ RP.shut[t.dataset.gp] = !RP.shut[t.dataset.gp]; rpDraw(); const b = view.querySelector('[data-gp="'+CSS.escape(t.dataset.gp)+'"]'); if(b) b.focus({preventScroll:true}); return; }
+  if(t.dataset.rm) return rpRmFrom(t.dataset.rm, +t.dataset.i);
+  if(t.dataset.tab){ RP.tab = t.dataset.tab; rpDraw(); return; }
+  if(t.dataset.fk){   // a field's click path: every drag has one (O60)
+    const k = t.dataset.fk, c = RP.draft, items = [];
+    if(rpCanAdd('cols', k)) items.push({v:'cols', t:'Add as column'});
+    if(rpCanAdd('gr', k)) items.push({v:'gr', t:'Group rows by'});
+    if(rpCanAdd('gc', k)) items.push({v:'gc', t:'Group columns by'});
+    if(c.cols.includes(k)) items.push({v:'rmc', t:'Remove column'});
+    menuFloatOpen(t, items, it=>{ if(it.v==='rmc') rpRmFrom('cols', RP.draft.cols.indexOf(k)); else rpAddTo(it.v, k); });
+    return; }
+  if(!a) return;
+  if(a==='fclear') return rpSet(d=>{ d.f.root = {op:'and', items:[]}; });
+  if(a==='fav'){ RP.fav = !RP.fav; rpDraw(); return; }
+  if(a==='addchart') return rpSet(d=>{ d.chart = {type:'hbar', view:d.gr[0]||'stage', seg:'', measure:'size'}; if(RPF[d.chart.view].date) d.chart.type = 'vbar'; });
+  if(a==='rmchart') return rpSet(d=>{ d.chart = null; });
+  if(a==='fpanel'){ RP.fpanel = !RP.fpanel; rpDraw(); return; }
+  if(a==='dash') return rpDashMenu(t);
+  if(a==='export') return rpExport();
+  if(a==='edit'){ RP.draft = rpClone(RP.saved); RP.hist = []; RP.fut = []; RP.screen = 'build'; RP.renaming = false; rpDraw(); window.scrollTo(0,0); return; }
+  if(a==='close') return rpToRun(false);
+  if(a==='run') return rpToRun(true);
+  if(a==='save'){ RP.saved = rpClone(RP.draft); toastShow({icon:'check', title:'Report saved', line:RP.draft.title}); return; }
+  if(a==='saverun'){ rpToRun(true); toastShow({icon:'check', title:'Report saved', line:RP.saved.title}); return; }
+  if(a==='undo'){ if(!RP.hist.length) return; RP.fut.push(rpClone(RP.draft)); RP.draft = RP.hist.pop(); rpDraw(); return; }
+  if(a==='redo'){ if(!RP.fut.length) return; RP.hist.push(rpClone(RP.draft)); RP.draft = RP.fut.pop(); rpDraw(); return; }
+  if(a==='fields'){ RP.fields = !RP.fields; rpDraw(); const q = document.getElementById('rp-fq'); if(q) q.focus(); return; }
+  if(a==='rename'){ RP.renaming = true; rpDraw(); return; }
+});
+rpView().addEventListener('input', e=>{
+  if(e.target.id==='rp-q'){ RP.q = e.target.value; rpDraw(); return; }
+  if(e.target.id==='rp-fq'){ document.getElementById('rp-flist').innerHTML = rpFlistHtml(e.target.value); return; }
+  if(e.target.dataset.ta){ if(!RP_TA || RP_TA.input!==e.target) rpTaOpen(e.target); else { RP_TA.hi = 0; rpTaDraw(); } }
+});
+rpView().addEventListener('change', rpFilterChange);
+rpView().addEventListener('focusin', e=>{ if(e.target.dataset && e.target.dataset.ta) rpTaOpen(e.target); });
+rpView().addEventListener('focusout', e=>{
+  if(RP_TA && e.target===RP_TA.input) setTimeout(()=>{ if(RP_TA && document.activeElement!==RP_TA.input) rpTaClose(); }, 0);
+  /* the name saves when focus leaves it; a press that took focus keeps its click (O27) */
+  if(e.target.id==='rp-rename' && RP.renaming){ const v = e.target.value.trim(); RP.renaming = false; if(v && v!==RP.draft.title) rpEdit(d=>{ d.title = v; }); else rpDraw(); }
+});
+rpView().addEventListener('keydown', e=>{
+  if(e.target.classList && e.target.classList.contains('rp-fld') && (e.key==='Enter'||e.key===' ')){ e.preventDefault(); e.target.click(); return; }
+  if(e.target.id==='rp-rename'){ if(e.key==='Enter'){ e.preventDefault(); e.target.blur(); } else if(e.key==='Escape'){ e.preventDefault(); RP.renaming = false; rpDraw(); } return; }
+  if(RP_TA && e.target===RP_TA.input){
+    if(e.key==='ArrowDown'||e.key==='ArrowUp'){ e.preventDefault(); const n = RP_TA.ks.length; if(n){ RP_TA.hi = (RP_TA.hi+(e.key==='ArrowDown'?1:n-1))%n; rpTaDraw(); } }
+    else if(e.key==='Enter'){ e.preventDefault(); if(RP_TA.ks[RP_TA.hi]) rpTaPick(RP_TA.ks[RP_TA.hi]); }
+    else if(e.key==='Escape'){ e.preventDefault(); rpTaClose(); }
+  }
+});
+/* the builder's HTML drag (O60): a field from the Fields tab into a zone or onto the preview; a chip to reorder or move
+   between zones. Within its own zone a chip draws only a line where it will land; from elsewhere the zone is outlined.
+   A zone that can't take the item doesn't light up and takes no drop (D497: no error toasts). */
+let RP_DRAG = null;
+rpView().addEventListener('dragstart', e=>{
+  const n = e.target.nodeType===3 ? e.target.parentElement : e.target;
+  const f = n && n.closest ? n.closest('.rp-fld') : null, ch = n && n.closest ? n.closest('.rp-chipz') : null;
+  if(f) RP_DRAG = {k:f.dataset.fk}; else if(ch){ RP_DRAG = {zone:ch.dataset.zone, i:+ch.dataset.i}; ch.classList.add('drag'); } else return;
+  try{ e.dataTransfer.setData('text/plain', 'rp'); e.dataTransfer.effectAllowed = 'move'; }catch(x){}
+});
+const rpDragClear = ()=>rpView().querySelectorAll('.over,.ins-b,.ins-a').forEach(el=>el.classList.remove('over','ins-b','ins-a'));
+rpView().addEventListener('dragend', ()=>{ RP_DRAG = null; rpDragClear(); rpFigUnmark(); rpView().querySelectorAll('.drag').forEach(el=>el.classList.remove('drag')); });
+/* where a chip would land: the insertion index among the zone's chips, from the pointer's height against each chip's middle */
+function rpInsAt(z, y){
+  const chips = [...z.querySelectorAll('.rp-chipz')];
+  const i = chips.findIndex(c=>{ const r = c.getBoundingClientRect(); return y < r.top + r.height/2; });
+  return {chips, i: i<0 ? chips.length : i};
+}
+/* whether the dragged item may land in a zone */
+function rpDropOk(d0, zone){
+  if(d0.k) return rpCanAdd(zone, d0.k);
+  if(d0.zone===zone) return true;
+  const c = RP.draft, k = c[d0.zone][d0.i];
+  if(zone==='cols') return true;
+  return !!RPF[k].g && !(zone==='gr' && c.gr.length>=rpCapGr(c)) && !(zone==='gc' && c.gc.length>=rpCapGc(c));
+}
+rpView().addEventListener('dragover', e=>{
+  if(!RP_DRAG) return; const tn = e.target.nodeType===3 ? e.target.parentElement : e.target;
+  /* a field or chip over the figures (a chip is copied, so it stays in its zone, O20); a field that can't be added leaves
+     the strip unlit (O11) */
+  const fs = tn.closest('.rp-figs');
+  if(fs){ rpDragClear(); const k = RP_DRAG.k || RP.draft[RP_DRAG.zone][RP_DRAG.i]; if(rpFigBlock(k)){ rpFigUnmark(); return; }
+    e.preventDefault(); RP_DRAG.fins = rpFigMark(fs, e.clientX, true, null, e.clientY); return; }
+  rpFigUnmark();
+  const z = tn.closest('.rpk-zone, #rp-pv'); if(!z){ rpDragClear(); return; }
+  const zone = z.id==='rp-pv' ? 'cols' : z.dataset.zone;
+  rpDragClear();
+  if(!rpDropOk(RP_DRAG, zone)) return;
+  e.preventDefault();
+  if(RP_DRAG.zone && z.classList.contains('rpk-zone')){
+    const {chips, i} = rpInsAt(z, e.clientY);
+    if(RP_DRAG.zone!==zone) z.classList.add('over');
+    if(chips.length){ if(i<chips.length) chips[i].classList.add('ins-b'); else chips[chips.length-1].classList.add('ins-a'); }
+  } else z.classList.add('over');
+});
+rpView().addEventListener('drop', e=>{
+  if(!RP_DRAG) return; const tn = e.target.nodeType===3 ? e.target.parentElement : e.target;
+  const fs = tn.closest('.rp-figs');
+  if(fs){ e.preventDefault(); const d0 = RP_DRAG, at = rpFigIns(fs, e.clientX, e.clientY).i; RP_DRAG = null; rpDragClear(); rpFigUnmark();
+    return rpFigAdd(d0.k || RP.draft[d0.zone][d0.i], at); }
+  const z = tn.closest('.rpk-zone, #rp-pv'); if(!z) return;
+  const zone = z.id==='rp-pv' ? 'cols' : z.dataset.zone, d0 = RP_DRAG; RP_DRAG = null; rpDragClear();
+  if(!rpDropOk(d0, zone)) return;
+  e.preventDefault();
+  if(d0.k) return rpAddTo(zone, d0.k);
+  const k = RP.draft[d0.zone][d0.i], ins = z.classList.contains('rpk-zone') ? rpInsAt(z, e.clientY).i : null;
+  if(d0.zone===zone){ if(ins==null) return; const to = ins>d0.i ? ins-1 : ins; if(to===d0.i) return; rpEdit(d=>{ const l = d[zone]; l.splice(d0.i,1); l.splice(to,0,k); }); return; }
+  if(zone==='cols') return rpEdit(d=>{ d[d0.zone].splice(d0.i,1); if(!d.cols.includes(k)) d.cols.splice(ins==null?d.cols.length:ins, 0, k); });
+  rpEdit(d=>{ d[d0.zone].splice(d0.i,1); d.cols = d.cols.filter(x=>x!==k); d.gr = d.gr.filter(x=>x!==k); d.gc = d.gc.filter(x=>x!==k);
+    d[zone].splice(ins==null?d[zone].length:Math.min(ins, d[zone].length), 0, k); });
+});
+/* the pointer drag (the same in Safari, which focuses no button on click): a column header into the figures, or a figure
+   along the strip to reorder it or out of it to remove it (O5, O8, O14). A press that moves under 6px stays a click
+   (sort, or the figure's menu). The drag spends the press, so what it changes draws at once, not after the click. */
+let RP_PD = null, RP_FIG_SKIP = false;
+rpView().addEventListener('pointerdown', e=>{
+  if(e.button!==0 || RP_PD) return;
+  const th = e.target.closest('.rp-th[data-sort]'), fb = e.target.closest('.rp-figb');
+  if(th) RP_PD = {src:'col', k:th.dataset.sort, el:th, x0:e.clientX, y0:e.clientY};
+  else if(fb) RP_PD = {src:'fig', i:+fb.dataset.fi, el:fb, x0:e.clientX, y0:e.clientY};
+});
+document.addEventListener('pointermove', e=>{
+  const d = RP_PD; if(!d) return;
+  if(!d.on){
+    if(Math.hypot(e.clientX-d.x0, e.clientY-d.y0)<6) return;
+    d.on = true; actMenuClose(); document.body.classList.add('rp-dragging');
+    const g = document.createElement('div'); g.className = 'rp-ghost';
+    d.lab = d.src==='col' ? RPF[d.k].l : rpFigLabel(rpFigsOf(rpC())[d.i]); g.innerHTML = '<span>'+esc(d.lab)+'</span>'; document.body.appendChild(g); d.g = g;
+    if(d.src==='fig') d.el.closest('.rp-fig').classList.add('drag');
+  }
+  e.preventDefault();
+  d.g.style.left = (e.clientX+12)+'px'; d.g.style.top = (e.clientY+10)+'px';
+  const strip = rpView().querySelector('.rp-figs'), over = rpOverStrip(strip, e), why = d.src==='col' ? rpFigBlock(d.k) : '';
+  if(over && !why) d.ins = rpFigMark(strip, e.clientX, d.src==='col', d.src==='fig' ? d.i : null, e.clientY); else { d.ins = null; rpFigUnmark(); }
+  /* a column that can't be added says why on the chip (O11) */
+  if(d.src==='col'){ const t = over && why ? d.lab+' · '+why : d.lab; if(d.gt!==t){ d.gt = t; d.g.innerHTML = '<span>'+esc(t)+'</span>'; d.g.classList.toggle('no', !!(over && why)); } }
+  /* a figure out of the strip is removed on release: the chip says so in words and turns red, the figure fades (O14) */
+  if(d.src==='fig'){ const out = !over;
+    if(out!==!!d.out){ d.out = out; d.g.classList.toggle('rm', out);
+      d.g.innerHTML = out ? RP_IC.x+'<span>Remove '+esc(d.lab.charAt(0).toLowerCase()+d.lab.slice(1))+'</span>' : '<span>'+esc(d.lab)+'</span>';
+      const fg = d.el.closest('.rp-fig'); if(fg) fg.classList.toggle('out', out); } }
+});
+function rpPdEnd(cancel){
+  const d = RP_PD; RP_PD = null; if(!d || !d.on) return;
+  RP_FIG_SKIP = true; setTimeout(()=>{ RP_FIG_SKIP = false; }, 0);
+  EF_PRESSED = false;
+  if(d.g) d.g.remove(); document.body.classList.remove('rp-dragging'); rpFigUnmark();
+  rpView().querySelectorAll('.rp-fig.drag').forEach(el=>el.classList.remove('drag','out'));
+  if(cancel) return;
+  if(d.src==='fig' && d.out) return rpFigRemove(d.i);
+  if(d.ins==null) return;
+  if(d.src==='col') return rpFigAdd(d.k, d.ins);
+  const to = d.ins>d.i ? d.ins-1 : d.ins; if(to!==d.i) rpFigMove(d.i, to);
+}
+document.addEventListener('pointerup', ()=>rpPdEnd(false));
+document.addEventListener('pointercancel', ()=>rpPdEnd(true));
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && RP_PD && RP_PD.on) rpPdEnd(true); });   // Escape cancels the drag (O14)
+
 
 /* ---------- init ---------- */
 /* D240: the footer now shows only the avatar (name/role labels removed from the rail entirely),
