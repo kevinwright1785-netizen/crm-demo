@@ -174089,6 +174089,7 @@ function activateEdit(span){
   const isField = input && input.tagName!=='DIV';
   if(isField) input.focus();
   const session = {settled:false};
+  span._efSession = session;   // D479: efOpenEditors() tells an open editor from one whose commit is waiting on a redraw
   /* D375: a def may carry its own redraw (the Activity tab's When cell, in an unsaved form, on account
      pages too, which set no EF_RERENDER); every other field keeps EF_RERENDER. */
   const rerender = def.rerender || (()=>{ if(EF_RERENDER) EF_RERENDER(); });
@@ -174148,8 +174149,8 @@ function activateEdit(span){
    the click left the page (a route change, or the cell's page no longer showing) or re-rendered the
    cell's page itself, that render already reads the written value and nothing more is drawn; a cell
    inside the Deal modal or the side panel always redraws, since the page behind it still shows the old
-   value. Otherwise the page is redrawn keeping what the click opened: focus, the Won/Lost menu and the
-   float menu move to their redrawn controls (efRedrawKeeping). The save confirmation plays after that
+   value. Otherwise the page is redrawn keeping what the click opened: focus, an editor (D479), the Won/Lost
+   menu and the float menu move to their redrawn controls (efRedrawKeeping). The save confirmation plays after that
    redraw, on whichever copy of the cell is then showing. Enter, Tab, a select's change and Escape do
    not involve a press and redraw at once, as before. A key clears the flag too, since a native picker
    can swallow the mouseup (not a change event: a text input's change fires on that same blur). */
@@ -174185,13 +174186,44 @@ function efNodeFind(k){
   for(const i of k.p) n = n && n.children[i];
   return n && n.tagName===k.tag && (n.classList[0]||'')===k.cls ? n : null;
 }
+/* D479 (Known issue 52): an editor still open when a deferred redraw runs (the click it waited for opened it) is
+   reopened in its redrawn cell with what was typed in it, its error and its caret, so the redraw shows the earlier
+   save without closing the later edit. Found again by its place, as focus is, then by record and field among the
+   copies on the same side of an overlay. An editor whose own commit is waiting (settled) is not kept. */
+function efOpenEditors(){
+  return Array.from(document.querySelectorAll('.ef.editing')).filter(s=>s._efSession && !s._efSession.settled).map(span=>{
+    const ctl = Array.from(span.querySelectorAll('.ef-editing input, .ef-editing select')), err = span.querySelector('.ef-error');
+    const a = document.activeElement, fi = ctl.indexOf(a);
+    return {span, key:efNodeKey(span), rec:span.dataset.rec, k:span.dataset.key, inOverlay:!!span.closest('.modal, .dd-panel'),
+      vals:ctl.map(c=>c.type==='checkbox' ? c.checked : c.value), fi, sel:fi>=0 && a.selectionStart!=null ? [a.selectionStart, a.selectionEnd] : null,
+      err:err && !err.hidden ? err.textContent : null};
+  });
+}
+function efReopen(ed){
+  if(ed.span.isConnected) return false;
+  const same = s=>!!s && s.dataset.rec===ed.rec && s.dataset.key===ed.k && !!s.closest('.modal, .dd-panel')===ed.inOverlay;
+  let s = efNodeFind(ed.key);
+  if(!same(s)) s = Array.from(document.querySelectorAll('.ef[data-key="'+ed.k+'"]')).find(same);
+  if(!s || s.classList.contains('editing')) return false;
+  activateEdit(s);
+  const ctl = Array.from(s.querySelectorAll('.ef-editing input, .ef-editing select'));
+  if(ctl.length!==ed.vals.length) return false;
+  ctl.forEach((c,i)=>{ if(c.type==='checkbox') c.checked = ed.vals[i]; else c.value = ed.vals[i]; });
+  const err = s.querySelector('.ef-error');
+  if(ed.err && err) efShowError(err.id.replace(/_err$/, ''), ed.err);
+  if(ed.fi<0) return false;
+  ctl[ed.fi].focus({preventScroll:true});
+  if(ed.sel) try{ ctl[ed.fi].setSelectionRange(ed.sel[0], ed.sel[1]); }catch(e){}   // date and number inputs have no caret to set
+  return true;
+}
 function efRedrawKeeping(rerender){
-  const had = document.activeElement, focusKey = efNodeKey(had);
+  const had = document.activeElement, focusKey = efNodeKey(had), eds = efOpenEditors();
   const cm = CLOSE_MENU, cmKey = cm && efNodeKey(cm.anchor), cmR = cm && cm.anchor.getBoundingClientRect();
   const am = ACT_MENU, amKey = am && efNodeKey(am.anchor);
   CLOSE_MENU = null;   // renderOpp() closes the Won/Lost menu (D342); this one was opened by the press, so it moves instead
   rerender();
-  if(had && !had.isConnected){ const f = efNodeFind(focusKey); if(f) f.focus({preventScroll:true}); }
+  const focused = eds.map(efReopen).some(Boolean);
+  if(!focused && had && !had.isConnected){ const f = efNodeFind(focusKey); if(f) f.focus({preventScroll:true}); }
   if(cm){
     const a = efNodeFind(cmKey);
     CLOSE_MENU = cm;
@@ -179679,13 +179711,16 @@ function cdRerender(o){ if(OPP_SECTION_FOR===o.id && EF_RERENDER) EF_RERENDER();
 /* D451 (Known issue 31): the close's Undo can be pressed from any page (the toast outlives the route),
    so it redraws whichever page is showing, with route()'s own render for it, and an open side panel,
    not only the deal's page. A record page redraws through its EF_RERENDER (the page's, not the side
-   panel's deal editor). Home's entrance plays on first landing only (D118), so a redraw shows none. */
+   panel's deal editor). Home's entrance plays on first landing only (D118), so a redraw shows none.
+   D479 (Known issue 53): every toast Undo redraws through here, and the Contacts list is one of the pages; a list
+   keeps its page, order, sort and tab (LP, D467), and the scroll stays. */
 function rerenderShowing(){
   const v = document.querySelector('.view.active'), id = v && v.id;
   const page = SURF_KIND==='panel' && EF_RERENDER===panelEditRerender ? PANEL_PRIOR_RERENDER : EF_RERENDER;
   if(id==='view-home') renderHome();
   else if(id==='view-pipeline') renderPipeline();
   else if(id==='view-accounts') renderAccounts();
+  else if(id==='view-contacts') renderContacts();
   else if((id==='view-opp' || id==='view-account' || id==='view-contact') && page) page();
   if(SURF_EL && SURF_KIND==='panel' && PANEL_STACK.length) renderPanel();
 }
@@ -180630,7 +180665,7 @@ function actLog(){
   toastShow({icon:'check', title:(t==='Note' ? 'Note saved' : t+' logged'), line:a.subject, action:'Undo', ms:TOAST_UNDO_MS,
     onAction: tt=>{
       actRemove(a);
-      if(ACT_LAST && ACT_LAST.key===here.key && document.querySelector('.view.active .act-tab')) actRerender();
+      if(ACT_LAST && ACT_LAST.key===here.key && document.querySelector('.view.active .act-tab')) actRerender(); else rerenderShowing();   // D479
       toastUpdate(tt, {icon:'check', title:'Undone', line:a.subject, ms:TOAST_MS});
     }});
 }
@@ -180649,7 +180684,7 @@ function actDone(id){
   toastShow({icon:'check', title:'Marked done', line:u.subject, action:'Undo', ms:TOAST_UNDO_MS,
     onAction: tt=>{
       u.status = 'open'; actRemove(a);
-      if(ACT_LAST && ACT_LAST.key===here.key && document.querySelector('.view.active .act-tab')) actRerender();
+      if(ACT_LAST && ACT_LAST.key===here.key && document.querySelector('.view.active .act-tab')) actRerender(); else rerenderShowing();   // D479
       toastUpdate(tt, {icon:'check', title:'Undone', line:u.subject, ms:TOAST_MS});
     }});
 }
@@ -181081,7 +181116,7 @@ function ctAddParty(o, base){
   ctAudit(o.id, 'Contacts', '', ctPName(p));
   toastShow({icon:'check', title: base.partyKind==='account' ? 'Company added' : 'Contact added', line:ctPName(p)+' on '+getAccount(o.accountId).name, action:'Undo', ms:TOAST_UNDO_MS,
     onAction: t=>{ const i = ps.indexOf(p); if(i>=0) ps.splice(i,1); if(CT_RED && CT_RED.pid===p.id) CT_RED = null;
-      ctAudit(o.id, 'Contacts', ctPName(p), ''); ctRerender(); toastUpdate(t, {icon:'check', title:'Undone', line:ctPName(p)+' removed', ms:TOAST_MS}); }});
+      ctAudit(o.id, 'Contacts', ctPName(p), ''); rerenderShowing(); toastUpdate(t, {icon:'check', title:'Undone', line:ctPName(p)+' removed', ms:TOAST_MS}); }});
   ctRedOpen(p.id, true);   // its cell is not drawn yet: ctRolesRedraw() re-renders the record with the editor open
 }
 function ctFocusRow(pid){
@@ -181105,7 +181140,7 @@ function ctRowMenu(anchor, pid){
       ctAudit(o.id, 'Primary contact', prev ? ctPName(prev) : '', ctPName(p));
       ctRerender(); ctFocusRow(p.id);
       toastShow({icon:'check', title:'Primary changed', line:ctPName(p)+' is now Primary', action:'Undo', ms:TOAST_UNDO_MS,
-        onAction: t=>{ ps.forEach(x=>x.isPrimary = x===prev); ctAudit(o.id, 'Primary contact', ctPName(p), prev ? ctPName(prev) : ''); ctRerender();
+        onAction: t=>{ ps.forEach(x=>x.isPrimary = x===prev); ctAudit(o.id, 'Primary contact', ctPName(p), prev ? ctPName(prev) : ''); rerenderShowing();
           toastUpdate(t, {icon:'check', title:'Undone', line:(prev ? ctPName(prev)+' is Primary again' : 'No Primary'), ms:TOAST_MS}); }});
     }
     if(it.v==='rm'){
@@ -181114,7 +181149,7 @@ function ctRowMenu(anchor, pid){
       ctAudit(o.id, 'Contacts', ctPName(p), '');
       ctRerender(); ctFocusRow(next ? next.id : null);
       toastShow({icon:'check', title:'Contact removed', line:ctPName(p)+' from '+getAccount(o.accountId).name, action:'Undo', ms:TOAST_UNDO_MS,
-        onAction: t=>{ ps.splice(Math.min(i, ps.length), 0, p); ctAudit(o.id, 'Contacts', '', ctPName(p)); ctRerender();
+        onAction: t=>{ ps.splice(Math.min(i, ps.length), 0, p); ctAudit(o.id, 'Contacts', '', ctPName(p)); rerenderShowing();
           toastUpdate(t, {icon:'check', title:'Undone', line:ctPName(p)+' is back', ms:TOAST_MS}); }});
     }
   });
@@ -181508,7 +181543,7 @@ function ctLogGo(s){
   actAdd(a);
   closeSurface(); ctRerender();
   toastShow({icon:'check', title:(s.type==='Note' ? 'Note saved' : s.type+' logged'), line:a.subject, action:'Undo', ms:TOAST_UNDO_MS,
-    onAction: t=>{ actRemove(a); ctRerender(); toastUpdate(t, {icon:'check', title:'Undone', line:a.subject, ms:TOAST_MS}); }});
+    onAction: t=>{ actRemove(a); rerenderShowing(); toastUpdate(t, {icon:'check', title:'Undone', line:a.subject, ms:TOAST_MS}); }});
 }
 
 /* ---------- the company page's Contacts tab (Contacts part 3, D426, named by D435; spec
@@ -181622,7 +181657,7 @@ function ctaCreated(c, co){
       ctPartiesOfContact(c.id).forEach(p=>{ const ps = ctParties(p.opportunityId); ps.splice(ps.indexOf(p), 1); ctAudit(p.opportunityId, 'Contacts', c.name, ''); });
       const i = D.contacts.indexOf(c); if(i>=0) D.contacts.splice(i, 1);
       delete CONTACTS_BY_ID[c.id]; delete AFFS_BY_CONTACT[c.id]; delete EF_STORE['contact:'+c.id]; ctReindexAcct(co.id);
-      if(location.hash==='#/contact/'+c.id) location.hash = '#/account/'+co.id+'/contacts'; else ctRerender();
+      if(location.hash==='#/contact/'+c.id) location.hash = '#/account/'+co.id+'/contacts'; else rerenderShowing();
       toastUpdate(t, {icon:'check', title:'Undone', line:c.name+' removed', ms:TOAST_MS}); }});
 }
 /* O10, O11: Open contact page · Add to opportunity (not for an advisor firm's people) · Mark as left {company} */
@@ -181656,22 +181691,22 @@ function ctaFocus(sel){ const el = document.querySelector('#view-account '+sel);
 function ctaLeave(a, cid){
   const c = CONTACTS_BY_ID[cid], aff = (AFFS_BY_CONTACT[cid]||[]).find(x=>x.accountId===a.id && !x.endDate); if(!aff) return;
   const list = ctaSorted(a), next = list[list.indexOf(c)+1] || null;
-  const set = (end, was, now)=>{ aff.endDate = end; ctReindexAcct(a.id); ctAuditPerson(cid, 'Left '+a.name, was, now); ctRerender(); };
+  const set = (end, was, now, draw)=>{ aff.endDate = end; ctReindexAcct(a.id); ctAuditPerson(cid, 'Left '+a.name, was, now); (draw||ctRerender)(); };
   set(TODAY, 'Current', 'Left');
   ctaFocus(next ? '[data-ct="arow"][data-v="'+next.id+'"]' : '[data-ct="afmr"]');
   toastShow({icon:'check', title:'Marked as left', line:c.name+' left '+a.name, action:'Undo', ms:TOAST_UNDO_MS,
-    onAction: t=>{ set(null, 'Left', 'Current'); toastUpdate(t, {icon:'check', title:'Undone', line:c.name+' is current at '+a.name, ms:TOAST_MS}); }});   // D443: always exact
+    onAction: t=>{ set(null, 'Left', 'Current', rerenderShowing); toastUpdate(t, {icon:'check', title:'Undone', line:c.name+' is current at '+a.name, ms:TOAST_MS}); }});   // D443: always exact
 }
 /* O7, O12, D443: Mark as current from Former; refused when their ownership would take the company past 100% */
 function ctaRestore(a, affId){
   const aff = ctAffById(affId), c = CONTACTS_BY_ID[aff.contactId], was = aff.endDate;
   const n = ctOwnTotal(aff, aff.ownershipPct||0);
   if(aff.ownershipPct!=null && n>100) return toastShow({icon:'alert', title:'Not marked as current', line:'Ownership at '+a.name+' would total '+n+'%.', ms:TOAST_MS});
-  const set = (end, from, to)=>{ aff.endDate = end; ctReindexAcct(a.id); ctAuditPerson(c.id, 'Left '+a.name, from, to); ctRerender(); };
+  const set = (end, from, to, draw)=>{ aff.endDate = end; ctReindexAcct(a.id); ctAuditPerson(c.id, 'Left '+a.name, from, to); (draw||ctRerender)(); };
   set(null, 'Left', 'Current');
   ctaFocus('[data-ct="arow"][data-v="'+c.id+'"]');
   toastShow({icon:'check', title:'Marked as current', line:c.name+' at '+a.name, action:'Undo', ms:TOAST_UNDO_MS,
-    onAction: t=>{ set(was, 'Current', 'Left'); toastUpdate(t, {icon:'check', title:'Undone', line:c.name+' is back in Former', ms:TOAST_MS}); }});
+    onAction: t=>{ set(was, 'Current', 'Left', rerenderShowing); toastUpdate(t, {icon:'check', title:'Undone', line:c.name+' is back in Former', ms:TOAST_MS}); }});
 }
 function ctaFormerMenu(anchor, affId){
   const aff = ctAffById(affId), a = ctaAcct();
