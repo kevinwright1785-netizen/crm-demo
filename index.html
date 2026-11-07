@@ -2535,7 +2535,6 @@ body.rp-dragging .rp-figb:hover .rp-fig-l{color:var(--ink-3)}
 .rp-fpick{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:var(--s1);min-width:0;font-size:12px;font-weight:500;color:var(--ink);border-radius:var(--r-s);padding:2px var(--s1);margin-left:calc(-1 * var(--s1))}
 .rp-fpick:hover{background:var(--hover)}
 .rp-fpick:focus-visible,.rp-vpick:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
-.rp-ccnt{margin-left:auto;font-size:12px;color:var(--ink-3);font-variant-numeric:tabular-nums;white-space:nowrap;padding-right:var(--s1)}
 .rp-cl3 .rp-input{width:100%;height:30px;font-size:12px}
 .rp-vpick{all:unset;cursor:pointer;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:var(--s2);width:100%;min-height:30px;padding:var(--s1) var(--s2) var(--s1) var(--s3);
   border:1px solid var(--line-2);border-radius:var(--r-s);font-size:12px;color:var(--ink);background:var(--paper)}
@@ -174858,6 +174857,7 @@ function route(){
   const parts = hash.replace('#/','').split('/');
   const view = parts[0] || 'home';
   const id = parts[1];
+  if(view!=='reports' && document.getElementById('view-reports').classList.contains('active')) rpLeave();   // O5, O6 (D505)
 
   /* D240: aria-current="page" alongside .active, kept in sync here since this is the one place
      the active route is ever decided. */
@@ -183321,7 +183321,8 @@ function rpPickVals(k, ctx){
   if(f.order) l.sort((a,b)=>{ const ia = f.order.indexOf(a), ib = f.order.indexOf(b); return (ia<0?99:ia)-(ib<0?99:ib); }); else l.sort((a,b)=>String(a).localeCompare(String(b)));
   return l;
 }
-/* a condition is complete when it has what its operator needs; an incomplete row is shown (dashed) but not applied */
+/* a condition is complete when it has what its operator needs; an unfinished row is shown (dashed) but never applied, under
+   All or Any (O2, D505), and falls out on Run, Save, Save & run, the run page's panel closing or leaving the page (O4, O5) */
 function rpComplete(cd, ctx){
   if(rpNoValue(cd.o)) return true; const t = rpFtype(cd.field, ctx), v = cd.v;
   if(t==='pick'||t==='lookup'||t==='user'||t==='multi') return (v||[]).length>0;
@@ -183337,7 +183338,6 @@ function rpSplit(str){
   out.push(cur); return out.map(x=>x.trim()).filter(Boolean);
 }
 function rpTestCond(row, cd, ctx){
-  if(!rpComplete(cd, ctx)) return true;
   const t = rpFtype(cd.field, ctx), raw = rpDefs(ctx)[cd.field].get(row), v = cd.v, empty = raw==null || raw==='' || (Array.isArray(raw) && !raw.length);
   if(cd.o==='empty') return empty; if(cd.o==='nempty') return !empty;
   if(t==='user'){ if(cd.o==='me') return row.bdoId===CURRENT_BDO_ID; if(cd.o==='team') return !!BDOS[row.bdoId]; const inn = v.includes(raw); return cd.o==='in' ? inn : !inn; }
@@ -183355,14 +183355,26 @@ function rpTestCond(row, cd, ctx){
 }
 const rpRelComplete = nd=>(nd.q!=='atleast' && nd.q!=='atmost') || (nd.n!=='' && nd.n!=null && !isNaN(+nd.n));
 function rpTestNode(row, nd, ctx){
-  if(nd.rel){ if(!rpRelComplete(nd)) return true;
+  if(nd.rel){
     const n = RP_REL[nd.rel].rows(row).filter(r=>rpTestGroup(r, nd, nd.rel)).length;
     return nd.q==='any' ? n>0 : nd.q==='none' ? n===0 : nd.q==='atleast' ? n>=+nd.n : n<=+nd.n; }
   if(nd.items) return rpTestGroup(row, nd, ctx);
   return rpTestCond(row, nd, ctx);
 }
-function rpTestGroup(row, g, ctx){ if(!g.items.length) return true;
-  return g.op==='or' ? g.items.some(it=>rpTestNode(row, it, ctx)) : g.items.every(it=>rpTestNode(row, it, ctx)); }
+/* whether a node takes part in the result: an unfinished row, an unfinished related-records row ("has at least" with no
+   number) and a group with nothing finished in it are skipped, at every level, under All and Any alike (O2, D505) */
+const rpApplied = (nd, ctx)=>nd.rel ? rpRelComplete(nd) : nd.items ? nd.items.some(it=>rpApplied(it, ctx)) : rpComplete(nd, ctx);
+function rpTestGroup(row, g, ctx){
+  const items = g.items.filter(it=>rpApplied(it, ctx)); if(!items.length) return true;
+  return g.op==='or' ? items.some(it=>rpTestNode(row, it, ctx)) : items.every(it=>rpTestNode(row, it, ctx)); }
+/* removes every unfinished row, related-records row and condition, and any group left empty (O4, O5, D505) */
+function rpPrune(g, ctx){
+  g.items = g.items.filter(it=>{
+    if(it.rel){ if(!rpRelComplete(it)) return false; rpPrune(it, it.rel); return true; }
+    if(it.items){ rpPrune(it, ctx); return it.items.length>0; }
+    return rpComplete(it, ctx); });
+  return g;
+}
 const rpFmtNum = (k,x,ctx)=>{ const f = rpDefs(ctx)[k]; return x==null||x==='' ? '' : f.num==='money' ? moneyPlain(+x) : f.num==='pct' ? (+x)+'%' : (+x).toLocaleString('en-US'); };
 function rpValText(cd, ctx){
   const t = rpFtype(cd.field, ctx), v = cd.v;
@@ -183379,8 +183391,13 @@ function rpValText(cd, ctx){
   const l = rpSplit(v); return !l.length ? '' : l.length<=2 ? l.join(', ') : l.slice(0,2).join(', ')+' +'+(l.length-2);
 }
 const rpCondText = (cd, ctx)=>rpDefs(ctx)[cd.field].l+' '+rpOpLabel(cd.field, cd.o, ctx)+(rpNoValue(cd.o)?'':' '+rpValText(cd, ctx));
-const rpRelText = nd=>RP_REL[nd.rel].l+': '+(RP_QUANT.find(x=>x[0]===nd.q)||['',''])[1]+(nd.q==='atleast'||nd.q==='atmost'?' '+(nd.n||'N'):'')+
-  (nd.items.length ? ' where '+nd.items.filter(c=>!c.items).map(c=>rpCondText(c, nd.rel)).join(nd.op==='or'?' or ':' and ') : '');
+/* an unfinished related-records row, and an unfinished condition inside one, are left out (O3, D505) */
+function rpRelText(nd){
+  if(!rpRelComplete(nd)) return '';
+  const conds = nd.items.filter(c=>!c.items && rpComplete(c, nd.rel));
+  return RP_REL[nd.rel].l+': '+(RP_QUANT.find(x=>x[0]===nd.q)||['',''])[1]+(nd.q==='atleast'||nd.q==='atmost'?' '+nd.n:'')+
+    (conds.length ? ' where '+conds.map(c=>rpCondText(c, nd.rel)).join(nd.op==='or'?' or ':' and ') : '');
+}
 /* the whole filter read back as one sentence, count first (RESEARCH_17 §7, O50) */
 function rpNodeText(nd, ctx){
   if(nd.rel) return rpRelText(nd);
@@ -183402,13 +183419,11 @@ const rpDefCond = (k, ctx)=>{ const t = rpFtype(k, ctx);
 /* a change to the report: in the builder it goes through Undo (rpEdit); on the run page it saves to the report at once
    (the owner's change, O10) */
 const rpSet = fn=>{ if(RP.screen==='build') rpEdit(fn); else { fn(RP.saved); rpDraw(); } };
-/* records a single top-level row lets through on its own (each row shows its own count, RESEARCH_17 §7) */
-function rpRowCount(nd){ const c = rpC(); return allOpps().filter(o=>(c.f.owner==='all' || o.bdoId===CURRENT_BDO_ID) && rpTestNode(o, nd, null)).length; }
 const RP_CHEV = '<span class="rp-chev">&#9660;</span>';
-const rpRecs = n=>n+' record'+(n===1?'':'s');
 
-/* one condition row: Field ▾ ⋯ / Operator ▾ count / value, all edited in place */
-function rpCondHtml(cd, p, ctx, top){
+/* one condition row: Field ▾ ⋯ / Operator ▾ / value, all edited in place. No record count in the card (O1, D504): the
+   result count is the sentence's, Total records' and the footer's */
+function rpCondHtml(cd, p, ctx){
   const f = rpDefs(ctx)[cd.field], t = rpFtype(cd.field, ctx), ok = rpComplete(cd, ctx), v = cd.v;
   let val = '';
   if(!rpNoValue(cd.o)){
@@ -183425,22 +183440,19 @@ function rpCondHtml(cd, p, ctx, top){
         val = cd.o==='between' ? '<div class="rp-vrow">'+inp(0,'From')+'<span class="and">and</span>'+inp(1,'To')+'</div>' : inp(0,'Date'); } }
     else val = '<input class="rp-input" id="cv-'+p+'-t" data-ctext="'+p+'" placeholder="One value, or several separated by commas" value="'+esc(v||'')+'" aria-label="'+esc(f.l)+' value">';
   }
-  const n = top && ok ? rpRowCount(cd) : null;
-  /* the live count ends the operator line; when the operator is long it wraps under it, right-aligned (O25) */
   return '<div class="rp-cond'+(ok?'':' inc')+'"><div class="rp-cl1"><button class="rp-fpick" data-cfield="'+p+'" aria-haspopup="menu" title="'+esc(f.l)+'"><span class="t">'+esc(f.l)+'</span>'+RP_CHEV+'</button>'+
     '<button class="rp-x" data-cmenu="'+p+'" aria-label="More for '+esc(f.l)+'" aria-haspopup="menu">&#8943;</button></div>'+
-    '<div class="rp-cl2"><button class="rp-pick sm" data-cop="'+p+'" aria-haspopup="menu" title="'+esc(rpOpLabel(cd.field, cd.o, ctx))+'"><span class="t">'+esc(rpOpLabel(cd.field, cd.o, ctx))+'</span>'+RP_CHEV+'</button>'+
-    (n!=null?'<span class="rp-ccnt">'+rpRecs(n)+'</span>':'')+'</div>'+
+    '<div class="rp-cl2"><button class="rp-pick sm" data-cop="'+p+'" aria-haspopup="menu" title="'+esc(rpOpLabel(cd.field, cd.o, ctx))+'"><span class="t">'+esc(rpOpLabel(cd.field, cd.o, ctx))+'</span>'+RP_CHEV+'</button></div>'+
     (val?'<div class="rp-cl3">'+val+'</div>':'')+'</div>';
 }
-function rpRelHtml(nd, p, top){
-  const n = top && rpRelComplete(nd) ? rpRowCount(nd) : null, many = nd.q==='atleast'||nd.q==='atmost';
+function rpRelHtml(nd, p){
+  const many = nd.q==='atleast'||nd.q==='atmost';
   return '<div class="rp-rel"><div class="rp-cl1"><span class="rp-rel-l">'+esc(RP_REL[nd.rel].l)+'</span>'+
     '<button class="rp-x" data-cmenu="'+p+'" aria-label="More for '+esc(RP_REL[nd.rel].l)+'" aria-haspopup="menu">&#8943;</button></div>'+
     '<div class="rp-cl2"><button class="rp-pick sm" data-cq="'+p+'" aria-haspopup="menu">'+esc((RP_QUANT.find(x=>x[0]===nd.q)||['',''])[1])+RP_CHEV+'</button>'+
-    (many?'<input class="rp-input rp-nin" id="cv-'+p+'-q" data-cqn="'+p+'" inputmode="numeric" value="'+esc(String(nd.n==null?'':nd.n))+'" aria-label="How many">':'')+(n!=null?'<span class="rp-ccnt">'+rpRecs(n)+'</span>':'')+'</div>'+
+    (many?'<input class="rp-input rp-nin" id="cv-'+p+'-q" data-cqn="'+p+'" inputmode="numeric" value="'+esc(String(nd.n==null?'':nd.n))+'" aria-label="How many">':'')+'</div>'+
     (nd.items.length ? '<div class="rp-rel-w">'+(nd.items.length>1?'<div class="rp-flogic">where <button class="rp-pick sm" data-glogic="'+p+'" aria-haspopup="menu">'+(nd.op==='or'?'any':'all')+RP_CHEV+'</button> of these</div>':'<div class="rp-flogic">where</div>')+
-      nd.items.map((c,i)=>rpCondHtml(c, p+'.'+i, nd.rel, false)).join('')+'</div>' : '')+
+      nd.items.map((c,i)=>rpCondHtml(c, p+'.'+i, nd.rel)).join('')+'</div>' : '')+
     '<button class="rp-link" data-radd="'+p+'" aria-haspopup="menu">+ Add condition</button></div>';
 }
 function rpTreeHtml(g, path){
@@ -183448,9 +183460,9 @@ function rpTreeHtml(g, path){
   let h = '';
   if(!top || g.items.length>1) h += '<div class="rp-flogic">'+(top?'Match ':'')+'<button class="rp-pick sm" data-glogic="'+ps+'" aria-haspopup="menu">'+(g.op==='or'?'Any':'All')+RP_CHEV+'</button> '+(top?'filters':'of these')+'</div>';
   g.items.forEach((it,i)=>{ const p = path.concat(i).join('.');
-    if(it.rel) h += rpRelHtml(it, p, top);
+    if(it.rel) h += rpRelHtml(it, p);
     else if(it.items) h += '<div class="rp-fgroup">'+rpTreeHtml(it, path.concat(i))+'<div class="rp-fgroup-f"><button class="rp-link" data-gadd="'+p+'" aria-haspopup="menu">+ Add filter</button><button class="rp-link" data-crm="'+p+'">Remove group</button></div></div>';
-    else h += rpCondHtml(it, p, null, top); });
+    else h += rpCondHtml(it, p, null); });
   return h;
 }
 function rpFilters(c){
@@ -184074,7 +184086,7 @@ function rpExport(){
 /* An edit box that saves when a press takes focus away (a filter value, the report name) changes the report at once, but
    the redraw waits for that press's click, so the control pressed is still there when the button comes up (D449's
    press flag, EF_PRESSED; O27, D498). An HTML drag never sends mouseup, so a drag starting ends the press. */
-let RP_PENDING = false;
+let RP_PENDING = false, RP_COMMITTING = false;
 document.addEventListener('dragstart', ()=>{
   EF_PRESSED = false;
   if(RP_PENDING) setTimeout(()=>{ if(RP_PENDING){ RP_PENDING = false; rpDraw('now'); } }, 0);
@@ -184088,7 +184100,7 @@ function rpDraw(how){
   }
   RP_PENDING = false;
   rpTaClose();
-  const ae = document.activeElement, focusKey = ae && view.contains(ae) ? (ae.id ? '#'+ae.id : ae.dataset.act ? '[data-act="'+ae.dataset.act+'"]' : ae.dataset.tog ? '[data-tog="'+ae.dataset.tog+'"]' :
+  const ae = RP_COMMITTING ? null : document.activeElement, focusKey = ae && view.contains(ae) ? (ae.id ? '#'+ae.id : ae.dataset.act ? '[data-act="'+ae.dataset.act+'"]' : ae.dataset.tog ? '[data-tog="'+ae.dataset.tog+'"]' :
     ae.dataset.ctype ? '[data-ctype="'+ae.dataset.ctype+'"]' : ae.dataset.tab ? '[data-tab="'+ae.dataset.tab+'"]' : null) : null;
   const caret = ae && ae.id==='rp-q' ? ae.selectionStart : null;
   const sc = view.querySelector('.rp-gridwrap'), st = sc ? sc.scrollTop : 0;
@@ -184099,6 +184111,24 @@ function rpDraw(how){
   if(focusKey){ const el = view.querySelector(focusKey); if(el){ el.focus({preventScroll:true}); if(caret!=null && el.setSelectionRange) el.setSelectionRange(caret, caret); } }
   const rn = document.getElementById('rp-rename'); if(rn){ rn.focus(); rn.select(); }
 }
+/* A value still being typed in a filter box is committed before any filter falls out, whatever ends the edit (O6, D505).
+   A press has already committed it: the box's change fires as the press takes focus, and D449's press flag holds the
+   redraw for the click (efAfterPress), so the pressed button is still there. A click with no press, a link or browser
+   Back leave the box focused, so it is blurred here, which fires its change now; the redraw that follows does not put
+   focus back into it. */
+function rpCommitTyping(){
+  const ae = document.activeElement; if(!ae || ae.tagName!=='INPUT' || !rpView().contains(ae)) return;
+  RP_COMMITTING = true; try{ ae.blur(); } finally{ RP_COMMITTING = false; }
+}
+/* the builder's Run, Save and Save & run drop every unfinished filter first, as their own Undo step (O4, D505) */
+function rpPruneDraft(){
+  const before = rpClone(RP.draft), was = JSON.stringify(before.f.root);
+  rpPrune(RP.draft.f.root, null);
+  if(JSON.stringify(RP.draft.f.root)===was) return false;
+  RP.hist.push(before); if(RP.hist.length>50) RP.hist.shift(); RP.fut = []; return true;
+}
+/* route(): leaving #/reports commits a value still being typed, then unfinished filters fall out of the report (O5, O6) */
+function rpLeave(){ rpCommitTyping(); rpPrune(RP.saved.f.root, null); }
 /* route(): a landing on #/reports opens the saved report's run page; the search box and collapsed groups start fresh */
 function rpEnter(){ RP.screen = 'run'; RP.draft = null; RP.hist = []; RP.fut = []; RP.renaming = false; RP.q = ''; RP.shut = {}; }
 let RP_RZ = null;
@@ -184134,18 +184164,19 @@ rpView().addEventListener('click', e=>{
     menuFloatOpen(t, items, it=>{ if(it.v==='rmc') rpRmFrom('cols', RP.draft.cols.indexOf(k)); else rpAddTo(it.v, k); });
     return; }
   if(!a) return;
+  if(a==='run' || a==='save' || a==='saverun' || a==='fpanel') rpCommitTyping();   // O6: before anything falls out
   if(a==='fclear') return rpSet(d=>{ d.f.root = {op:'and', items:[]}; });
   if(a==='fav'){ RP.fav = !RP.fav; rpDraw(); return; }
   if(a==='addchart') return rpSet(d=>{ d.chart = {type:'hbar', view:d.gr[0]||'stage', seg:'', measure:'size'}; if(RPF[d.chart.view].date) d.chart.type = 'vbar'; });
   if(a==='rmchart') return rpSet(d=>{ d.chart = null; });
-  if(a==='fpanel'){ RP.fpanel = !RP.fpanel; rpDraw(); return; }
+  if(a==='fpanel'){ if(RP.fpanel) rpPrune(RP.saved.f.root, null); RP.fpanel = !RP.fpanel; rpDraw(); return; }   // closing: O5
   if(a==='dash') return rpDashMenu(t);
   if(a==='export') return rpExport();
   if(a==='edit'){ RP.draft = rpClone(RP.saved); RP.hist = []; RP.fut = []; RP.screen = 'build'; RP.renaming = false; rpDraw(); window.scrollTo(0,0); return; }
   if(a==='close') return rpToRun(false);
-  if(a==='run') return rpToRun(true);
-  if(a==='save'){ RP.saved = rpClone(RP.draft); toastShow({icon:'check', title:'Report saved', line:RP.draft.title}); return; }
-  if(a==='saverun'){ rpToRun(true); toastShow({icon:'check', title:'Report saved', line:RP.saved.title}); return; }
+  if(a==='run'){ rpPruneDraft(); return rpToRun(true); }
+  if(a==='save'){ const cut = rpPruneDraft(); RP.saved = rpClone(RP.draft); if(cut) rpDraw(); toastShow({icon:'check', title:'Report saved', line:RP.draft.title}); return; }
+  if(a==='saverun'){ rpPruneDraft(); rpToRun(true); toastShow({icon:'check', title:'Report saved', line:RP.saved.title}); return; }
   if(a==='undo'){ if(!RP.hist.length) return; RP.fut.push(rpClone(RP.draft)); RP.draft = RP.hist.pop(); rpDraw(); return; }
   if(a==='redo'){ if(!RP.fut.length) return; RP.hist.push(rpClone(RP.draft)); RP.draft = RP.fut.pop(); rpDraw(); return; }
   if(a==='fields'){ RP.fields = !RP.fields; rpDraw(); const q = document.getElementById('rp-fq'); if(q) q.focus(); return; }
