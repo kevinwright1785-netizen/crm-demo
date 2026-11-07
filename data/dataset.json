@@ -80,6 +80,1018 @@
       "annualQuota": 43000000
     }
   ],
+  "users": [
+    {
+      "id": "usr_admin",
+      "name": "Claire Dunmore",
+      "role": "Admin"
+    }
+  ],
+  "savedReports": [
+    {
+      "id": "open-pipeline",
+      "type": "opps",
+      "title": "My open pipeline by stage",
+      "description": "Open opportunities I own, by stage",
+      "scope": "Personal",
+      "ownerId": "bdo_05",
+      "lastRun": "2026-08-17",
+      "runCount": 41,
+      "favorite": true,
+      "lastOpened": "2026-08-17",
+      "definition": {
+        "title": "My open pipeline by stage",
+        "gr": [
+          "stage"
+        ],
+        "gc": [],
+        "cols": [
+          "name",
+          "product",
+          "close",
+          "days",
+          "size"
+        ],
+        "sum": {
+          "size": "sum"
+        },
+        "sort": {
+          "k": "size",
+          "d": -1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "me",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "status",
+                "o": "in",
+                "v": [
+                  "Open"
+                ]
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          },
+          {
+            "k": "size",
+            "how": "sum"
+          }
+        ]
+      }
+    },
+    {
+      "id": "stalled",
+      "type": "opps",
+      "title": "My stalled opportunities",
+      "description": "Open and stale in their stage",
+      "scope": "Personal",
+      "ownerId": "bdo_05",
+      "lastRun": "2026-08-16",
+      "runCount": 23,
+      "favorite": true,
+      "lastOpened": "2026-08-16",
+      "definition": {
+        "title": "My stalled opportunities",
+        "gr": [
+          "stage"
+        ],
+        "gc": [],
+        "cols": [
+          "name",
+          "product",
+          "days",
+          "close",
+          "size"
+        ],
+        "sum": {
+          "size": "sum"
+        },
+        "sort": {
+          "k": "days",
+          "d": -1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "me",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "status",
+                "o": "in",
+                "v": [
+                  "Open"
+                ]
+              },
+              {
+                "field": "stale",
+                "o": "in",
+                "v": [
+                  "Yes"
+                ]
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          },
+          {
+            "k": "size",
+            "how": "sum"
+          }
+        ]
+      }
+    },
+    {
+      "id": "acts-7",
+      "type": "acts",
+      "title": "My activities, last 7 days",
+      "description": "Calls, meetings and notes I logged this past week",
+      "scope": "Personal",
+      "ownerId": "bdo_05",
+      "lastRun": "2026-08-14",
+      "runCount": 17,
+      "favorite": false,
+      "lastOpened": "2026-08-14",
+      "definition": {
+        "title": "My activities, last 7 days",
+        "gr": [
+          "type"
+        ],
+        "gc": [],
+        "cols": [
+          "subject",
+          "date",
+          "acct",
+          "opp",
+          "src"
+        ],
+        "sum": {},
+        "sort": {
+          "k": "date",
+          "d": -1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "me",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "date",
+                "o": "rel",
+                "v": {
+                  "r": "lastn",
+                  "n": 7
+                }
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          }
+        ]
+      }
+    },
+    {
+      "id": "closing-q",
+      "type": "opps",
+      "title": "My opportunities closing this quarter",
+      "description": "Open, expected to close by quarter end",
+      "scope": "Personal",
+      "ownerId": "bdo_05",
+      "lastRun": "2026-08-12",
+      "runCount": 12,
+      "favorite": false,
+      "lastOpened": "2026-08-12",
+      "definition": {
+        "title": "My opportunities closing this quarter",
+        "gr": [],
+        "gc": [],
+        "cols": [
+          "name",
+          "stage",
+          "product",
+          "close",
+          "size"
+        ],
+        "sum": {
+          "size": "sum"
+        },
+        "sort": {
+          "k": "close",
+          "d": 1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "me",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "status",
+                "o": "in",
+                "v": [
+                  "Open"
+                ]
+              },
+              {
+                "field": "close",
+                "o": "rel",
+                "v": {
+                  "r": "thisq",
+                  "n": 30
+                }
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          },
+          {
+            "k": "size",
+            "how": "sum"
+          }
+        ]
+      }
+    },
+    {
+      "id": "fact-ref",
+      "type": "opps",
+      "title": "Factoring referrals by partner, this year",
+      "description": "Partner-referred Factoring opportunities, count and size",
+      "scope": "Team",
+      "ownerId": "bdo_02",
+      "lastRun": "2026-08-10",
+      "runCount": 14,
+      "favorite": false,
+      "lastOpened": "2026-08-10",
+      "definition": {
+        "title": "Factoring referrals by partner, this year",
+        "gr": [
+          "partner"
+        ],
+        "gc": [],
+        "cols": [
+          "name",
+          "stage",
+          "size",
+          "owner"
+        ],
+        "sum": {
+          "size": "sum"
+        },
+        "sort": {
+          "k": "size",
+          "d": -1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "all",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "product",
+                "o": "in",
+                "v": [
+                  "Factoring"
+                ]
+              },
+              {
+                "field": "channel",
+                "o": "in",
+                "v": [
+                  "Partner-Referred"
+                ]
+              },
+              {
+                "field": "created",
+                "o": "rel",
+                "v": {
+                  "r": "thisy",
+                  "n": 30
+                }
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          },
+          {
+            "k": "size",
+            "how": "sum"
+          }
+        ]
+      }
+    },
+    {
+      "id": "abl-uw",
+      "type": "opps",
+      "title": "ABL opportunities in Underwriting",
+      "description": "Open ABL opportunities in Underwriting, by owner",
+      "scope": "Team",
+      "ownerId": "bdo_03",
+      "lastRun": "2026-08-07",
+      "runCount": 9,
+      "favorite": false,
+      "lastOpened": null,
+      "definition": {
+        "title": "ABL opportunities in Underwriting",
+        "gr": [
+          "owner"
+        ],
+        "gc": [],
+        "cols": [
+          "name",
+          "acct",
+          "size",
+          "days",
+          "close"
+        ],
+        "sum": {
+          "size": "sum"
+        },
+        "sort": {
+          "k": "size",
+          "d": -1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "all",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "product",
+                "o": "in",
+                "v": [
+                  "ABL"
+                ]
+              },
+              {
+                "field": "stage",
+                "o": "in",
+                "v": [
+                  "Underwriting"
+                ]
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          },
+          {
+            "k": "size",
+            "how": "sum"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ptr-contacts",
+      "type": "contacts",
+      "title": "Partner contacts by tier",
+      "description": "Referral partner contacts and their tier",
+      "scope": "Team",
+      "ownerId": "bdo_06",
+      "lastRun": "2026-08-01",
+      "runCount": 6,
+      "favorite": false,
+      "lastOpened": null,
+      "definition": {
+        "title": "Partner contacts by tier",
+        "gr": [
+          "tier"
+        ],
+        "gc": [],
+        "cols": [
+          "name",
+          "company",
+          "title",
+          "last",
+          "owner"
+        ],
+        "sum": {},
+        "sort": {
+          "k": "name",
+          "d": 1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "all",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "ctype",
+                "o": "in",
+                "v": [
+                  "Referral partner"
+                ]
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          }
+        ]
+      }
+    },
+    {
+      "id": "stage-product",
+      "type": "opps",
+      "title": "Pipeline by stage and product",
+      "description": "Every open opportunity, count and facility size",
+      "scope": "Certified",
+      "ownerId": "usr_admin",
+      "lastRun": "2026-08-15",
+      "runCount": 96,
+      "favorite": true,
+      "lastOpened": "2026-08-15",
+      "definition": {
+        "title": "Pipeline by stage and product",
+        "gr": [
+          "stage"
+        ],
+        "gc": [
+          "product"
+        ],
+        "cols": [
+          "name",
+          "owner",
+          "size"
+        ],
+        "sum": {
+          "size": "sum"
+        },
+        "sort": {
+          "k": "size",
+          "d": -1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "all",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "status",
+                "o": "in",
+                "v": [
+                  "Open"
+                ]
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          },
+          {
+            "k": "size",
+            "how": "sum"
+          }
+        ]
+      }
+    },
+    {
+      "id": "partner-prod",
+      "type": "opps",
+      "title": "Referral partner production",
+      "description": "Partner-referred opportunities this year, by partner",
+      "scope": "Certified",
+      "ownerId": "usr_admin",
+      "lastRun": "2026-08-13",
+      "runCount": 58,
+      "favorite": false,
+      "lastOpened": "2026-08-13",
+      "definition": {
+        "title": "Referral partner production",
+        "gr": [
+          "partner"
+        ],
+        "gc": [],
+        "cols": [
+          "name",
+          "status",
+          "owner",
+          "size"
+        ],
+        "sum": {
+          "size": "sum"
+        },
+        "sort": {
+          "k": "size",
+          "d": -1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "all",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "channel",
+                "o": "in",
+                "v": [
+                  "Partner-Referred"
+                ]
+              },
+              {
+                "field": "created",
+                "o": "rel",
+                "v": {
+                  "r": "thisy",
+                  "n": 30
+                }
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          },
+          {
+            "k": "size",
+            "how": "sum"
+          }
+        ]
+      }
+    },
+    {
+      "id": "loss",
+      "type": "opps",
+      "title": "Closed lost reasons, this year",
+      "description": "Lost opportunities created this year, by reason",
+      "scope": "Certified",
+      "ownerId": "usr_admin",
+      "lastRun": "2026-08-08",
+      "runCount": 44,
+      "favorite": false,
+      "lastOpened": null,
+      "definition": {
+        "title": "Closed lost reasons, this year",
+        "gr": [
+          "loss"
+        ],
+        "gc": [],
+        "cols": [
+          "name",
+          "product",
+          "owner",
+          "size"
+        ],
+        "sum": {
+          "size": "sum"
+        },
+        "sort": {
+          "k": "size",
+          "d": -1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "all",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "status",
+                "o": "in",
+                "v": [
+                  "Lost"
+                ]
+              },
+              {
+                "field": "created",
+                "o": "rel",
+                "v": {
+                  "r": "thisy",
+                  "n": 30
+                }
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          },
+          {
+            "k": "size",
+            "how": "sum"
+          }
+        ]
+      }
+    },
+    {
+      "id": "uw-time",
+      "type": "hist",
+      "title": "Time in Underwriting by product",
+      "description": "Days each opportunity spent in Underwriting",
+      "scope": "Certified",
+      "ownerId": "usr_admin",
+      "lastRun": "2026-08-11",
+      "runCount": 37,
+      "favorite": true,
+      "lastOpened": "2026-08-11",
+      "definition": {
+        "title": "Time in Underwriting by product",
+        "gr": [
+          "product"
+        ],
+        "gc": [],
+        "cols": [
+          "opp",
+          "in",
+          "out",
+          "dur",
+          "status"
+        ],
+        "sum": {
+          "dur": "median"
+        },
+        "sort": {
+          "k": "dur",
+          "d": -1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "all",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "stage",
+                "o": "in",
+                "v": [
+                  "Underwriting"
+                ]
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          },
+          {
+            "k": "dur",
+            "how": "median"
+          }
+        ]
+      }
+    },
+    {
+      "id": "close-moves",
+      "type": "fch",
+      "title": "Close-date changes this quarter",
+      "description": "Expected close dates edited this quarter, old and new",
+      "scope": "Certified",
+      "ownerId": "usr_admin",
+      "lastRun": "2026-08-05",
+      "runCount": 29,
+      "favorite": false,
+      "lastOpened": null,
+      "definition": {
+        "title": "Close-date changes this quarter",
+        "gr": [
+          "owner"
+        ],
+        "gc": [],
+        "cols": [
+          "rec",
+          "old",
+          "nv",
+          "at",
+          "product"
+        ],
+        "sum": {},
+        "sort": {
+          "k": "at",
+          "d": -1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "all",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "field",
+                "o": "in",
+                "v": [
+                  "Expected close"
+                ]
+              },
+              {
+                "field": "at",
+                "o": "rel",
+                "v": {
+                  "r": "thisq",
+                  "n": 30
+                }
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ucc-90",
+      "type": "liens",
+      "title": "New UCC filings, last 90 days",
+      "description": "Filings against our accounts, by secured party",
+      "scope": "Certified",
+      "ownerId": "usr_admin",
+      "lastRun": "2026-07-28",
+      "runCount": 21,
+      "favorite": false,
+      "lastOpened": "2026-07-28",
+      "definition": {
+        "title": "New UCC filings, last 90 days",
+        "gr": [
+          "party"
+        ],
+        "gc": [],
+        "cols": [
+          "acct",
+          "num",
+          "filed",
+          "rank",
+          "coll"
+        ],
+        "sum": {},
+        "sort": {
+          "k": "filed",
+          "d": -1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "all",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "filed",
+                "o": "rel",
+                "v": {
+                  "r": "lastn",
+                  "n": 90
+                }
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          }
+        ]
+      }
+    },
+    {
+      "id": "docs-q",
+      "type": "docs",
+      "title": "Documents added this quarter",
+      "description": "Files added to opportunities this quarter, by type",
+      "scope": "Certified",
+      "ownerId": "usr_admin",
+      "lastRun": "2026-08-02",
+      "runCount": 18,
+      "favorite": false,
+      "lastOpened": null,
+      "definition": {
+        "title": "Documents added this quarter",
+        "gr": [
+          "type"
+        ],
+        "gc": [],
+        "cols": [
+          "opp",
+          "up",
+          "by",
+          "stage"
+        ],
+        "sum": {},
+        "sort": {
+          "k": "up",
+          "d": -1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "all",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "up",
+                "o": "rel",
+                "v": {
+                  "r": "thisq",
+                  "n": 30
+                }
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          }
+        ]
+      }
+    },
+    {
+      "id": "pros-ind",
+      "type": "accts",
+      "title": "Prospects by industry",
+      "description": "Prospect accounts and their open pipeline, by industry",
+      "scope": "Certified",
+      "ownerId": "usr_admin",
+      "lastRun": "2026-07-23",
+      "runCount": 15,
+      "favorite": false,
+      "lastOpened": null,
+      "definition": {
+        "title": "Prospects by industry",
+        "gr": [
+          "industry"
+        ],
+        "gc": [],
+        "cols": [
+          "name",
+          "state",
+          "revenue",
+          "openv",
+          "owner"
+        ],
+        "sum": {
+          "openv": "sum"
+        },
+        "sort": {
+          "k": "openv",
+          "d": -1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "all",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "atype",
+                "o": "in",
+                "v": [
+                  "Prospect"
+                ]
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          },
+          {
+            "k": "openv",
+            "how": "sum"
+          }
+        ]
+      }
+    }
+  ],
   "partners": [
     {
       "id": "acct_p_0001",

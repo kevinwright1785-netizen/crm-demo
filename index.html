@@ -2280,6 +2280,104 @@ body.rp-wide .viewport{max-width:none}
 .rp-hl{min-width:0;flex:1}
 .rp-tblock{min-width:0}
 .rp-eyebrow{font-size:12px;color:var(--ink-3);line-height:16px}
+/* E4: "Reports" in the eyebrow is the way back to the library (D106 (b)); a link in look, a button in the markup */
+.rp-back{all:unset;cursor:pointer;color:var(--brand);border-radius:var(--r-s)}
+.rp-back:hover{text-decoration:underline}
+.rp-back:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
+/* ---------- Reports home and New report (spec D511, H1 to H12, N1 to N8). Report pages keep D488's uncapped sheet;
+   the home is a list page and keeps the cap (H2), so body.rp-wide is set on report pages only. ---------- */
+.rh-headrow{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--s4)}
+.rh-actions{display:flex;align-items:center;gap:var(--s3)}
+.rh-actions .rp-input{width:280px}
+.rh-lib{display:grid;grid-template-columns:184px minmax(0,1fr);gap:var(--s6);align-items:start}
+.rh-lists{display:flex;flex-direction:column;gap:0}
+/* H4: the label sits on the heading's left edge (D446); the fill reaches 8px past it (D305) */
+.rh-li{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:var(--s2);height:var(--h);
+  padding:0 var(--s2);margin:0 calc(-1*var(--s2));border-radius:var(--r-s);font-size:13px;color:var(--ink-2);
+  transition:background var(--t-fast) var(--ease)}
+.rh-li:hover{background:var(--hover);color:var(--ink)}
+.rh-li.on{background:var(--brand-a06);color:var(--brand-ink);font-weight:500}
+.rh-li .rh-n{font-size:12px;color:var(--ink-3);font-variant-numeric:tabular-nums;font-weight:400}
+.rh-li.on .rh-n{color:var(--brand-ink)}
+.rh-li:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
+.rh-lsep{height:1px;background:var(--line);margin:var(--s2) 0}
+.rh-main{min-width:0}
+.rh-main .tbl-wrap{margin-top:0}
+/* H7: the three list pages' table (D446, O10, O11 of D454): first text on the heading's edge, last on the content's right,
+   hover fill 8px past both ends. Name and description share the first cell, two lines, as direction A drew them (D482) */
+#view-reports .rh-main .tbl-wrap{margin:0 calc(-1 * var(--s2));padding:0 var(--s2)}
+#view-reports table.rh-tbl{border-collapse:separate;border-spacing:0;table-layout:fixed;width:100%}
+#view-reports .rh-tbl th{border-top:0;box-shadow:inset 0 1px 0 var(--line)}
+#view-reports .rh-tbl th:first-child,#view-reports .rh-tbl td:first-child{padding-left:0}
+#view-reports .rh-tbl th:last-child,#view-reports .rh-tbl td:last-child{padding-right:0}
+#view-reports .rh-tbl.clickable tbody tr:hover td{box-shadow:none}
+#view-reports .rh-tbl.clickable tbody tr:hover td:first-child{box-shadow:calc(-1 * var(--s2)) 0 0 var(--hover);border-radius:var(--r-s) 0 0 var(--r-s)}
+#view-reports .rh-tbl.clickable tbody tr:hover td:last-child{box-shadow:var(--s2) 0 0 var(--hover);border-radius:0 var(--r-s) var(--r-s) 0}
+#view-reports .rh-tbl.clickable tbody tr:hover + tr td{box-shadow:none}
+.rh-tbl col.c-name{width:auto}
+.rh-tbl col.c-type{width:216px}
+.rh-tbl col.c-scope{width:104px}
+.rh-tbl col.c-owner{width:148px}
+.rh-tbl col.c-run{width:120px}
+.rh-tbl col.c-runs{width:64px}
+.rh-tbl col.c-act{width:72px}
+.rh-tbl td{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;height:52px}
+.rh-tbl .rh-rname{font-size:13px;font-weight:500;color:var(--ink);overflow:hidden;text-overflow:ellipsis}
+.rh-tbl td.rh-scope{text-overflow:clip}
+.rh-tbl td.rh-scope .tag{margin-left:0}
+.rh-tbl .rh-rdesc{font-size:12px;color:var(--ink-3);overflow:hidden;text-overflow:ellipsis}
+.rh-tbl td.rh-acts{overflow:visible;text-align:right;padding-right:0}
+.rh-tbl th:last-child{padding-right:0}
+.rh-rowbtns{display:flex;justify-content:flex-end;align-items:center;gap:var(--s1)}
+#view-reports .rh-rowbtns > *{flex:none;width:24px;height:24px}
+.rh-more{all:unset;box-sizing:border-box;cursor:pointer;width:24px;height:24px;display:inline-grid;place-items:center;border-radius:var(--r-s);
+  color:var(--ink-2);transition:background var(--t-fast) var(--ease)}
+.rh-more:hover{background:var(--hover);color:var(--ink)}
+.rh-more:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
+.rh-more svg{width:16px;height:16px;display:block}
+.rh-tbl .rp-star{vertical-align:middle}
+.rh-empty{padding:var(--s6) 0;text-align:center;color:var(--ink-3);font-size:12px}
+.rh-empty .drill{margin-left:var(--s1)}
+.rh-lbtn{all:unset;cursor:pointer;border-radius:var(--r-s)}
+.rh-lbtn.drill{color:var(--brand)}
+.rh-lbtn:hover{text-decoration:underline}
+.rh-lbtn:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
+/* H9: For you, three starters as cards in one row */
+.rh-starters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s5)}
+.rh-starter{cursor:pointer;margin-bottom:0;display:flex;flex-direction:column}
+.rh-starter:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
+.rh-starter .panel-body{font-size:12px;color:var(--ink-2);flex:1}
+.rh-starter .rh-q{color:var(--ink);margin:0 0 var(--s1)}
+.rh-starter .rh-q:last-child{margin-bottom:0}
+.rh-sech{display:flex;align-items:baseline;gap:var(--s2);margin:var(--s6) 0 var(--s2);font-size:13.5px;font-weight:500;letter-spacing:-.01em;color:var(--ink)}
+.rh-sech .rh-n{font-size:12px;font-weight:400;letter-spacing:0;color:var(--ink-3);font-variant-numeric:tabular-nums}
+
+/* ---------- N: New report pop-up ---------- */
+.modal.rh-nr{width:900px;max-width:calc(100vw - 2*var(--s5))}
+.modal.rh-nr .modal-scope:empty{display:none}
+.modal.rh-nr .modal-body{padding-bottom:0}
+.rh-tp{display:grid;grid-template-columns:232px minmax(0,1fr);gap:0}
+.rh-tp-list{display:flex;flex-direction:column;gap:0;border-right:1px solid var(--line);padding:0 var(--s4) var(--s4) var(--s2)}
+.rh-tp-h{font-size:11px;font-weight:500;color:var(--ink-3);height:24px;display:flex;align-items:center;padding:0 var(--s2)}
+.rh-tp-h + .rh-tp-i{margin-top:0}
+.rh-tp-h.second{margin-top:var(--s3)}
+.rh-tp-i{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;height:var(--h);padding:0 var(--s2);border-radius:var(--r-s);
+  font-size:13px;color:var(--ink-2);transition:background var(--t-fast) var(--ease)}
+.rh-tp-i:hover{background:var(--hover);color:var(--ink)}
+.rh-tp-i.on{background:var(--brand-a06);color:var(--brand-ink);font-weight:500}
+.rh-tp-i:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
+.rh-tp-d{padding:0 0 var(--s4) var(--s5);min-width:0}
+.rh-tp-d h3{font-size:13.5px;font-weight:500;letter-spacing:-.01em;margin:0 0 var(--s1);color:var(--ink);line-height:24px}
+.rh-tp-d .rh-tp-desc{font-size:12px;color:var(--ink-2);margin:0 0 var(--s4)}
+.rh-kv{display:grid;grid-template-columns:112px minmax(0,1fr);gap:var(--s2) var(--s4);font-size:12px;margin:0 0 var(--s5)}
+.rh-kv dt{color:var(--ink-3);font-size:12px}
+.rh-kv dd{margin:0;color:var(--ink);font-variant-numeric:tabular-nums}
+.rh-tp-qh{font-size:12px;color:var(--ink-3);margin:0 0 var(--s2)}
+.rh-tp-q{font-size:12px;color:var(--ink);margin:0 0 var(--s1)}
+.rh-tp-d .rh-tp-qh{margin-top:var(--s4)}
+.rh-tp-d .rh-tp-qh:first-of-type{margin-top:0}
+.rh-tp-r{display:block;font-size:12px;margin:0 0 var(--s1);width:fit-content}
+.rh-tp-more,.rh-tp-none{font-size:12px;color:var(--ink-3)}
 .rp-title{display:flex;align-items:center;gap:var(--s2);font-size:20px;font-weight:500;letter-spacing:-.01em;color:var(--ink);line-height:28px}
 .rp-star{all:unset;cursor:pointer;width:24px;height:24px;display:grid;place-items:center;border-radius:var(--r-s);color:var(--ink-3)}
 .rp-star:hover{background:var(--hover)}
@@ -2736,6 +2834,1018 @@ const DATASET = {
       "email": "jonas.fontaine@ridgemarkcapital.com",
       "capacityWeight": 0.5,
       "annualQuota": 43000000
+    }
+  ],
+  "users": [
+    {
+      "id": "usr_admin",
+      "name": "Claire Dunmore",
+      "role": "Admin"
+    }
+  ],
+  "savedReports": [
+    {
+      "id": "open-pipeline",
+      "type": "opps",
+      "title": "My open pipeline by stage",
+      "description": "Open opportunities I own, by stage",
+      "scope": "Personal",
+      "ownerId": "bdo_05",
+      "lastRun": "2026-08-17",
+      "runCount": 41,
+      "favorite": true,
+      "lastOpened": "2026-08-17",
+      "definition": {
+        "title": "My open pipeline by stage",
+        "gr": [
+          "stage"
+        ],
+        "gc": [],
+        "cols": [
+          "name",
+          "product",
+          "close",
+          "days",
+          "size"
+        ],
+        "sum": {
+          "size": "sum"
+        },
+        "sort": {
+          "k": "size",
+          "d": -1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "me",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "status",
+                "o": "in",
+                "v": [
+                  "Open"
+                ]
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          },
+          {
+            "k": "size",
+            "how": "sum"
+          }
+        ]
+      }
+    },
+    {
+      "id": "stalled",
+      "type": "opps",
+      "title": "My stalled opportunities",
+      "description": "Open and stale in their stage",
+      "scope": "Personal",
+      "ownerId": "bdo_05",
+      "lastRun": "2026-08-16",
+      "runCount": 23,
+      "favorite": true,
+      "lastOpened": "2026-08-16",
+      "definition": {
+        "title": "My stalled opportunities",
+        "gr": [
+          "stage"
+        ],
+        "gc": [],
+        "cols": [
+          "name",
+          "product",
+          "days",
+          "close",
+          "size"
+        ],
+        "sum": {
+          "size": "sum"
+        },
+        "sort": {
+          "k": "days",
+          "d": -1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "me",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "status",
+                "o": "in",
+                "v": [
+                  "Open"
+                ]
+              },
+              {
+                "field": "stale",
+                "o": "in",
+                "v": [
+                  "Yes"
+                ]
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          },
+          {
+            "k": "size",
+            "how": "sum"
+          }
+        ]
+      }
+    },
+    {
+      "id": "acts-7",
+      "type": "acts",
+      "title": "My activities, last 7 days",
+      "description": "Calls, meetings and notes I logged this past week",
+      "scope": "Personal",
+      "ownerId": "bdo_05",
+      "lastRun": "2026-08-14",
+      "runCount": 17,
+      "favorite": false,
+      "lastOpened": "2026-08-14",
+      "definition": {
+        "title": "My activities, last 7 days",
+        "gr": [
+          "type"
+        ],
+        "gc": [],
+        "cols": [
+          "subject",
+          "date",
+          "acct",
+          "opp",
+          "src"
+        ],
+        "sum": {},
+        "sort": {
+          "k": "date",
+          "d": -1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "me",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "date",
+                "o": "rel",
+                "v": {
+                  "r": "lastn",
+                  "n": 7
+                }
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          }
+        ]
+      }
+    },
+    {
+      "id": "closing-q",
+      "type": "opps",
+      "title": "My opportunities closing this quarter",
+      "description": "Open, expected to close by quarter end",
+      "scope": "Personal",
+      "ownerId": "bdo_05",
+      "lastRun": "2026-08-12",
+      "runCount": 12,
+      "favorite": false,
+      "lastOpened": "2026-08-12",
+      "definition": {
+        "title": "My opportunities closing this quarter",
+        "gr": [],
+        "gc": [],
+        "cols": [
+          "name",
+          "stage",
+          "product",
+          "close",
+          "size"
+        ],
+        "sum": {
+          "size": "sum"
+        },
+        "sort": {
+          "k": "close",
+          "d": 1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "me",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "status",
+                "o": "in",
+                "v": [
+                  "Open"
+                ]
+              },
+              {
+                "field": "close",
+                "o": "rel",
+                "v": {
+                  "r": "thisq",
+                  "n": 30
+                }
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          },
+          {
+            "k": "size",
+            "how": "sum"
+          }
+        ]
+      }
+    },
+    {
+      "id": "fact-ref",
+      "type": "opps",
+      "title": "Factoring referrals by partner, this year",
+      "description": "Partner-referred Factoring opportunities, count and size",
+      "scope": "Team",
+      "ownerId": "bdo_02",
+      "lastRun": "2026-08-10",
+      "runCount": 14,
+      "favorite": false,
+      "lastOpened": "2026-08-10",
+      "definition": {
+        "title": "Factoring referrals by partner, this year",
+        "gr": [
+          "partner"
+        ],
+        "gc": [],
+        "cols": [
+          "name",
+          "stage",
+          "size",
+          "owner"
+        ],
+        "sum": {
+          "size": "sum"
+        },
+        "sort": {
+          "k": "size",
+          "d": -1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "all",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "product",
+                "o": "in",
+                "v": [
+                  "Factoring"
+                ]
+              },
+              {
+                "field": "channel",
+                "o": "in",
+                "v": [
+                  "Partner-Referred"
+                ]
+              },
+              {
+                "field": "created",
+                "o": "rel",
+                "v": {
+                  "r": "thisy",
+                  "n": 30
+                }
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          },
+          {
+            "k": "size",
+            "how": "sum"
+          }
+        ]
+      }
+    },
+    {
+      "id": "abl-uw",
+      "type": "opps",
+      "title": "ABL opportunities in Underwriting",
+      "description": "Open ABL opportunities in Underwriting, by owner",
+      "scope": "Team",
+      "ownerId": "bdo_03",
+      "lastRun": "2026-08-07",
+      "runCount": 9,
+      "favorite": false,
+      "lastOpened": null,
+      "definition": {
+        "title": "ABL opportunities in Underwriting",
+        "gr": [
+          "owner"
+        ],
+        "gc": [],
+        "cols": [
+          "name",
+          "acct",
+          "size",
+          "days",
+          "close"
+        ],
+        "sum": {
+          "size": "sum"
+        },
+        "sort": {
+          "k": "size",
+          "d": -1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "all",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "product",
+                "o": "in",
+                "v": [
+                  "ABL"
+                ]
+              },
+              {
+                "field": "stage",
+                "o": "in",
+                "v": [
+                  "Underwriting"
+                ]
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          },
+          {
+            "k": "size",
+            "how": "sum"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ptr-contacts",
+      "type": "contacts",
+      "title": "Partner contacts by tier",
+      "description": "Referral partner contacts and their tier",
+      "scope": "Team",
+      "ownerId": "bdo_06",
+      "lastRun": "2026-08-01",
+      "runCount": 6,
+      "favorite": false,
+      "lastOpened": null,
+      "definition": {
+        "title": "Partner contacts by tier",
+        "gr": [
+          "tier"
+        ],
+        "gc": [],
+        "cols": [
+          "name",
+          "company",
+          "title",
+          "last",
+          "owner"
+        ],
+        "sum": {},
+        "sort": {
+          "k": "name",
+          "d": 1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "all",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "ctype",
+                "o": "in",
+                "v": [
+                  "Referral partner"
+                ]
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          }
+        ]
+      }
+    },
+    {
+      "id": "stage-product",
+      "type": "opps",
+      "title": "Pipeline by stage and product",
+      "description": "Every open opportunity, count and facility size",
+      "scope": "Certified",
+      "ownerId": "usr_admin",
+      "lastRun": "2026-08-15",
+      "runCount": 96,
+      "favorite": true,
+      "lastOpened": "2026-08-15",
+      "definition": {
+        "title": "Pipeline by stage and product",
+        "gr": [
+          "stage"
+        ],
+        "gc": [
+          "product"
+        ],
+        "cols": [
+          "name",
+          "owner",
+          "size"
+        ],
+        "sum": {
+          "size": "sum"
+        },
+        "sort": {
+          "k": "size",
+          "d": -1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "all",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "status",
+                "o": "in",
+                "v": [
+                  "Open"
+                ]
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          },
+          {
+            "k": "size",
+            "how": "sum"
+          }
+        ]
+      }
+    },
+    {
+      "id": "partner-prod",
+      "type": "opps",
+      "title": "Referral partner production",
+      "description": "Partner-referred opportunities this year, by partner",
+      "scope": "Certified",
+      "ownerId": "usr_admin",
+      "lastRun": "2026-08-13",
+      "runCount": 58,
+      "favorite": false,
+      "lastOpened": "2026-08-13",
+      "definition": {
+        "title": "Referral partner production",
+        "gr": [
+          "partner"
+        ],
+        "gc": [],
+        "cols": [
+          "name",
+          "status",
+          "owner",
+          "size"
+        ],
+        "sum": {
+          "size": "sum"
+        },
+        "sort": {
+          "k": "size",
+          "d": -1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "all",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "channel",
+                "o": "in",
+                "v": [
+                  "Partner-Referred"
+                ]
+              },
+              {
+                "field": "created",
+                "o": "rel",
+                "v": {
+                  "r": "thisy",
+                  "n": 30
+                }
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          },
+          {
+            "k": "size",
+            "how": "sum"
+          }
+        ]
+      }
+    },
+    {
+      "id": "loss",
+      "type": "opps",
+      "title": "Closed lost reasons, this year",
+      "description": "Lost opportunities created this year, by reason",
+      "scope": "Certified",
+      "ownerId": "usr_admin",
+      "lastRun": "2026-08-08",
+      "runCount": 44,
+      "favorite": false,
+      "lastOpened": null,
+      "definition": {
+        "title": "Closed lost reasons, this year",
+        "gr": [
+          "loss"
+        ],
+        "gc": [],
+        "cols": [
+          "name",
+          "product",
+          "owner",
+          "size"
+        ],
+        "sum": {
+          "size": "sum"
+        },
+        "sort": {
+          "k": "size",
+          "d": -1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "all",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "status",
+                "o": "in",
+                "v": [
+                  "Lost"
+                ]
+              },
+              {
+                "field": "created",
+                "o": "rel",
+                "v": {
+                  "r": "thisy",
+                  "n": 30
+                }
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          },
+          {
+            "k": "size",
+            "how": "sum"
+          }
+        ]
+      }
+    },
+    {
+      "id": "uw-time",
+      "type": "hist",
+      "title": "Time in Underwriting by product",
+      "description": "Days each opportunity spent in Underwriting",
+      "scope": "Certified",
+      "ownerId": "usr_admin",
+      "lastRun": "2026-08-11",
+      "runCount": 37,
+      "favorite": true,
+      "lastOpened": "2026-08-11",
+      "definition": {
+        "title": "Time in Underwriting by product",
+        "gr": [
+          "product"
+        ],
+        "gc": [],
+        "cols": [
+          "opp",
+          "in",
+          "out",
+          "dur",
+          "status"
+        ],
+        "sum": {
+          "dur": "median"
+        },
+        "sort": {
+          "k": "dur",
+          "d": -1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "all",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "stage",
+                "o": "in",
+                "v": [
+                  "Underwriting"
+                ]
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          },
+          {
+            "k": "dur",
+            "how": "median"
+          }
+        ]
+      }
+    },
+    {
+      "id": "close-moves",
+      "type": "fch",
+      "title": "Close-date changes this quarter",
+      "description": "Expected close dates edited this quarter, old and new",
+      "scope": "Certified",
+      "ownerId": "usr_admin",
+      "lastRun": "2026-08-05",
+      "runCount": 29,
+      "favorite": false,
+      "lastOpened": null,
+      "definition": {
+        "title": "Close-date changes this quarter",
+        "gr": [
+          "owner"
+        ],
+        "gc": [],
+        "cols": [
+          "rec",
+          "old",
+          "nv",
+          "at",
+          "product"
+        ],
+        "sum": {},
+        "sort": {
+          "k": "at",
+          "d": -1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "all",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "field",
+                "o": "in",
+                "v": [
+                  "Expected close"
+                ]
+              },
+              {
+                "field": "at",
+                "o": "rel",
+                "v": {
+                  "r": "thisq",
+                  "n": 30
+                }
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ucc-90",
+      "type": "liens",
+      "title": "New UCC filings, last 90 days",
+      "description": "Filings against our accounts, by secured party",
+      "scope": "Certified",
+      "ownerId": "usr_admin",
+      "lastRun": "2026-07-28",
+      "runCount": 21,
+      "favorite": false,
+      "lastOpened": "2026-07-28",
+      "definition": {
+        "title": "New UCC filings, last 90 days",
+        "gr": [
+          "party"
+        ],
+        "gc": [],
+        "cols": [
+          "acct",
+          "num",
+          "filed",
+          "rank",
+          "coll"
+        ],
+        "sum": {},
+        "sort": {
+          "k": "filed",
+          "d": -1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "all",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "filed",
+                "o": "rel",
+                "v": {
+                  "r": "lastn",
+                  "n": 90
+                }
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          }
+        ]
+      }
+    },
+    {
+      "id": "docs-q",
+      "type": "docs",
+      "title": "Documents added this quarter",
+      "description": "Files added to opportunities this quarter, by type",
+      "scope": "Certified",
+      "ownerId": "usr_admin",
+      "lastRun": "2026-08-02",
+      "runCount": 18,
+      "favorite": false,
+      "lastOpened": null,
+      "definition": {
+        "title": "Documents added this quarter",
+        "gr": [
+          "type"
+        ],
+        "gc": [],
+        "cols": [
+          "opp",
+          "up",
+          "by",
+          "stage"
+        ],
+        "sum": {},
+        "sort": {
+          "k": "up",
+          "d": -1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "all",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "up",
+                "o": "rel",
+                "v": {
+                  "r": "thisq",
+                  "n": 30
+                }
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          }
+        ]
+      }
+    },
+    {
+      "id": "pros-ind",
+      "type": "accts",
+      "title": "Prospects by industry",
+      "description": "Prospect accounts and their open pipeline, by industry",
+      "scope": "Certified",
+      "ownerId": "usr_admin",
+      "lastRun": "2026-07-23",
+      "runCount": 15,
+      "favorite": false,
+      "lastOpened": null,
+      "definition": {
+        "title": "Prospects by industry",
+        "gr": [
+          "industry"
+        ],
+        "gc": [],
+        "cols": [
+          "name",
+          "state",
+          "revenue",
+          "openv",
+          "owner"
+        ],
+        "sum": {
+          "openv": "sum"
+        },
+        "sort": {
+          "k": "openv",
+          "d": -1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "all",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "atype",
+                "o": "in",
+                "v": [
+                  "Prospect"
+                ]
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          },
+          {
+            "k": "openv",
+            "how": "sum"
+          }
+        ]
+      }
     }
   ],
   "partners": [
@@ -174857,7 +175967,7 @@ function route(){
   const parts = hash.replace('#/','').split('/');
   const view = parts[0] || 'home';
   const id = parts[1];
-  if(view!=='reports' && document.getElementById('view-reports').classList.contains('active')) rpLeave();   // O5, O6 (D505)
+  if(document.getElementById('view-reports').classList.contains('active') && hash!==RP_AT) rpLeave(view!=='reports');   // O5, O6 (D505), H4
 
   /* D240: aria-current="page" alongside .active, kept in sync here since this is the one place
      the active route is ever decided. */
@@ -174867,7 +175977,7 @@ function route(){
     if(isActive) el.setAttribute('aria-current','page'); else el.removeAttribute('aria-current');
   });
   document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
-  document.body.classList.toggle('rp-wide', view==='reports');   // D488: report pages drop the 1504px cap
+  document.body.classList.toggle('rp-wide', view==='reports' && parts[1]==='r');   // D488: report pages drop the 1504px cap; the home keeps it (H2)
 
   const titles = {
     home: ROLE==='bdo' ? 'BDO Home' : 'Exec Home',
@@ -175545,7 +176655,7 @@ window.openModal = function(key){
   scrim.className = 'scrim';
   scrim.id = 'modal-scrim';
   scrim.innerHTML =
-    '<div class="modal" role="dialog" aria-modal="true" aria-label="'+esc(d.title)+'" tabindex="-1">'+
+    '<div class="modal'+(d.cls?' '+d.cls:'')+'" role="dialog" aria-modal="true" aria-label="'+esc(d.title)+'" tabindex="-1">'+
       '<div class="modal-head"><div class="modal-head-text">'+
         '<div class="modal-title">'+esc(d.title)+'</div>'+
         '<div class="modal-scope">'+d.scope+'</div>'+
@@ -183177,8 +184287,9 @@ const rpPros = o=>PROSPECTS[o.accountId]||{};
 const rpQtr = s=>{ if(!s) return ''; const p = s.split('-'); return 'Q'+(Math.floor((+p[1]-1)/3)+1)+' '+p[0]; };
 const rpQtrSort = (a,b)=>{ const pa = a.split(' '), pb = b.split(' '); return (+pa[1]-+pb[1]) || (pa[0]<pb[0]?-1:pa[0]>pb[0]?1:0); };
 /* the fields an Opportunities report can use, grouped by object as the Fields pane shows them; fields reached through a
-   relationship read by path (RESEARCH_17 §14, O46). Yield reads "Pricing" (D379, O23). */
-const RPF = {
+   relationship read by path (RESEARCH_17 §14, O46). Yield reads "Pricing" (D379, O23). Stale in stage is the app's
+   shared Stale rule (D384, attnStale), so a report matches the Stale chips on both Homes (D514, E10). */
+const RP_OPP_F = {
   name:{l:'Opportunity', o:'Opportunity', ty:'Abc', get:o=>o.name, link:o=>'#/opp/'+o.id},
   stage:{l:'Stage', o:'Opportunity', ty:'Pick', g:1, get:o=>o.outcome==='open'?o.stage:RP_STATUS[o.outcome], order:TRACK_STAGES.concat(['Won','Lost'])},
   product:{l:'Product', o:'Opportunity', ty:'Pick', g:1, get:o=>productLabel(o.productType), order:['Factoring','ABL','Term Loan']},
@@ -183199,10 +184310,12 @@ const RPF = {
   emp:{l:'Account > Employees', s:'Employees', o:'Account', ty:'#', num:'int', get:o=>rpPros(o).employeeCount||null},
   partner:{l:'Referral partner > Name', s:'Name', o:'Referral partner', ty:'Abc', t:'lookup', g:1, get:o=>o.referralPartnerId?((PARTNERS[o.referralPartnerId]||{}).name||''):''},
   ptype:{l:'Referral partner > Partner type', s:'Partner type', o:'Referral partner', ty:'Pick', g:1, get:o=>o.referralPartnerId?((PARTNERS[o.referralPartnerId]||{}).partnerType||''):''},
+  stale:{l:'Stale in stage', o:'Opportunity', ty:'Pick', g:1, get:o=>attnStale(o) ? 'Yes' : 'No', order:['Yes','No']},
 };
-const RP_OBJS = ['Opportunity','Account','Referral partner'];
+/* the open report's type sets these three (rpUse): its fields, its related records and the Fields pane's objects */
+let RPF = RP_OPP_F, RP_OBJS = ['Opportunity','Account','Referral partner'];
 const RP_SUMS = {sum:'Sum', avg:'Average', median:'Median', max:'Max', min:'Min'};
-const rpDefault = ()=>({title:'My open pipeline by stage', gr:['stage'], gc:[], cols:['name','product','close','days','size'], sum:{size:'sum'},
+const rpDefault = ()=>({type:'opps', title:'My open pipeline by stage', gr:['stage'], gc:[], cols:['name','product','close','days','size'], sum:{size:'sum'},
   sort:{k:'size', d:-1}, gsort:{}, f:{owner:'me', root:{op:'and', items:[{field:'status', o:'in', v:['Open']}]}}, tog:{rc:true, det:true, sub:true, tot:true}, chart:null,
   figs:[{k:'_rc'},{k:'size', how:'sum'}]});
 const rpClone = o=>JSON.parse(JSON.stringify(o));
@@ -183214,8 +184327,8 @@ const rpView = ()=>document.getElementById('view-reports');
 
 /* ---------- data ---------- */
 function rpRows(c, q){
-  let r = allOpps().filter(o=>(c.f.owner==='all' || o.bdoId===CURRENT_BDO_ID) && rpTestGroup(o, c.f.root));
-  if(q){ const s = q.toLowerCase(); r = r.filter(o=>c.cols.concat(c.gr).some(k=>String(RPF[k].get(o)==null?'':RPF[k].get(o)).toLowerCase().includes(s))); }
+  let r = rpTypeRows().filter(o=>(c.f.owner==='all' || o.bdoId===CURRENT_BDO_ID) && rpTestGroup(o, c.f.root));
+  if(q){ const s = q.toLowerCase(); r = r.filter(o=>c.cols.concat(c.gr).some(k=>RPF[k] && String(RPF[k].get(o)==null?'':RPF[k].get(o)).toLowerCase().includes(s))); }
   if(c.sort && RPF[c.sort.k]){ const f = RPF[c.sort.k], d = c.sort.d;
     r.sort((a,b)=>{ const x = f.get(a), y = f.get(b); if(x==null&&y==null) return 0; if(x==null) return 1; if(y==null) return -1;
       return (typeof x==='number' ? x-y : String(x).localeCompare(String(y)))*d; }); }
@@ -183255,12 +184368,13 @@ const rpFmtAgg = (k, how, v)=>v==null ? '' : (RPF[k].num==='int' && (how==='avg'
 
 /* ---------- the filter engine (RESEARCH_17 §7 and §14; D298, D489; O42 to O50). Condition rows of field, operator and
    value, edited in place; related-record rows with their own conditions; All/Any groups nested to any depth. ---------- */
-const RP_FILT = {owner:{k:'Show me', opts:[['me','My opportunities'],['all','All opportunities']]}};
-const rpFLabel = (k,v)=>(RP_FILT[k].opts.find(x=>x[0]===v)||['',''])[1];
+/* Show me reads the type's own words, My or All (E2) */
+const rpShowOpts = ()=>[['me', rpT().mine], ['all', rpT().all]];
+const rpFLabel = (k,v)=>(rpShowOpts().find(x=>x[0]===v)||['',''])[1];
 const rpBdoName = id=>(BDOS[id]||{}).name||'';
 const RP_FIELD_NAMES = {expectedCloseDate:'Expected close', facilitySize:'Facility size', stage:'Stage', yieldPct:'Pricing', productType:'Product'};
 /* related records an opportunity reaches (RESEARCH_17 §14's object graph, O45), read from the live stores */
-const RP_REL = {
+const RP_OPP_REL = {
   acts:{l:'Activities on the account', rows:o=>ACTS_BY_ACCT[o.accountId]||[], all:()=>Object.values(ACTS_BY_ACCT).flat(), f:{
     date:{l:'Date', t:'date', get:r=>r.date}, type:{l:'Type', t:'pick', get:r=>r.type}, by:{l:'Logged by', t:'pick', get:r=>rpBdoName(r.bdoId)},
     src:{l:'Source', t:'pick', get:r=>r.source==='captured'?'Captured':'Hand-logged'}}},
@@ -183276,6 +184390,182 @@ const RP_REL = {
   changes:{l:'Field changes', rows:o=>AUDIT_BY_OPP[o.id]||[], all:()=>Object.values(AUDIT_BY_OPP).flat(), f:{
     field:{l:'Field', t:'pick', get:r=>RP_FIELD_NAMES[r.field]||r.field}, at:{l:'Changed', t:'date', get:r=>r.changedAt}, by:{l:'Changed by', t:'pick', get:r=>rpBdoName(r.changedBy)}}},
 };
+let RP_REL = RP_OPP_REL;
+
+/* ---------- report types (D509; spec D511, E1 to E5, E10, E11). One engine, eight types: each brings its rows, its fields
+   (by object, as the Fields pane groups them), its related-record filters, its Show me wording, the noun the engine counts
+   in, the chart's money measure and its starting report. Rows are read from the live stores once per draw. ---------- */
+const rpPerson = id=>((BDOS[id]||RP_USERS[id]||{}).name)||'';
+const RP_USERS = Object.fromEntries((D.users||[]).map(u=>[u.id, u]));
+const rpAcctName = id=>((PROSPECTS[id]||PARTNERS[id]||{}).name)||'';
+const rpOppOf = id=>OPPS[id]||{};
+const rpStageName = s=>s==='ClosedLost' ? 'Lost' : s==='ClosedWon' ? 'Won' : s;
+const rpStatusOf = o=>o.outcome==='open' ? o.stage : RP_STATUS[o.outcome]||'';
+const rpChangeText = (field, v)=>v==null||v==='' ? '' : field==='expectedCloseDate' ? fmtDate(v) : field==='facilitySize' ? moneyPlain(+v) :
+  field==='yieldPct' ? (+v).toFixed(2)+'%' : field==='productType' ? productLabel(v) : String(v);
+const rpF = (l, o, ty, get, x)=>Object.assign({l, o, ty, get}, x||{});
+const rpCfg = (type, cols, f, x)=>Object.assign({type, title:'', gr:[], gc:[], cols, sum:{}, sort:null, gsort:{}, f, tog:{rc:true, det:true, sub:true, tot:true}, chart:null, figs:[{k:'_rc'}]}, x||{});
+const rpRelDate = (field, r)=>({field, o:'rel', v:{r, n:30}});
+/* per-draw indexes the contact, lien and account types read (cleared by rpDraw) */
+let RP_IDX = null;
+function rpIdx(){
+  if(RP_IDX) return RP_IDX;
+  const parties = {}, last = {}, owner = {};
+  Object.values(PARTIES_BY_OPP).flat().forEach(p=>{ if(p.contactId) (parties[p.contactId] = parties[p.contactId]||[]).push(p); });
+  D.activities.forEach(a=>{ if(a.contactId && a.date<=TODAY && (!last[a.contactId] || a.date>last[a.contactId])) last[a.contactId] = a.date; });
+  allAccounts().forEach(a=>{ owner[a.id] = accountRowStats(a).ownerId||null; });
+  return (RP_IDX = {parties, last, owner});
+}
+const RP_TYPES = {
+  opps:{label:'Opportunities', g:'cur', mine:'My opportunities', all:'All opportunities', yours:'Your opportunities', every:'All opportunities',
+    noun:['opportunity','opportunities'], measure:'size',
+    desc:'Every opportunity, open and closed, with its account and referral partner.',
+    q:['What is my open pipeline by stage?','Which referral partners sent the most this year?'],
+    rows:()=>allOpps(), F:()=>RP_OPP_F, REL:()=>RP_OPP_REL, OBJS:['Opportunity','Account','Referral partner'],
+    def:()=>rpCfg('opps', ['name','product','stage','size','close','owner'], {owner:'me', root:{op:'and', items:[rpRelDate('created','thisy')]}},
+      {sum:{size:'sum'}, sort:{k:'size', d:-1}, figs:[{k:'_rc'},{k:'size', how:'sum'}]})},
+  accts:{label:'Accounts', g:'cur', mine:'My accounts', all:'All accounts', yours:'Your accounts', every:'All accounts',
+    noun:['account','accounts'], measure:'openv',
+    desc:'Prospects and Partners, with their firmographics and open pipeline.',
+    q:['Which industries hold the most open pipeline?','Which of my prospects have gone quiet?'],
+    rows:()=>allAccounts().map(a=>{ const st = accountRowStats(a); return {id:a.id, accountId:a.id, bdoId:st.ownerId||null, a, st}; }),
+    F:()=>({
+      name:rpF('Account','Account','Abc', r=>r.a.name, {link:r=>'#/account/'+r.id}),
+      atype:rpF('Type','Account','Pick', r=>r.a.accountTypes.join(' and '), {g:1, order:['Prospect','Partner','Prospect and Partner']}),
+      industry:rpF('Industry','Account','Pick', r=>r.a.industryName||'', {g:1}),
+      ptype:rpF('Partner type','Account','Pick', r=>r.a.partnerType||(r.a.partnerProfile&&r.a.partnerProfile.partnerType)||'', {g:1}),
+      state:rpF('State','Account','Pick', r=>((r.a.location||'').split(', ')[1])||'', {g:1}),
+      revenue:rpF('Annual revenue','Account','$', r=>r.a.annualRevenue||null, {num:'money'}),
+      emp:rpF('Employees','Account','#', r=>r.a.employeeCount||null, {num:'int'}),
+      openn:rpF('Open opportunities','Account','#', r=>r.st.openCount, {num:'int'}),
+      openv:rpF('Open pipeline','Account','$', r=>r.st.openValue, {num:'money'}),
+      last:rpF('Last touch','Account','Date', r=>r.st.lastTouch||null, {date:1, g:1}),
+      created:rpF('Created date','Account','Date', r=>r.a.createdDate||r.a.firstActiveDate||null, {date:1, g:1}),
+      owner:rpF('Owner','Account','Abc', r=>rpPerson(r.bdoId), {g:1}),
+    }),
+    REL:()=>({acts:RP_OPP_REL.acts, liens:RP_OPP_REL.liens}), OBJS:['Account'],
+    def:()=>rpCfg('accts', ['name','atype','industry','openv','last','owner'], {owner:'me', root:{op:'and', items:[]}}, {sum:{openv:'sum'}, sort:{k:'openv', d:-1}, figs:[{k:'_rc'},{k:'openv', how:'sum'}]})},
+  contacts:{label:'Contacts', g:'cur', mine:'My contacts', all:'All contacts', yours:'Your contacts', every:'All contacts',
+    noun:['contact','contacts'],
+    desc:'People at accounts, with their roles on opportunities.',
+    q:['Which personal guarantors sit on open opportunities?','Which contacts have had no activity in 90 days?'],
+    rows:()=>D.contacts.map(c=>({id:c.id, accountId:c.accountId, bdoId:c.ownerBdoId||null, c})),
+    F:()=>({
+      name:rpF('Name','Contact','Abc', r=>r.c.name, {link:r=>'#/contact/'+r.id}),
+      title:rpF('Title','Contact','Abc', r=>r.c.role||''),
+      ctype:rpF('Contact type','Contact','Pick', r=>r.c.contactType||'', {g:1}),
+      auth:rpF('Decision authority','Contact','Pick', r=>r.c.decisionAuthority||'', {g:1, order:['Approves','Recommends','Informs']}),
+      tier:rpF('Partner tier','Contact','Pick', r=>r.c.partnerTier||'', {g:1, order:['Tier 1','Tier 2','Tier 3']}),
+      email:rpF('Email','Contact','Abc', r=>r.c.email||''),
+      phone:rpF('Phone','Contact','Abc', r=>r.c.phone||''),
+      last:rpF('Last activity','Contact','Date', r=>rpIdx().last[r.id]||null, {date:1, g:1}),
+      owner:rpF('Owner','Contact','Abc', r=>rpPerson(r.bdoId), {g:1}),
+      company:rpF('Account > Name','Account','Abc', r=>rpAcctName(r.accountId), {s:'Name', link:r=>'#/account/'+r.accountId}),
+      ctypeAcct:rpF('Account > Type','Account','Pick', r=>PROSPECTS[r.accountId] ? 'Prospect' : PARTNERS[r.accountId] ? 'Partner' : '', {s:'Type', g:1}),
+    }),
+    REL:()=>({roles:{l:'Roles on opportunities', rows:r=>rpIdx().parties[r.id]||[], all:()=>Object.values(rpIdx().parties).flat(), f:{
+      roles:{l:'Role', t:'multi', get:p=>p.roles||[]}, gty:{l:'Guaranty type', t:'pick', get:p=>p.guarantyType||''},
+      stage:{l:'Opportunity stage', t:'pick', get:p=>rpStatusOf(rpOppOf(p.opportunityId)), order:TRACK_STAGES.concat(['Won','Lost'])}}}}),
+    OBJS:['Contact','Account'],
+    def:()=>rpCfg('contacts', ['name','company','title','ctype','last','owner'], {owner:'me', root:{op:'and', items:[]}}, {sort:{k:'name', d:1}})},
+  acts:{label:'Activities', g:'cur', mine:'My activities', all:'All activities', yours:'Your activities', every:'All activities',
+    noun:['activity','activities'],
+    desc:'Calls, meetings, emails and notes, logged or captured.',
+    q:['How many meetings did I hold this month?','Which accounts got no calls last quarter?'],
+    rows:()=>D.activities.map(a=>({id:a.id, accountId:a.accountId, bdoId:a.bdoId, a})),
+    F:()=>({
+      subject:rpF('Subject','Activity','Abc', r=>r.a.subject||''),
+      type:rpF('Type','Activity','Pick', r=>r.a.type, {g:1}),
+      date:rpF('Date','Activity','Date', r=>r.a.date, {date:1, g:1}),
+      src:rpF('Source','Activity','Pick', r=>r.a.source==='captured' ? 'Captured' : 'Hand-logged', {g:1}),
+      owner:rpF('Logged by','Activity','Abc', r=>rpPerson(r.bdoId), {g:1}),
+      opp:rpF('Opportunity > Name','Opportunity','Abc', r=>r.a.opportunityId ? (rpOppOf(r.a.opportunityId).name||'') : '', {s:'Name', link:r=>r.a.opportunityId ? '#/opp/'+r.a.opportunityId : null}),
+      acct:rpF('Account > Name','Account','Abc', r=>rpAcctName(r.accountId), {s:'Name', link:r=>'#/account/'+r.accountId}),
+      contact:rpF('Contact > Name','Contact','Abc', r=>r.a.contactId ? ((CONTACTS_BY_ID[r.a.contactId]||{}).name||'') : '', {s:'Name', link:r=>r.a.contactId ? '#/contact/'+r.a.contactId : null}),
+    }),
+    REL:()=>({}), OBJS:['Activity','Opportunity','Account','Contact'],
+    def:()=>rpCfg('acts', ['subject','type','date','acct','opp'], {owner:'me', root:{op:'and', items:[rpRelDate('date','thisq')]}}, {sort:{k:'date', d:-1}})},
+  liens:{label:'Liens and UCC filings', g:'cur', mine:'Liens on my accounts', all:'All liens', yours:'Liens on your accounts', every:'All liens',
+    noun:['filing','filings'],
+    desc:'UCC filings against accounts, with secured party, priority and collateral.',
+    q:['Which lenders file most against our prospects?','Which prospects had a filing in the last 90 days?'],
+    rows:()=>D.liens.map(l=>({id:l.id, accountId:l.accountId, bdoId:rpIdx().owner[l.accountId]||null, l})),
+    F:()=>({
+      party:rpF('Secured party','Lien','Pick', r=>r.l.securedParty, {g:1}),
+      num:rpF('Filing number','Lien','Abc', r=>r.l.filingNumber),
+      filed:rpF('Filing date','Lien','Date', r=>r.l.filingDate, {date:1, g:1}),
+      rank:rpF('Priority rank','Lien','#', r=>r.l.priorityRank, {num:'int'}),
+      sub:rpF('Subordinated','Lien','Pick', r=>r.l.subordinated ? 'Yes' : 'No', {g:1}),
+      coll:rpF('Collateral','Lien','Pick', r=>r.l.collateralDescription||'', {g:1}),
+      acct:rpF('Account > Name','Account','Abc', r=>rpAcctName(r.accountId), {s:'Name', link:r=>'#/account/'+r.accountId}),
+      owner:rpF('Account > Owner','Account','Abc', r=>rpPerson(r.bdoId), {s:'Owner', g:1}),
+    }),
+    REL:()=>({}), OBJS:['Lien','Account'],
+    def:()=>rpCfg('liens', ['acct','party','num','filed','rank','coll'], {owner:'me', root:{op:'and', items:[rpRelDate('filed','thisy')]}}, {sort:{k:'filed', d:-1}})},
+  docs:{label:'Documents', g:'cur', mine:'Documents on my opportunities', all:'All documents', yours:'Documents on your opportunities', every:'All documents',
+    noun:['document','documents'],
+    desc:'Files on opportunities, by type, with who added them and when.',
+    q:['Which opportunities in Underwriting have a credit memo?','What did we collect this quarter?'],
+    rows:()=>D.documents.map(x=>{ const o = rpOppOf(x.opportunityId); return {id:x.id, accountId:o.accountId, bdoId:o.bdoId||null, x, o}; }),
+    F:()=>({
+      type:rpF('Type','Document','Pick', r=>r.x.type, {g:1}),
+      up:rpF('Uploaded','Document','Date', r=>r.x.uploadedDate, {date:1, g:1}),
+      by:rpF('Uploaded by','Document','Pick', r=>rpPerson(r.x.uploadedBy), {g:1}),
+      opp:rpF('Opportunity > Name','Opportunity','Abc', r=>r.o.name||'', {s:'Name', link:r=>'#/opp/'+r.o.id}),
+      stage:rpF('Opportunity > Stage','Opportunity','Pick', r=>rpStatusOf(r.o), {s:'Stage', g:1, order:TRACK_STAGES.concat(['Won','Lost'])}),
+      owner:rpF('Opportunity > Owner','Opportunity','Abc', r=>rpPerson(r.bdoId), {s:'Owner', g:1}),
+      acct:rpF('Account > Name','Account','Abc', r=>rpAcctName(r.accountId), {s:'Name', link:r=>'#/account/'+r.accountId}),
+    }),
+    REL:()=>({}), OBJS:['Document','Opportunity','Account'],
+    def:()=>rpCfg('docs', ['type','opp','up','by'], {owner:'me', root:{op:'and', items:[rpRelDate('up','thisq')]}}, {sort:{k:'up', d:-1}})},
+  hist:{label:'Opportunities with stage history', g:'his', mine:'Stage entries on my opportunities', all:'All stage entries', yours:'Stage entries on your opportunities', every:'All stage entries',
+    noun:['stage entry','stage entries'], from:r=>r.h.enteredDate,
+    desc:'Every move between stages, with the date entered and the days spent there.',
+    q:['How long do opportunities sit in Underwriting?','How many reached Proposal this quarter?'],
+    rows:()=>allOpps().flatMap(o=>(STAGEHIST[o.id]||[]).map((h,i)=>({id:o.id+'_'+i, accountId:o.accountId, bdoId:o.bdoId, o, h}))),
+    F:()=>({
+      opp:rpF('Opportunity','Opportunity','Abc', r=>r.o.name, {link:r=>'#/opp/'+r.o.id}),
+      stage:rpF('Stage','Stage history','Pick', r=>rpStageName(r.h.stage), {g:1, order:TRACK_STAGES.concat(['Won','Lost'])}),
+      in:rpF('Entered','Stage history','Date', r=>r.h.enteredDate, {date:1, g:1}),
+      out:rpF('Exited','Stage history','Date', r=>r.h.exitedDate||null, {date:1, g:1}),
+      dur:rpF('Days in stage','Stage history','#', r=>r.h.durationDays, {num:'int'}),
+      product:rpF('Product','Opportunity','Pick', r=>productLabel(r.o.productType), {g:1, order:['Factoring','ABL','Term Loan']}),
+      status:rpF('Status','Opportunity','Pick', r=>RP_STATUS[r.o.outcome], {g:1, order:['Open','Won','Lost']}),
+      owner:rpF('Owner','Opportunity','Abc', r=>rpPerson(r.bdoId), {g:1}),
+      size:rpF('Facility size','Opportunity','$', r=>r.o.facilitySize, {num:'money'}),
+    }),
+    REL:()=>({}), OBJS:['Stage history','Opportunity'],
+    def:()=>rpCfg('hist', ['opp','stage','in','out','dur','product'], {owner:'me', root:{op:'and', items:[rpRelDate('in','thisy')]}}, {sort:{k:'in', d:-1}})},
+  fch:{label:'Field change history', g:'his', mine:'Changes I made', all:'All changes', yours:'Your changes', every:'All changes',
+    noun:['change','changes'], from:r=>r.e.changedAt,
+    desc:'Every edit to a tracked field: old value, new value, who made it and when.',
+    q:['Which close dates moved later this quarter?','Which facility sizes changed after Proposal?'],
+    rows:()=>Object.values(AUDIT_BY_OPP).flat().map((e,i)=>{ const o = rpOppOf(e.opportunityId); return {id:e.id||('chg_'+i), accountId:o.accountId, bdoId:e.changedBy||null, e, o}; }),
+    F:()=>({
+      rec:rpF('Opportunity','Opportunity','Abc', r=>r.o.name||'', {link:r=>'#/opp/'+r.o.id}),
+      field:rpF('Field','Field change','Pick', r=>RP_FIELD_NAMES[r.e.field]||r.e.field, {g:1}),
+      old:rpF('Old value','Field change','Abc', r=>rpChangeText(r.e.field, r.e.oldValue)),
+      nv:rpF('New value','Field change','Abc', r=>rpChangeText(r.e.field, r.e.newValue)),
+      owner:rpF('Changed by','Field change','Abc', r=>rpPerson(r.bdoId), {g:1}),
+      at:rpF('Changed','Field change','Date', r=>r.e.changedAt, {date:1, g:1}),
+      product:rpF('Product','Opportunity','Pick', r=>productLabel(r.o.productType), {g:1, order:['Factoring','ABL','Term Loan']}),
+    }),
+    REL:()=>({}), OBJS:['Field change','Opportunity'],
+    def:()=>rpCfg('fch', ['rec','field','old','nv','owner','at'], {owner:'all', root:{op:'and', items:[rpRelDate('at','thisq')]}}, {sort:{k:'at', d:-1}})},
+};
+const RP_TYPE_ORDER = ['opps','accts','contacts','acts','liens','docs','hist','fch'];
+Object.values(RP_TYPES).forEach(T=>{ const mk = T.F; let f = null; T.F = ()=>f || (f = mk()); });   // each type's field table is built once
+const rpT = ()=>RP_TYPES[(rpC()||{}).type||'opps'];
+let RP_ROWS = null;   // the open type's rows, read once per draw (rpDraw clears it)
+const rpTypeRows = ()=>RP_ROWS || (RP_ROWS = rpT().rows());
+/* switches the engine to a type: its fields, related records and the Fields pane's objects */
+function rpUse(type){
+  const T = RP_TYPES[type||'opps'];
+  if(RPF!==T.F()){ RP_ROWS = null; RP_IDX = null; }
+  RPF = T.F(); RP_REL = T.REL(); RP_OBJS = T.OBJS;
+}
+/* the counted noun the engine writes (E3): "52 stage entries", "No accounts match…", the matrix's "All …" row */
+const rpNounN = n=>n+' '+rpT().noun[n===1?0:1];
 const rpDefs = ctx=>ctx ? RP_REL[ctx].f : RPF;
 const rpFtype = (k, ctx)=>{ const f = rpDefs(ctx)[k]; return f.t || (k==='owner' ? 'user' : f.num ? 'num' : f.date ? 'date' : f.ty==='Pick' ? 'pick' : 'text'); };
 /* operator wording is plain, "is equal to" and so on (D489); the set per type is RESEARCH_17 §7's table (O43) */
@@ -183316,7 +184606,7 @@ function rpPickVals(k, ctx){
   if(!ctx && k==='owner') return Object.values(BDOS).map(b=>b.name).sort();
   if(!ctx && k==='partner') return Object.values(PARTNERS).map(p=>p.name).sort();
   const set = new Set();
-  (ctx ? RP_REL[ctx].all() : allOpps()).forEach(r=>{ const v = f.get(r); (Array.isArray(v)?v:[v]).forEach(x=>{ if(x!=null && x!=='') set.add(x); }); });
+  (ctx ? RP_REL[ctx].all() : rpTypeRows()).forEach(r=>{ const v = f.get(r); (Array.isArray(v)?v:[v]).forEach(x=>{ if(x!=null && x!=='') set.add(x); }); });
   const l = [...set];
   if(f.order) l.sort((a,b)=>{ const ia = f.order.indexOf(a), ib = f.order.indexOf(b); return (ia<0?99:ia)-(ib<0?99:ib); }); else l.sort((a,b)=>String(a).localeCompare(String(b)));
   return l;
@@ -183406,7 +184696,7 @@ function rpNodeText(nd, ctx){
 }
 function rpSentence(c){
   const top = c.f.root, parts = top.items.map(x=>rpNodeText(x, null)).filter(Boolean), n = rpRows(c,'').length;
-  return n+' record'+(n===1?'':'s')+' · '+(c.f.owner==='me'?'Your':'All')+' opportunities'+(parts.length?' where '+parts.join(top.op==='or'?' or ':' and '):'');
+  return n+' record'+(n===1?'':'s')+' · '+(c.f.owner==='me' ? rpT().yours : rpT().every)+(parts.length?' where '+parts.join(top.op==='or'?' or ':' and '):'');
 }
 const rpNodeAt = (root, path)=>path.reduce((n,i)=>n.items[i], root);
 const rpCtxAt = (root, path)=>{ let n = root, ctx = null; path.forEach(i=>{ if(n.rel) ctx = n.rel; n = n.items[i]; }); return ctx; };
@@ -183469,13 +184759,13 @@ function rpFilters(c){
   return '<button class="rp-fcard" data-filt="owner" aria-haspopup="menu"><div class="k">Show me</div><div class="v">'+esc(rpFLabel('owner', c.f.owner))+'</div></button>'+
     '<input class="rp-input rp-fadd" data-ta="filter" placeholder="Add filter…" aria-label="Add filter" autocomplete="off">'+
     rpTreeHtml(c.f.root, [])+
-    '<div class="rp-fbtns"><button class="rp-link" data-act="addrel" aria-haspopup="menu">+ Add related records</button><button class="rp-link" data-act="addgroup" aria-haspopup="menu">+ Add group</button></div>';
+    '<div class="rp-fbtns">'+(Object.keys(RP_REL).length ? '<button class="rp-link" data-act="addrel" aria-haspopup="menu">+ Add related records</button>' : '')+'<button class="rp-link" data-act="addgroup" aria-haspopup="menu">+ Add group</button></div>';
 }
 /* the field menu for a row or a new filter: grouped by object, related records last */
 function rpFieldItems(withRel){
   const items = [];
   RP_OBJS.forEach(ob=>{ const ks = Object.keys(RPF).filter(k=>RPF[k].o===ob); if(!ks.length) return; items.push({head:ob}); ks.forEach(k=>items.push({v:k, t:RPF[k].s||RPF[k].l})); });
-  if(withRel){ items.push({head:'Related records'}); Object.keys(RP_REL).forEach(r=>items.push({v:'rel:'+r, t:RP_REL[r].l})); }
+  if(withRel && Object.keys(RP_REL).length){ items.push({head:'Related records'}); Object.keys(RP_REL).forEach(r=>items.push({v:'rel:'+r, t:RP_REL[r].l})); }
   return items;
 }
 const rpNewNode = v=>v.startsWith('rel:') ? {rel:v.slice(4), q:'any', n:1, op:'and', items:[]} : rpDefCond(v, null);
@@ -183626,8 +184916,7 @@ function rpThHtml(c, k, where){
   return '<th class="'+(f.num?'num':'')+(on?' sorted':'')+'"'+(on?' aria-sort="'+(c.sort.d>0?'ascending':'descending')+'"':'')+'><div class="rp-thw">'+
     '<button class="rp-th" data-sort="'+k+'" data-where="'+where+'" aria-label="Sort by '+esc(f.l)+'">'+(f.num ? '<span class="rp-grow"></span>'+ar+lab : lab+ar)+'</button>'+menu+'</div></th>';
 }
-const rpEmptyLine = c=>'No opportunities match '+(c.f.owner==='me'?'your ':'')+'filters'+(RP.q && RP.screen==='run' ? ' and "'+esc(RP.q)+'"' : '');
-const rpOppN = n=>n+' opportunit'+(n===1?'y':'ies');
+const rpEmptyLine = c=>'No '+rpT().noun[1]+' match '+(c.f.owner==='me'?'your ':'')+'filters'+(RP.q && RP.screen==='run' ? ' and "'+esc(RP.q)+'"' : '');
 /* grouped rows: each group is its own full-width row, chevron, value, count, and its totals on that row (D486, O36, O38).
    The Subtotals switch shows or hides those totals; there are no separate Subtotal rows. Nested levels step in 20px. */
 function rpGridHtml(c, where){
@@ -183649,7 +184938,7 @@ function rpGridHtml(c, where){
     const k = c.gr[l];
     rpGroupBy(list, k, (c.gsort||{})[k]).forEach(g=>{
       const p = path+'|'+k+'='+g.v, shut = !!RP.shut[p];
-      const lab = '<button class="rp-gt'+(shut?' shut':'')+'" data-gp="'+esc(p)+'" aria-expanded="'+(!shut)+'"'+tipAttr(RPF[k].l, esc(g.v), rpOppN(g.list.length))+'>'+
+      const lab = '<button class="rp-gt'+(shut?' shut':'')+'" data-gp="'+esc(p)+'" aria-expanded="'+(!shut)+'"'+tipAttr(RPF[k].l, esc(g.v), rpNounN(g.list.length))+'>'+
         '<span class="tw" aria-hidden="true">&#9660;</span>'+esc(g.v)+(c.tog.rc ? '<span class="gn">('+g.list.length+')</span>' : '')+'</button>';
       const onRow = c.tog.sub || shut || !det;
       html += '<tr class="g g'+Math.min(l,2)+'" aria-level="'+(l+1)+'">'+(onRow&&sumCols.length ? band(lab, g.list, lv(l)) : '<td class="'+lv(l)+'" colspan="'+n+'">'+lab+'</td>')+'</tr>';
@@ -183669,7 +184958,11 @@ function rpFootHtml(where){
 }
 
 /* ---------- the optional chart (D485; O29 to O34): one per report, added by the user above the table ---------- */
-const rpViewOf = c=>c.chart.view || c.gr[0] || 'stage';
+/* the chart reads the type (E11): View by its groupable fields, the first one when the report is ungrouped; Measure its
+   money field or Record count */
+const rpFirstG = ()=>Object.keys(RPF).find(k=>RPF[k].g);
+const rpViewOf = c=>(RPF[c.chart.view] && RPF[c.chart.view].g && c.chart.view) || c.gr.find(k=>RPF[k] && RPF[k].g) || rpFirstG();
+const rpMeasureOf = c=>c.chart.measure!=='count' && c.chart.measure===rpT().measure ? c.chart.measure : 'count';
 function rpTypeOk(c, t){
   const ch = c.chart, vf = RPF[rpViewOf(c)];
   if(t==='line') return !!vf.date && !ch.seg;
@@ -183684,19 +184977,19 @@ function rpChartHtml(c){
   return '<div class="rp-chart"><div class="rp-ctool"><div class="rp-ctypes" role="group" aria-label="Chart type">'+types+'</div>'+
     '<span class="rp-plab">View by</span><button class="rp-pick" data-cpick="view" aria-haspopup="menu">'+esc(RPF[vk].l)+' '+RP_CHEV+'</button>'+
     '<span class="rp-plab">Segment by</span><button class="rp-pick" data-cpick="seg" aria-haspopup="menu">'+(ch.seg?esc(RPF[ch.seg].l):'None')+' '+RP_CHEV+'</button>'+
-    '<span class="rp-plab">Measure</span><button class="rp-pick" data-cpick="measure" aria-haspopup="menu">'+(ch.measure==='count'?'Record count':'Facility size')+' '+RP_CHEV+'</button>'+
+    '<span class="rp-plab">Measure</span><button class="rp-pick" data-cpick="measure" aria-haspopup="menu">'+(rpMeasureOf(c)==='count'?'Record count':esc(RPF[rpMeasureOf(c)].l))+' '+RP_CHEV+'</button>'+
     '<span class="rp-grow"></span><button class="rp-x" data-act="rmchart" aria-label="Remove chart"'+tipAttr('Remove chart','','')+'>&#10005;</button></div>'+
     '<div class="rp-plot"><div class="rp-plotin"></div></div></div>';
 }
 function rpChartData(c){
-  const ch = c.chart, vk = rpViewOf(c), rows = rpRows(c,'');
-  const m = l=>ch.measure==='count' ? l.length : l.reduce((s,o)=>s+o.facilitySize,0);
+  const ch = c.chart, vk = rpViewOf(c), rows = rpRows(c,''), mk = rpMeasureOf(c)==='count' ? null : rpMeasureOf(c);
+  const m = l=>!mk ? l.length : l.reduce((s,o)=>s+(RPF[mk].get(o)||0),0);
   let series = null;
   if(ch.seg){ const sg = rpGroupBy(rows, ch.seg); series = sg.slice(0,4).map(g=>g.v); if(sg.length>4) series.push('Other'); }
   const segOf = o=>{ const v = rpGval(ch.seg,o); return series.indexOf(v)>=0 && v!=='Other' ? v : 'Other'; };
   return {vk, series, cats:rpGroupBy(rows, vk).map(g=>({v:g.v, n:g.list.length, t:m(g.list),
       parts:series ? series.map(s=>{ const l = g.list.filter(o=>segOf(o)===s); return {s, val:m(l), n:l.length}; }) : null})),
-    fmtV:v=>ch.measure==='count'?String(v):moneyShort(v), fullV:v=>ch.measure==='count'?String(v):moneyPlain(v)};
+    fmtV:v=>!mk?String(v):moneyShort(v), fullV:v=>!mk?String(v):moneyPlain(v)};
 }
 const rpNice = max=>{ if(max<=0) return 1; const p = Math.pow(10, Math.floor(Math.log10(max))), r = max/p; return (r<=1?1:r<=2?2:r<=2.5?2.5:r<=5?5:10)*p; };
 const rpTick = (v, cnt)=>cnt ? String(Math.round(v)) : (v===0?'$0':moneyShort(v).replace('.0M','M').replace('.0K','K'));
@@ -183704,8 +184997,8 @@ const rpSer = (s, series)=>s==='Other' ? 'co' : 'c'+series.indexOf(s);
 /* one hue and its tints; a key only when segmented; value labels on the bars; exact figures and the count in the
    tooltip (O33, O34) */
 function rpDrawChart(host, c){
-  const d = rpChartData(c), ch = c.chart, cnt = ch.measure==='count';
-  const W = Math.max(320, host.clientWidth), H = Math.max(160, host.clientHeight), axisT = cnt ? 'Record count' : 'Facility size (sum)';
+  const d = rpChartData(c), ch = c.chart, cnt = rpMeasureOf(c)==='count';
+  const W = Math.max(320, host.clientWidth), H = Math.max(160, host.clientHeight), axisT = cnt ? 'Record count' : RPF[rpMeasureOf(c)].l+' (sum)';
   const key = d.series ? '<div class="rp-key">'+d.series.map(s=>'<span><i class="k'+(s==='Other'?'o':d.series.indexOf(s))+'"></i>'+esc(s)+'</span>').join('')+'</div>' : '';
   const h = d.series ? H-22 : H;
   if(!d.cats.length){ host.innerHTML = '<div class="rp-cempty">'+rpEmptyLine(c)+'</div>'; return; }
@@ -183719,8 +185012,8 @@ function rpDrawChart(host, c){
     d.cats.forEach((g,i)=>{ const y = T+rh*i+(rh-bh)/2;
       s += '<text x="'+(L-10)+'" y="'+(y+bh/2+4)+'" text-anchor="end">'+esc(g.v)+'</text>';
       if(g.parts){ let acc = 0; g.parts.forEach(p=>{ if(!p.val) return; const x = L+pw*acc/max, w = pw*p.val/max; acc += p.val;
-        s += '<rect class="'+rpSer(p.s,d.series)+'" x="'+x+'" y="'+y+'" width="'+w+'" height="'+bh+'"'+tipAttr(g.v+' · '+p.s, d.fullV(p.val), rpOppN(p.n))+'/>'; }); }
-      else s += '<rect class="c0" x="'+L+'" y="'+y+'" width="'+(pw*g.t/max)+'" height="'+bh+'"'+tipAttr(g.v, d.fullV(g.t), rpOppN(g.n))+'/>';
+        s += '<rect class="'+rpSer(p.s,d.series)+'" x="'+x+'" y="'+y+'" width="'+w+'" height="'+bh+'"'+tipAttr(g.v+' · '+p.s, d.fullV(p.val), rpNounN(p.n))+'/>'; }); }
+      else s += '<rect class="c0" x="'+L+'" y="'+y+'" width="'+(pw*g.t/max)+'" height="'+bh+'"'+tipAttr(g.v, d.fullV(g.t), rpNounN(g.n))+'/>';
       s += '<text class="vl" x="'+(L+pw*g.t/max+8)+'" y="'+(y+bh/2+4)+'">'+d.fmtV(g.t)+'</text>'; });
     s += '</svg>';
   } else if(ch.type==='vbar' || ch.type==='line'){
@@ -183733,11 +185026,11 @@ function rpDrawChart(host, c){
     d.cats.forEach((g,i)=>{ const cx = L+cw*(i+.5), x = cx-bw/2, yT = T+ph*(1-g.t/max);
       if(line) pts.push([cx,yT,g]);
       else if(g.parts){ let acc = 0; g.parts.forEach(p=>{ if(!p.val) return; const y1 = T+ph*(1-(acc+p.val)/max), hh = ph*p.val/max; acc += p.val;
-        s += '<rect class="'+rpSer(p.s,d.series)+'" x="'+x+'" y="'+y1+'" width="'+bw+'" height="'+hh+'"'+tipAttr(g.v+' · '+p.s, d.fullV(p.val), rpOppN(p.n))+'/>'; }); }
-      else s += '<rect class="c0" x="'+x+'" y="'+yT+'" width="'+bw+'" height="'+(T+ph-yT)+'"'+tipAttr(g.v, d.fullV(g.t), rpOppN(g.n))+'/>';
+        s += '<rect class="'+rpSer(p.s,d.series)+'" x="'+x+'" y="'+y1+'" width="'+bw+'" height="'+hh+'"'+tipAttr(g.v+' · '+p.s, d.fullV(p.val), rpNounN(p.n))+'/>'; }); }
+      else s += '<rect class="c0" x="'+x+'" y="'+yT+'" width="'+bw+'" height="'+(T+ph-yT)+'"'+tipAttr(g.v, d.fullV(g.t), rpNounN(g.n))+'/>';
       s += '<text class="vl" x="'+cx+'" y="'+(yT-(line?10:6))+'" text-anchor="middle">'+d.fmtV(g.t)+'</text>';
       s += '<text x="'+cx+'" y="'+(T+ph+16)+'" text-anchor="middle">'+esc(g.v)+'</text>'; });
-    if(pts.length) s += '<path class="ln" d="M'+pts.map(p=>p[0]+' '+p[1]).join(' L')+'"/>'+pts.map(p=>'<circle class="dt" cx="'+p[0]+'" cy="'+p[1]+'" r="4"'+tipAttr(p[2].v, d.fullV(p[2].t), rpOppN(p[2].n))+'/>').join('');
+    if(pts.length) s += '<path class="ln" d="M'+pts.map(p=>p[0]+' '+p[1]).join(' L')+'"/>'+pts.map(p=>'<circle class="dt" cx="'+p[0]+'" cy="'+p[1]+'" r="4"'+tipAttr(p[2].v, d.fullV(p[2].t), rpNounN(p[2].n))+'/>').join('');
     s += '</svg>';
   } else if(ch.type==='donut'){
     /* restricted: four groups at most, no segment, never the default, largest first, value and share printed (D478) */
@@ -183747,7 +185040,7 @@ function rpDrawChart(host, c){
     let a0 = -Math.PI/2;
     cats.forEach((g,i)=>{ const a1 = a0+2*Math.PI*g.t/tot, big = a1-a0>Math.PI?1:0;
       const p = (rr,a)=>[cx+rr*Math.cos(a), cy+rr*Math.sin(a)], A = p(r,a0), B2 = p(r,a1), Ci = p(ri,a1), Di = p(ri,a0);
-      s += '<path class="sl c'+i+'" d="M'+A+' A'+r+' '+r+' 0 '+big+' 1 '+B2+' L'+Ci+' A'+ri+' '+ri+' 0 '+big+' 0 '+Di+' Z"'+tipAttr(g.v, d.fullV(g.t), rpOppN(g.n)+' · '+Math.round(g.t/tot*100)+'%')+'/>';
+      s += '<path class="sl c'+i+'" d="M'+A+' A'+r+' '+r+' 0 '+big+' 1 '+B2+' L'+Ci+' A'+ri+' '+ri+' 0 '+big+' 0 '+Di+' Z"'+tipAttr(g.v, d.fullV(g.t), rpNounN(g.n)+' · '+Math.round(g.t/tot*100)+'%')+'/>';
       a0 = a1; });
     s += '<text class="dc" x="'+cx+'" y="'+(cy+2)+'" text-anchor="middle">'+d.fmtV(tot)+'</text><text class="at" x="'+cx+'" y="'+(cy+20)+'" text-anchor="middle">Total</text>';
     const lx = cx+r+48;
@@ -183757,6 +185050,15 @@ function rpDrawChart(host, c){
     s += '</svg>';
   }
   host.innerHTML = key+s;
+  /* a category name too long for the label column ends in an ellipsis, with the full name in the shared tooltip (E11) */
+  const svg = host.querySelector('svg'); if(!svg) return;
+  svg.querySelectorAll('text').forEach(t=>{
+    let bb; try{ bb = t.getBBox(); }catch(e){ return; }
+    if(bb.x >= 0) return;
+    const full = t.textContent; let cut = full;
+    while(cut.length>4 && t.getBBox().x < 0){ cut = cut.slice(0, -2); t.textContent = cut.replace(/[\s,–-]+$/,'')+'…'; }
+    t.setAttribute('data-tip', '<div class="tip-t">'+esc(full)+'</div>');
+  });
 }
 function rpDrawCharts(){ rpView().querySelectorAll('.rp-plotin').forEach(h=>rpDrawChart(h, rpC())); }
 
@@ -183764,15 +185066,17 @@ function rpDrawCharts(){ rpView().querySelectorAll('.rp-plotin').forEach(h=>rpDr
 /* the title block: on the run page the favorite star; in the builder a pencil to rename and the type pill (O57) */
 function rpTitleHtml(c, eyebrow, edit){
   const name = RP.renaming && edit ? '<input class="rp-input rp-rename" id="rp-rename" value="'+esc(c.title)+'" aria-label="Report name">' : '<span>'+esc(c.title)+'</span>';
-  const after = edit ? (RP.renaming ? '' : '<button class="rp-pen" data-act="rename" aria-label="Rename report">'+RP_IC.pen+'</button><span class="rp-pill">Opportunities</span>')
+  const after = edit ? (RP.renaming ? '' : '<button class="rp-pen" data-act="rename" aria-label="Rename report">'+RP_IC.pen+'</button><span class="rp-pill">'+esc(rpT().label)+'</span>')
     : '<button class="rp-star'+(RP.fav?' on':'')+'" data-act="fav" aria-pressed="'+RP.fav+'" aria-label="Favorite"'+tipAttr(RP.fav?'Remove from Favorites':'Add to Favorites','','')+'>'+(RP.fav?RP_IC.starOn:RP_IC.star)+'</button>';
   return '<div class="rp-tblock"><div class="rp-eyebrow">'+eyebrow+'</div><div class="rp-title">'+name+after+'</div></div>';
 }
+/* the run page's eyebrow, "Reports · <type>": "Reports" goes back to the list the report was opened from (E4, D106 (b)) */
+const rpEyebrow = ()=>'<button class="rp-back" data-act="back" aria-label="Back to Reports, '+esc(rhList(RH.h.list).t)+'">Reports</button> · '+esc(rpT().label);
 /* Add chart and Remove chart take the same width, so the search box doesn't move (O29) */
 const rpChartBtn = c=>'<button class="rp-btn rp-chbtn" data-act="'+(c.chart?'rmchart':'addchart')+'">'+RP_IC.chart+(c.chart?'Remove chart':'Add chart')+'</button>';
 function rpRunHtml(){
   const c = RP.saved, sent = rpSentence(c), nf = rpNF(c);   // the sentence and the badge together (D489)
-  return '<div class="rp-sheet'+(c.chart?' has-chart':'')+'"><div class="rp-head"><div class="rp-hl">'+rpTitleHtml(c, 'Report · Opportunities')+'<div class="rp-fsent" title="'+esc(sent)+'">'+esc(sent)+'</div></div>'+
+  return '<div class="rp-sheet'+(c.chart?' has-chart':'')+'"><div class="rp-head"><div class="rp-hl">'+rpTitleHtml(c, rpEyebrow())+'<div class="rp-fsent" title="'+esc(sent)+'">'+esc(sent)+'</div></div>'+
     '<div class="rp-tools"><input class="rp-input rp-q" id="rp-q" placeholder="Search report" value="'+esc(RP.q)+'" aria-label="Search report">'+rpChartBtn(c)+
     '<button class="rp-btn icon rp-fbtn'+(RP.fpanel?' on':'')+'" data-act="fpanel" aria-label="Filters, '+nf+' applied" aria-pressed="'+RP.fpanel+'"'+tipAttr('Filters','','')+'>'+RP_IC.filter+'<span class="rp-fbadge" aria-hidden="true">'+nf+'</span></button>'+
     '<button class="rp-btn" data-act="dash" aria-haspopup="menu">Add to dashboard</button><button class="rp-btn" data-act="export">Export</button><button class="rp-btn" data-act="edit">Edit</button></div></div>'+
@@ -183984,19 +185288,19 @@ function rpRmFrom(zone, i){
 function rpMatrixHtml(c, rows){
   const rk = c.gr[0], ck = c.gc[0], mk = Object.keys(c.sum).find(k=>c.sum[k]) || null, how = mk ? c.sum[mk] : null;
   const val = l=>mk ? rpFmtAgg(mk, how, rpAgg(l, mk, how)) : String(l.length);
-  const colsG = rpGroupBy(rows, ck), rowsG = rk ? rpGroupBy(rows, rk) : [{v:'All opportunities', list:rows}];
+  const colsG = rpGroupBy(rows, ck), rowsG = rk ? rpGroupBy(rows, rk) : [{v:'All '+rpT().noun[1], list:rows}];
   const measure = mk ? RP_SUMS[how]+' of '+RPF[mk].l.toLowerCase() : 'Record count';
   let html = '<table class="rp-grid"><thead><tr><th class="mx-g">'+esc(rk?RPF[rk].l:'')+' &#8595; &nbsp;'+esc(RPF[ck].l)+' &#8594; &nbsp;<span class="mx-m">'+esc(measure)+'</span></th>'+
     colsG.map(g=>'<th class="mx-c">'+esc(g.v)+'</th>').join('')+'<th class="mx-c">Total</th></tr></thead><tbody>';
   if(!rows.length) return html+'<tr><td class="empty" colspan="'+(colsG.length+2)+'">'+rpEmptyLine(c)+'</td></tr></tbody></table>';
-  const cell = (l, t)=>'<td class="num"'+tipAttr(t, val(l)||'0', rpOppN(l.length))+'>'+(l.length ? val(l) : '')+'</td>';
+  const cell = (l, t)=>'<td class="num"'+tipAttr(t, val(l)||'0', rpNounN(l.length))+'>'+(l.length ? val(l) : '')+'</td>';
   rowsG.forEach(r=>{ html += '<tr class="d"><td><b class="mx-r">'+esc(r.v)+'</b>'+(c.tog.rc?' <span class="mx-n">('+r.list.length+')</span>':'')+'</td>'+
     colsG.map(g=>cell(r.list.filter(o=>rpGval(ck,o)===g.v), r.v+' · '+g.v)).join('')+cell(r.list, r.v+' · Total')+'</tr>'; });
   if(c.tog.tot) html += '<tr class="tot"><td>Total'+(c.tog.rc?' ('+rows.length+')':'')+'</td>'+colsG.map(g=>cell(g.list, 'Total · '+g.v)).join('')+cell(rows, 'Total')+'</tr>';
   return html+'</tbody></table>';
 }
 /* leaving the builder: Run carries the draft, Close discards it (O20) */
-function rpToRun(keep){ if(keep) RP.saved = rpClone(RP.draft); RP.screen = 'run'; RP.draft = null; RP.renaming = false; rpDraw(); window.scrollTo(0,0); }
+function rpToRun(keep){ if(keep){ RP.saved = rpClone(RP.draft); rpKeep(); } RP.screen = 'run'; RP.draft = null; RP.renaming = false; rpDraw(); window.scrollTo(0,0); }
 
 /* ---------- the "Add filter…", "Add group…" and "Add column…" type-ahead (.newmenu, D418) ---------- */
 let RP_TA = null;
@@ -184055,14 +185359,14 @@ function rpColMenu(btn){
 }
 function rpShowMeMenu(btn){
   const k = btn.dataset.filt, c = rpC();
-  menuFloatOpen(btn, RP_FILT[k].opts.map(o=>({v:o[0], t:o[1], on:c.f[k]===o[0]})), it=>rpSet(d=>{ d.f[k] = it.v; }));
+  menuFloatOpen(btn, rpShowOpts().map(o=>({v:o[0], t:o[1], on:c.f[k]===o[0]})), it=>rpSet(d=>{ d.f[k] = it.v; }));
 }
 function rpChartPick(btn){
   const which = btn.dataset.cpick, c = rpC(), ch = c.chart, gks = Object.keys(RPF).filter(k=>RPF[k].g);
   let items;
   if(which==='view') items = gks.map(k=>({v:k, t:RPF[k].l, on:rpViewOf(c)===k}));
   if(which==='seg') items = [{v:'', t:'None', on:!ch.seg},{sep:true}].concat(gks.filter(k=>k!==rpViewOf(c)).map(k=>({v:k, t:RPF[k].l, on:ch.seg===k})));
-  if(which==='measure') items = [{v:'size', t:'Facility size', s:'Sum', on:ch.measure!=='count'},{v:'count', t:'Record count', on:ch.measure==='count'}];
+  if(which==='measure'){ const mk = rpT().measure; items = (mk ? [{v:mk, t:RPF[mk].l, s:'Sum', on:rpMeasureOf(c)===mk}] : []).concat([{v:'count', t:'Record count', on:rpMeasureOf(c)==='count'}]); }
   menuFloatOpen(btn, items, it=>rpSet(d=>{ d.chart[which] = it.v; if(which==='view' && d.chart.seg===it.v) d.chart.seg = '';
     if(!rpTypeOk(d, d.chart.type)) d.chart.type = RPF[rpViewOf(d)].date ? 'vbar' : 'hbar'; }));
 }
@@ -184094,11 +185398,14 @@ document.addEventListener('dragstart', ()=>{
 function rpDraw(how){
   const view = rpView();
   if(!view.classList.contains('active')) return;
+  if(rpParse().home) return rhDraw();
+  if(RP.cur==='missing'){ document.body.classList.remove('rp-wide'); view.innerHTML = rpMissingHtml(); return; }
   if(EF_PRESSED && how!=='now'){
     if(!RP_PENDING){ RP_PENDING = true; efAfterPress(()=>{ if(RP_PENDING){ RP_PENDING = false; rpDraw('now'); } }); }
     return;
   }
   RP_PENDING = false;
+  RP_ROWS = null; RP_IDX = null; rpUse(rpC().type);
   rpTaClose();
   const ae = RP_COMMITTING ? null : document.activeElement, focusKey = ae && view.contains(ae) ? (ae.id ? '#'+ae.id : ae.dataset.act ? '[data-act="'+ae.dataset.act+'"]' : ae.dataset.tog ? '[data-tog="'+ae.dataset.tog+'"]' :
     ae.dataset.ctype ? '[data-ctype="'+ae.dataset.ctype+'"]' : ae.dataset.tab ? '[data-tab="'+ae.dataset.tab+'"]' : null) : null;
@@ -184127,17 +185434,287 @@ function rpPruneDraft(){
   if(JSON.stringify(RP.draft.f.root)===was) return false;
   RP.hist.push(before); if(RP.hist.length>50) RP.hist.shift(); RP.fut = []; return true;
 }
-/* route(): leaving #/reports commits a value still being typed, then unfinished filters fall out of the report (O5, O6) */
-function rpLeave(){ rpCommitTyping(); rpPrune(RP.saved.f.root, null); }
-/* route(): a landing on #/reports opens the saved report's run page; the search box and collapsed groups start fresh */
-function rpEnter(){ RP.screen = 'run'; RP.draft = null; RP.hist = []; RP.fut = []; RP.renaming = false; RP.q = ''; RP.shut = {}; }
+/* route(): leaving a report page commits a value still being typed, then unfinished filters fall out of the report (O5,
+   O6); anyone else's report forgets their changes (D496). Leaving Reports altogether makes the next visit from the side
+   menu land on Recent (H4). */
+function rpLeave(away){
+  if(/^#\/reports\/r\//.test(RP_AT)){ rpCommitTyping(); rpPrune(RP.saved.f.root, null);
+    const x = rpEntry(RP.cur); if(x && !rpMine(x)) RP.cur = null; }
+  if(away) RH.left = true;
+}
+/* route(): a landing on Reports. The home: For you on the first visit since load, Recent on a later one from the side
+   menu, the list as left on Back (H4). A report: the run page, the search box and collapsed groups fresh; new: the
+   builder on the chosen type's start (N6); no such report: E12. */
+function rpEnter(){
+  RP.screen = 'run'; RP.draft = null; RP.hist = []; RP.fut = []; RP.renaming = false; RP.q = ''; RP.shut = {};
+  RP_AT = location.hash;
+  const st = rpParse();
+  if(st.home){ RP.cur = null; if(RH.left && RH.seen){ RH.h = {list:'recent', q:'', y:0, sort:null}; RH.fromReport = false; LP.reports.page = 1; }
+    RH.left = false; RH.seen = true; return; }
+  RH.left = false;
+  if(st.rid==='new'){
+    if(RP.cur!=='new'){ RP.saved = RP_TYPES[RH.tp].def(); RP.saved.title = 'New report'; RP.fav = false; RP.cur = 'new'; RP.newSaved = false; }
+    RP.draft = rpClone(RP.saved); RP.screen = 'build'; RP.tab = 'outline'; RP.fields = true;
+    return; }
+  if(!rpEntry(st.rid)){ RP.cur = 'missing'; return; }
+  if(RP.cur!==st.rid) rpOpen(st.rid);
+  if(RH.editOnOpen){ RH.editOnOpen = false; RP.draft = rpClone(RP.saved); RP.screen = 'build'; RP.tab = 'outline'; }
+}
 let RP_RZ = null;
 window.addEventListener('resize', ()=>{ clearTimeout(RP_RZ); RP_RZ = setTimeout(()=>{ if(rpView().classList.contains('active')) rpDrawCharts(); }, 120); });
 window.addEventListener('scroll', ()=>{ if(RP_TA) rpTaDraw(); }, true);
 window.addEventListener('hashchange', rpTaClose);
 
+/* ---------- the report library and Reports home (D509 to D515; spec D511, H1 to H12, N1 to N8, E6 to E9, E12) ----------
+   #/reports is the home; #/reports/r/<id> a report; #/reports/r/new a report being started. The saved reports are the
+   dataset's (D515), with their usage; opening one sets its Last run to today and puts it first in Recent (E6). */
+const RP_LIB = (D.savedReports||[]).map(r=>({id:r.id, type:r.type, title:r.title, desc:r.description, scope:r.scope, owner:r.ownerId,
+  lastRun:r.lastRun, runs:r.runCount, fav:!!r.favorite, opened:r.lastOpened, seq:0, cfg:Object.assign({type:r.type}, rpClone(r.definition))}));
+let RP_SEQ = 0, RP_AT = '';   // RP_SEQ orders reports opened today; RP_AT is the reports address now showing
+const rpEntry = id=>RP_LIB.find(x=>x.id===id);
+const rpMine = x=>x.owner===CURRENT_BDO_ID;
+const rpParse = ()=>{ const p = location.hash.replace('#/','').split('/'); return p[1]==='r' && p[2] ? {rid:p[2]} : {home:true}; };
+/* the home's state: the open list, its search, sort and scroll, and how the next visit lands (H4) */
+const RH = {h:{list:'foryou', q:'', y:0, sort:null}, seen:false, left:false, fromReport:false, editOnOpen:false, editFromHome:false, tp:'opps'};
+const RH_LISTS = [
+  {k:'foryou', t:'For you'},
+  {k:'recent', t:'Recent', f:x=>x.opened!=null},
+  {k:'fav', t:'Favorites', f:x=>x.fav},
+  {k:'mine', t:'Created by me', f:x=>rpMine(x)},
+  {k:'team', t:'Team', f:x=>x.scope==='Team'},
+  {k:'cert', t:'Certified', f:x=>x.scope==='Certified'},
+  {k:'all', t:'All reports', f:()=>true},
+];
+/* For you's three starters and the questions each answers (RESEARCH_28 §8's BDO examples, judgment) */
+const RH_STARTERS = [
+  {id:'open-pipeline', q:['Where is my pipeline sitting?','What is in Underwriting now?']},
+  {id:'stalled', q:['Which opportunities need a call today?','What has sat longest in its stage?']},
+  {id:'acts-7', q:['Am I keeping my usual pace?','Which accounts did I reach?']},
+];
+const rhList = k=>RH_LISTS.find(l=>l.k===k)||RH_LISTS[1];
+const RH_SCOPE_ORDER = {Certified:0, Team:1, Personal:2};
+/* H8: Recent by when you last opened them; All reports Certified, Team, Personal, A to Z within each; the rest A to Z */
+function rhRows(list, q){
+  const L = rhList(list), s = (q||'').trim().toLowerCase();
+  const rows = RP_LIB.filter(L.f||(()=>false)).filter(x=>!s || [x.title, x.desc, rpPerson(x.owner), RP_TYPES[x.type].label].join(' ').toLowerCase().includes(s));
+  if(list==='recent') rows.sort((a,b)=>(b.opened||'').localeCompare(a.opened||'') || b.seq-a.seq);
+  else if(list==='all') rows.sort((a,b)=>(RH_SCOPE_ORDER[a.scope]-RH_SCOPE_ORDER[b.scope]) || a.title.localeCompare(b.title));
+  else rows.sort((a,b)=>a.title.localeCompare(b.title));
+  return rows;
+}
+/* a new entry: yours, Personal, opened and run now (E7) */
+function rpLibAdd(type, title, desc, cfg, runs){
+  const x = {id:'rep-'+(++RP_SEQ), type, title, desc, scope:'Personal', owner:CURRENT_BDO_ID, lastRun:TODAY, runs, fav:false, opened:TODAY, seq:++RP_SEQ, cfg};
+  RP_LIB.push(x); return x;
+}
+function rpLibCopy(x, cfg){
+  const c = rpLibAdd(x.type, 'Copy of '+x.title, x.desc, rpClone(cfg||x.cfg), 0);
+  c.cfg.title = c.title; return c;
+}
+/* opening a report: the owner's changes save to it, anyone else's last until they leave it (E6, D496) */
+function rpOpen(id){
+  const x = rpEntry(id);
+  RP.saved = rpMine(x) ? x.cfg : rpClone(x.cfg); RP.fav = x.fav;
+  x.lastRun = TODAY; x.runs++; x.opened = TODAY; x.seq = ++RP_SEQ;
+  RP.cur = id;
+}
+/* the owner's report keeps what was run or saved (E6) */
+function rpKeep(){ const x = RP.cur && rpEntry(RP.cur); if(x && rpMine(x)){ x.cfg = RP.saved; x.title = RP.saved.title; } }
+const rpSetHash = id=>{ history.replaceState(history.state, '', '#/reports/r/'+id); RP_AT = location.hash; };
+/* Save and Save & run (E7): a new report is filed, yours, Personal, with its own address; your report keeps the change;
+   on anyone else's, theirs stays as it was and you get a copy. Returns the toast's line. */
+function rpFile(){
+  if(RP.cur==='new'){
+    const x = rpLibAdd(RP.saved.type, RP.saved.title, '', RP.saved, 1); x.fav = RP.fav;
+    RP.cur = x.id; RP.newSaved = true; rpSetHash(x.id); return x.title;
+  }
+  const x = rpEntry(RP.cur); if(!x) return RP.saved.title;
+  if(rpMine(x)){ rpKeep(); return x.title; }
+  const c = rpLibCopy(x, RP.saved); c.title = c.cfg.title = RP.saved.title===x.title ? 'Copy of '+x.title : RP.saved.title;
+  RP.saved = c.cfg; if(RP.draft) RP.draft.title = c.title; RP.cur = c.id; rpSetHash(c.id);
+  return c.title+', in Created by me';
+}
+function rpGo(id){ RH.h.y = window.scrollY; RH.fromReport = true; location.hash = '#/reports/r/'+id; }
+
+/* ---------- the home ---------- */
+const RH_IC_MORE = '<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><circle cx="3.5" cy="8" r="1.3"/><circle cx="8" cy="8" r="1.3"/><circle cx="12.5" cy="8" r="1.3"/></svg>';
+LP_NOUN.reports = ['report','reports','Reports'];
+LP.reports = {page:1, size:50, ids:[], recs:[]};
+/* H12: an empty list says what goes there and gives one next action */
+function rhEmptyHtml(list, q){
+  const L = rhList(list).t;
+  if(q.trim()) return '<div class="rh-empty">No reports in '+esc(L)+' match “'+esc(q.trim())+'”.<button class="drill rh-lbtn" data-rh="clearq">Clear search</button></div>';
+  if(list==='fav') return '<div class="rh-empty">No favorites yet. Star a report to keep it here.<button class="drill rh-lbtn" data-rh="toall">View all reports</button></div>';
+  const why = {mine:'No reports of yours yet.', team:'No team reports yet.', cert:'No certified reports yet.', recent:'No reports opened yet.'}[list]||'No reports.';
+  return '<div class="rh-empty">'+why+'<button class="drill rh-lbtn" data-rh="new">New report</button></div>';
+}
+/* H7: name over description, type, scope, owner, last run, runs, star and menu; the lists' table (D446, O10, O11) */
+function rhTableHtml(list, q){
+  const rows = rhRows(list, q);
+  if(!rows.length) return rhEmptyHtml(list, q);
+  const st = LP.reports; st.ids = rows.map(x=>x.id); st.recs = rows; st.page = Math.min(Math.max(1, st.page), lpPages('reports'));
+  const a = (st.page-1)*st.size;
+  return '<div class="tbl-wrap"><table class="tbl clickable rh-tbl"><colgroup><col class="c-name"><col class="c-type"><col class="c-scope"><col class="c-owner"><col class="c-run"><col class="c-runs"><col class="c-act"></colgroup><thead><tr>'+
+    sortableTh('Name',{type:'text'})+sortableTh('Report type',{type:'text'})+sortableTh('Scope',{type:'text'})+
+    sortableTh('Owner',{type:'text'})+sortableTh('Last run',{type:'date'})+sortableTh('Runs',{num:true, type:'number'})+'<th aria-label="Actions"></th></tr></thead><tbody>'+
+    rows.slice(a, a+st.size).map(x=>{ const tl = RP_TYPES[x.type].label, ow = rpPerson(x.owner), tip = x.fav ? 'Remove from Favorites' : 'Add to Favorites';
+      return '<tr data-rhrow="'+x.id+'">'+
+      '<td title="'+esc(x.title+(x.desc?'. '+x.desc:''))+'"><div class="rh-rname">'+esc(x.title)+'</div>'+(x.desc?'<div class="rh-rdesc">'+esc(x.desc)+'</div>':'')+'</td>'+
+      '<td class="sec" title="'+esc(tl)+'">'+esc(tl)+'</td>'+
+      '<td class="rh-scope">'+(x.scope==='Certified' ? '<span class="tag brand">Certified</span>' : '<span class="sec">'+x.scope+'</span>')+'</td>'+
+      '<td class="sec" title="'+esc(ow)+'">'+esc(ow)+'</td>'+
+      '<td class="sec" data-sort="'+x.lastRun+'">'+fmtDate(x.lastRun)+'</td>'+
+      '<td class="num" data-sort="'+x.runs+'">'+x.runs+'</td>'+
+      '<td class="rh-acts"><span class="rh-rowbtns"><button class="rp-star'+(x.fav?' on':'')+'" data-rhfav="'+x.id+'" aria-pressed="'+x.fav+'" aria-label="'+tip+'"'+tipAttr(tip,'','')+'>'+(x.fav?RP_IC.starOn:RP_IC.star)+'</button>'+
+      '<button class="rh-more" data-rhmore="'+x.id+'" aria-haspopup="menu" aria-label="More for '+esc(x.title)+'">'+RH_IC_MORE+'</button></span></td></tr>'; }).join('')+
+    '</tbody></table></div>'+lpBarHtml('reports');
+}
+/* H9: For you, the three starters as cards in one row, then the Certified reports */
+function rhForYouHtml(){
+  const cards = '<div class="rh-starters">'+RH_STARTERS.map(s=>{ const x = rpEntry(s.id);
+    return '<div class="panel rh-starter" tabindex="0" role="link" data-rhrow="'+x.id+'">'+panelHeaderHtml(x.title, RP_TYPES[x.type].label, '<span class="drill">Open &rsaquo;</span>')+
+      '<div class="panel-body">'+s.q.map(q=>'<div class="rh-q">'+esc(q)+'</div>').join('')+'</div></div>'; }).join('')+'</div>';
+  return cards+'<div class="rh-sech"><span>Certified reports</span><span class="rh-n">'+RP_LIB.filter(x=>x.scope==='Certified').length+'</span></div>'+rhTableHtml('cert', '');
+}
+/* H5: the open list's count; while searching, "3 of 15 match"; For you, the library's total */
+function rhSubText(){
+  const L = rhList(RH.h.list); if(!L.f) return RP_LIB.length+' reports';
+  const tot = RP_LIB.filter(L.f).length;
+  return RH.h.q.trim() ? rhRows(RH.h.list, RH.h.q).length+' of '+tot+' match' : tot+' report'+(tot===1?'':'s');
+}
+function rhHomeHtml(){
+  const k = RH.h.list, L = rhList(k);
+  const lists = '<nav class="rh-lists" aria-label="Report lists">'+RH_LISTS.map((l,i)=>(i===2?'<div class="rh-lsep" role="presentation"></div>':'')+
+    '<button class="rh-li'+(k===l.k?' on':'')+'" data-rhlist="'+l.k+'"'+(k===l.k?' aria-current="true"':'')+'><span>'+l.t+'</span><span class="rh-n">'+(l.f && l.k!=='recent' ? RP_LIB.filter(l.f).length : '')+'</span></button>').join('')+'</nav>';
+  return '<div class="rh-headrow"><div><h1 class="page-heading">Reports</h1><div class="page-sub" id="rh-sub">'+esc(rhSubText())+'</div></div>'+
+    '<div class="rh-actions">'+(k==='foryou' ? '' : '<input class="rp-input" id="rh-q" placeholder="Search '+esc(L.t)+'" value="'+esc(RH.h.q)+'" aria-label="Search reports in '+esc(L.t)+'" autocomplete="off">')+
+    '<button class="btn primary" data-rh="new">New report</button></div></div>'+
+    '<div class="rh-lib">'+lists+'<div class="rh-main" id="rh-main">'+(k==='foryou' ? rhForYouHtml() : rhTableHtml(k, RH.h.q))+'</div></div>';
+}
+/* H8: a header sort holds for the open list through a star, a search, a report opened and Back */
+function rhSortApply(){
+  const s = RH.h.sort, tb = rpView().querySelector('#rh-main table.rh-tbl'); if(!s || s.list!==RH.h.list || !tb) return;
+  const th = tb.querySelectorAll('thead th')[s.i], body = tb.querySelector('tbody'); if(!th || !body) return;
+  th.setAttribute('aria-sort', s.dir);
+  sortRowsByColumn([...body.querySelectorAll(':scope > tr')], s.i, th.dataset.sortType||'text', s.dir).forEach(tr=>body.appendChild(tr));
+}
+function rhDraw(){
+  const view = rpView(), ae = document.activeElement, keep = ae && ae.id==='rh-q' ? ae.selectionStart : null;
+  view.innerHTML = rhHomeHtml(); rhSortApply();
+  if(keep!=null){ const q = document.getElementById('rh-q'); if(q){ q.focus(); q.setSelectionRange(keep, keep); } }
+  /* H4: route() scrolls to the top after drawing, so a list left for a report gets its place back once it has */
+  if(RH.fromReport){ RH.fromReport = false; const y = RH.h.y; setTimeout(()=>window.scrollTo(0, y), 0); }
+}
+/* H6: only the table and the count redraw as you type, so focus stays in the box */
+function rhSearch(v){
+  RH.h.q = v; LP.reports.page = 1;
+  document.getElementById('rh-main').innerHTML = rhTableHtml(RH.h.list, v); rhSortApply();
+  document.getElementById('rh-sub').textContent = rhSubText();
+}
+function rhPickList(k){ RH.h.list = k; RH.h.q = ''; RH.h.sort = null; LP.reports.page = 1; rhDraw(); const b = rpView().querySelector('[data-rhlist="'+k+'"]'); if(b) b.focus({preventScroll:true}); }
+/* E12: an address with no report */
+function rpMissingHtml(){ return '<h1 class="page-heading">Reports</h1><div class="page-sub">Report not found</div><div class="rh-empty">No report at this address.<button class="drill rh-lbtn" data-act="back">Back to Reports</button></div>'; }
+/* H10: the row menu, the app's float menu: Edit opens the builder (its Close comes back here); Add to dashboard is the
+   report page's own; Duplicate makes your own copy and opens it, with no toast */
+function rhMore(btn){
+  const x = rpEntry(btn.dataset.rhmore);
+  menuFloatOpen(btn, [{v:'edit', t:'Edit'},{v:'dash', t:'Add to dashboard'},{v:'dup', t:'Duplicate'}], it=>{
+    if(it.v==='dash') return setTimeout(()=>rpDashMenu(btn), 0);
+    if(it.v==='edit'){ RH.editOnOpen = true; RH.editFromHome = true; rpGo(x.id); }
+    if(it.v==='dup') rpGo(rpLibCopy(x).id);
+  });
+}
+function rhClick(e){
+  const t = e.target;
+  const li = t.closest('[data-rhlist]'); if(li) return rhPickList(li.dataset.rhlist);
+  const fav = t.closest('[data-rhfav]'); if(fav){
+    const x = rpEntry(fav.dataset.rhfav), at = [...rpView().querySelectorAll('[data-rhfav]')].indexOf(fav);
+    x.fav = !x.fav; rhDraw();
+    /* the same star, or, when the row left the list (Favorites), the next row's, else the list's name (H12) */
+    const stars = rpView().querySelectorAll('[data-rhfav]');
+    const b = rpView().querySelector('[data-rhfav="'+x.id+'"]') || stars[at] || stars[at-1] || rpView().querySelector('[data-rhlist="'+RH.h.list+'"]');
+    if(b) b.focus({preventScroll:true}); return; }
+  const more = t.closest('[data-rhmore]'); if(more) return rhMore(more);
+  const a = t.closest('[data-rh]'); if(a){ const k = a.dataset.rh;
+    if(k==='new') return rpNewOpen();
+    if(k==='toall') return rhPickList('all');
+    if(k==='clearq'){ RH.h.q = ''; rhDraw(); const q = document.getElementById('rh-q'); if(q) q.focus(); return; } }
+  if(t.closest('th')){ const b = t.closest('.th-sort'); if(b) setTimeout(()=>{ const th = b.closest('th'); RH.h.sort = {list:RH.h.list, i:[...th.parentNode.children].indexOf(th), dir:th.getAttribute('aria-sort')}; }, 0); return; }
+  const row = t.closest('[data-rhrow]'); if(row) return rpGo(row.dataset.rhrow);
+}
+/* H11: the lists' page bar (D467), wired to this list: pages, and 25, 50 or 100 per page */
+rpView().addEventListener('click', e=>{
+  if(!rpParse().home || !e.target.closest('.lp-bar')) return;
+  e.stopPropagation();
+  const st = LP.reports, b = e.target.closest('button'); if(!b) return;
+  const go = p=>{ st.page = p; rhDraw(); };
+  if(b.dataset.lp==='prev') return go(st.page-1);
+  if(b.dataset.lp==='next') return go(st.page+1);
+  if(b.dataset.lpn) return go(+b.dataset.lpn);
+  if(b.dataset.lpm==='size') menuFloatOpen(b, LP_SIZES.map(n=>({v:n, t:n+' per page', on:st.size===n})), it=>{ st.size = it.v; st.page = 1; rhDraw();
+    const t2 = rpView().querySelector('.lp-trig'); if(t2) t2.focus({preventScroll:true}); });
+}, true);
+
+/* ---------- the New report pop-up (D503; N1 to N8): the app's modal, 900px; types on the left, the chosen type's
+   details on the right; Cancel and Start report ---------- */
+function rpTypeMeta(k){
+  const T = RP_TYPES[k], prev = (rpC()||{}).type; rpUse(k);
+  const rows = T.rows(), d = T.def(), from = T.from ? rows.reduce((m,r)=>{ const v = T.from(r); return !m || v<m ? v : m; }, null) : '';
+  const cols = d.cols.map(c=>RPF[c].l).join(', ');
+  const filt = [(d.f.owner==='me' ? T.mine : T.all)].concat(d.f.root.items.map(x=>rpNodeText(x, null))).join(', ');
+  rpUse(prev);
+  return {n:rows.length.toLocaleString('en-US')+' '+T.noun[1]+(from ? ' from '+fmtDateMonthYear(from) : ''), cols, filt};
+}
+/* N3: the reports already built on the type, two by name and "and N more"; a name opens it */
+function rpBuiltOnHtml(k){
+  const l = RP_LIB.filter(x=>x.type===k).sort((a,b)=>a.title.localeCompare(b.title));
+  return '<div class="rh-tp-qh">Saved reports on it</div>'+(l.length ? l.slice(0,2).map(x=>'<button class="drill rh-lbtn rh-tp-r" data-rhopen="'+x.id+'">'+esc(x.title)+'</button>').join('')+
+    (l.length>2 ? '<div class="rh-tp-more">and '+(l.length-2)+' more</div>' : '') : '<div class="rh-tp-q rh-tp-none">None yet</div>');
+}
+function rpNewBody(){
+  const sel = RH.tp, T = RP_TYPES[sel], m = rpTypeMeta(sel);
+  const item = k=>'<button class="rh-tp-i'+(k===sel?' on':'')+'" data-rhtp="'+k+'" role="option" aria-selected="'+(k===sel)+'" tabindex="'+(k===sel?'0':'-1')+'">'+esc(RP_TYPES[k].label)+'</button>';
+  return '<div class="rh-tp"><div class="rh-tp-list" role="listbox" aria-label="Report types">'+
+    '<div class="rh-tp-h">Current records</div>'+RP_TYPE_ORDER.filter(k=>RP_TYPES[k].g==='cur').map(item).join('')+
+    '<div class="rh-tp-h second">History</div>'+RP_TYPE_ORDER.filter(k=>RP_TYPES[k].g==='his').map(item).join('')+'</div>'+
+    '<div class="rh-tp-d" aria-live="polite"><h3>'+esc(T.label)+'</h3><p class="rh-tp-desc">'+esc(T.desc)+'</p>'+
+    '<dl class="rh-kv"><dt>Records</dt><dd>'+esc(m.n)+'</dd><dt>Starts with</dt><dd>'+esc(m.cols)+'</dd><dt>Filtered to</dt><dd>'+esc(m.filt)+'</dd></dl>'+rpBuiltOnHtml(sel)+
+    '<div class="rh-tp-qh">Questions it answers</div>'+T.q.map(q=>'<div class="rh-tp-q">'+esc(q)+'</div>').join('')+'</div></div>';
+}
+MODALS.rpNewReport = ()=>({title:'New report', scope:'', cls:'rh-nr', body:rpNewBody(),
+  footer:'<div class="actions-end ml-auto"><button type="button" class="btn" data-rhn="cancel">Cancel</button><button type="button" class="btn primary" data-rhn="start">Start report</button></div>'});
+function rpNewOpen(){
+  openModal('rpNewReport');
+  const s = document.getElementById('modal-scrim'); if(!s) return;
+  s.addEventListener('click', rpNewClick); s.addEventListener('keydown', rpNewKey);
+  const on = s.querySelector('.rh-tp-i.on'); if(on) on.focus();
+}
+function rpNewPick(k){
+  RH.tp = k; const s = document.getElementById('modal-scrim'); if(!s) return;
+  s.querySelector('.modal-body').innerHTML = rpNewBody();
+  const b = s.querySelector('[data-rhtp="'+k+'"]'); if(b) b.focus();
+}
+/* N6: the builder on the type's starting columns and filter, its Fields pane open; nothing saved until Save (E7) */
+function rpNewStart(){ RH.h.y = window.scrollY; RP.cur = null; MODAL_RETURN_FOCUS = null; closeModal(); location.hash = '#/reports/r/new'; }
+function rpNewClick(e){
+  const tp = e.target.closest('[data-rhtp]'); if(tp) return rpNewPick(tp.dataset.rhtp);
+  const o = e.target.closest('[data-rhopen]'); if(o){ MODAL_RETURN_FOCUS = null; closeModal(); return rpGo(o.dataset.rhopen); }
+  const b = e.target.closest('[data-rhn]'); if(!b) return;
+  if(b.dataset.rhn==='cancel') return closeModal();
+  if(b.dataset.rhn==='start') return rpNewStart();
+}
+/* N7: Up and Down move through the types, Home and End jump, Enter starts; Escape is the modal's own */
+function rpNewKey(e){
+  const it = e.target.closest && e.target.closest('[data-rhtp]'); if(!it) return;
+  const ks = RP_TYPE_ORDER, i = ks.indexOf(it.dataset.rhtp);
+  const j = e.key==='ArrowDown' ? Math.min(ks.length-1, i+1) : e.key==='ArrowUp' ? Math.max(0, i-1) : e.key==='Home' ? 0 : e.key==='End' ? ks.length-1 : null;
+  if(j!=null){ e.preventDefault(); return rpNewPick(ks[j]); }
+  if(e.key==='Enter'){ e.preventDefault(); rpNewStart(); }
+}
+
 /* ---------- events ---------- */
 rpView().addEventListener('click', e=>{
+  if(rpParse().home) return rhClick(e);
   const view = rpView(), t = e.target.closest('button, a, .rp-fld'); if(!t || !view.contains(t)) return;
   if(RP_FIG_SKIP){ RP_FIG_SKIP = false; return; }   // the click that ends a pointer drag
   if(t.getAttribute('aria-disabled')==='true') return;
@@ -184165,24 +185742,31 @@ rpView().addEventListener('click', e=>{
     return; }
   if(!a) return;
   if(a==='run' || a==='save' || a==='saverun' || a==='fpanel') rpCommitTyping();   // O6: before anything falls out
+  if(a==='back'){ RH.fromReport = true; location.hash = '#/reports'; return; }   // E4: the list, its search, sort and scroll
   if(a==='fclear') return rpSet(d=>{ d.f.root = {op:'and', items:[]}; });
-  if(a==='fav'){ RP.fav = !RP.fav; rpDraw(); return; }
-  if(a==='addchart') return rpSet(d=>{ d.chart = {type:'hbar', view:d.gr[0]||'stage', seg:'', measure:'size'}; if(RPF[d.chart.view].date) d.chart.type = 'vbar'; });
+  if(a==='fav'){ RP.fav = !RP.fav; const x = rpEntry(RP.cur); if(x) x.fav = RP.fav; rpDraw(); return; }
+  if(a==='addchart') return rpSet(d=>{ const v = d.gr[0] || rpFirstG(); d.chart = {type:RPF[v].date ? 'vbar' : 'hbar', view:v, seg:'', measure:rpT().measure||'count'}; });
   if(a==='rmchart') return rpSet(d=>{ d.chart = null; });
   if(a==='fpanel'){ if(RP.fpanel) rpPrune(RP.saved.f.root, null); RP.fpanel = !RP.fpanel; rpDraw(); return; }   // closing: O5
   if(a==='dash') return rpDashMenu(t);
   if(a==='export') return rpExport();
   if(a==='edit'){ RP.draft = rpClone(RP.saved); RP.hist = []; RP.fut = []; RP.screen = 'build'; RP.renaming = false; rpDraw(); window.scrollTo(0,0); return; }
-  if(a==='close') return rpToRun(false);
+  if(a==='close'){
+    if(RP.cur==='new' && !RP.newSaved){ RP.cur = null; location.hash = '#/reports'; return; }   // E8: nothing kept
+    if(RH.editFromHome){ RH.editFromHome = false; RP.screen = 'run'; RP.draft = null; RH.fromReport = true; location.hash = '#/reports'; return; }   // H10
+    return rpToRun(false); }
+  if(a==='run' || a==='save' || a==='saverun') RH.editFromHome = false;
   if(a==='run'){ rpPruneDraft(); return rpToRun(true); }
-  if(a==='save'){ const cut = rpPruneDraft(); RP.saved = rpClone(RP.draft); if(cut) rpDraw(); toastShow({icon:'check', title:'Report saved', line:RP.draft.title}); return; }
-  if(a==='saverun'){ rpPruneDraft(); rpToRun(true); toastShow({icon:'check', title:'Report saved', line:RP.saved.title}); return; }
+  if(a==='save'){ const cut = rpPruneDraft(), was = RP.cur; RP.saved = rpClone(RP.draft); const line = rpFile();
+    if(cut || RP.cur!==was) rpDraw(); toastShow({icon:'check', title:'Report saved', line}); return; }
+  if(a==='saverun'){ rpPruneDraft(); RP.saved = rpClone(RP.draft); const line = rpFile(); rpToRun(false); toastShow({icon:'check', title:'Report saved', line}); return; }
   if(a==='undo'){ if(!RP.hist.length) return; RP.fut.push(rpClone(RP.draft)); RP.draft = RP.hist.pop(); rpDraw(); return; }
   if(a==='redo'){ if(!RP.fut.length) return; RP.hist.push(rpClone(RP.draft)); RP.draft = RP.fut.pop(); rpDraw(); return; }
   if(a==='fields'){ RP.fields = !RP.fields; rpDraw(); const q = document.getElementById('rp-fq'); if(q) q.focus(); return; }
   if(a==='rename'){ RP.renaming = true; rpDraw(); return; }
 });
 rpView().addEventListener('input', e=>{
+  if(e.target.id==='rh-q'){ rhSearch(e.target.value); return; }
   if(e.target.id==='rp-q'){ RP.q = e.target.value; rpDraw(); return; }
   if(e.target.id==='rp-fq'){ document.getElementById('rp-flist').innerHTML = rpFlistHtml(e.target.value); return; }
   if(e.target.dataset.ta){ if(!RP_TA || RP_TA.input!==e.target) rpTaOpen(e.target); else { RP_TA.hi = 0; rpTaDraw(); } }
@@ -184195,6 +185779,10 @@ rpView().addEventListener('focusout', e=>{
   if(e.target.id==='rp-rename' && RP.renaming){ const v = e.target.value.trim(); RP.renaming = false; if(v && v!==RP.draft.title) rpEdit(d=>{ d.title = v; }); else rpDraw(); }
 });
 rpView().addEventListener('keydown', e=>{
+  if(rpParse().home){
+    const st = e.target.closest && e.target.closest('.rh-starter'); if(st && (e.key==='Enter' || e.key===' ')){ e.preventDefault(); rpGo(st.dataset.rhrow); }
+    if(e.target.id==='rh-q' && e.key==='Escape' && RH.h.q){ e.preventDefault(); e.stopPropagation(); e.target.value = ''; rhSearch(''); }
+    return; }
   if(e.target.classList && e.target.classList.contains('rp-fld') && (e.key==='Enter'||e.key===' ')){ e.preventDefault(); e.target.click(); return; }
   if(e.target.id==='rp-rename'){ if(e.key==='Enter'){ e.preventDefault(); e.target.blur(); } else if(e.key==='Escape'){ e.preventDefault(); RP.renaming = false; rpDraw(); } return; }
   if(RP_TA && e.target===RP_TA.input){
