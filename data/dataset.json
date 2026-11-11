@@ -1090,6 +1090,690 @@
           }
         ]
       }
+    },
+    {
+      "id": "dash-open",
+      "type": "opps",
+      "title": "Open pipeline",
+      "description": "Every open opportunity, by stage",
+      "scope": "Certified",
+      "ownerId": "usr_admin",
+      "lastRun": "2026-08-15",
+      "runCount": 88,
+      "favorite": false,
+      "lastOpened": null,
+      "definition": {
+        "title": "Open pipeline",
+        "gr": [
+          "stage"
+        ],
+        "gc": [],
+        "cols": [
+          "name",
+          "product",
+          "owner",
+          "size"
+        ],
+        "sum": {
+          "size": "sum"
+        },
+        "sort": {
+          "k": "size",
+          "d": -1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "all",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "status",
+                "o": "in",
+                "v": [
+                  "Open"
+                ]
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          },
+          {
+            "k": "size",
+            "how": "sum"
+          }
+        ]
+      }
+    },
+    {
+      "id": "dash-funded",
+      "type": "opps",
+      "title": "Funded this year",
+      "description": "Opportunities funded this year, by owner, against the annual goal",
+      "scope": "Certified",
+      "ownerId": "usr_admin",
+      "lastRun": "2026-08-15",
+      "runCount": 80,
+      "favorite": false,
+      "lastOpened": null,
+      "definition": {
+        "title": "Funded this year",
+        "gr": [
+          "owner"
+        ],
+        "gc": [],
+        "cols": [
+          "name",
+          "product",
+          "funded",
+          "size"
+        ],
+        "sum": {
+          "size": "sum"
+        },
+        "sort": {
+          "k": "size",
+          "d": -1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "all",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "status",
+                "o": "in",
+                "v": [
+                  "Won"
+                ]
+              },
+              {
+                "field": "funded",
+                "o": "rel",
+                "v": {
+                  "r": "thisy",
+                  "n": 30
+                }
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          },
+          {
+            "k": "size",
+            "how": "sum"
+          }
+        ],
+        "goal": "annualQuota"
+      }
+    },
+    {
+      "id": "dash-win",
+      "type": "opps",
+      "title": "Win rate this year",
+      "description": "Opportunities closed this year, won and lost",
+      "scope": "Certified",
+      "ownerId": "usr_admin",
+      "lastRun": "2026-08-14",
+      "runCount": 71,
+      "favorite": false,
+      "lastOpened": null,
+      "definition": {
+        "title": "Win rate this year",
+        "gr": [
+          "status"
+        ],
+        "gc": [],
+        "cols": [
+          "name",
+          "product",
+          "closed",
+          "size"
+        ],
+        "sum": {
+          "size": "sum"
+        },
+        "sort": {
+          "k": "size",
+          "d": -1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "all",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "status",
+                "o": "in",
+                "v": [
+                  "Won",
+                  "Lost"
+                ]
+              },
+              {
+                "field": "closed",
+                "o": "rel",
+                "v": {
+                  "r": "thisy",
+                  "n": 30
+                }
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          },
+          {
+            "k": "size",
+            "how": "sum"
+          }
+        ],
+        "rate": {
+          "k": "status",
+          "v": "Won"
+        }
+      }
+    },
+    {
+      "id": "dash-cov",
+      "type": "opps",
+      "title": "Coverage",
+      "description": "Open pipeline against the goal still to fund this year",
+      "scope": "Certified",
+      "ownerId": "usr_admin",
+      "lastRun": "2026-08-14",
+      "runCount": 63,
+      "favorite": false,
+      "lastOpened": null,
+      "definition": {
+        "title": "Coverage",
+        "gr": [],
+        "gc": [],
+        "cols": [
+          "name",
+          "stage",
+          "owner",
+          "size"
+        ],
+        "sum": {
+          "size": "sum"
+        },
+        "sort": {
+          "k": "size",
+          "d": -1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "all",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "status",
+                "o": "in",
+                "v": [
+                  "Open"
+                ]
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          },
+          {
+            "k": "size",
+            "how": "sum"
+          }
+        ],
+        "goal": "annualQuota",
+        "vs": "remaining"
+      }
+    },
+    {
+      "id": "dash-pace",
+      "type": "opps",
+      "title": "Funded this year against pace",
+      "description": "Facility size funded in each month this year, against the annual goal",
+      "scope": "Certified",
+      "ownerId": "usr_admin",
+      "lastRun": "2026-08-13",
+      "runCount": 52,
+      "favorite": false,
+      "lastOpened": null,
+      "definition": {
+        "title": "Funded this year against pace",
+        "gr": [
+          "fmonth"
+        ],
+        "gc": [],
+        "cols": [
+          "name",
+          "owner",
+          "funded",
+          "size"
+        ],
+        "sum": {
+          "size": "sum"
+        },
+        "sort": {
+          "k": "funded",
+          "d": 1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "all",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "status",
+                "o": "in",
+                "v": [
+                  "Won"
+                ]
+              },
+              {
+                "field": "funded",
+                "o": "rel",
+                "v": {
+                  "r": "thisy",
+                  "n": 30
+                }
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          },
+          {
+            "k": "size",
+            "how": "sum"
+          }
+        ],
+        "goal": "annualQuota"
+      }
+    },
+    {
+      "id": "dash-attain",
+      "type": "opps",
+      "title": "Goal attainment, by BDO",
+      "description": "Funded this year by each BDO, against their annual goal",
+      "scope": "Certified",
+      "ownerId": "usr_admin",
+      "lastRun": "2026-08-13",
+      "runCount": 48,
+      "favorite": false,
+      "lastOpened": null,
+      "definition": {
+        "title": "Goal attainment, by BDO",
+        "gr": [
+          "owner"
+        ],
+        "gc": [],
+        "cols": [
+          "name",
+          "product",
+          "funded",
+          "size"
+        ],
+        "sum": {
+          "size": "sum"
+        },
+        "sort": {
+          "k": "size",
+          "d": -1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "all",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "status",
+                "o": "in",
+                "v": [
+                  "Won"
+                ]
+              },
+              {
+                "field": "funded",
+                "o": "rel",
+                "v": {
+                  "r": "thisy",
+                  "n": 30
+                }
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          },
+          {
+            "k": "size",
+            "how": "sum"
+          }
+        ],
+        "goal": "annualQuota"
+      }
+    },
+    {
+      "id": "dash-snap",
+      "type": "hist",
+      "title": "Open pipeline at month end, by stage",
+      "description": "Opportunities open at each month end this year, and today, by stage, at today's facility size",
+      "scope": "Certified",
+      "ownerId": "usr_admin",
+      "lastRun": "2026-08-12",
+      "runCount": 34,
+      "favorite": false,
+      "lastOpened": null,
+      "definition": {
+        "title": "Open pipeline at month end, by stage",
+        "gr": [
+          "at"
+        ],
+        "gc": [
+          "stage"
+        ],
+        "cols": [
+          "opp",
+          "in",
+          "product",
+          "size"
+        ],
+        "sum": {
+          "size": "sum"
+        },
+        "sort": null,
+        "gsort": {},
+        "f": {
+          "owner": "all",
+          "root": {
+            "op": "and",
+            "items": []
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          },
+          {
+            "k": "size",
+            "how": "sum"
+          }
+        ],
+        "snap": "month"
+      }
+    },
+    {
+      "id": "dash-funnel",
+      "type": "hist",
+      "title": "Stage conversion",
+      "description": "Opportunities created this year, by each stage they reached",
+      "scope": "Certified",
+      "ownerId": "usr_admin",
+      "lastRun": "2026-08-11",
+      "runCount": 32,
+      "favorite": false,
+      "lastOpened": null,
+      "definition": {
+        "title": "Stage conversion",
+        "gr": [
+          "stage"
+        ],
+        "gc": [],
+        "cols": [
+          "opp",
+          "in",
+          "out",
+          "product",
+          "size"
+        ],
+        "sum": {},
+        "sort": {
+          "k": "in",
+          "d": 1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "all",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "stage",
+                "o": "in",
+                "v": [
+                  "Qualification",
+                  "Structuring",
+                  "Proposal",
+                  "Underwriting",
+                  "Won"
+                ]
+              },
+              {
+                "field": "created",
+                "o": "rel",
+                "v": {
+                  "r": "thisy",
+                  "n": 30
+                }
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          }
+        ],
+        "uniq": "opp"
+      }
+    },
+    {
+      "id": "dash-moves",
+      "type": "fch",
+      "title": "Expected close dates moved this year",
+      "description": "Close-date changes this year, by opportunity, with the days each moved later",
+      "scope": "Certified",
+      "ownerId": "usr_admin",
+      "lastRun": "2026-08-09",
+      "runCount": 26,
+      "favorite": false,
+      "lastOpened": null,
+      "definition": {
+        "title": "Expected close dates moved this year",
+        "gr": [
+          "rec"
+        ],
+        "gc": [],
+        "cols": [
+          "old",
+          "nv",
+          "at",
+          "later"
+        ],
+        "sum": {
+          "later": "sum"
+        },
+        "sort": {
+          "k": "at",
+          "d": -1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "all",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "field",
+                "o": "in",
+                "v": [
+                  "Expected close"
+                ]
+              },
+              {
+                "field": "at",
+                "o": "rel",
+                "v": {
+                  "r": "thisy",
+                  "n": 30
+                }
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          }
+        ]
+      }
+    }
+  ],
+  "dashboards": [
+    {
+      "id": "pipeline-review",
+      "name": "Pipeline review",
+      "scope": "Team",
+      "ownerId": "usr_admin",
+      "cards": [
+        {
+          "report": "dash-open",
+          "display": "number",
+          "measure": "size",
+          "span": 3
+        },
+        {
+          "report": "dash-funded",
+          "display": "number",
+          "measure": "size",
+          "span": 3
+        },
+        {
+          "report": "dash-win",
+          "display": "number",
+          "measure": "rate",
+          "span": 3
+        },
+        {
+          "report": "dash-cov",
+          "display": "number",
+          "measure": "rate",
+          "span": 3
+        },
+        {
+          "report": "dash-pace",
+          "display": "pace",
+          "measure": "size",
+          "span": 8
+        },
+        {
+          "report": "dash-attain",
+          "display": "bullet",
+          "measure": "size",
+          "span": 4
+        },
+        {
+          "report": "dash-snap",
+          "display": "stack",
+          "measure": "size",
+          "span": 8
+        },
+        {
+          "report": "dash-funnel",
+          "display": "funnel",
+          "measure": "count",
+          "span": 4
+        },
+        {
+          "report": "dash-moves",
+          "display": "slip",
+          "measure": "size",
+          "span": 12
+        }
+      ]
     }
   ],
   "partners": [

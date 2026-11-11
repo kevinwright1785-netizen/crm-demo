@@ -30,6 +30,9 @@
      10.10:1 (WCAG relative-luminance formula), clearing the same >=7.7:1 bar the other triples
      already hold themselves to. */
   --cat-d:#7A4A6B; --cat-d-soft:#F3E7EF; --cat-d-ink:#5C3550;
+  /* D521: a fifth data colour, for a fifth channel on dashboard charts only. No card on the first
+     dashboard uses it. Named --cat-e because --cat-d is D142's. */
+  --cat-e:#C2A14A;
   --brand-a05:rgba(14,94,99,.05); --brand-a06:rgba(14,94,99,.06);
   --brand-a07:rgba(14,94,99,.07);
   --brand-a15:rgba(14,94,99,.15); --brand-a25:rgba(14,94,99,.25);
@@ -995,11 +998,11 @@ body.snap-lead.panel-open #view-home .snapshot-panel{order:-1}
    the top once scrolled and over 40px at the bottom while more remains (fadeEdges() sets the two
    classes). A logged exception to the no-gradients rule, scoped to scroll edges (CLAUDE.md §4). The
    mask reads alpha only, so its opaque stop is a token rather than a colour keyword. */
-.dd-scroll,.modal-body,.kcol-body,.act-scroll,.act-up-scroll{--fade-top:0px;--fade-bottom:0px;
+.dd-scroll,.modal-body,.kcol-body,.act-scroll,.act-up-scroll,.ds-body .ds-tbl{--fade-top:0px;--fade-bottom:0px;
   -webkit-mask-image:linear-gradient(to bottom,transparent 0,var(--ink) var(--fade-top),var(--ink) calc(100% - var(--fade-bottom)),transparent 100%);
   mask-image:linear-gradient(to bottom,transparent 0,var(--ink) var(--fade-top),var(--ink) calc(100% - var(--fade-bottom)),transparent 100%)}
-.dd-scroll.fade-top,.modal-body.fade-top,.kcol-body.fade-top,.act-scroll.fade-top,.act-up-scroll.fade-top{--fade-top:var(--s5)}
-.dd-scroll.fade-bot,.modal-body.fade-bot,.kcol-body.fade-bot,.act-scroll.fade-bot,.act-up-scroll.fade-bot{--fade-bottom:40px}
+.dd-scroll.fade-top,.modal-body.fade-top,.kcol-body.fade-top,.act-scroll.fade-top,.act-up-scroll.fade-top,.ds-body .ds-tbl.fade-top{--fade-top:var(--s5)}
+.dd-scroll.fade-bot,.modal-body.fade-bot,.kcol-body.fade-bot,.act-scroll.fade-bot,.act-up-scroll.fade-bot,.ds-body .ds-tbl.fade-bot{--fade-bottom:40px}
 
 /* ---------- pipeline stage-filter chip (Pipeline view, arrived via a stage-bar click) ---------- */
 .stage-filter-clear{margin-left:var(--s1);background:none;border:none;color:var(--brand);
@@ -2646,6 +2649,209 @@ body.rp-dragging .rp-figb:hover .rp-fig-l{color:var(--ink-3)}
 .rp-rel-w{border-left:2px solid var(--line-2);padding-left:var(--s2);margin:var(--s1) 0 0}
 .rp-rel-w .rp-flogic{margin:0 0 var(--s1)}
 .rp-rel .rp-link{align-self:flex-start}
+
+/* ===== the Dashboards page (D524, D525; spec Other/mocks/dashboard-spec-v3.html, D522). Chart marks take D521's
+   dashboard colours: the stage ramp (--st-1..4, --brand-ink for Won), the product colours, --brand-2 for one unordered
+   group, --cat-e for a fifth channel. ===== */
+.ds-headrow{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--s4)}
+.ds-actions{display:flex;align-items:center;gap:var(--s3)}
+.ds-star{all:unset;box-sizing:border-box;cursor:pointer;width:var(--h);height:var(--h);display:inline-grid;place-items:center;border-radius:var(--r-s);color:var(--brand)}
+.ds-star:hover{background:var(--hover)}
+.ds-star:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
+.ds-star svg{width:16px;height:16px;display:block}
+.ds-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:var(--s5);align-items:stretch}
+.ds-grid > .panel{margin-bottom:0;display:flex;flex-direction:column;min-width:0}
+.ds-grid > .panel > .panel-body{flex:1}
+.ds-grid > .s4{grid-column:span 4}
+.ds-grid > .s6{grid-column:span 6}
+.ds-grid > .s8{grid-column:span 8}
+.ds-grid > .s12{grid-column:span 12}
+#view-dashboards .strip{margin-bottom:var(--s5)}
+.ds-tbl{max-height:168px;overflow-y:auto;overflow-x:hidden}
+.ds-tbl.full{max-height:none}
+.ds-tile .tbl{width:100%;table-layout:fixed}
+.ds-tile .tbl th:first-child,.ds-tile .tbl td:first-child{padding-left:0}
+.ds-tile .tbl th:last-child,.ds-tile .tbl td:last-child{padding-right:0}
+.ds-tile .tbl thead th{position:sticky;top:0;background:var(--paper);z-index:1}
+.ds-tile .tbl td{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ds-count{margin-top:var(--s3);font-size:12px;color:var(--ink-3)}
+.ds-body{height:228px;display:flex;flex-direction:column;min-width:0}
+.ds-vb{flex:1;display:flex;align-items:stretch;gap:var(--s3);min-height:0}
+.ds-vcol{flex:1;min-width:0;display:flex;flex-direction:column;align-items:stretch}
+.ds-vval{font-size:12px;color:var(--ink);text-align:center;margin-bottom:var(--s1);font-variant-numeric:tabular-nums}
+.ds-vtrack{flex:1;display:flex;align-items:flex-end;min-height:0}
+.ds-vbar{width:100%;background:var(--brand-a15);border-radius:var(--r-s);transition:background var(--t-fast) var(--ease)}
+.ds-vname{height:32px;margin-top:var(--s2);font-size:11px;line-height:16px;color:var(--ink-2);text-align:center;overflow:hidden}
+.ds-dn{flex:1;display:flex;align-items:center;gap:var(--s5);min-height:0}
+.ds-dn svg{flex:0 0 auto;width:148px;height:148px;display:block}
+.ds-dn circle{fill:none;stroke-width:20}
+.ds-dn text{font-family:var(--ui);fill:var(--ink)}
+.ds-dn .dn-tot{font-size:19px;font-weight:500;letter-spacing:-.03em}
+.ds-dn .dn-totl{font-size:11px;fill:var(--ink-3)}
+.ds-dnl{flex:1;min-width:0;display:flex;flex-direction:column;gap:var(--s2)}
+.ds-dnrow{display:grid;grid-template-columns:12px minmax(0,1fr);column-gap:var(--s2);align-items:center;font-size:12px;color:var(--ink)}
+.ds-dnsw{width:12px;height:12px;border-radius:var(--r-s)}
+.ds-dnname{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ds-dnval{grid-column:2;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--ink-2)}
+.ds-dnval span{color:var(--ink-3);margin-left:var(--s2)}
+.ds-fn{flex:1;display:flex;flex-direction:column;justify-content:space-between;min-height:0}
+.ds-fnrow{display:grid;grid-template-columns:96px minmax(0,1fr) 64px;column-gap:var(--s3);align-items:center;height:28px;font-size:12px;color:var(--ink)}
+.ds-fntrack{display:flex;justify-content:center;height:100%}
+.ds-fnbar{height:100%;border-radius:var(--r-s);background:var(--brand-a15);transition:background var(--t-fast) var(--ease)}
+.ds-fnval{text-align:right;font-variant-numeric:tabular-nums}
+.ds-fnconv{display:grid;grid-template-columns:96px minmax(0,1fr) 64px;column-gap:var(--s3);font-size:11px;color:var(--ink-3);height:16px;line-height:16px}
+.ds-fnconv span{grid-column:2;text-align:center}
+.ds-body .ds-tbl{max-height:none;flex:1;min-height:0;overflow-y:auto}
+.ds-body .ds-count{margin-top:var(--s2)}
+.ds-tile.wide .ds-fnrow,.ds-tile.wide .ds-fnconv{grid-template-columns:120px minmax(0,1fr) 96px}
+.ds-panel{position:fixed;top:0;right:0;bottom:0;width:460px;z-index:var(--z-modal);background:var(--paper);box-shadow:var(--lift-hi);display:flex;flex-direction:column}
+.ds-phead{padding:var(--s5) var(--s5) var(--s4);display:flex;align-items:flex-start;justify-content:space-between;gap:var(--s3)}
+.ds-ptitle{font-size:13.5px;font-weight:500;letter-spacing:-.01em;color:var(--ink)}
+.ds-psub{font-size:12px;color:var(--ink-3);margin-top:var(--s1)}
+.ds-pbody{flex:1;overflow:auto;padding:0 var(--s5) var(--s5)}
+.ds-prev{border:1px solid var(--line);border-radius:var(--r-m);padding:var(--s4);margin-bottom:var(--s5)}
+.ds-plab{font-size:12px;font-weight:500;color:var(--ink-2);margin:0 0 var(--s2)}
+.ds-opts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s2);margin-bottom:var(--s5)}
+.ds-opts.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.ds-opt{all:unset;box-sizing:border-box;cursor:pointer;height:var(--h);padding:0 var(--s3);display:flex;align-items:center;justify-content:center;border:1px solid var(--line-2);border-radius:var(--r-s);font-size:12px;font-weight:500;color:var(--ink);white-space:nowrap}
+.ds-opt:hover{background:var(--hover)}
+.ds-opt.on{border-color:var(--brand);background:var(--brand-soft);color:var(--brand-ink)}
+.ds-opt:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
+.ds-opt[disabled]{cursor:default;color:var(--ink-3);background:var(--sunken);border-color:var(--line)}
+.ds-pnote{font-size:12px;color:var(--ink-3);margin:calc(-1 * var(--s3)) 0 var(--s5)}
+.ds-pfoot{padding:var(--s4) var(--s5);display:flex;justify-content:flex-end;gap:var(--s2);border-top:1px solid var(--line)}
+.ds-hb{display:grid;grid-template-columns:152px minmax(0,1fr) 60px;column-gap:var(--s3);align-items:center;height:28px;margin-bottom:var(--s3);font-size:12px;color:var(--ink)}
+.ds-hb:last-of-type{margin-bottom:0}
+.ds-hbname{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ds-hbtrack{height:100%;display:flex}
+.ds-hbbar{height:100%;border-radius:var(--r-s)}
+.ds-hbval{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.ds-hb:hover .ds-hbbar,.ds-vcol:hover .ds-vbar,.ds-fnrow:hover .ds-fnbar{opacity:.8}
+.k-brand{background:var(--brand-2)}
+.k-sr-0{background:var(--st-1)}
+.k-sr-1{background:var(--st-2)}
+.k-sr-2{background:var(--st-3)}
+.k-sr-3{background:var(--st-4)}
+.k-sr-4{background:var(--brand-ink)}
+.k-cat-a{background:var(--cat-a)}
+.k-cat-b{background:var(--cat-b)}
+.k-cat-c{background:var(--cat-c)}
+.k-cat-e{background:var(--cat-e)}
+.k-other{background:var(--neutral-a15)}
+.ds-dn circle.k-brand{stroke:var(--brand-2)}
+.ds-dn circle.k-cat-a{stroke:var(--cat-a)}
+.ds-dn circle.k-cat-b{stroke:var(--cat-b)}
+.ds-dn circle.k-cat-c{stroke:var(--cat-c)}
+.ds-dn circle.k-cat-e{stroke:var(--cat-e)}
+.ds-dn circle.k-other{stroke:var(--neutral-a15)}
+.ds-dn circle.k-sr-0{stroke:var(--st-1)}
+.ds-dn circle.k-sr-1{stroke:var(--st-2)}
+.ds-dn circle.k-sr-2{stroke:var(--st-3)}
+.ds-dn circle.k-sr-3{stroke:var(--st-4)}
+.ds-editbar{position:sticky;top:57px;z-index:var(--z-sticky);display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s4);margin-bottom:var(--s5);
+  background:var(--paper);border:1px solid var(--line-2);border-radius:var(--r-m);font-size:12px;color:var(--ink-2)}
+.ds-editbar b{font-weight:500;color:var(--ink)}
+.ds-grow{flex:1}
+.ds-gridwrap{position:relative}
+.ds-guides{position:absolute;inset:calc(-1 * var(--s2)) 0;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:var(--s5);pointer-events:none}
+.ds-guides div{border:1px dashed var(--line-2);border-radius:var(--r-s)}
+.ds-editing .ds-grid{position:relative}
+.ds-editing .ds-tile{cursor:default}
+.ds-handle{all:unset;box-sizing:border-box;width:24px;height:24px;display:inline-grid;place-items:center;border-radius:var(--r-s);color:var(--ink-3);cursor:grab;flex:0 0 auto}
+.ds-handle:hover{background:var(--hover);color:var(--ink)}
+.ds-handle svg{width:16px;height:16px;display:block}
+.ds-editing .toggle-header-top{gap:var(--s2)}
+.ds-editing .panel-title{flex:1}
+.ds-resize{position:absolute;right:0;bottom:0;width:24px;height:24px;cursor:nwse-resize;color:var(--ink-3);display:grid;place-items:center;touch-action:none}
+.ds-resize svg{width:12px;height:12px;display:block}
+.ds-tile.dragging{opacity:.4}
+.ds-tile.resizing{outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
+.ds-sizetag{position:absolute;right:var(--s5);bottom:var(--s2);font-size:11px;color:var(--brand-ink);background:var(--brand-soft);border-radius:var(--r-s);padding:0 var(--s2);line-height:20px}
+.ds-addrow{display:flex;align-items:center;justify-content:space-between;gap:var(--s3);padding:var(--s3) 0;border-bottom:1px solid var(--row-sep);font-size:12px;color:var(--ink)}
+.ds-addrow span:last-child{color:var(--brand);font-weight:500}
+.ds-addrow small{display:block;font-size:11px;color:var(--ink-3)}
+.ds-hero{height:320px}
+.ds-heroSvg{width:100%;height:100%;display:block}
+.ds-heroSvg .g{stroke:var(--line);stroke-width:1}
+.ds-heroSvg .area{fill:var(--brand-a07)}
+.ds-heroSvg .act{fill:none;stroke:var(--brand);stroke-width:2.5;stroke-linejoin:round}
+.ds-heroSvg .pace{fill:none;stroke:var(--ink-2);stroke-width:1.5;stroke-dasharray:5 4}
+.ds-heroSvg .today{stroke:var(--line-2);stroke-width:1}
+.ds-heroSvg .dot{fill:var(--paper);stroke:var(--brand);stroke-width:2}
+.ds-heroSvg text{font-family:var(--ui);font-size:11px;fill:var(--ink-3)}
+.ds-heroSvg text.lab{fill:var(--ink);font-size:12px}
+.ds-bl{display:grid;grid-template-columns:120px minmax(0,1fr) 44px;column-gap:var(--s3);align-items:center;height:24px;margin-bottom:var(--s4);font-size:12px;color:var(--ink)}
+.ds-bl:last-child{margin-bottom:0}
+.ds-bltrack{position:relative;height:12px;background:var(--neutral-a15);border-radius:var(--r-s)}
+.ds-blbar{position:absolute;left:0;top:0;bottom:0;background:var(--brand-2);border-radius:var(--r-s)}
+.ds-bltick{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--ink)}
+.ds-blv{text-align:right;font-variant-numeric:tabular-nums}
+.ds-stk{flex:1;display:flex;gap:var(--s3);min-height:0}
+.ds-stkcol{flex:1;min-width:0;display:flex;flex-direction:column}
+.ds-stktrack{flex:1;display:flex;flex-direction:column;justify-content:flex-end;min-height:0}
+.ds-stkseg{width:100%;border-top:1px solid var(--paper)}
+.ds-stkseg:first-child{border-radius:var(--r-s) var(--r-s) 0 0;border-top:0}
+.ds-stkname{font-size:11px;color:var(--ink-2);text-align:center;margin-top:var(--s2)}
+.ds-key{display:flex;gap:var(--s4);margin-top:var(--s3);font-size:11px;color:var(--ink-2)}
+.ds-key span{display:inline-flex;align-items:center;gap:var(--s1)}
+.ds-key i{width:12px;height:12px;border-radius:var(--r-s);display:inline-block}
+.ds-cellbar{display:flex;align-items:center;justify-content:flex-end;gap:var(--s2)}
+.ds-cellbar i{height:8px;border-radius:var(--r-s);background:var(--brand-a30);display:inline-block}
+.ds-goal{margin-top:var(--s2);position:relative;height:6px;background:var(--neutral-a15);border-radius:var(--r-s)}
+.ds-goal i{position:absolute;left:0;top:0;bottom:0;background:var(--brand-2);border-radius:var(--r-s)}
+.ds-goal b{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink)}
+.ds-body.tall{height:320px}
+.ds-body.auto{height:auto}
+#view-dashboards .ds-strip{margin-bottom:0;display:grid;min-width:0}
+.ds-strip > .met{min-width:0}
+.ds-strip > .met:first-child{border-left:0}
+.ds-cell{position:relative}
+.ds-cellhead{display:flex;align-items:center;gap:var(--s2)}
+.ds-cellhead .met-label{flex:1;min-width:0}
+.ds-cell .rh-more{position:absolute;top:var(--s3);right:var(--s3);opacity:0;transition:opacity var(--t-fast) var(--ease)}
+.ds-cell:hover .rh-more,.ds-cell .rh-more:focus-visible,.ds-editing .ds-cell .rh-more{opacity:1}
+.ds-cell.dragging{opacity:.4}
+.ds-cell .ds-handle{margin:calc(-1 * var(--s1)) 0 calc(-1 * var(--s1)) calc(-1 * var(--s1))}
+.ds-hero{height:100%}
+.ds-bl:last-child{margin-bottom:0}
+.ds-grid > .ds-strip{align-self:start}
+.ds-vtrack,.ds-stktrack{flex-direction:column;justify-content:flex-end;align-items:stretch}
+.ds-vtrack .ds-vval,.ds-stktrack .ds-vval{flex:0 0 auto;height:20px;line-height:16px;margin-bottom:0}
+.ds-vtrack .ds-vbar{flex:0 0 auto}
+.ds-stktrack .ds-stkseg{flex:0 0 auto}
+.ds-stkseg:first-child{border-radius:0;border-top:1px solid var(--paper)}
+.ds-vval + .ds-stkseg{border-radius:var(--r-s) var(--r-s) 0 0;border-top:0}
+.ds-heroSvg{width:auto;height:auto;max-width:100%}
+.ds-heroSvg text{fill:var(--ink-2)}
+.ds-heroSvg .act{stroke-width:2}
+.ds-heroSvg .hit{stroke:transparent;stroke-width:12;fill:none}
+.ds-hb,.ds-bl{grid-template-columns:120px minmax(0,1fr) 56px}
+.ds-fnrow,.ds-fnconv{grid-template-columns:120px minmax(0,1fr) 56px}
+.ds-tile.wide .ds-fnrow,.ds-tile.wide .ds-fnconv{grid-template-columns:120px minmax(0,1fr) 56px}
+.ds-vtrack .ds-vval,.ds-stktrack .ds-vval{height:var(--s5);line-height:var(--s5)}
+.ds-vname{white-space:nowrap;text-overflow:ellipsis;height:var(--s4)}
+.ds-goal{height:var(--s2)}
+.ds-goal b,.ds-bltick{top:calc(-1 * var(--s1));bottom:calc(-1 * var(--s1))}
+.ds-cell .rh-more{top:var(--s3);right:var(--s5)}
+.ds-handle:focus-visible{outline:var(--focus) solid var(--brand);outline-offset:var(--focus-offset)}
+.ds-editing .panel-scope{margin-left:var(--s6)}
+.ds-prev{overflow:auto}
+.ds-guides{inset:calc(-1 * var(--s3)) 0 calc(-1 * var(--s7)) 0}
+.ds-editing{padding-bottom:var(--s7)}
+#view-dashboards .empty{grid-column:span 12}
+/* D525: value labels wider than their bars: none drawn. Bar heights leave the label's --s5 either way, so the bars do not move */
+.ds-nolab .ds-vval{display:none}
+/* the pace chart's fill never takes the pointer, so the today and pace lines hover along their whole length (O14) */
+.ds-heroSvg .area{pointer-events:none}
+/* D525: the Edit card and + Card panels are the Sheet's scrim and surface (.dd-scrim, .dd-pop), docked at the right,
+   460px, full height (O26); the handle takes the pointer whole so a press starts a move (O31) */
+.dd-scrim.ds-sheet{display:block;padding:0}
+.dd-pop.ds-panel{border-radius:0;max-width:none;max-height:none;padding:0}
+.ds-handle{touch-action:none}
+.ds-tile.dragging{cursor:grabbing}
+/* the star: filled while a favorite, outlined when not (O2) */
+.ds-star svg{fill:currentColor}
+.ds-star.off svg{fill:none;stroke:currentColor;stroke-width:1.25}
 </style>
 
 <div class="app">
@@ -2681,6 +2887,10 @@ body.rp-dragging .rp-figb:hover .rp-fig-l{color:var(--ink-3)}
       <a class="rail-item" href="#/reports" data-route="reports">
         <svg class="rail-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 16v-3"/><path d="M12 16V9"/><path d="M16 16v-5"/></svg>
         <span class="rail-label">Reports</span>
+      </a>
+      <a class="rail-item" href="#/dashboards" data-route="dashboards">
+        <svg class="rail-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="5" rx="1.5"/><rect x="13" y="10" width="8" height="11" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/></svg>
+        <span class="rail-label">Dashboards</span>
       </a>
       <a class="rail-item inert" href="#/network" data-route="network" title="Network · soon" aria-label="Network · soon">
         <svg class="rail-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.3 11l7.4-4"/><path d="M8.3 13l7.4 4"/></svg>
@@ -2747,6 +2957,7 @@ body.rp-dragging .rp-figb:hover .rp-fig-l{color:var(--ink-3)}
       <div class="view" id="view-benchmarking"></div>
       <div class="view" id="view-contact"></div>
       <div class="view" id="view-reports"></div>
+      <div class="view" id="view-dashboards"></div>
     </div>
   </div>
 </div>
@@ -3846,6 +4057,690 @@ const DATASET = {
           }
         ]
       }
+    },
+    {
+      "id": "dash-open",
+      "type": "opps",
+      "title": "Open pipeline",
+      "description": "Every open opportunity, by stage",
+      "scope": "Certified",
+      "ownerId": "usr_admin",
+      "lastRun": "2026-08-15",
+      "runCount": 88,
+      "favorite": false,
+      "lastOpened": null,
+      "definition": {
+        "title": "Open pipeline",
+        "gr": [
+          "stage"
+        ],
+        "gc": [],
+        "cols": [
+          "name",
+          "product",
+          "owner",
+          "size"
+        ],
+        "sum": {
+          "size": "sum"
+        },
+        "sort": {
+          "k": "size",
+          "d": -1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "all",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "status",
+                "o": "in",
+                "v": [
+                  "Open"
+                ]
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          },
+          {
+            "k": "size",
+            "how": "sum"
+          }
+        ]
+      }
+    },
+    {
+      "id": "dash-funded",
+      "type": "opps",
+      "title": "Funded this year",
+      "description": "Opportunities funded this year, by owner, against the annual goal",
+      "scope": "Certified",
+      "ownerId": "usr_admin",
+      "lastRun": "2026-08-15",
+      "runCount": 80,
+      "favorite": false,
+      "lastOpened": null,
+      "definition": {
+        "title": "Funded this year",
+        "gr": [
+          "owner"
+        ],
+        "gc": [],
+        "cols": [
+          "name",
+          "product",
+          "funded",
+          "size"
+        ],
+        "sum": {
+          "size": "sum"
+        },
+        "sort": {
+          "k": "size",
+          "d": -1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "all",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "status",
+                "o": "in",
+                "v": [
+                  "Won"
+                ]
+              },
+              {
+                "field": "funded",
+                "o": "rel",
+                "v": {
+                  "r": "thisy",
+                  "n": 30
+                }
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          },
+          {
+            "k": "size",
+            "how": "sum"
+          }
+        ],
+        "goal": "annualQuota"
+      }
+    },
+    {
+      "id": "dash-win",
+      "type": "opps",
+      "title": "Win rate this year",
+      "description": "Opportunities closed this year, won and lost",
+      "scope": "Certified",
+      "ownerId": "usr_admin",
+      "lastRun": "2026-08-14",
+      "runCount": 71,
+      "favorite": false,
+      "lastOpened": null,
+      "definition": {
+        "title": "Win rate this year",
+        "gr": [
+          "status"
+        ],
+        "gc": [],
+        "cols": [
+          "name",
+          "product",
+          "closed",
+          "size"
+        ],
+        "sum": {
+          "size": "sum"
+        },
+        "sort": {
+          "k": "size",
+          "d": -1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "all",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "status",
+                "o": "in",
+                "v": [
+                  "Won",
+                  "Lost"
+                ]
+              },
+              {
+                "field": "closed",
+                "o": "rel",
+                "v": {
+                  "r": "thisy",
+                  "n": 30
+                }
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          },
+          {
+            "k": "size",
+            "how": "sum"
+          }
+        ],
+        "rate": {
+          "k": "status",
+          "v": "Won"
+        }
+      }
+    },
+    {
+      "id": "dash-cov",
+      "type": "opps",
+      "title": "Coverage",
+      "description": "Open pipeline against the goal still to fund this year",
+      "scope": "Certified",
+      "ownerId": "usr_admin",
+      "lastRun": "2026-08-14",
+      "runCount": 63,
+      "favorite": false,
+      "lastOpened": null,
+      "definition": {
+        "title": "Coverage",
+        "gr": [],
+        "gc": [],
+        "cols": [
+          "name",
+          "stage",
+          "owner",
+          "size"
+        ],
+        "sum": {
+          "size": "sum"
+        },
+        "sort": {
+          "k": "size",
+          "d": -1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "all",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "status",
+                "o": "in",
+                "v": [
+                  "Open"
+                ]
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          },
+          {
+            "k": "size",
+            "how": "sum"
+          }
+        ],
+        "goal": "annualQuota",
+        "vs": "remaining"
+      }
+    },
+    {
+      "id": "dash-pace",
+      "type": "opps",
+      "title": "Funded this year against pace",
+      "description": "Facility size funded in each month this year, against the annual goal",
+      "scope": "Certified",
+      "ownerId": "usr_admin",
+      "lastRun": "2026-08-13",
+      "runCount": 52,
+      "favorite": false,
+      "lastOpened": null,
+      "definition": {
+        "title": "Funded this year against pace",
+        "gr": [
+          "fmonth"
+        ],
+        "gc": [],
+        "cols": [
+          "name",
+          "owner",
+          "funded",
+          "size"
+        ],
+        "sum": {
+          "size": "sum"
+        },
+        "sort": {
+          "k": "funded",
+          "d": 1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "all",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "status",
+                "o": "in",
+                "v": [
+                  "Won"
+                ]
+              },
+              {
+                "field": "funded",
+                "o": "rel",
+                "v": {
+                  "r": "thisy",
+                  "n": 30
+                }
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          },
+          {
+            "k": "size",
+            "how": "sum"
+          }
+        ],
+        "goal": "annualQuota"
+      }
+    },
+    {
+      "id": "dash-attain",
+      "type": "opps",
+      "title": "Goal attainment, by BDO",
+      "description": "Funded this year by each BDO, against their annual goal",
+      "scope": "Certified",
+      "ownerId": "usr_admin",
+      "lastRun": "2026-08-13",
+      "runCount": 48,
+      "favorite": false,
+      "lastOpened": null,
+      "definition": {
+        "title": "Goal attainment, by BDO",
+        "gr": [
+          "owner"
+        ],
+        "gc": [],
+        "cols": [
+          "name",
+          "product",
+          "funded",
+          "size"
+        ],
+        "sum": {
+          "size": "sum"
+        },
+        "sort": {
+          "k": "size",
+          "d": -1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "all",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "status",
+                "o": "in",
+                "v": [
+                  "Won"
+                ]
+              },
+              {
+                "field": "funded",
+                "o": "rel",
+                "v": {
+                  "r": "thisy",
+                  "n": 30
+                }
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          },
+          {
+            "k": "size",
+            "how": "sum"
+          }
+        ],
+        "goal": "annualQuota"
+      }
+    },
+    {
+      "id": "dash-snap",
+      "type": "hist",
+      "title": "Open pipeline at month end, by stage",
+      "description": "Opportunities open at each month end this year, and today, by stage, at today's facility size",
+      "scope": "Certified",
+      "ownerId": "usr_admin",
+      "lastRun": "2026-08-12",
+      "runCount": 34,
+      "favorite": false,
+      "lastOpened": null,
+      "definition": {
+        "title": "Open pipeline at month end, by stage",
+        "gr": [
+          "at"
+        ],
+        "gc": [
+          "stage"
+        ],
+        "cols": [
+          "opp",
+          "in",
+          "product",
+          "size"
+        ],
+        "sum": {
+          "size": "sum"
+        },
+        "sort": null,
+        "gsort": {},
+        "f": {
+          "owner": "all",
+          "root": {
+            "op": "and",
+            "items": []
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          },
+          {
+            "k": "size",
+            "how": "sum"
+          }
+        ],
+        "snap": "month"
+      }
+    },
+    {
+      "id": "dash-funnel",
+      "type": "hist",
+      "title": "Stage conversion",
+      "description": "Opportunities created this year, by each stage they reached",
+      "scope": "Certified",
+      "ownerId": "usr_admin",
+      "lastRun": "2026-08-11",
+      "runCount": 32,
+      "favorite": false,
+      "lastOpened": null,
+      "definition": {
+        "title": "Stage conversion",
+        "gr": [
+          "stage"
+        ],
+        "gc": [],
+        "cols": [
+          "opp",
+          "in",
+          "out",
+          "product",
+          "size"
+        ],
+        "sum": {},
+        "sort": {
+          "k": "in",
+          "d": 1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "all",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "stage",
+                "o": "in",
+                "v": [
+                  "Qualification",
+                  "Structuring",
+                  "Proposal",
+                  "Underwriting",
+                  "Won"
+                ]
+              },
+              {
+                "field": "created",
+                "o": "rel",
+                "v": {
+                  "r": "thisy",
+                  "n": 30
+                }
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          }
+        ],
+        "uniq": "opp"
+      }
+    },
+    {
+      "id": "dash-moves",
+      "type": "fch",
+      "title": "Expected close dates moved this year",
+      "description": "Close-date changes this year, by opportunity, with the days each moved later",
+      "scope": "Certified",
+      "ownerId": "usr_admin",
+      "lastRun": "2026-08-09",
+      "runCount": 26,
+      "favorite": false,
+      "lastOpened": null,
+      "definition": {
+        "title": "Expected close dates moved this year",
+        "gr": [
+          "rec"
+        ],
+        "gc": [],
+        "cols": [
+          "old",
+          "nv",
+          "at",
+          "later"
+        ],
+        "sum": {
+          "later": "sum"
+        },
+        "sort": {
+          "k": "at",
+          "d": -1
+        },
+        "gsort": {},
+        "f": {
+          "owner": "all",
+          "root": {
+            "op": "and",
+            "items": [
+              {
+                "field": "field",
+                "o": "in",
+                "v": [
+                  "Expected close"
+                ]
+              },
+              {
+                "field": "at",
+                "o": "rel",
+                "v": {
+                  "r": "thisy",
+                  "n": 30
+                }
+              }
+            ]
+          }
+        },
+        "tog": {
+          "rc": true,
+          "det": true,
+          "sub": true,
+          "tot": true
+        },
+        "chart": null,
+        "figs": [
+          {
+            "k": "_rc"
+          }
+        ]
+      }
+    }
+  ],
+  "dashboards": [
+    {
+      "id": "pipeline-review",
+      "name": "Pipeline review",
+      "scope": "Team",
+      "ownerId": "usr_admin",
+      "cards": [
+        {
+          "report": "dash-open",
+          "display": "number",
+          "measure": "size",
+          "span": 3
+        },
+        {
+          "report": "dash-funded",
+          "display": "number",
+          "measure": "size",
+          "span": 3
+        },
+        {
+          "report": "dash-win",
+          "display": "number",
+          "measure": "rate",
+          "span": 3
+        },
+        {
+          "report": "dash-cov",
+          "display": "number",
+          "measure": "rate",
+          "span": 3
+        },
+        {
+          "report": "dash-pace",
+          "display": "pace",
+          "measure": "size",
+          "span": 8
+        },
+        {
+          "report": "dash-attain",
+          "display": "bullet",
+          "measure": "size",
+          "span": 4
+        },
+        {
+          "report": "dash-snap",
+          "display": "stack",
+          "measure": "size",
+          "span": 8
+        },
+        {
+          "report": "dash-funnel",
+          "display": "funnel",
+          "measure": "count",
+          "span": 4
+        },
+        {
+          "report": "dash-moves",
+          "display": "slip",
+          "measure": "size",
+          "span": 12
+        }
+      ]
     }
   ],
   "partners": [
@@ -175968,6 +176863,7 @@ function route(){
   const view = parts[0] || 'home';
   const id = parts[1];
   if(document.getElementById('view-reports').classList.contains('active') && hash!==RP_AT) rpLeave(view!=='reports');   // O5, O6 (D505), H4
+  if(document.getElementById('view-dashboards').classList.contains('active') && view!=='dashboards') dsLeave();   // D524: O22, O36
 
   /* D240: aria-current="page" alongside .active, kept in sync here since this is the one place
      the active route is ever decided. */
@@ -175992,6 +176888,7 @@ function route(){
     contact: 'Contact',
     contacts: 'Contacts',
     reports: 'Reports',
+    dashboards: 'Dashboards',
   };
 
   if(view==='home'){ showView('view-home'); renderHome(); }
@@ -176126,7 +177023,8 @@ function route(){
     } else lpReset('contacts');
     renderContacts(); showView('view-contacts');
   }
-  else if(view==='reports'){ rpEnter(); showView('view-reports'); rpDraw('now'); }   // D500: the starter report, until Reports home is built
+  else if(view==='reports'){ rpEnter(); showView('view-reports'); rpDraw('now'); }
+  else if(view==='dashboards'){ showView('view-dashboards'); dsEnter(); }   // D524: drawn showing, so each chart takes its real width (O13)   // D500: the starter report, until Reports home is built
   else if(view==='network'){ renderStub('view-network','Network','The full trade-relationship graph explorer. This pass wires network insight into the Opportunity record only; the standalone explorer is next.'); showView('view-network'); }
   else if(view==='bdoperf'){ renderStub('view-bdoperf','BDO Performance','Rep-level created/lost/won/activity intelligence — exec-only. Not built in this skeleton pass.'); showView('view-bdoperf'); }
   else if(view==='benchmarking'){ renderStub('view-benchmarking','Benchmarking','Cross-firm benchmarking is a phase-2 network-effect play with a real cold-start problem — shown to Dan as a vision panel, not a built feature.'); showView('view-benchmarking'); }
@@ -176530,7 +177428,7 @@ let MODAL_OPEN_KEY = null;
 /* D312: the scroll-edge fade. Called after anything that renders a scrolling area inside a surface
    (a modal opening or refreshing, a drill-down surface, the Board); a scroll or a window resize
    re-checks it through the listeners below. */
-const FADE_SEL = '.dd-scroll, .modal-body, .kcol-body, .act-scroll, .act-up-scroll';   // History (D373), Upcoming (D374)
+const FADE_SEL = '.dd-scroll, .modal-body, .kcol-body, .act-scroll, .act-up-scroll, .ds-body .ds-tbl';   // D525: a dashboard Table display (O40)   // History (D373), Upcoming (D374)
 function fadeEdges(el){
   if(!el) return;
   el.classList.toggle('fade-top', el.scrollTop > 0);
@@ -184285,6 +185183,11 @@ function renderStub(viewId, title, note){
 const RP_STATUS = {open:'Open', won:'Won', lost:'Lost'};
 const rpPros = o=>PROSPECTS[o.accountId]||{};
 const rpQtr = s=>{ if(!s) return ''; const p = s.split('-'); return 'Q'+(Math.floor((+p[1]-1)/3)+1)+' '+p[0]; };
+/* D523: a month as "Jan 2026", sorted by date, with no month ("None") last */
+const RP_MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const rpMonth = s=>s ? RP_MON[+s.slice(5,7)-1]+' '+s.slice(0,4) : '';
+const rpMonthAt = v=>{ const p = String(v).split(' '), m = RP_MON.indexOf(p[0]); return m<0 ? Infinity : (+p[1])*12+m; };
+const rpMonthCmp = (a,b)=>rpMonthAt(a)-rpMonthAt(b);
 const rpQtrSort = (a,b)=>{ const pa = a.split(' '), pb = b.split(' '); return (+pa[1]-+pb[1]) || (pa[0]<pb[0]?-1:pa[0]>pb[0]?1:0); };
 /* the fields an Opportunities report can use, grouped by object as the Fields pane shows them; fields reached through a
    relationship read by path (RESEARCH_17 §14, O46). Yield reads "Pricing" (D379, O23). Stale in stage is the app's
@@ -184311,6 +185214,10 @@ const RP_OPP_F = {
   partner:{l:'Referral partner > Name', s:'Name', o:'Referral partner', ty:'Abc', t:'lookup', g:1, get:o=>o.referralPartnerId?((PARTNERS[o.referralPartnerId]||{}).name||''):''},
   ptype:{l:'Referral partner > Partner type', s:'Partner type', o:'Referral partner', ty:'Pick', g:1, get:o=>o.referralPartnerId?((PARTNERS[o.referralPartnerId]||{}).partnerType||''):''},
   stale:{l:'Stale in stage', o:'Opportunity', ty:'Pick', g:1, get:o=>attnStale(o) ? 'Yes' : 'No', order:['Yes','No']},
+  /* D523: the dates the dashboard's reports filter on, and the funded month its pace chart reads (spec D522, O8, O9, O12) */
+  funded:{l:'Funded date', o:'Opportunity', ty:'Date', date:1, g:1, get:o=>o.fundedDate||null},
+  closed:{l:'Closed date', o:'Opportunity', ty:'Date', date:1, g:1, get:o=>o.outcome==='open' ? null : closedDateOf(o)},
+  fmonth:{l:'Funded month', o:'Opportunity', ty:'Pick', g:1, get:o=>rpMonth(o.fundedDate), cmp:rpMonthCmp},
 };
 /* the open report's type sets these three (rpUse): its fields, its related records and the Fields pane's objects */
 let RPF = RP_OPP_F, RP_OBJS = ['Opportunity','Account','Referral partner'];
@@ -184339,11 +185246,13 @@ function rpGroupBy(list, k, dir){
   const f = RPF[k], m = new Map();
   list.forEach(o=>{ const v = rpGval(k,o); if(!m.has(v)) m.set(v, []); m.get(v).push(o); });
   const keys = [...m.keys()];
-  if(f.order) keys.sort((a,b)=>{ const ia = f.order.indexOf(a), ib = f.order.indexOf(b); return (ia<0?99:ia)-(ib<0?99:ib); });
-  else if(f.date) keys.sort(rpQtrSort); else keys.sort((a,b)=>a.localeCompare(b));
+  keys.sort(rpGroupCmp(f));
   if(dir===-1) keys.reverse();
   return keys.map(v=>({v, list:m.get(v)}));
 }
+/* the order groups take: the field's own order, its comparison (D523, months), quarters for a date, else A to Z */
+const rpGroupCmp = f=>f.order ? (a,b)=>{ const ia = f.order.indexOf(a), ib = f.order.indexOf(b); return (ia<0?99:ia)-(ib<0?99:ib); }
+  : f.cmp || (f.date ? rpQtrSort : (a,b)=>a.localeCompare(b));
 /* an Account field repeats on every opportunity of that account: each account counts once (O12) */
 const rpPerAcct = (list, k)=>{ if(RPF[k].o!=='Account') return list; const seen = new Set(); return list.filter(o=>!seen.has(o.accountId) && seen.add(o.accountId)); };
 function rpAgg(list, k, how){
@@ -184522,7 +185431,7 @@ const RP_TYPES = {
     noun:['stage entry','stage entries'], from:r=>r.h.enteredDate,
     desc:'Every move between stages, with the date entered and the days spent there.',
     q:['How long do opportunities sit in Underwriting?','How many reached Proposal this quarter?'],
-    rows:()=>allOpps().flatMap(o=>(STAGEHIST[o.id]||[]).map((h,i)=>({id:o.id+'_'+i, accountId:o.accountId, bdoId:o.bdoId, o, h}))),
+    rows:c=>c && c.snap==='month' ? rpSnapRows() : allOpps().flatMap(o=>(STAGEHIST[o.id]||[]).map((h,i)=>({id:o.id+'_'+i, accountId:o.accountId, bdoId:o.bdoId, o, h}))),
     F:()=>({
       opp:rpF('Opportunity','Opportunity','Abc', r=>r.o.name, {link:r=>'#/opp/'+r.o.id}),
       stage:rpF('Stage','Stage history','Pick', r=>rpStageName(r.h.stage), {g:1, order:TRACK_STAGES.concat(['Won','Lost'])}),
@@ -184533,6 +185442,8 @@ const RP_TYPES = {
       status:rpF('Status','Opportunity','Pick', r=>RP_STATUS[r.o.outcome], {g:1, order:['Open','Won','Lost']}),
       owner:rpF('Owner','Opportunity','Abc', r=>rpPerson(r.bdoId), {g:1}),
       size:rpF('Facility size','Opportunity','$', r=>r.o.facilitySize, {num:'money'}),
+      created:rpF('Opportunity > Created date','Opportunity','Date', r=>r.o.createdDate, {s:'Created date', date:1, g:1}),   // D523
+      at:rpF('Month end','Stage history','Pick', r=>r.at||'', {g:1, order:RP_MON.concat(['Today'])}),   // D523: set on a month-end reading (snap)
     }),
     REL:()=>({}), OBJS:['Stage history','Opportunity'],
     def:()=>rpCfg('hist', ['opp','stage','in','out','dur','product'], {owner:'me', root:{op:'and', items:[rpRelDate('in','thisy')]}}, {sort:{k:'in', d:-1}})},
@@ -184542,13 +185453,16 @@ const RP_TYPES = {
     q:['Which close dates moved later this quarter?','Which facility sizes changed after Proposal?'],
     rows:()=>Object.values(AUDIT_BY_OPP).flat().map((e,i)=>{ const o = rpOppOf(e.opportunityId); return {id:e.id||('chg_'+i), accountId:o.accountId, bdoId:e.changedBy||null, e, o}; }),
     F:()=>({
-      rec:rpF('Opportunity','Opportunity','Abc', r=>r.o.name||'', {link:r=>'#/opp/'+r.o.id}),
+      rec:rpF('Opportunity','Opportunity','Abc', r=>r.o.name||'', {g:1, key:r=>r.o.id, link:r=>'#/opp/'+r.o.id}),   // D523: groupable, one group per opportunity
       field:rpF('Field','Field change','Pick', r=>RP_FIELD_NAMES[r.e.field]||r.e.field, {g:1}),
       old:rpF('Old value','Field change','Abc', r=>rpChangeText(r.e.field, r.e.oldValue)),
       nv:rpF('New value','Field change','Abc', r=>rpChangeText(r.e.field, r.e.newValue)),
       owner:rpF('Changed by','Field change','Abc', r=>rpPerson(r.bdoId), {g:1}),
       at:rpF('Changed','Field change','Date', r=>r.e.changedAt, {date:1, g:1}),
       product:rpF('Product','Opportunity','Pick', r=>productLabel(r.o.productType), {g:1, order:['Factoring','ABL','Term Loan']}),
+      /* D523: how many days a close-date change moved the date (negative when earlier), and the opportunity's size */
+      later:rpF('Days later','Field change','#', r=>r.e.field==='expectedCloseDate' && r.e.oldValue && r.e.newValue ? daysBetween(r.e.oldValue, r.e.newValue) : null, {num:'int'}),
+      size:rpF('Opportunity > Facility size','Opportunity','$', r=>r.o.facilitySize, {s:'Facility size', num:'money'}),
     }),
     REL:()=>({}), OBJS:['Field change','Opportunity'],
     def:()=>rpCfg('fch', ['rec','field','old','nv','owner','at'], {owner:'all', root:{op:'and', items:[rpRelDate('at','thisq')]}}, {sort:{k:'at', d:-1}})},
@@ -184557,12 +185471,63 @@ const RP_TYPE_ORDER = ['opps','accts','contacts','acts','liens','docs','hist','f
 Object.values(RP_TYPES).forEach(T=>{ const mk = T.F; let f = null; T.F = ()=>f || (f = mk()); });   // each type's field table is built once
 const rpT = ()=>RP_TYPES[(rpC()||{}).type||'opps'];
 let RP_ROWS = null;   // the open type's rows, read once per draw (rpDraw clears it)
-const rpTypeRows = ()=>RP_ROWS || (RP_ROWS = rpT().rows());
+const rpTypeRows = ()=>RP_ROWS || (RP_ROWS = rpT().rows(rpC()));   // a type may read the report's own settings (D523, snap)
 /* switches the engine to a type: its fields, related records and the Fields pane's objects */
 function rpUse(type){
   const T = RP_TYPES[type||'opps'];
   if(RPF!==T.F()){ RP_ROWS = null; RP_IDX = null; }
   RPF = T.F(); RP_REL = T.REL(); RP_OBJS = T.OBJS;
+}
+/* D523: a month-end reading from stage history, the rows of a hist report with snap 'month'. One row for each opportunity
+   open at each month end this year, and today: the stage entry current on that date (entered on or before it, not yet
+   exited), in one of the four open stages. Facility size is today's (the audit log's size edits are not unwound). */
+function rpSnapRows(){
+  const yr = TODAY.slice(0,4), ends = [];
+  for(let m=1; m<+TODAY.slice(5,7); m++) ends.push([RP_MON[m-1], rpIso(new Date(Date.UTC(+yr, m, 0)))]);
+  ends.push(['Today', TODAY]);
+  return ends.flatMap(([at, d])=>allOpps().map(o=>{
+    const h = getStageHistory(o.id).find(x=>x.enteredDate<=d && (!x.exitedDate || x.exitedDate>d));
+    return h && TRACK_STAGES.includes(h.stage) ? {id:o.id+'_'+at, accountId:o.accountId, bdoId:o.bdoId, o, h, at} : null; }).filter(Boolean));
+}
+/* D523: a saved report read without opening it; the dashboard reads every card through here. The report's own type,
+   Show me and filters, grouped by its first grouping and split by its column grouping, in one pass; the open report's
+   engine state is put back after. Beside the filters a report may carry: uniq 'opp' (each opportunity counted once in a
+   group: stage history repeats the current stage on open opportunities, D297), goal 'annualQuota' (rpGoal), rate (the
+   share of rows whose field holds a value) and vs 'remaining' (the measure over the goal still to fund). Count is
+   records; size is the type's facility size. */
+function rpEval(def){
+  const keep = [RPF, RP_REL, RP_OBJS, RP_ROWS, RP_IDX], T = RP_TYPES[def.type];
+  RPF = T.F(); RP_REL = T.REL(); RP_OBJS = T.OBJS; RP_IDX = null;
+  try{
+    const rows = T.rows(def).filter(o=>(def.f.owner==='all' || o.bdoId===CURRENT_BDO_ID) && rpTestGroup(o, def.f.root));
+    const sizeOf = RPF.size ? r=>RPF.size.get(r)||0 : ()=>0;
+    const one = list=>{ if(def.uniq!=='opp') return list; const seen = new Set(); return list.filter(r=>{ const id = (r.o||r).id; return !seen.has(id) && seen.add(id); }); };
+    const stat = list=>{ const u = one(list), s = {};
+      Object.keys(def.sum||{}).forEach(k=>{ if(RPF[k] && k!=='size') s[k] = rpAgg(u, k, def.sum[k]); });
+      return {n:u.length, v:u.reduce((a,r)=>a+sizeOf(r),0), sums:s, list:u}; };
+    const split = (list, k)=>{ const f = RPF[k], m = new Map();
+      list.forEach(r=>{ const key = f.key ? f.key(r) : rpGval(k, r); if(!m.has(key)) m.set(key, {k:key, label:rpGval(k, r), list:[]}); m.get(key).list.push(r); });
+      const cmp = rpGroupCmp(f); return [...m.values()].sort((a,b)=>cmp(a.label, b.label)); };
+    const gk = (def.gr||[])[0], ck = (def.gc||[])[0];
+    const groups = gk && RPF[gk] ? split(rows, gk).map(g=>Object.assign({k:g.k, label:g.label},
+      stat(g.list), ck && RPF[ck] ? {by:Object.fromEntries(split(g.list, ck).map(x=>[x.label, stat(x.list)]))} : {})) : [];
+    const res = Object.assign({rows, groups, goal:rpGoal(def)}, stat(rows));
+    if(def.rate){ const f = RPF[def.rate.k], hit = res.list.filter(r=>String(f.get(r))===def.rate.v).length; res.rate = {hit, of:res.n, share:res.n ? hit/res.n : 0}; }
+    if(def.vs==='remaining' && res.goal) res.ratio = res.v/Math.max(res.goal.goal-res.goal.funded, 1);
+    return res;
+  } finally { [RPF, RP_REL, RP_OBJS, RP_ROWS, RP_IDX] = keep; }
+}
+/* D523: a report's goal, the BDOs' annual goals (annualQuota) in its Show me scope, and the pace by today: the goal
+   prorated by the share of the calendar year elapsed, a straight line (D253's execGoalStats). Funded is facility size won
+   with a funded date this year, in the same scope. Per BDO for goal bars. */
+function rpGoal(def){
+  if(!def || def.goal!=='annualQuota') return null;
+  const yr = TODAY.slice(0,4), share = execGoalStats().paceShare, mine = def.f.owner!=='all';
+  const per = D.bdos.filter(b=>!mine || b.id===CURRENT_BDO_ID).map(b=>{
+    const won = allOpps().filter(o=>o.bdoId===b.id && o.outcome==='won' && (o.fundedDate||'').slice(0,4)===yr);
+    return {id:b.id, name:b.name, goal:b.annualQuota, funded:sumFacility(won)}; });
+  const goal = per.reduce((s,b)=>s+b.goal,0);
+  return {goal, share, pace:goal*share, funded:per.reduce((s,b)=>s+b.funded,0), per};
 }
 /* the counted noun the engine writes (E3): "52 stage entries", "No accounts match…", the matrix's "All …" row */
 const rpNounN = n=>n+' '+rpT().noun[n===1?0:1];
@@ -185899,6 +186864,445 @@ document.addEventListener('pointerup', ()=>rpPdEnd(false));
 document.addEventListener('pointercancel', ()=>rpPdEnd(true));
 document.addEventListener('keydown', e=>{ if(e.key==='Escape' && RP_PD && RP_PD.on) rpPdEnd(true); });   // Escape cancels the drag (O14)
 
+
+/* ---------- the Dashboards page (D524, D525; spec Other/mocks/dashboard-spec-v3.html, O1 to O41, D522) ----------
+   One dashboard, the dataset's "Pipeline review" (D523). Every card is a saved report read through rpEval (RESEARCH_18
+   confirmed rules); its display, measure and span belong to the card, its data to the report (O29). A card's report is
+   read once per visit (DS.data), so a view switch, a move or a resize redraws from what was read. Number cards that sit
+   side by side and fit one row draw as one metric strip (D475, O6). Charts take the dashboard colours of D521: the stage
+   ramp, the product colours, one solid for unordered groups. */
+const DS_DASH = (D.dashboards||[])[0] || null;
+const DS_MON = RP_MON;
+/* what a card's display can switch to, by the display it ships with (O27); Donut only for four groups or fewer, part
+   to whole (D478); a ratio has one display */
+const DS_OPTS = {number:['number','hbar','vbar','donut','table'], pace:['pace','vbar','table'], bullet:['bullet','hbar','table'],
+  stack:['stack','vbar','table'], funnel:['funnel','hbar','vbar','table'], slip:['slip']};
+const DS_DISP_LABEL = {hbar:'Horizontal bar', vbar:'Vertical bar', donut:'Donut', funnel:'Funnel', number:'Number', table:'Table', pace:'Line with pace', bullet:'Goal bars', stack:'Stacked bar', slip:'Table'};
+const DS_SIZE_NAME = {3:'Compact', 4:'Small', 6:'Medium', 8:'Large', 12:'Full width'};
+/* card copy (O29): the one-line scope each display states, and the reason a measure is fixed. Keyed by report. */
+const DS_COPY = {
+  'dash-win':{fixed:'Win rate', why:'This figure is a ratio, so it has one display and one measure.'},
+  'dash-cov':{fixed:'Coverage', why:'This figure is a ratio, so it has one display and one measure.'},
+  'dash-pace':{scope:{pace:'Cumulative facility size funded, against a straight line to the annual goal', vbar:'Facility size funded in each month', table:'Funded in each month'},
+    fixed:'Facility size', why:'Goals are set in dollars, so this card measures facility size.'},
+  'dash-attain':{scope:{bullet:'Bar: funded this year. Tick: pace today', hbar:'Facility size funded this year', table:'Funded this year'},
+    fixed:'Facility size', why:'Goals are set in dollars, so this card measures facility size.'},
+  'dash-snap':{scope:{_count:'Opportunities open on each date', _size:'Facility size open on each date'}},
+  'dash-funnel':{scope:{_all:'Created this year, furthest stage reached'}},
+  'dash-moves':{fixed:'Facility size', why:'This card lists opportunities, so it has one display.'},
+};
+const DS = {cards:[], layout:[], data:{}, tbl:{}, editing:false, snap:null, undo:[], edit:null, add:false, fav:true, focus:null};
+const dsView = ()=>document.getElementById('view-dashboards');
+const dsCard = id=>DS.cards.find(c=>c.id===id);
+const dsLay = id=>DS.layout.find(x=>x.id===id);
+/* the dashboard as shipped: each card from its record and its report (O5) */
+function dsLoad(){
+  DS.cards = DS_DASH ? DS_DASH.cards.map(c=>{ const r = rpEntry(c.report); return r ? {id:c.report, title:r.title, disp:c.display, meas:c.measure, kind:c.display, rep:r} : null; }).filter(Boolean) : [];
+  DS.layout = DS_DASH ? DS_DASH.cards.filter(c=>rpEntry(c.report)).map(c=>({id:c.report, span:c.span})) : [];
+}
+/* a card's report, read once per visit */
+function dsRes(c){ return DS.data[c.id] || (DS.data[c.id] = rpEval(c.rep.cfg)); }
+const dsGoal = c=>dsRes(c).goal;
+const dsRatio = c=>!!(c.rep.cfg.rate || c.rep.cfg.vs);
+const dsStaged = c=>(c.rep.cfg.gr||[])[0]==='stage';
+const dsOrdered = c=>{ const k = (c.rep.cfg.gr||[])[0], f = RP_TYPES[c.rep.cfg.type].F()[k]; return !!(f && (f.order || f.cmp)); };
+const dsTall = c=>c.kind==='pace' || c.kind==='bullet';
+const dsOpts = c=>dsRatio(c) ? ['number'] : DS_OPTS[c.kind].filter(k=>k!=='donut' || dsSeries(c).length<=4);
+/* a card's groups as the displays draw them: {k label, n count, v facility size}. Months read "Jan"; the pace chart
+   reads every month from January to this one, an empty month as 0. */
+function dsSeries(c){
+  const res = dsRes(c);
+  if(c.kind==='pace'){ const by = Object.fromEntries(res.groups.map(g=>[g.label, g]));
+    return DS_MON.slice(0, +TODAY.slice(5,7)).map(m=>{ const g = by[m+' '+TODAY.slice(0,4)]; return {k:m, n:g ? g.n : 0, v:g ? g.v : 0}; }); }
+  return res.groups.map(g=>({k:g.label, n:g.n, v:g.v, by:g.by, sums:g.sums, list:g.list}));
+}
+const dsVal = (c,x)=>c.meas==='count' ? x.n : x.v;
+const dsShort = (c,x)=>c.meas==='count' ? x.n.toLocaleString('en-US') : moneyShort(x.v);
+const dsLong = (c,x)=>c.meas==='count' ? x.n.toLocaleString('en-US')+' opportunities' : moneyPlain(x.v);
+const dsOther = (c,x)=>c.meas==='count' ? moneyPlain(x.v)+' facility size' : x.n.toLocaleString('en-US')+' opportunities';
+const dsTip = (c,x)=>tipAttr(x.k, dsLong(c,x), dsOther(c,x));
+const dsSorted = (c,g)=>dsOrdered(c) ? g : g.slice().sort((a,b)=>dsVal(c,b)-dsVal(c,a));
+const DS_STEPS = TRACK_STAGES.concat(['Won']);
+const dsK = (c,x)=>x.other ? 'k-other' : dsStaged(c) ? 'k-sr-'+Math.max(DS_STEPS.indexOf(x.k), 0) : 'k-brand';
+const dsFold = (s, keep)=>{ if(s.length<=keep+1) return s; const rest = s.slice(keep); return s.slice(0,keep).concat([{k:'Other', other:true, n:rest.reduce((a,x)=>a+x.n,0), v:rest.reduce((a,x)=>a+x.v,0)}]); };
+const dsTight = (c,x,px)=>c.meas==='count' || px>=480 || Math.abs(x.v)>=1e9 ? dsShort(c,x) : '$'+Math.round(x.v/1e6)+'M';   // O18a: under 480px dollar values in millions drop the decimal; $1B and up stays in billions (D525)
+/* the displays (O12 to O21). Each takes the card, its groups and the drawing's own width in px. */
+const DS_DRAW = {
+  donut(c, g){
+    const s = dsFold(g.slice().sort((a,b)=>dsVal(c,b)-dsVal(c,a)), 4);
+    const tot = s.reduce((a,x)=>a+dsVal(c,x),0) || 1, tx = {k:'Total', n:s.reduce((a,x)=>a+x.n,0), v:s.reduce((a,x)=>a+x.v,0)};
+    let off = 0;
+    const arcs = s.map(x=>{ const p = dsVal(c,x)/tot*100, d = Math.max(p-0.8,0), a = '<circle class="'+dsK(c,x)+'" cx="70" cy="70" r="54" pathLength="100" stroke-dasharray="'+d.toFixed(2)+' '+(100-d).toFixed(2)+'" stroke-dashoffset="'+(-off).toFixed(2)+'" transform="rotate(-90 70 70)"'+dsTip(c,x)+'></circle>'; off += p; return a; }).join('');
+    return '<div class="ds-dn"><svg viewBox="0 0 140 140" role="img" aria-label="'+esc(c.title)+'">'+arcs+
+      '<text class="dn-tot" x="70" y="72" text-anchor="middle">'+dsShort(c,tx)+'</text><text class="dn-totl" x="70" y="88" text-anchor="middle">Total</text></svg>'+
+      '<div class="ds-dnl">'+s.map(x=>'<div class="ds-dnrow"'+dsTip(c,x)+'><span class="ds-dnsw '+dsK(c,x)+'"></span><span class="ds-dnname" title="'+esc(x.k)+'">'+esc(x.k)+'</span>'+
+        '<span class="ds-dnval">'+dsShort(c,x)+' · '+Math.round(dsVal(c,x)/tot*100)+'%</span></div>').join('')+'</div></div>';
+  },
+  hbar(c, g){
+    const s = dsSorted(c, g), cap = dsTall(c) ? 8 : 5, shown = s.slice(0,cap), mx = Math.max(...shown.map(x=>dsVal(c,x)), 1);
+    return shown.map(x=>'<div class="ds-hb"'+dsTip(c,x)+'><span class="ds-hbname" title="'+esc(x.k)+'">'+esc(x.k)+'</span><span class="ds-hbtrack"><span class="ds-hbbar '+dsK(c,x)+'" style="width:'+Math.max(dsVal(c,x)/mx*100, 1).toFixed(1)+'%"></span></span>'+
+      '<span class="ds-hbval">'+dsShort(c,x)+'</span></div>').join('')+(s.length>shown.length ? '<div class="ds-count">Top '+cap+' of '+s.length+'</div>' : '');
+  },
+  vbar(c, g, px){
+    const s = dsOrdered(c) ? g : dsFold(dsSorted(c, g), 5), mx = Math.max(...s.map(x=>dsVal(c,x)), 1);
+    return '<div class="ds-vb">'+s.map(x=>'<div class="ds-vcol"'+dsTip(c,x)+'><div class="ds-vtrack"><div class="ds-vval">'+dsTight(c,x,px)+'</div><div class="ds-vbar '+dsK(c,x)+'" style="height:calc((100% - var(--s5)) * '+Math.max(dsVal(c,x)/mx, .01).toFixed(4)+')"></div></div>'+
+      '<div class="ds-vname" title="'+esc(x.k)+'">'+esc(x.k)+'</div></div>').join('')+'</div>';
+  },
+  funnel(c, g){
+    const mx = Math.max(...g.map(x=>dsVal(c,x)), 1);
+    return '<div class="ds-fn">'+g.map((x,i)=>'<div class="ds-fnrow"'+dsTip(c,x)+'><span>'+esc(x.k)+'</span><span class="ds-fntrack"><span class="ds-fnbar '+dsK(c,x)+'" style="width:'+Math.max(dsVal(c,x)/mx*100, 1).toFixed(1)+'%"></span></span>'+
+      '<span class="ds-fnval">'+dsShort(c,x)+'</span></div>'+
+      (i<g.length-1 ? '<div class="ds-fnconv"><span>'+(dsVal(c,x) ? Math.round(dsVal(c,g[i+1])/dsVal(c,x)*100) : 0)+'% moved on</span></div>' : '')).join('')+'</div>';
+  },
+  table(c, g){
+    const s = dsSorted(c, g), head = RP_TYPES[c.rep.cfg.type].F()[(c.rep.cfg.gr||[])[0]];
+    const first = c.kind==='pace' ? 'Month' : c.kind==='stack' ? 'Date' : head ? (head.s || head.l).replace('Owner','BDO') : '';
+    return '<div class="ds-tbl"><table class="tbl"><thead><tr><th>'+esc(first)+'</th><th class="num">Opportunities</th><th class="num">Facility size</th></tr></thead><tbody>'+
+      s.map(x=>'<tr><td class="name" title="'+esc(x.k)+'">'+esc(x.k)+'</td><td class="num">'+x.n.toLocaleString('en-US')+'</td><td class="num">'+moneyPlain(x.v)+'</td></tr>').join('')+'</tbody></table></div>';
+  },
+  /* O12 to O14: funded facility size accumulated by month from Jan 1 to today, against a dashed straight line from $0 on
+     Jan 1 to the goal on Dec 31 (the pace, rpGoal); a vertical line at today. Drawn at the card's real width, never
+     scaled, so its text stays 11px and 12px at every size; four gridlines at $100M steps. */
+  pace(c, g, px){
+    const G = dsGoal(c), W = Math.round(px), H = 320, T = 24, Bo = 28, wide = W>=560, mN = g.length;
+    const x = f=>W*f, y = v=>T+(H-T-Bo)*(1-v/G.goal), fx = m=>m===mN ? G.share : m/12;
+    let run = 0; const cum = g.map((p,i)=>{ run += p.v; return {m:i+1, v:run, n:p.n, add:p.v}; });
+    const pts = [[x(0), y(0)]].concat(cum.map(p=>[x(fx(p.m)), y(p.v)])), path = pts.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' L');
+    const ticks = []; for(let v=100e6; v<=G.goal; v+=100e6) ticks.push(v);
+    const mons = wide ? DS_MON : DS_MON.filter((_,i)=>i%2===0), tx = x(G.share);
+    return '<div class="ds-hero"><svg class="ds-heroSvg" width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(c.title)+'">'+
+      ticks.map(v=>'<line class="g" x1="0" x2="'+W+'" y1="'+y(v).toFixed(1)+'" y2="'+y(v).toFixed(1)+'"></line><text x="0" y="'+(y(v)-6).toFixed(1)+'">$'+(v/1e6)+'M</text>').join('')+
+      mons.map(mn=>{ const i = DS_MON.indexOf(mn); return '<text x="'+(i===0 ? 0 : i===11 ? W : x((i+.5)/12)).toFixed(1)+'" y="'+(H-8)+'" text-anchor="'+(i===0 ? 'start' : i===11 ? 'end' : 'middle')+'">'+mn+'</text>'; }).join('')+
+      '<line class="today" x1="'+tx.toFixed(1)+'" x2="'+tx.toFixed(1)+'" y1="'+T+'" y2="'+(H-Bo)+'"></line><line class="hit" x1="'+tx.toFixed(1)+'" x2="'+tx.toFixed(1)+'" y1="'+T+'" y2="'+(H-Bo)+'"'+tipAttr('Today', fmtDate(TODAY), '')+'></line>'+
+      '<path class="area" d="M'+path+' L'+pts[pts.length-1][0].toFixed(1)+' '+y(0)+' Z"></path>'+
+      '<line class="pace" x1="'+x(0)+'" y1="'+y(0)+'" x2="'+x(1)+'" y2="'+y(G.goal)+'"></line><line class="hit" x1="'+x(0)+'" y1="'+y(0)+'" x2="'+x(1)+'" y2="'+y(G.goal)+'"'+tipAttr('Pace', moneyPlain(G.pace)+' by today', 'A straight line from $0 on Jan 1 to the '+moneyShort(G.goal)+' goal on Dec 31')+'></line>'+
+      '<path class="act" d="M'+path+'"></path>'+
+      cum.map(p=>'<circle class="dot" cx="'+x(fx(p.m)).toFixed(1)+'" cy="'+y(p.v).toFixed(1)+'" r="4"'+tipAttr(DS_MON[p.m-1]+' '+TODAY.slice(0,4), moneyPlain(p.v)+' funded to date', p.n+' funded in the month, '+moneyShort(p.add))+'></circle>').join('')+
+      '<text class="lab" x="'+(tx+10).toFixed(1)+'" y="'+(y(G.funded)+16).toFixed(1)+'">Funded '+moneyShort(G.funded)+'</text>'+
+      '<text class="lab" x="'+(tx-10).toFixed(1)+'" y="'+(y(G.pace)-12).toFixed(1)+'" text-anchor="end">Pace today '+moneyShort(G.pace)+'</text>'+
+      '<text class="lab" x="'+W+'" y="'+(y(G.goal)-8).toFixed(1)+'" text-anchor="end">Goal '+moneyShort(G.goal)+'</text></svg></div>';
+  },
+  /* O15: one bullet graph per BDO, sorted by share of goal: bar = funded this year, tick = pace today, track = the goal */
+  bullet(c){
+    const G = dsGoal(c), rows = G.per.map(b=>({b, p:b.funded/(b.goal||1)})).sort((a,z)=>z.p-a.p);
+    return rows.map(r=>'<div class="ds-bl"'+tipAttr(r.b.name, moneyPlain(r.b.funded)+' funded', 'Goal '+moneyShort(r.b.goal)+', pace today '+moneyShort(r.b.goal*G.share))+'><span class="ds-hbname">'+esc(r.b.name)+'</span>'+
+      '<span class="ds-bltrack"><span class="ds-blbar" style="width:'+Math.min(r.p*100,100).toFixed(1)+'%"></span><span class="ds-bltick" style="left:'+(G.share*100).toFixed(1)+'%"></span></span><span class="ds-blv">'+Math.round(r.p*100)+'%</span></div>').join('');
+  },
+  /* O16, O18a: one column per month end plus Today, the four stages stacked on the stage ramp, Qualification at the bottom */
+  stack(c, g, px){
+    const mx = Math.max(...g.map(s=>dsVal(c,s)), 1), m = c.meas==='count' ? 'n' : 'v', z = {n:0, v:0};
+    return '<div class="ds-stk">'+g.map(s=>'<div class="ds-stkcol"><div class="ds-stktrack"><div class="ds-vval">'+dsTight(c,s,px)+'</div>'+
+      TRACK_STAGES.slice().reverse().map(k=>{ const b = (s.by||{})[k] || z; return '<div class="ds-stkseg k-sr-'+TRACK_STAGES.indexOf(k)+'" style="height:calc((100% - var(--s5)) * '+(b[m]/mx).toFixed(4)+')"'+dsTip(c, {k:k+', '+s.k, n:b.n, v:b.v})+'></div>'; }).join('')+
+      '</div><div class="ds-stkname">'+esc(s.k)+'</div></div>').join('')+'</div><div class="ds-key">'+TRACK_STAGES.map((k,i)=>'<span><i class="k-sr-'+i+'"></i>'+k+'</span>').join('')+'</div>';
+  },
+  /* O18: the six opportunities whose close dates moved the most days later; Times moved is the group's count, Days later
+     its sum of Days later; the size bar in the cell is the opportunity's facility size against the six's largest */
+  slip(c, g){
+    const rows = g.map(x=>({o:x.list[0].o, n:x.n, d:x.sums.later||0})).sort((a,b)=>b.d-a.d), top = rows.slice(0,6), tmx = Math.max(...top.map(x=>x.o.facilitySize), 1);
+    return '<table class="tbl"><thead><tr><th>Opportunity</th><th>Product</th><th>Stage</th><th>BDO</th><th class="num">Facility size</th><th class="num">Times moved</th><th class="num">Days later</th></tr></thead><tbody>'+
+      top.map(x=>'<tr><td class="name" title="'+esc(x.o.name)+'">'+esc(x.o.name)+'</td><td>'+productTagHtml(x.o.productType)+'</td><td>'+stageTagHtml(x.o)+'</td><td class="sec">'+esc((BDOS[x.o.bdoId]||{}).name||'')+'</td>'+
+        '<td class="num"><span class="ds-cellbar"'+tipAttr(x.o.name, moneyPlain(x.o.facilitySize), 'Largest of the six: '+moneyPlain(tmx))+'><i style="width:'+(x.o.facilitySize/tmx*80).toFixed(0)+'px"></i>'+moneyPlain(x.o.facilitySize)+'</span></td><td class="num">'+x.n+'</td><td class="num">'+x.d+'</td></tr>').join('')+'</tbody></table>'+
+      '<div class="ds-count">Top '+top.length+' of '+rows.length+' by days later</div>';
+  },
+};
+const DS_IC = {
+  more:'<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><circle cx="3.5" cy="8" r="1.3"></circle><circle cx="8" cy="8" r="1.3"></circle><circle cx="12.5" cy="8" r="1.3"></circle></svg>',
+  star:'<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.6l1.9 4 4.4.5-3.3 3 .9 4.3L8 11.3l-3.9 2.1.9-4.3-3.3-3 4.4-.5z"/></svg>',
+};
+const dsMenuBtn = c=>'<button class="rh-more" data-dsmore="'+c.id+'" aria-haspopup="menu" aria-label="More for '+esc(c.title)+'">'+DS_IC.more+'</button>';
+/* the drawing's width: the card's content box (O10, O13); before the grid is laid out, from its 12 columns */
+function dsPx(id, span){
+  const el = dsView().querySelector('[data-dscard="'+id+'"] .ds-body'); if(el && el.clientWidth) return el.clientWidth;
+  const w = dsView().querySelector('.ds-grid') ? dsView().querySelector('.ds-grid').clientWidth : dsView().clientWidth, col = (w-24*11)/12;
+  return col*span+24*(span-1)-50;
+}
+const dsBodyHtml = (c, px, asTable)=>'<div class="ds-body'+(c.kind==='slip' && !asTable ? ' auto' : dsTall(c) ? ' tall' : '')+'">'+DS_DRAW[asTable ? 'table' : c.disp](c, dsSeries(c), px)+'</div>';
+/* a number's content (O7 to O9): label, figure, one line beneath; the goal bar where the report has a goal */
+function dsNum(c){
+  const res = dsRes(c), G = res.goal;
+  if(res.rate) return {fig:Math.round(res.rate.share*100)+'%', sub:res.rate.hit+' won of '+res.rate.of+' closed', extra:''};
+  if(c.rep.cfg.vs==='remaining') return {fig:res.ratio.toFixed(1)+'x', sub:'Open pipeline against the '+moneyShort(Math.max(G.goal-G.funded, 0))+' still to fund', extra:''};
+  const fig = c.meas==='count' ? res.n.toLocaleString('en-US') : money(res.v);
+  if(!G) return {fig, sub:c.meas==='count' ? moneyShort(res.v)+' facility size' : res.n+' opportunities', extra:''};
+  return {fig, sub:Math.round(G.funded/G.goal*100)+'% of the '+moneyShort(G.goal)+' goal · '+(c.meas==='count' ? moneyShort(res.v) : res.n+' opportunities'),
+    extra:'<div class="ds-goal"'+tipAttr(c.title, moneyPlain(G.funded), 'Pace today '+moneyShort(G.pace)+', goal '+moneyShort(G.goal))+'><i style="width:'+Math.min(G.funded/G.goal*100,100).toFixed(1)+'%"></i><b style="left:'+Math.min(G.share*100,100).toFixed(1)+'%"></b></div>'};
+}
+function dsCellHtml(l){
+  const c = dsCard(l.id), n = dsNum(c);
+  return '<div class="met ds-tile ds-cell" style="grid-column:span '+l.span+'" data-dscard="'+c.id+'"><div class="ds-cellhead">'+dsGrip(c)+'<div class="met-label" title="'+esc(c.title)+'">'+esc(c.title)+'</div>'+dsMenuBtn(c)+'</div>'+
+    '<div class="met-figure">'+n.fig+'</div><div class="met-sub">'+n.sub+'</div>'+n.extra+dsResizer(c)+'</div>';
+}
+/* the one-line scope states what the card's current display and measure show (O29) */
+const dsScope = c=>{ const s = (DS_COPY[c.id]||{}).scope; if(!s) return ''; return s[c.disp] || s['_'+c.meas] || s._all || ''; };
+function dsCardHtml(l){
+  const c = dsCard(l.id), sc = dsScope(c);
+  return '<div class="panel ds-tile" style="grid-column:span '+l.span+'" data-dscard="'+c.id+'"><div class="panel-header stacked"><div class="toggle-header-top">'+dsGrip(c)+'<div class="panel-title">'+esc(c.title)+'</div>'+dsMenuBtn(c)+'</div>'+
+    (sc ? '<div class="panel-scope toggle-scope" title="'+esc(sc)+'">'+sc+'</div>' : '')+'</div><div class="panel-body">'+dsBodyHtml(c, dsPx(c.id, l.span), DS.tbl[c.id])+'</div>'+dsResizer(c)+'</div>';
+}
+/* number cards next to each other, as many as fit 12 columns, draw as one strip; the next starts a new strip (O6) */
+function dsGridInner(){
+  let out = '', i = 0;
+  while(i<DS.layout.length){
+    if(dsCard(DS.layout[i].id).disp!=='number'){ out += dsCardHtml(DS.layout[i++]); continue; }
+    const run = []; let tot = 0;
+    while(i<DS.layout.length && dsCard(DS.layout[i].id).disp==='number' && tot+DS.layout[i].span<=12){ tot += DS.layout[i].span; run.push(DS.layout[i++]); }
+    out += '<div class="strip ds-strip" style="grid-column:span '+tot+';grid-template-columns:repeat('+tot+',minmax(0,1fr))">'+run.map(dsCellHtml).join('')+'</div>';
+  }
+  return out;
+}
+/* the header (O2): name, scope and owner, the star and Edit dashboard */
+function dsHeadHtml(){
+  const d = DS_DASH, owner = rpPerson(d.ownerId);
+  return '<div class="ds-headrow"><div><h1 class="page-heading">'+esc(d.name)+'</h1><div class="page-sub">'+esc(d.scope)+' · Owner '+esc(owner)+'</div></div>'+
+    '<div class="ds-actions">'+(DS.editing ? '' : '<button class="ds-star'+(DS.fav?'':' off')+'" data-dsfav="1" aria-label="Favorite" aria-pressed="'+DS.fav+'">'+DS_IC.star+'</button><button class="btn" data-dsedit="1">Edit dashboard</button>')+'</div></div>';
+}
+function dsHtml(){
+  return dsHeadHtml()+dsBarHtml()+'<div class="ds-gridwrap'+(DS.editing ? ' ds-editing' : '')+'">'+(DS.editing ? '<div class="ds-guides">'+'<div></div>'.repeat(12)+'</div>' : '')+
+    '<div class="ds-grid" id="ds-grid">'+dsGridInner()+'</div>'+(DS.layout.length ? '' : '<div class="empty">This dashboard has no cards. '+(DS.editing ? 'Use + Card to add one from your saved reports.' : 'Choose Edit dashboard to add one.')+'</div>')+'</div>';
+}
+/* drawing: the page once on entry; the grid alone after a layout change; one card alone after a view change. Charts
+   whose drawing depends on width are drawn once the grid is laid out, at their real width. */
+function dsDraw(){ const v = dsView(); if(!DS_DASH){ v.innerHTML = '<div class="empty">No dashboard.</div>'; return; } v.innerHTML = dsHtml(); dsRedrawWide(); dsFocus(); }
+function dsDrawGrid(){ const g = document.getElementById('ds-grid');
+  if(!g || !DS.layout.length!==!!dsView().querySelector('.ds-gridwrap > .empty')) return dsDraw();   // the empty state comes or goes (O38)
+  g.innerHTML = dsGridInner(); dsRedrawWide(); dsFocus(); }
+function dsDrawCard(id){ const el = dsView().querySelector('.panel[data-dscard="'+id+'"]'), l = dsLay(id); if(!el || !l) return dsDrawGrid();
+  el.outerHTML = dsCardHtml(l); dsRedrawWide(); dsFocus(); }
+/* the displays laid out by width (pace, vertical and stacked bars) drawn again at their card's measured width */
+function dsRedrawWide(){
+  dsView().querySelectorAll('.panel.ds-tile').forEach(el=>{ const c = dsCard(el.dataset.dscard), body = el.querySelector('.ds-body');
+    if(!c || DS.tbl[c.id] || !body || !/^(pace|vbar|stack)$/.test(c.disp)) return;
+    const w = body.clientWidth; if(w && w!==+body.dataset.px){ body.dataset.px = w; body.innerHTML = DS_DRAW[c.disp](c, dsSeries(c), w); } });
+  dsView().querySelectorAll('.ds-body .ds-tbl').forEach(fadeEdges);   // O40: a table taller than its card scrolls, with the scroll-edge fade
+  dsFitLabels(dsView());
+}
+/* D525 (O18a as amended, Kevin 2026-11-11): on vertical and stacked bars, if any value label is wider than its bar, the
+   chart draws none; the values stay on hover. Measured from rendered widths each time the chart is drawn or resized.
+   Each bar's height already leaves room for its label, so hiding them moves no bar. */
+function dsFitLabels(root){
+  root.querySelectorAll('.ds-vb, .ds-stk').forEach(ch=>{
+    ch.classList.remove('ds-nolab');
+    const over = [...ch.querySelectorAll('.ds-vval')].some(v=>{ const bar = v.parentElement.querySelector('.ds-vbar, .ds-stkseg') || v.parentElement;
+      const rg = document.createRange(); rg.selectNodeContents(v); return rg.getBoundingClientRect().width > bar.getBoundingClientRect().width + 0.5; });
+    ch.classList.toggle('ds-nolab', over); });
+}
+function dsFocus(){ if(DS.focus){ const el = document.querySelector(DS.focus); if(el) el.focus({preventScroll:true}); DS.focus = null; } }
+/* entering the page: the shipped dashboard on the first visit; each visit reads the reports again (O36 keeps edits) */
+function dsEnter(){ if(!DS.cards.length && !DS.editing) dsLoad(); DS.data = {}; dsDraw(); }
+/* leaving: a View as table look resets (O22); an open panel closes; edit mode and its changes stay for the session (O36) */
+function dsLeave(){ DS.tbl = {}; dsPanelClose(true); }
+
+/* the card menu (O22, O24): outside edit mode, Open report, View as table, then As of and the date */
+function dsMenu(btn){
+  const id = btn.dataset.dsmore, c = dsCard(id), me = '[data-dsmore="'+id+'"]';
+  const items = [];
+  dsMenuItems(c, items);
+  menuFloatOpen(btn, items, it=>dsMenuPick(c, it, me));
+}
+function dsMenuView(c, items){
+  items.push({v:'open', t:'Open report'});
+  if(dsOpts(c).includes('table') && c.disp!=='number' && c.disp!=='table') items.push({v:'table', t:DS.tbl[c.id] ? 'View as chart' : 'View as table'});
+  items.push({sep:true},{head:'As of '+fmtDate(TODAY)});
+}
+function dsMenuPickView(c, it, me){
+  if(it.v==='open'){ location.hash = '#/reports/r/'+c.id; return true; }
+  if(it.v==='table'){ DS.tbl[c.id] = !DS.tbl[c.id]; DS.focus = me; dsDrawCard(c.id); return true; }   // a temporary look: nothing moves, nothing is saved
+  return false;
+}
+/* ---------- edit mode (D525; O23, O25 to O40) ----------
+   Edit dashboard opens a bar under the header (Undo, + Filter, + Card, Cancel, Save), dashed 12-column guides, a
+   handle before each card's title and a corner mark at its bottom right. Every change (move, resize, remove, a card's
+   display, measure or size) goes on the dashboard's own undo stack, apart from the inline-edit stack (EF_UNDO_STACK).
+   Cancel puts back the dashboard as edit mode found it; Save keeps it for the session and toasts. Nothing persists
+   across a reload in the POC (O36). */
+const DS_IC_EDIT = {
+  grip:'<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><circle cx="5.5" cy="3.5" r="1.3"/><circle cx="10.5" cy="3.5" r="1.3"/><circle cx="5.5" cy="8" r="1.3"/><circle cx="10.5" cy="8" r="1.3"/><circle cx="5.5" cy="12.5" r="1.3"/><circle cx="10.5" cy="12.5" r="1.3"/></svg>',
+  corner:'<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M11 5L5 11M11 9l-2 2"/></svg>',
+  x:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg>',
+};
+const dsGrip = c=>DS.editing ? '<button class="ds-handle" data-dsgrip="'+c.id+'" aria-label="Move '+esc(c.title)+'">'+DS_IC_EDIT.grip+'</button>' : '';
+const dsResizer = c=>DS.editing ? '<span class="ds-resize" data-dsresize="'+c.id+'" title="Drag to resize">'+DS_IC_EDIT.corner+'</span>' : '';
+const dsBarHtml = ()=>DS.editing ? '<div class="ds-editbar"><b>Editing '+esc(DS_DASH.name)+'</b><span>Drag a card by its handle to move it. Drag its corner to resize.</span><span class="ds-grow"></span>'+
+  '<button class="btn" data-dsbar="undo"'+(DS.undo.length ? '' : ' disabled')+'>Undo</button><button class="btn" data-dsbar="filter">+ Filter</button><button class="btn" data-dsbar="card">+ Card</button>'+
+  '<button class="btn" data-dsbar="cancel">Cancel</button><button class="btn primary" data-dsbar="save">Save</button></div>' : '';
+/* the smallest span a card takes: 3 for a number, the close-dates table 8, any other 4; the largest 12 (O32) */
+const dsMin = id=>dsCard(id).disp==='number' ? 3 : dsCard(id).kind==='slip' ? 8 : 4;
+const dsSizes = c=>[3,4,6,8,12].filter(n=>n>=dsMin(c.id));
+const dsState = ()=>JSON.stringify({l:DS.layout, c:DS.cards.map(c=>[c.disp, c.meas])});
+const dsRestore = s=>{ const o = JSON.parse(s); DS.layout = o.l; o.c.forEach((v,i)=>{ DS.cards[i].disp = v[0]; DS.cards[i].meas = v[1]; }); };
+function dsEnterEdit(){ if(DS.editing) return false; DS.editing = true; DS.snap = dsState(); DS.undo = []; DS.tbl = {}; return true; }
+/* a change: onto the undo stack, then the grid and the bar redrawn; the header and the rest of the page stay */
+function dsChange(fn){ DS.undo.push(dsState()); fn(); dsDrawGrid(); dsDrawBar(); }
+function dsDrawBar(){ const u = dsView().querySelector('[data-dsbar="undo"]'); if(u) u.disabled = !DS.undo.length; }
+function dsUndo(){ if(!DS.undo.length) return; dsRestore(DS.undo.pop()); DS.focus = DS.undo.length ? '[data-dsbar="undo"]' : '[data-dsbar="save"]'; dsDrawGrid(); dsDrawBar(); dsPanelRefresh(); }
+function dsCancel(){ dsPanelClose(true); dsRestore(DS.snap); DS.editing = false; DS.undo = []; DS.focus = '[data-dsedit]'; dsDraw(); }
+function dsSave(){ dsPanelClose(true); DS.editing = false; DS.undo = []; DS.snap = null; DS.focus = '[data-dsedit]'; dsDraw(); toastShow({icon:'check', title:'Dashboard saved'}); }
+
+/* the card menu: Edit card first everywhere (O22); in edit mode Move earlier, Move later and Remove card (O23, O33) */
+function dsMenuItemsEdit(c, items){
+  items.push({v:'edit', t:'Edit card'});
+  if(!DS.editing) return dsMenuView(c, items);
+  const at = DS.layout.findIndex(x=>x.id===c.id);
+  items.push({v:'up', t:'Move earlier', dis:at===0}, {v:'down', t:'Move later', dis:at===DS.layout.length-1}, {sep:true}, {v:'rm', t:'Remove card'});
+}
+function dsMenuPickEdit(c, it, me){
+  if(dsMenuPickView(c, it, me)) return;
+  if(it.v==='edit'){ if(dsEnterEdit()){ dsDraw(); } dsPanelOpen('edit', c.id); return; }   // O25: Edit card always runs inside edit mode
+  const at = DS.layout.findIndex(x=>x.id===c.id);
+  if(it.v==='up' || it.v==='down'){ DS.focus = me; dsChange(()=>{ const [x] = DS.layout.splice(at, 1); DS.layout.splice(at+(it.v==='up' ? -1 : 1), 0, x); }); }
+  if(it.v==='rm'){ DS.focus = '[data-dsbar="undo"]'; dsChange(()=>{ DS.layout = DS.layout.filter(x=>x.id!==c.id); }); }
+}
+
+/* ---------- the Edit card and + Card panels: the Sheet's scrim and surface, docked at the right (O26), entering and
+   leaving on the Sheet's own motion (surfEnter, surfLeave), reduced motion included ---------- */
+let DS_PANEL = null;   // {el, kind 'edit' | 'add', id, back}
+function dsPanelInner(){
+  const sheet = (title, sub, body)=>'<div class="ds-phead"><div><div class="ds-ptitle">'+title+'</div><div class="ds-psub">'+sub+'</div></div>'+
+    '<button class="rh-more" data-dsclose="1" aria-label="Close">'+DS_IC_EDIT.x+'</button></div><div class="ds-pbody">'+body+'</div><div class="ds-pfoot"><button class="btn primary" data-dsclose="1">Done</button></div>';
+  if(DS_PANEL.kind==='add') return sheet('Add a card', 'From your saved reports', RP_LIB.map(x=>'<div class="ds-addrow"><span>'+esc(x.title)+'<small>'+esc(RP_TYPES[x.type].label)+' · '+esc(x.scope)+'</small></span><span>Add</span></div>').join(''));
+  return sheet('Edit card', esc(dsCard(DS_PANEL.id).title), dsPanelBody());
+}
+/* the preview, then Display, Measure and Size (O26 to O28) */
+function dsPanelBody(){
+  const c = dsCard(DS_PANEL.id), l = dsLay(c.id), n = c.disp==='number' ? dsNum(c) : null, cp = DS_COPY[c.id]||{};
+  const o = (k, on, label, dis)=>'<button class="ds-opt'+(on?' on':'')+'" '+k+(dis?' disabled':'')+' aria-pressed="'+on+'">'+label+'</button>';
+  const prev = n ? '<div class="met-label">'+esc(c.title)+'</div><div class="met-figure">'+n.fig+'</div><div class="met-sub">'+n.sub+'</div>'+n.extra : dsBodyHtml(c, 378);
+  const fixed = !!cp.fixed;   // a ratio, a goal in dollars or a list has one measure, with its reason (O28)
+  return '<div class="ds-prev">'+prev+'</div>'+
+    '<div class="ds-plab">Display</div><div class="ds-opts">'+dsOpts(c).map(k=>o('data-dsdisp="'+k+'"', c.disp===k, DS_DISP_LABEL[k])).join('')+'</div>'+
+    '<div class="ds-plab">Measure</div><div class="ds-opts two">'+(fixed ? o('', true, cp.fixed, true) : o('data-dsmeas="count"', c.meas==='count', 'Count')+o('data-dsmeas="size"', c.meas==='size', 'Facility size'))+'</div>'+
+    (fixed && cp.why ? '<div class="ds-pnote">'+cp.why+'</div>' : '')+
+    '<div class="ds-plab">Size</div><div class="ds-opts">'+(l ? dsSizes(c).map(k=>o('data-dssize="'+k+'"', l.span===k, DS_SIZE_NAME[k])).join('') : '')+'</div>';
+}
+function dsPanelOpen(kind, id){
+  if(DS_PANEL) dsPanelClose(true);
+  surfCancelLeaving('pop');
+  const scrim = document.createElement('div');
+  scrim.className = 'dd-scrim ds-sheet';
+  scrim.innerHTML = '<aside class="dd-pop ds-panel" role="dialog" aria-modal="true" tabindex="-1"></aside>';
+  const box = scrim.querySelector('.ds-panel');
+  DS_PANEL = {el:scrim, kind, id, back:kind==='edit' ? '[data-dsmore="'+id+'"]' : '[data-dsbar="card"]'};
+  box.innerHTML = dsPanelInner(); dsFitLabels(box);
+  box.setAttribute('aria-label', kind==='edit' ? 'Edit card' : 'Add a card');
+  scrim.addEventListener('click', e=>{ if(e.target===scrim || e.target.closest('[data-dsclose]')) dsPanelClose(); else dsPanelClick(e); });
+  scrim.addEventListener('keydown', e=>{ if(e.key==='Tab') trapTab(e, box); if(e.key==='Escape'){ e.stopPropagation(); dsPanelClose(); } });
+  document.body.appendChild(scrim);
+  lockScroll();
+  surfEnter(scrim, 'pop');
+  const first = box.querySelector(kind==='edit' ? '.ds-opt.on:not([disabled])' : '[data-dsclose]');   // O26: focus moves into the panel
+  (first || box).focus();
+}
+/* closing returns focus to what opened it: the card's menu button, or + Card (O26) */
+function dsPanelClose(now){
+  if(!DS_PANEL) return;
+  const {el, back} = DS_PANEL; DS_PANEL = null;
+  unlockScroll();
+  if(now) el.remove(); else surfLeave(el, 'pop');
+  if(!now){ const b = dsView().querySelector(back); if(b) b.focus({preventScroll:true}); }
+}
+/* after a change the panel's body is redrawn in place, no entrance; focus stays on the chosen control */
+function dsPanelRefresh(sel){
+  if(!DS_PANEL || DS_PANEL.kind!=='edit') return;
+  if(!dsLay(DS_PANEL.id)) return dsPanelClose(true);   // its card undone away
+  const body = DS_PANEL.el.querySelector('.ds-pbody'); body.innerHTML = dsPanelBody(); dsFitLabels(body);
+  const f = sel && body.querySelector(sel); if(f) f.focus({preventScroll:true});
+}
+function dsPanelClick(e){
+  if(!DS_PANEL || DS_PANEL.kind!=='edit') return;
+  const c = dsCard(DS_PANEL.id), l = dsLay(c.id);
+  const d = e.target.closest('[data-dsdisp]'), m = e.target.closest('[data-dsmeas]'), z = e.target.closest('[data-dssize]');
+  if(d && !d.disabled && d.dataset.dsdisp!==c.disp){ dsChange(()=>{ const was = c.disp; c.disp = d.dataset.dsdisp;
+      if(c.disp==='number' && was!=='number') l.span = 3;                      // back to a number: Compact, so it rejoins the band (O28)
+      else l.span = Math.max(l.span, dsMin(c.id)); });
+    dsPanelRefresh('[data-dsdisp="'+d.dataset.dsdisp+'"]'); }
+  if(m && !m.disabled && m.dataset.dsmeas!==c.meas){ dsChange(()=>{ c.meas = m.dataset.dsmeas; }); dsPanelRefresh('[data-dsmeas="'+m.dataset.dsmeas+'"]'); }
+  if(z && +z.dataset.dssize!==l.span){ dsChange(()=>{ l.span = +z.dataset.dssize; }); dsPanelRefresh('[data-dssize="'+z.dataset.dssize+'"]'); }
+  const chosen = e.target.closest('.ds-opt:not([disabled])');
+  if(chosen && document.activeElement!==chosen && chosen.isConnected) chosen.focus({preventScroll:true});   // Safari focuses no button on click: the choice keeps focus all the same
+}
+
+/* ---------- moving and resizing (O31 to O33). Both follow the pointer, captured on the handle or the corner, so a
+   press starts them and a plain click leaves nothing behind; nothing is marked draggable, which keeps Safari and Chromium
+   alike. Cards make room by moving in the page while a drag runs; the grid is rebuilt once, when it ends. ---------- */
+let DS_DRAG = null, DS_RS = null;
+document.addEventListener('pointerdown', e=>{
+  const v = dsView(); if(!DS.editing || !v || !v.contains(e.target) || e.button!==0) return;
+  const g = e.target.closest('[data-dsgrip]');
+  if(g){ const el = g.closest('.ds-tile'); DS_DRAG = {el, g, x0:e.clientX, y0:e.clientY, on:false, before:dsState(), at:null}; g.setPointerCapture(e.pointerId); return; }
+  const r = e.target.closest('[data-dsresize]'); if(!r) return;
+  const el = r.closest('.ds-tile'), grid = document.getElementById('ds-grid'), gap = parseFloat(getComputedStyle(grid).columnGap), col = (grid.clientWidth-gap*11)/12, l = dsLay(r.dataset.dsresize);
+  DS_RS = {el, l, x0:e.clientX, w0:l.span*col+(l.span-1)*gap, col, gap, span:l.span, min:dsMin(l.id)};
+  el.classList.add('resizing'); el.insertAdjacentHTML('beforeend', '<span class="ds-sizetag"></span>'); r.setPointerCapture(e.pointerId); e.preventDefault();
+});
+document.addEventListener('pointermove', e=>{
+  if(DS_RS){ const R = DS_RS;
+    R.span = Math.max(R.min, Math.min(12, Math.round((R.w0+(e.clientX-R.x0)+R.gap)/(R.col+R.gap))));
+    if(R.el.classList.contains('ds-cell')){ const st = R.el.parentNode, tot = [...st.children].reduce((a,x)=>a+(x===R.el ? R.span : dsLay(x.dataset.dscard).span), 0);
+      if(tot<=12){ st.style.gridColumn = 'span '+tot; st.style.gridTemplateColumns = 'repeat('+tot+',minmax(0,1fr))'; R.el.style.gridColumn = 'span '+R.span; } }
+    else R.el.style.gridColumn = 'span '+R.span;
+    R.el.querySelector('.ds-sizetag').textContent = R.span+' of 12 columns'+(DS_SIZE_NAME[R.span] ? ', '+DS_SIZE_NAME[R.span] : '');
+    return; }
+  if(!DS_DRAG) return;
+  const Dg = DS_DRAG;
+  if(!Dg.on){ if(Math.hypot(e.clientX-Dg.x0, e.clientY-Dg.y0)<4) return; Dg.on = true; Dg.el.classList.add('dragging'); }
+  /* O31: on the left half of a card, before it; on the right half, after it; below the last card, to the end. A chart card
+     passes the band whole, never into it. */
+  const under = document.elementsFromPoint(e.clientX, e.clientY).find(x=>x.closest && x.closest('.ds-tile') && !Dg.el.contains(x));
+  const grid = document.getElementById('ds-grid');
+  let over = under && under.closest('.ds-tile'), place = null;
+  if(!over){ const last = grid.lastElementChild; if(last && last!==Dg.el && e.clientY>last.getBoundingClientRect().bottom) place = [grid, null]; }
+  else { if(over.classList.contains('ds-cell') && !Dg.el.classList.contains('ds-cell')) over = over.parentNode;
+    const r = over.getBoundingClientRect(), after = e.clientX>r.left+r.width/2; place = [over.parentNode, after ? over.nextSibling : over]; }
+  if(!place) return;
+  const key = place[0].id+'|'+(place[1] ? place[1].dataset.dscard || place[1].className : 'end');
+  if(key===Dg.at) return; Dg.at = key;
+  if(place[1]!==Dg.el) place[0].insertBefore(Dg.el, place[1]);
+});
+function dsPointerEnd(){
+  if(DS_RS){ const {l, span, el} = DS_RS; DS_RS = null; el.classList.remove('resizing');
+    if(span!==l.span) dsChange(()=>{ l.span = span; }); else dsDrawGrid(); return; }
+  if(!DS_DRAG) return;
+  const Dg = DS_DRAG; DS_DRAG = null;
+  if(!Dg.on) return;   // a plain click on the handle: nothing moved
+  const order = [...document.querySelectorAll('#ds-grid [data-dscard]')].map(x=>x.dataset.dscard);
+  if(order.join()!==DS.layout.map(x=>x.id).join()){ DS.undo.push(Dg.before); DS.layout = order.map(id=>dsLay(id)); }
+  DS.focus = '[data-dsgrip="'+Dg.el.dataset.dscard+'"]'; dsDrawGrid(); dsDrawBar();
+}
+document.addEventListener('pointerup', dsPointerEnd);
+document.addEventListener('pointercancel', dsPointerEnd);
+
+/* the bar and the header */
+function dsBar(k, btn){
+  if(k==='undo') dsUndo();
+  if(k==='cancel') dsCancel();
+  if(k==='save') dsSave();
+  if(k==='card') dsPanelOpen('add');
+  if(k==='filter') menuFloatOpen(btn, [{head:'Filter this dashboard by'},{v:'d', t:'Date'},{v:'p', t:'Product'},{v:'b', t:'BDO'},{v:'r', t:'Referral partner'},{v:'c', t:'Channel'}], ()=>{});   // O39: opens, no choice works yet
+}
+document.addEventListener('click', e=>{
+  const v = dsView(); if(!v || !v.contains(e.target)) return;
+  if(e.target.closest('[data-dsedit]')){ dsEnterEdit(); DS.focus = '[data-dsbar="save"]'; dsDraw(); return; }
+  const b = e.target.closest('[data-dsbar]'); if(b && !b.disabled) dsBar(b.dataset.dsbar, b);
+});
+/* Ctrl or Cmd+Z undoes the dashboard's last change, only while the page is in edit mode and no input has focus; caught
+   before the inline-edit handler, so one press never undoes both (O34) */
+document.addEventListener('keydown', e=>{
+  if((e.key!=='z' && e.key!=='Z') || !(e.metaKey || e.ctrlKey) || e.shiftKey || e.altKey) return;
+  const v = dsView(); if(!DS.editing || !v || !v.classList.contains('active')) return;
+  const t = e.target; if(t && (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable)) return;
+  e.preventDefault(); e.stopPropagation(); dsUndo();
+}, true);
+const dsMenuItems = dsMenuItemsEdit, dsMenuPick = dsMenuPickEdit;
+
+/* ---------- events ---------- */
+document.addEventListener('click', e=>{
+  const v = dsView(); if(!v || !v.contains(e.target)) return;
+  const fav = e.target.closest('[data-dsfav]');
+  if(fav){ DS.fav = !DS.fav; fav.classList.toggle('off', !DS.fav); fav.setAttribute('aria-pressed', DS.fav); return; }
+  const more = e.target.closest('[data-dsmore]'); if(more) dsMenu(more);
+});
+/* the drawings sized by width follow the window (O13) */
+window.addEventListener('resize', ()=>{ if(dsView() && dsView().classList.contains('active')) dsRedrawWide(); });
 
 /* ---------- init ---------- */
 /* D240: the footer now shows only the avatar (name/role labels removed from the rail entirely),
